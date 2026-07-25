@@ -8,7 +8,7 @@ const cards = GAMES.map((game) => ({ ...game, best: getLocalBest(game.slug) }))
 <template>
   <div class="home">
     <header class="home-header">
-      <h1>웹게임 허브</h1>
+      <h1>게임 허브</h1>
       <RouterLink class="settings-link" to="/settings" aria-label="설정">⚙️</RouterLink>
     </header>
 
