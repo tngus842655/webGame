@@ -38,16 +38,18 @@ export const WAVE = {
   doubleHpChance: 0.3, // HP 2배 벽돌 등장 확률
 } as const
 
+import type { TranslationKey } from '@/shared/i18n'
+
 export interface UpgradeDef {
   key: 'attack' | 'balls'
-  label: string
+  label: TranslationKey
   baseCost: number
   growth: number // 비용 = baseCost × growth^(레벨-1)
 }
 
 export const UPGRADES: UpgradeDef[] = [
-  { key: 'attack', label: '공격력', baseCost: 15, growth: 1.6 },
-  { key: 'balls', label: '공 개수', baseCost: 30, growth: 1.9 },
+  { key: 'attack', label: 'brick.attack', baseCost: 15, growth: 1.6 },
+  { key: 'balls', label: 'brick.balls', baseCost: 30, growth: 1.9 },
 ]
 
 // UPGRADES와 같은 순서의 버튼 영역

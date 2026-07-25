@@ -8,19 +8,21 @@ export const HISTORY_LEN = 120
 
 export type Phase = 'playing' | 'over'
 
+import type { TranslationKey } from '@/shared/i18n'
+
 export interface NewsEvent {
-  text: string
+  text: TranslationKey
   drift: number
   duration: number
 }
 
 export const EVENTS: NewsEvent[] = [
-  { text: '📰 호재! 신제품 발표', drift: 0.015, duration: 8 },
-  { text: '📰 대규모 투자 유치 성공', drift: 0.02, duration: 6 },
-  { text: '📰 악재! 규제 강화 발표', drift: -0.015, duration: 8 },
-  { text: '📰 실적 부진 소문 확산', drift: -0.02, duration: 6 },
-  { text: '🚀 급등! 매수세 폭주', drift: 0.045, duration: 3 },
-  { text: '💥 급락! 투매 발생', drift: -0.045, duration: 3 },
+  { text: 'stock.ev1', drift: 0.015, duration: 8 },
+  { text: 'stock.ev2', drift: 0.02, duration: 6 },
+  { text: 'stock.ev3', drift: -0.015, duration: 8 },
+  { text: 'stock.ev4', drift: -0.02, duration: 6 },
+  { text: 'stock.ev5', drift: 0.045, duration: 3 },
+  { text: 'stock.ev6', drift: -0.045, duration: 3 },
 ]
 
 export interface StockState {
@@ -32,7 +34,7 @@ export interface StockState {
   cash: number
   qty: number
   drift: number
-  eventText: string
+  eventText: TranslationKey | ''
   eventTimer: number
   nextEventIn: number
 }

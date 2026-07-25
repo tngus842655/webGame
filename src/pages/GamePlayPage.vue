@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { GAMES } from '@/games/registry'
 import type { GameModule } from '@/games/types'
 import { createGameContext } from '@/shared/gameContext'
+import { t } from '@/shared/i18n'
 
 const route = useRoute()
 const router = useRouter()
@@ -36,7 +37,7 @@ onBeforeUnmount(() => {
 <template>
   <div class="play-page">
     <div ref="host" class="game-host"></div>
-    <button class="back-button" type="button" @click="router.push('/')">← 홈</button>
+    <button class="back-button" type="button" @click="router.push('/')">{{ t('common.back') }}</button>
   </div>
 </template>
 

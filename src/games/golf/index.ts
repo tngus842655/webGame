@@ -1,3 +1,4 @@
+import { t } from '@/shared/i18n'
 import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
@@ -166,7 +167,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.textAlign = 'center'
     c.fillStyle = '#BCAAA4'
     c.font = '20px sans-serif'
-    c.fillText(`홀 ${state.holeIndex + 1} / ${LEVELS.length} · 이번 홀 ${state.strokes}타`, 360, 52)
+    c.fillText(t('golf.hole', { a: state.holeIndex + 1, b: LEVELS.length, n: state.strokes }), 360, 52)
     c.fillStyle = '#5D4037'
     c.font = 'bold 48px sans-serif'
     c.fillText(state.score.toLocaleString(), 360, 108)
@@ -182,8 +183,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (state.holeIndex === 0 && state.strokes === 0 && state.phase === 'playing') {
       c.fillStyle = '#33691E'
       c.font = '26px sans-serif'
-      c.fillText('당겨서 조준하고, 놓으면 발사!', 360, 1210)
-      c.fillText('적은 타수로 넣을수록 점수가 높아요', 360, 1250)
+      c.fillText(t('golf.hint1'), 360, 1210)
+      c.fillText(t('golf.hint2'), 360, 1250)
     }
   }
 

@@ -1,3 +1,4 @@
+import { t } from '@/shared/i18n'
 import { CanvasStage } from '../stage'
 import { BOARD, TIERS } from './config'
 import { POP_DURATION, POPUP_DURATION, SPARK_DURATION, type SuikaState } from './state'
@@ -53,8 +54,8 @@ export class SuikaRenderer {
       c.textAlign = 'center'
       c.fillStyle = '#8D6E63'
       c.font = '26px sans-serif'
-      c.fillText('드래그로 조준하고, 놓으면 떨어져요!', 360, 560)
-      c.fillText('같은 과일끼리 닿으면 합쳐집니다', 360, 600)
+      c.fillText(t('suika.hint1'), 360, 560)
+      c.fillText(t('suika.hint2'), 360, 600)
     }
   }
 
@@ -88,7 +89,7 @@ export class SuikaRenderer {
     c.font = '22px sans-serif'
     c.textAlign = 'left'
     c.fillStyle = '#E53935'
-    c.fillText('⚠ 위험선', BOARD.wallLeft + 25, BOARD.dangerY - 12)
+    c.fillText(t('suika.danger'), BOARD.wallLeft + 25, BOARD.dangerY - 12)
     c.globalAlpha = 1
   }
 
@@ -178,7 +179,7 @@ export class SuikaRenderer {
     c.textAlign = 'center'
     c.fillStyle = '#BCAAA4'
     c.font = '22px sans-serif'
-    c.fillText('점수', 360, 60)
+    c.fillText(t('hud.score'), 360, 60)
     c.fillStyle = '#5D4037'
     c.font = 'bold 52px sans-serif'
     c.fillText(state.score.toLocaleString(), 360, 118)
@@ -189,7 +190,7 @@ export class SuikaRenderer {
     c.fill()
     c.fillStyle = '#BCAAA4'
     c.font = '20px sans-serif'
-    c.fillText('다음', 648, 70)
+    c.fillText(t('hud.next'), 648, 70)
     this.drawFruit(648, 118, 0, state.nextTier, Math.min(TIERS[state.nextTier].radius, 30))
   }
 

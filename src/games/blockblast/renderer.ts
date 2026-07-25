@@ -1,3 +1,4 @@
+import { t } from '@/shared/i18n'
 import { CanvasStage } from '../stage'
 import { COLORS, GRID, LAYOUT } from './config'
 import {
@@ -55,8 +56,8 @@ export class BBRenderer {
       c.textAlign = 'center'
       c.fillStyle = '#8D6E63'
       c.font = '26px sans-serif'
-      c.fillText('블록을 끌어서 보드에 놓으세요', 360, 500)
-      c.fillText('가로·세로 한 줄을 채우면 사라져요!', 360, 540)
+      c.fillText(t('bb.hint1'), 360, 500)
+      c.fillText(t('bb.hint2'), 360, 540)
     }
   }
 
@@ -179,7 +180,7 @@ export class BBRenderer {
     c.textAlign = 'center'
     c.fillStyle = '#BCAAA4'
     c.font = '22px sans-serif'
-    c.fillText('점수', 360, 60)
+    c.fillText(t('hud.score'), 360, 60)
     c.fillStyle = '#5D4037'
     c.font = 'bold 52px sans-serif'
     c.fillText(state.score.toLocaleString(), 360, 118)

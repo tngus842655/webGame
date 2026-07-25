@@ -1,3 +1,4 @@
+import { t } from '@/shared/i18n'
 import { playGameOver, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
@@ -16,7 +17,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   let adContinueUsed = false
 
   const overlay = createGameOverOverlay(shell.wrapper, {
-    adButtonLabel: '▶ 광고 보고 이어하기',
+    adLabelKey: 'dodge.ad',
     onRetry() {
       if (state.phase !== 'over') return
       adContinueUsed = false
@@ -94,7 +95,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.textAlign = 'center'
     c.fillStyle = '#BCAAA4'
     c.font = '22px sans-serif'
-    c.fillText('점수', 360, 60)
+    c.fillText(t('hud.score'), 360, 60)
     c.fillStyle = '#5D4037'
     c.font = 'bold 52px sans-serif'
     c.fillText(scoreOf(state).toLocaleString(), 360, 118)
@@ -102,8 +103,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (state.time < 3 && state.phase === 'playing') {
       c.fillStyle = '#8D6E63'
       c.font = '26px sans-serif'
-      c.fillText('드래그로 좌우 이동!', 360, 600)
-      c.fillText('떨어지는 돌을 피해 버티세요', 360, 640)
+      c.fillText(t('dodge.hint1'), 360, 600)
+      c.fillText(t('dodge.hint2'), 360, 640)
     }
   }
 

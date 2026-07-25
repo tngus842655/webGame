@@ -25,7 +25,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   let drag: DragState | null = null
 
   const overlay = createGameOverOverlay(shell.wrapper, {
-    adButtonLabel: '▶ 광고 보고 블록 교체',
+    adLabelKey: 'bb.ad',
     onRetry() {
       if (state.phase !== 'over') return
       adSwapUsed = false

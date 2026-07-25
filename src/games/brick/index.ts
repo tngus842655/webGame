@@ -1,3 +1,4 @@
+import { t } from '@/shared/i18n'
 import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
@@ -26,7 +27,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   let aimingActive = false
 
   const overlay = createGameOverOverlay(shell.wrapper, {
-    adButtonLabel: '▶ 광고 보고 이어하기 (3줄 제거)',
+    adLabelKey: 'brick.ad',
     onRetry() {
       if (state.phase !== 'over') return
       adContinueUsed = false
@@ -92,7 +93,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
           state.popups.push({
             x: rect.x + rect.w / 2,
             y: rect.y - 10,
-            text: `${def.label} UP!`,
+            text: `${t(def.label)} UP!`,
             age: 0,
           })
         }

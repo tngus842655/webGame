@@ -3,6 +3,7 @@ import { onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { GAMES } from '@/games/registry'
 import { getCurrentUserId } from '@/shared/auth'
+import { t } from '@/shared/i18n'
 import { fetchLeaderboard, type LeaderboardEntry } from '@/shared/scores'
 
 const route = useRoute()
@@ -12,16 +13,16 @@ const game = GAMES.find((g) => g.slug === slug)
 const period = ref<'week' | 'all'>('week')
 const entries = ref<LeaderboardEntry[]>([])
 const loading = ref(true)
-const errorMsg = ref('')
+const failed = ref(false)
 const myUserId = ref<string | null>(null)
 
 async function load() {
   loading.value = true
-  errorMsg.value = ''
+  failed.value = false
   try {
     entries.value = await fetchLeaderboard(slug, period.value)
   } catch {
-    errorMsg.value = '랭킹을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.'
+    failed.value = true
   } finally {
     loading.value = false
   }
@@ -38,23 +39,21 @@ watch(period, load)
   <div class="ranking">
     <header class="ranking-header">
       <RouterLink class="back" to="/">←</RouterLink>
-      <h1>{{ game?.title ?? '알 수 없는 게임' }} 랭킹</h1>
+      <h1>{{ t('ranking.title', { name: game ? t(game.titleKey) : t('ranking.unknown') }) }}</h1>
     </header>
 
     <div class="tabs">
       <button type="button" :class="{ active: period === 'week' }" @click="period = 'week'">
-        주간
+        {{ t('ranking.week') }}
       </button>
       <button type="button" :class="{ active: period === 'all' }" @click="period = 'all'">
-        전체
+        {{ t('ranking.all') }}
       </button>
     </div>
 
-    <p v-if="loading" class="notice">불러오는 중…</p>
-    <p v-else-if="errorMsg" class="notice">{{ errorMsg }}</p>
-    <p v-else-if="entries.length === 0" class="notice">
-      아직 기록이 없습니다. 첫 기록의 주인공이 되어보세요!
-    </p>
+    <p v-if="loading" class="notice">{{ t('ranking.loading') }}</p>
+    <p v-else-if="failed" class="notice">{{ t('ranking.error') }}</p>
+    <p v-else-if="entries.length === 0" class="notice">{{ t('ranking.empty') }}</p>
     <ol v-else class="board">
       <li v-for="(entry, i) in entries" :key="entry.user_id" :class="{ me: entry.user_id === myUserId }">
         <span class="rank">{{ i + 1 }}</span>

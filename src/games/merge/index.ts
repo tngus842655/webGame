@@ -1,3 +1,4 @@
+import { t } from '@/shared/i18n'
 import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
@@ -30,7 +31,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   let drag: { from: number; x: number; y: number } | null = null
 
   const overlay = createGameOverOverlay(shell.wrapper, {
-    adButtonLabel: '▶ 광고 보고 하위 아이템 정리',
+    adLabelKey: 'merge.ad',
     onRetry() {
       if (state.phase !== 'over') return
       adClearUsed = false
@@ -111,7 +112,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.textAlign = 'center'
     c.fillStyle = '#BCAAA4'
     c.font = '20px sans-serif'
-    c.fillText(`점수 · 최고 발견: ${ITEMS[state.discovered - 1]}`, 360, 52)
+    c.fillText(`${t('merge.found')}: ${ITEMS[state.discovered - 1]}`, 360, 52)
     c.fillStyle = '#5D4037'
     c.font = 'bold 48px sans-serif'
     c.fillText(state.score.toLocaleString(), 360, 108)
@@ -192,13 +193,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.fillStyle = '#FFFFFF'
     c.font = 'bold 34px sans-serif'
     c.textAlign = 'center'
-    c.fillText('🌱 생성', genButton.x + genButton.w / 2, genButton.y + genButton.h / 2 + 12)
+    c.fillText(`🌱 ${t('merge.gen')}`, genButton.x + genButton.w / 2, genButton.y + genButton.h / 2 + 12)
 
     if (state.score === 0 && state.phase === 'playing') {
       c.fillStyle = '#8D6E63'
       c.font = '24px sans-serif'
-      c.fillText('생성 버튼으로 아이템을 만들고,', 360, 1200)
-      c.fillText('같은 아이템끼리 드래그해 합치세요!', 360, 1232)
+      c.fillText(t('merge.hint1'), 360, 1200)
+      c.fillText(t('merge.hint2'), 360, 1232)
     }
   }
 

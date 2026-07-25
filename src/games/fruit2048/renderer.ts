@@ -1,3 +1,4 @@
+import { t } from '@/shared/i18n'
 import { CanvasStage } from '../stage'
 import { LAYOUT, SIZE, TIERS, cellPos } from './config'
 import type { F2State } from './state'
@@ -27,7 +28,7 @@ export class F2Renderer {
     c.textAlign = 'center'
     c.fillStyle = '#BCAAA4'
     c.font = '22px sans-serif'
-    c.fillText('점수', 360, 60)
+    c.fillText(t('hud.score'), 360, 60)
     c.fillStyle = '#5D4037'
     c.font = 'bold 52px sans-serif'
     c.fillText(state.score.toLocaleString(), 360, 118)
@@ -70,8 +71,8 @@ export class F2Renderer {
       c.textAlign = 'center'
       c.fillStyle = '#8D6E63'
       c.font = '26px sans-serif'
-      c.fillText('스와이프로 과일을 밀어보세요', 360, 1050)
-      c.fillText('같은 과일이 만나면 진화합니다!', 360, 1090)
+      c.fillText(t('f2.hint1'), 360, 1050)
+      c.fillText(t('f2.hint2'), 360, 1090)
     }
   }
 

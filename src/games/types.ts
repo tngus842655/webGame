@@ -1,6 +1,8 @@
+import type { TranslationKey } from '@/shared/i18n'
+
 export interface GameMeta {
   slug: string
-  title: string
+  titleKey: TranslationKey // 표시할 때 t()로 변환
   thumbnail: string
   loader: () => Promise<{ default: GameModule }>
 }

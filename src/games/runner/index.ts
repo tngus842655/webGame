@@ -1,3 +1,4 @@
+import { t } from '@/shared/i18n'
 import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
@@ -30,7 +31,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   let adContinueUsed = false
 
   const overlay = createGameOverOverlay(shell.wrapper, {
-    adButtonLabel: '▶ 광고 보고 이어하기',
+    adLabelKey: 'run.ad',
     onRetry() {
       if (state.phase !== 'over') return
       adContinueUsed = false
@@ -123,7 +124,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.textAlign = 'center'
     c.fillStyle = '#BCAAA4'
     c.font = '22px sans-serif'
-    c.fillText('점수', 360, 60)
+    c.fillText(t('hud.score'), 360, 60)
     c.fillStyle = '#5D4037'
     c.font = 'bold 52px sans-serif'
     c.fillText(scoreOf(state).toLocaleString(), 360, 118)
@@ -131,8 +132,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (state.time < 3 && state.phase === 'playing') {
       c.fillStyle = '#8D6E63'
       c.font = '26px sans-serif'
-      c.fillText('탭 = 점프 (한 번 더 탭하면 2단 점프)', 360, 500)
-      c.fillText('주황 막대는 점프하지 말고 지나가세요!', 360, 540)
+      c.fillText(t('run.hint1'), 360, 500)
+      c.fillText(t('run.hint2'), 360, 540)
     }
   }
 

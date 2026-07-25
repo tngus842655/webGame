@@ -19,7 +19,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   let swipeStart: { x: number; y: number } | null = null
 
   const overlay = createGameOverOverlay(shell.wrapper, {
-    adButtonLabel: '▶ 광고 보고 한 수 되돌리기',
+    adLabelKey: 'f2.ad',
     onRetry() {
       if (state.phase !== 'over') return
       adUndoUsed = false
