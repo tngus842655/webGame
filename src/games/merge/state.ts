@@ -4,7 +4,8 @@ export const COLS = 5
 export const ROWS = 7
 export const GEN_COOLDOWN = 0.8
 
-export const ITEMS = ['🌱', '🌿', '☘️', '🍀', '🌷', '🌹', '🌻', '🌳', '🎄', '⭐', '🌈', '👑']
+// 아이템 단계 수 (그림은 plantArt.ts)
+export const MAX_LEVEL = 12
 
 export const LAYOUT = {
   width: 720,
@@ -35,6 +36,7 @@ export interface MergeState {
   score: number
   grid: (Item | null)[]
   genCooldown: number
+  hintTime: number // 조작 힌트 애니메이션용
   discovered: number // 지금까지 만든 최고 레벨
 }
 
@@ -44,6 +46,7 @@ export function createState(): MergeState {
     score: 0,
     grid: new Array<Item | null>(COLS * ROWS).fill(null),
     genCooldown: 0,
+    hintTime: 0,
     discovered: 1,
   }
 }
@@ -105,7 +108,7 @@ export function dropItem(state: MergeState, from: number, to: number): DropResul
     state.grid[from] = null
     return result
   }
-  if (target.level === item.level && item.level < ITEMS.length) {
+  if (target.level === item.level && item.level < MAX_LEVEL) {
     const newLevel = item.level + 1
     state.grid[to] = { level: newLevel, pop: 1 }
     state.grid[from] = null
@@ -129,6 +132,7 @@ export function clearLowestItems(state: MergeState) {
 }
 
 export function updateEffects(state: MergeState, dt: number) {
+  state.hintTime += dt
   for (const item of state.grid) {
     if (item && item.pop > 0) item.pop = Math.max(0, item.pop - dt / 0.18)
   }
