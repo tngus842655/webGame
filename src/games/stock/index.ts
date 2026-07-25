@@ -16,7 +16,7 @@ import {
   update,
 } from './state'
 
-const CHART = { x: 50, y: 220, w: 620, h: 480 }
+const CHART = { x: 50, y: 236, w: 620, h: 468 }
 
 interface TradeButton {
   x: number
@@ -151,6 +151,14 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.roundRect(40, 168, 640 * ratio, 12, 6)
     c.fill()
     c.restore()
+
+    // 남은 시간(초) — 10초 미만이면 붉게 커진다
+    const remain = Math.ceil(state.timeLeft)
+    const urgent = remain <= 10
+    c.textAlign = 'center'
+    c.fillStyle = urgent ? '#E5393C' : '#78909C'
+    c.font = `bold ${urgent ? 34 : 26}px sans-serif`
+    c.fillText(t('sv.time', { n: remain }), 360, 214)
 
     // 차트 패널
     c.save()

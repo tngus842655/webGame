@@ -4,6 +4,7 @@ import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
+import { drawHazard, drawRunner } from './sprites'
 import { FIELD, PLAYER_R, PLAYER_Y, createState, scoreOf, update } from './state'
 
 function createSession(host: HTMLElement, ctx: GameContext) {
@@ -49,10 +50,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     overlay.show(score, prevBest, ctx.isRewardAdReady() && !adContinueUsed)
   }
 
+  let moveDir = 0
   const movePlayer = (clientX: number, clientY: number) => {
     if (state.phase !== 'playing') return
     const p = stage.toBoard(clientX, clientY)
-    state.playerX = Math.min(FIELD.right - PLAYER_R, Math.max(FIELD.left + PLAYER_R, p.x))
+    const next = Math.min(FIELD.right - PLAYER_R, Math.max(FIELD.left + PLAYER_R, p.x))
+    moveDir = Math.max(-1, Math.min(1, (next - state.playerX) / 24))
+    state.playerX = next
   }
 
   const detachInput = attachInput(stage.canvas, {
@@ -78,74 +82,16 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.fillStyle = '#90A4AE'
     c.fillRect(0, PLAYER_Y + 52, 720, 8)
 
-    // 낙하물 (회전하는 돌)
+    // 낙하물
     for (const rock of state.rocks) {
-      c.save()
-      c.translate(rock.x, rock.y)
-      c.rotate(rock.x * 0.02 + rock.y * 0.01)
-      const grad = c.createRadialGradient(-rock.r * 0.3, -rock.r * 0.35, rock.r * 0.1, 0, 0, rock.r)
-      grad.addColorStop(0, '#90A4AE')
-      grad.addColorStop(0.6, '#607D8B')
-      grad.addColorStop(1, '#37474F')
-      c.fillStyle = grad
-      c.beginPath()
-      // 각진 바위 실루엣
-      const sides = 7
-      for (let i = 0; i < sides; i++) {
-        const a = (i / sides) * Math.PI * 2
-        const rad = rock.r * (0.82 + ((i * 37) % 10) / 40)
-        const px = Math.cos(a) * rad
-        const py = Math.sin(a) * rad
-        if (i === 0) c.moveTo(px, py)
-        else c.lineTo(px, py)
-      }
-      c.closePath()
-      c.fill()
-      c.strokeStyle = 'rgb(38 50 56 / 0.35)'
-      c.lineWidth = 2
-      c.stroke()
-      c.restore()
+      drawHazard(c, rock.x, rock.y, rock.r, rock.kind, rock.spin)
     }
 
-    // 플레이어 (방패를 든 캐릭터)
+    // 플레이어 (사람 형체)
     const blink = state.invuln > 0 && Math.floor(state.invuln * 10) % 2 === 0
     c.save()
     if (blink) c.globalAlpha = 0.4
-    c.fillStyle = 'rgb(0 0 0 / 0.15)'
-    c.beginPath()
-    c.ellipse(state.playerX, PLAYER_Y + 44, PLAYER_R * 0.9, 9, 0, 0, Math.PI * 2)
-    c.fill()
-
-    const body = c.createRadialGradient(
-      state.playerX - PLAYER_R * 0.3,
-      PLAYER_Y - PLAYER_R * 0.35,
-      PLAYER_R * 0.1,
-      state.playerX,
-      PLAYER_Y,
-      PLAYER_R,
-    )
-    body.addColorStop(0, '#90CAF9')
-    body.addColorStop(0.55, '#42A5F5')
-    body.addColorStop(1, '#1565C0')
-    c.fillStyle = body
-    c.beginPath()
-    c.arc(state.playerX, PLAYER_Y, PLAYER_R, 0, Math.PI * 2)
-    c.fill()
-
-    // 머리 위 방패
-    c.fillStyle = '#FFC107'
-    c.beginPath()
-    c.moveTo(state.playerX - 22, PLAYER_Y - PLAYER_R - 6)
-    c.lineTo(state.playerX + 22, PLAYER_Y - PLAYER_R - 6)
-    c.lineTo(state.playerX, PLAYER_Y - PLAYER_R + 16)
-    c.closePath()
-    c.fill()
-
-    c.fillStyle = '#0D2C45'
-    c.beginPath()
-    c.ellipse(state.playerX - 9, PLAYER_Y - 2, 4, 5.5, 0, 0, Math.PI * 2)
-    c.ellipse(state.playerX + 9, PLAYER_Y - 2, 4, 5.5, 0, 0, Math.PI * 2)
-    c.fill()
+    drawRunner(c, state.playerX, PLAYER_Y, PLAYER_R, state.time, moveDir)
     c.restore()
 
     // HUD

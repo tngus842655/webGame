@@ -37,6 +37,7 @@ export interface MergeState {
   grid: (Item | null)[]
   genCooldown: number
   hintTime: number // 조작 힌트 애니메이션용
+  movedOnce: boolean // 아이템을 한 번이라도 옮겼는지 (힌트 종료 조건)
   discovered: number // 지금까지 만든 최고 레벨
 }
 
@@ -47,6 +48,7 @@ export function createState(): MergeState {
     grid: new Array<Item | null>(COLS * ROWS).fill(null),
     genCooldown: 0,
     hintTime: 0,
+    movedOnce: false,
     discovered: 1,
   }
 }
@@ -106,6 +108,7 @@ export function dropItem(state: MergeState, from: number, to: number): DropResul
   if (target === null) {
     state.grid[to] = item
     state.grid[from] = null
+    state.movedOnce = true
     return result
   }
   if (target.level === item.level && item.level < MAX_LEVEL) {
@@ -114,6 +117,7 @@ export function dropItem(state: MergeState, from: number, to: number): DropResul
     state.grid[from] = null
     state.score += 2 ** newLevel
     state.discovered = Math.max(state.discovered, newLevel)
+    state.movedOnce = true
     result.merged = true
     result.newLevel = newLevel
     result.gameOver = checkGameOver(state)
