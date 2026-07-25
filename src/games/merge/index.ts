@@ -5,10 +5,10 @@ import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
+import { drawPlant } from './plantArt'
 import {
   COLS,
   GEN_COOLDOWN,
-  ITEMS,
   LAYOUT,
   ROWS,
   cellPos,
@@ -106,47 +106,62 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
 
   const draw = () => {
-    const c = stage.begin('#FFE0B2', '#FFF8E1')
+    const c = stage.begin('#D9C3A0', '#FFF8E1')
+    const sky = c.createLinearGradient(0, 0, 0, LAYOUT.height)
+    sky.addColorStop(0, '#FFF4DA')
+    sky.addColorStop(0.5, '#FFF8E1')
+    sky.addColorStop(1, '#EFE0C0')
+    c.fillStyle = sky
+    c.fillRect(0, 0, LAYOUT.width, LAYOUT.height)
 
-    // HUD
+    // HUD: 점수 + 최고 발견 아이템
     c.textAlign = 'center'
-    c.fillStyle = '#BCAAA4'
-    c.font = '20px sans-serif'
-    c.fillText(`${t('merge.found')}: ${ITEMS[state.discovered - 1]}`, 360, 52)
+    c.save()
+    c.fillStyle = '#FFFFFF'
+    c.globalAlpha = 0.75
+    c.beginPath()
+    c.roundRect(200, 30, 240, 88, 24)
+    c.fill()
+    c.restore()
     c.fillStyle = '#5D4037'
-    c.font = 'bold 48px sans-serif'
-    c.fillText(state.score.toLocaleString(), 360, 108)
+    c.font = 'bold 50px sans-serif'
+    c.fillText(state.score.toLocaleString(), 320, 92)
+
+    c.save()
+    c.fillStyle = '#FFFFFF'
+    c.globalAlpha = 0.75
+    c.beginPath()
+    c.roundRect(470, 30, 110, 88, 24)
+    c.fill()
+    c.restore()
+    drawPlant(c, 525, 78, 34, state.discovered)
 
     // 보드
-    c.fillStyle = 'rgb(141 110 99 / 0.15)'
+    const boardW = COLS * LAYOUT.cell
+    const boardH = ROWS * LAYOUT.cell
+    c.save()
+    c.fillStyle = 'rgb(255 255 255 / 0.45)'
     c.beginPath()
-    c.roundRect(
-      LAYOUT.boardX - 8,
-      LAYOUT.boardY - 8,
-      COLS * LAYOUT.cell + 16,
-      ROWS * LAYOUT.cell + 16,
-      18,
-    )
+    c.roundRect(LAYOUT.boardX - 10, LAYOUT.boardY - 10, boardW + 20, boardH + 20, 22)
     c.fill()
+    c.strokeStyle = 'rgb(141 110 99 / 0.28)'
+    c.lineWidth = 3
+    c.stroke()
+    c.restore()
 
     const cellSize = LAYOUT.cell - LAYOUT.gap * 2
     for (let row = 0; row < ROWS; row++) {
       for (let col = 0; col < COLS; col++) {
         const idx = row * COLS + col
         const [px, py] = cellPos(col, row)
-        c.fillStyle = 'rgb(255 255 255 / 0.65)'
+        c.fillStyle = 'rgb(93 64 55 / 0.07)'
         c.beginPath()
-        c.roundRect(px, py, cellSize, cellSize, 12)
+        c.roundRect(px, py, cellSize, cellSize, 14)
         c.fill()
         const item = state.grid[idx]
         if (!item || drag?.from === idx) continue
         const scale = 1 + 0.2 * Math.sin(item.pop * Math.PI)
-        c.font = `${Math.round(72 * scale)}px sans-serif`
-        c.textAlign = 'center'
-        c.fillText(ITEMS[item.level - 1], px + cellSize / 2, py + cellSize / 2 + 26 * scale)
-        c.fillStyle = '#8D6E63'
-        c.font = 'bold 18px sans-serif'
-        c.fillText(`Lv.${item.level}`, px + cellSize / 2, py + cellSize - 8)
+        drawPlant(c, px + cellSize / 2, py + cellSize / 2, cellSize * 0.4 * scale, item.level)
       }
     }
 
@@ -159,47 +174,75 @@ function createSession(host: HTMLElement, ctx: GameContext) {
           const target = state.grid[to]
           if (target === null || target.level === item.level) {
             const [px, py] = cellPos(to % COLS, Math.floor(to / COLS))
-            c.strokeStyle = '#43A047'
+            c.save()
+            c.strokeStyle = target && target.level === item.level ? '#43A047' : '#BCAAA4'
             c.lineWidth = 5
+            c.setLineDash(target ? [] : [10, 8])
             c.beginPath()
-            c.roundRect(px, py, cellSize, cellSize, 12)
+            c.roundRect(px, py, cellSize, cellSize, 14)
             c.stroke()
+            c.restore()
           }
         }
-        c.font = '80px sans-serif'
-        c.textAlign = 'center'
-        c.fillText(ITEMS[item.level - 1], drag.x, drag.y - 60)
+        drawPlant(c, drag.x, drag.y - 70, cellSize * 0.46, item.level)
       }
     }
 
     // 생성 버튼
     const ready = state.genCooldown <= 0
-    c.fillStyle = ready ? '#43A047' : '#A5D6A7'
+    const gb = LAYOUT.genButton
+    c.save()
+    c.fillStyle = ready ? '#2E7D32' : '#9E9E9E'
     c.beginPath()
-    c.roundRect(genButton.x, genButton.y, genButton.w, genButton.h, 20)
+    c.roundRect(gb.x, gb.y + 6, gb.w, gb.h, 24)
+    c.fill()
+    c.fillStyle = ready ? '#43A047' : '#BDBDBD'
+    c.beginPath()
+    c.roundRect(gb.x, gb.y, gb.w, gb.h, 24)
     c.fill()
     if (!ready) {
-      c.fillStyle = 'rgb(0 0 0 / 0.12)'
+      c.save()
       c.beginPath()
-      c.roundRect(
-        genButton.x,
-        genButton.y,
-        genButton.w * (state.genCooldown / GEN_COOLDOWN),
-        genButton.h,
-        20,
-      )
-      c.fill()
+      c.roundRect(gb.x, gb.y, gb.w, gb.h, 24)
+      c.clip()
+      c.fillStyle = 'rgb(255 255 255 / 0.3)'
+      c.fillRect(gb.x, gb.y, gb.w * (1 - state.genCooldown / GEN_COOLDOWN), gb.h)
+      c.restore()
     }
+    c.restore()
+    drawPlant(c, gb.x + 62, gb.y + gb.h / 2 + 4, 30, 1)
+    c.textAlign = 'center'
     c.fillStyle = '#FFFFFF'
     c.font = 'bold 34px sans-serif'
-    c.textAlign = 'center'
-    c.fillText(`🌱 ${t('merge.gen')}`, genButton.x + genButton.w / 2, genButton.y + genButton.h / 2 + 12)
+    c.fillText(t('merge.gen'), gb.x + gb.w / 2 + 30, gb.y + gb.h / 2 + 12)
 
-    if (state.score === 0 && state.phase === 'playing') {
+    // 텍스트 없는 조작 안내: 생성 버튼 → 보드로 끌어가는 표식
+    if (!state.movedOnce && state.phase === 'playing' && !drag) {
+      const k = (state.hintTime % 2.4) / 2.4
+      const ease = k < 0.75 ? k / 0.75 : 1
+      const fade = k < 0.75 ? 1 : 1 - (k - 0.75) / 0.25
+      const sx = gb.x + gb.w / 2
+      const sy = gb.y - 30
+      const ex = LAYOUT.boardX + LAYOUT.cell * 2.5
+      const ey = LAYOUT.boardY + LAYOUT.cell * 5.5
+      const hx = sx + (ex - sx) * ease
+      const hy = sy + (ey - sy) * ease
+      c.save()
+      c.globalAlpha = 0.45 * fade
+      c.strokeStyle = '#8D6E63'
+      c.lineWidth = 3
+      c.setLineDash([8, 10])
+      c.beginPath()
+      c.moveTo(sx, sy)
+      c.lineTo(hx, hy)
+      c.stroke()
+      c.setLineDash([])
+      c.globalAlpha = 0.7 * fade
       c.fillStyle = '#8D6E63'
-      c.font = '24px sans-serif'
-      c.fillText(t('merge.hint1'), 360, 1200)
-      c.fillText(t('merge.hint2'), 360, 1232)
+      c.beginPath()
+      c.arc(hx, hy, 16, 0, Math.PI * 2)
+      c.fill()
+      c.restore()
     }
   }
 

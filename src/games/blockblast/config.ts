@@ -15,7 +15,20 @@ export const LAYOUT = {
   dragLift: 100, // 드래그 중 손가락 위로 띄우는 높이
 } as const
 
-export const COLORS = ['#42A5F5', '#66BB6A', '#FFA726', '#AB47BC', '#EF5350', '#26C6DA']
+export interface BlockColor {
+  base: string
+  light: string // 윗면 하이라이트
+  dark: string // 아랫면·테두리 음영
+}
+
+export const COLORS: BlockColor[] = [
+  { base: '#3D9BF0', light: '#7EC4FF', dark: '#1B5E9E' },
+  { base: '#4CAF50', light: '#8BE08F', dark: '#256B29' },
+  { base: '#FF9F2E', light: '#FFC978', dark: '#B35F00' },
+  { base: '#A055C8', light: '#CE94E6', dark: '#5E2880' },
+  { base: '#EF4E4E', light: '#FF9090', dark: '#9B1F1F' },
+  { base: '#1FC0CC', light: '#76E4EC', dark: '#0B7480' },
+]
 
 export interface PieceShape {
   cells: ReadonlyArray<readonly [number, number]> // [col, row]

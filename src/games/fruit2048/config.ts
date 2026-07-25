@@ -1,4 +1,4 @@
-// 과일 2048 설정 — 수박게임과 같은 과일 진화 테마
+// 과일 2048 설정 — 수박게임과 같은 과일 아트를 공유한다 (games/fruitArt.ts)
 
 export const SIZE = 4
 
@@ -18,21 +18,9 @@ export function cellPos(col: number, row: number): [number, number] {
   ]
 }
 
-// 티어 1부터 시작 (배열 인덱스 = tier - 1)
-export const TIERS = [
-  { emoji: '🍒', color: '#FFCDD2' },
-  { emoji: '🍓', color: '#F8BBD0' },
-  { emoji: '🍇', color: '#E1BEE7' },
-  { emoji: '🍊', color: '#FFE0B2' },
-  { emoji: '🍎', color: '#FFCCBC' },
-  { emoji: '🍐', color: '#F0F4C3' },
-  { emoji: '🍑', color: '#FFECB3' },
-  { emoji: '🍍', color: '#FFF9C4' },
-  { emoji: '🍈', color: '#DCEDC8' },
-  { emoji: '🍉', color: '#C8E6C9' },
-  { emoji: '⭐', color: '#FFF59D' },
-  { emoji: '👑', color: '#FFE082' },
-]
+// 티어 1~10은 과일(체리…수박), 11은 별, 12는 왕관
+export const FRUIT_TIERS = 10
+export const MAX_TIER = 12
 
 export const SPAWN_TIER2_CHANCE = 0.1
 

@@ -5,6 +5,7 @@ import { GAMES } from '@/games/registry'
 import type { GameModule } from '@/games/types'
 import { createGameContext } from '@/shared/gameContext'
 import { t } from '@/shared/i18n'
+import { startPlayTracking } from '@/shared/playSessions'
 
 const route = useRoute()
 const router = useRouter()
@@ -12,6 +13,7 @@ const host = ref<HTMLDivElement | null>(null)
 
 let game: GameModule | null = null
 let disposed = false
+let stopTracking: (() => void) | null = null
 
 onMounted(async () => {
   const slug = String(route.params.slug)
@@ -25,12 +27,15 @@ onMounted(async () => {
   if (disposed) return
   game = mod.default
   game.mount(host.value, createGameContext(slug))
+  stopTracking = startPlayTracking(slug)
 })
 
 onBeforeUnmount(() => {
   disposed = true
   game?.unmount()
   game = null
+  stopTracking?.()
+  stopTracking = null
 })
 </script>
 

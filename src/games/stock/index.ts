@@ -16,7 +16,7 @@ import {
   update,
 } from './state'
 
-const CHART = { x: 50, y: 220, w: 620, h: 480 }
+const CHART = { x: 50, y: 236, w: 620, h: 468 }
 
 interface TradeButton {
   x: number
@@ -103,95 +103,194 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const money = (n: number) => t('stock.money', { n: n.toLocaleString() })
 
   const draw = () => {
-    const c = stage.begin('#FFE0B2', '#FFF8E1')
+    const c = stage.begin('#C7D3DE', '#F4F7FA')
+    const sky = c.createLinearGradient(0, 0, 0, 1280)
+    sky.addColorStop(0, '#FFFFFF')
+    sky.addColorStop(0.5, '#F4F7FA')
+    sky.addColorStop(1, '#E3EAF2')
+    c.fillStyle = sky
+    c.fillRect(0, 0, 720, 1280)
 
-    // 타이머 바
-    c.fillStyle = 'rgb(141 110 99 / 0.25)'
-    c.fillRect(50, 150, 620, 14)
-    c.fillStyle = state.timeLeft < 15 ? '#E53935' : '#8D6E63'
-    c.fillRect(50, 150, 620 * (state.timeLeft / ROUND_SECONDS), 14)
-
-    // 자산 HUD
     const asset = assetOf(state)
     const profit = asset - START_CASH
-    c.textAlign = 'center'
-    c.fillStyle = '#BCAAA4'
-    c.font = '20px sans-serif'
-    c.fillText(t('stock.asset'), 360, 52)
-    c.fillStyle = '#5D4037'
-    c.font = 'bold 44px sans-serif'
-    c.fillText(money(asset), 360, 102)
-    c.fillStyle = profit >= 0 ? '#E53935' : '#1E88E5'
-    c.font = 'bold 24px sans-serif'
-    const pct = ((profit / START_CASH) * 100).toFixed(2)
-    c.fillText(`${profit >= 0 ? '+' : ''}${money(profit)} (${pct}%)`, 360, 136)
+    const up = profit >= 0
+    const accent = up ? '#E5393C' : '#1E88E5'
 
-    // 차트
-    c.fillStyle = 'rgb(255 255 255 / 0.75)'
+    // 상단: 자산 패널
+    c.save()
+    c.fillStyle = '#FFFFFF'
     c.beginPath()
-    c.roundRect(CHART.x, CHART.y, CHART.w, CHART.h, 16)
+    c.roundRect(40, 24, 640, 128, 26)
     c.fill()
+    c.strokeStyle = 'rgb(38 50 56 / 0.1)'
+    c.lineWidth = 2
+    c.stroke()
+    c.restore()
+
+    c.textAlign = 'center'
+    c.fillStyle = '#90A4AE'
+    c.font = '20px sans-serif'
+    c.fillText(t('stock.asset'), 360, 60)
+    c.fillStyle = '#263238'
+    c.font = 'bold 44px sans-serif'
+    c.fillText(money(asset), 360, 106)
+    c.fillStyle = accent
+    c.font = 'bold 22px sans-serif'
+    const pct = ((profit / START_CASH) * 100).toFixed(2)
+    c.fillText(`${up ? '+' : ''}${money(profit)} (${pct}%)`, 360, 136)
+
+    // 남은 시간 바
+    const ratio = state.timeLeft / ROUND_SECONDS
+    c.save()
+    c.fillStyle = 'rgb(38 50 56 / 0.12)'
+    c.beginPath()
+    c.roundRect(40, 168, 640, 12, 6)
+    c.fill()
+    c.fillStyle = state.timeLeft < 15 ? '#E5393C' : '#546E7A'
+    c.beginPath()
+    c.roundRect(40, 168, 640 * ratio, 12, 6)
+    c.fill()
+    c.restore()
+
+    // 남은 시간(초) — 10초 미만이면 붉게 커진다
+    const remain = Math.ceil(state.timeLeft)
+    const urgent = remain <= 10
+    c.textAlign = 'center'
+    c.fillStyle = urgent ? '#E5393C' : '#78909C'
+    c.font = `bold ${urgent ? 34 : 26}px sans-serif`
+    c.fillText(t('sv.time', { n: remain }), 360, 214)
+
+    // 차트 패널
+    c.save()
+    c.fillStyle = '#FFFFFF'
+    c.beginPath()
+    c.roundRect(CHART.x, CHART.y, CHART.w, CHART.h, 22)
+    c.fill()
+    c.strokeStyle = 'rgb(38 50 56 / 0.1)'
+    c.lineWidth = 2
+    c.stroke()
+    c.restore()
+
     const history = state.history
     const min = Math.min(...history)
     const max = Math.max(...history)
     const span = Math.max(1, max - min)
-    c.strokeStyle = state.drift > 0 ? '#E53935' : state.drift < 0 ? '#1E88E5' : '#8D6E63'
+    const px = (i: number) => CHART.x + 20 + ((CHART.w - 40) * i) / Math.max(1, history.length - 1)
+    const py = (v: number) => CHART.y + CHART.h - 26 - ((CHART.h - 52) * (v - min)) / span
+
+    // 격자
+    c.save()
+    c.strokeStyle = 'rgb(38 50 56 / 0.07)'
+    c.lineWidth = 1
+    for (let i = 1; i < 4; i++) {
+      const gy = CHART.y + (CHART.h / 4) * i
+      c.beginPath()
+      c.moveTo(CHART.x + 14, gy)
+      c.lineTo(CHART.x + CHART.w - 14, gy)
+      c.stroke()
+    }
+    c.restore()
+
+    // 시세 영역 채우기
+    c.save()
+    c.beginPath()
+    c.moveTo(px(0), CHART.y + CHART.h - 14)
+    for (let i = 0; i < history.length; i++) c.lineTo(px(i), py(history[i]))
+    c.lineTo(px(history.length - 1), CHART.y + CHART.h - 14)
+    c.closePath()
+    const fill = c.createLinearGradient(0, CHART.y, 0, CHART.y + CHART.h)
+    fill.addColorStop(0, up ? 'rgb(229 57 60 / 0.22)' : 'rgb(30 136 229 / 0.22)')
+    fill.addColorStop(1, 'rgb(255 255 255 / 0)')
+    c.fillStyle = fill
+    c.fill()
+    c.restore()
+
+    // 시세 선
+    c.save()
+    c.strokeStyle = accent
     c.lineWidth = 4
     c.lineJoin = 'round'
     c.beginPath()
     for (let i = 0; i < history.length; i++) {
-      const x = CHART.x + 14 + ((CHART.w - 28) * i) / Math.max(1, history.length - 1)
-      const y = CHART.y + CHART.h - 20 - ((CHART.h - 40) * (history[i] - min)) / span
+      const x = px(i)
+      const y = py(history[i])
       if (i === 0) c.moveTo(x, y)
       else c.lineTo(x, y)
     }
     c.stroke()
+    // 현재 지점
+    const lastX = px(history.length - 1)
+    const lastY = py(history[history.length - 1])
+    c.fillStyle = accent
+    c.beginPath()
+    c.arc(lastX, lastY, 8, 0, Math.PI * 2)
+    c.fill()
+    c.globalAlpha = 0.25
+    c.beginPath()
+    c.arc(lastX, lastY, 16, 0, Math.PI * 2)
+    c.fill()
+    c.restore()
 
     // 현재가
     c.textAlign = 'center'
-    c.fillStyle = '#5D4037'
+    c.fillStyle = '#263238'
     c.font = 'bold 40px sans-serif'
-    c.fillText(money(state.price), 360, CHART.y + CHART.h + 58)
-    c.fillStyle = '#BCAAA4'
-    c.font = '20px sans-serif'
-    c.fillText(t('stock.price'), 360, CHART.y + CHART.h + 90)
+    c.fillText(money(state.price), 360, CHART.y + CHART.h + 56)
+    c.fillStyle = '#90A4AE'
+    c.font = '19px sans-serif'
+    c.fillText(t('stock.price'), 360, CHART.y + CHART.h + 86)
 
     // 뉴스 배너
     if (state.eventText) {
-      c.fillStyle = state.drift > 0 ? 'rgb(229 57 53 / 0.12)' : 'rgb(30 136 229 / 0.12)'
+      c.save()
+      c.fillStyle = state.drift > 0 ? 'rgb(229 57 60 / 0.1)' : 'rgb(30 136 229 / 0.1)'
       c.beginPath()
-      c.roundRect(50, 840, 620, 60, 14)
+      c.roundRect(40, 838, 640, 64, 18)
       c.fill()
+      c.strokeStyle = state.drift > 0 ? 'rgb(229 57 60 / 0.35)' : 'rgb(30 136 229 / 0.35)'
+      c.lineWidth = 2
+      c.stroke()
+      c.restore()
       c.fillStyle = state.drift > 0 ? '#C62828' : '#1565C0'
-      c.font = 'bold 26px sans-serif'
-      c.fillText(t(state.eventText), 360, 880)
+      c.font = 'bold 25px sans-serif'
+      c.fillText(t(state.eventText), 360, 879)
     }
 
     // 보유 현황
-    c.fillStyle = '#8D6E63'
-    c.font = '24px sans-serif'
+    c.save()
+    c.fillStyle = 'rgb(255 255 255 / 0.8)'
+    c.beginPath()
+    c.roundRect(40, 930, 640, 60, 18)
+    c.fill()
+    c.restore()
+    c.fillStyle = '#546E7A'
+    c.font = '22px sans-serif'
     c.fillText(
       t('stock.holdings', { c: money(Math.round(state.cash)), q: state.qty.toLocaleString() }),
       360,
-      990,
+      969,
     )
 
-    // 버튼
+    // 매수/매도 버튼
     for (const button of BUTTONS) {
       const isBuy = button.action === 'buy'
-      c.fillStyle = isBuy ? '#E53935' : '#1E88E5'
+      const enabled =
+        state.phase === 'playing' &&
+        (isBuy ? state.cash >= state.price : state.qty > 0)
+      c.save()
+      if (!enabled) c.globalAlpha = 0.4
+      c.fillStyle = isBuy ? '#B71C1C' : '#0D47A1'
       c.beginPath()
-      c.roundRect(button.x, button.y, button.w, button.h, 16)
+      c.roundRect(button.x, button.y + 5, button.w, button.h, 20)
+      c.fill()
+      c.fillStyle = isBuy ? '#E5393C' : '#1E88E5'
+      c.beginPath()
+      c.roundRect(button.x, button.y, button.w, button.h, 20)
       c.fill()
       c.fillStyle = '#FFFFFF'
       c.font = 'bold 30px sans-serif'
       c.fillText(t(button.label), button.x + button.w / 2, button.y + button.h / 2 + 11)
-    }
-
-    if (state.timeLeft > ROUND_SECONDS - 4 && state.phase === 'playing') {
-      c.fillStyle = '#8D6E63'
-      c.font = '24px sans-serif'
-      c.fillText(t('stock.hint'), 360, 940)
+      c.restore()
     }
   }
 

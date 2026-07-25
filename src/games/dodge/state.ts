@@ -6,12 +6,19 @@ export const FIELD = { left: 40, right: 680 } as const
 
 export type Phase = 'playing' | 'over'
 
+// 낙하물 종류 — 모양·색이 달라 지루함을 덜고, 크기와 속도도 함께 달라진다
+export type HazardKind = 'rock' | 'ice' | 'log' | 'anvil' | 'meteor'
+
+const KINDS: HazardKind[] = ['rock', 'ice', 'log', 'anvil', 'meteor']
+
 export interface Rock {
   x: number
   y: number
   r: number
   vy: number
   vx: number
+  kind: HazardKind
+  spin: number // 고정 회전 오프셋
 }
 
 export interface DodgeState {
@@ -45,12 +52,18 @@ export function update(state: DodgeState, dt: number): boolean {
   state.spawnTimer -= dt
   if (state.spawnTimer <= 0) {
     state.spawnTimer = Math.max(0.16, 0.55 - state.time * 0.01)
+    const kind = KINDS[Math.floor(Math.random() * KINDS.length)]
+    // 운석은 작고 빠르게, 통나무는 크고 느리게
+    const fast = kind === 'meteor'
+    const heavy = kind === 'log' || kind === 'anvil'
     state.rocks.push({
       x: FIELD.left + Math.random() * (FIELD.right - FIELD.left),
       y: 120,
-      r: 16 + Math.random() * 26,
-      vy: 480 + state.time * 10 + Math.random() * 160,
-      vx: (Math.random() - 0.5) * 120,
+      r: (heavy ? 26 : 16) + Math.random() * (fast ? 14 : 24),
+      vy: (fast ? 700 : 460) + state.time * 10 + Math.random() * 160,
+      vx: (Math.random() - 0.5) * (heavy ? 60 : 140),
+      kind,
+      spin: Math.random() * Math.PI * 2,
     })
   }
 

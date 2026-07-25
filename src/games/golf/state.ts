@@ -88,6 +88,7 @@ export interface GolfState {
   moving: boolean
   aim: { dx: number; dy: number; power: number } | null
   sunkTimer: number // 홀인 연출 후 다음 홀로
+  playTime: number // 깃발·힌트 애니메이션용
 }
 
 export function currentLevel(state: GolfState): Level {
@@ -109,6 +110,7 @@ export function createState(): GolfState {
     moving: false,
     aim: null,
     sunkTimer: 0,
+    playTime: 0,
   }
 }
 

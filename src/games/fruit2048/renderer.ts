@@ -1,6 +1,6 @@
-import { t } from '@/shared/i18n'
 import { CanvasStage } from '../stage'
-import { LAYOUT, SIZE, TIERS, cellPos } from './config'
+import { LAYOUT, SIZE, cellPos } from './config'
+import { drawTile } from './tileArt'
 import type { F2State } from './state'
 
 export class F2Renderer {
@@ -21,59 +21,139 @@ export class F2Renderer {
   }
 
   draw(state: F2State) {
+    this.drawBackground()
+    this.drawHud(state)
+    this.drawBoard()
+
+    if (state.slideT > 0) this.drawSlidingTiles(state)
+    else this.drawTiles(state)
+
+    if (state.score === 0 && state.phase === 'playing') this.drawSwipeHint(state)
+  }
+
+  private drawBackground() {
     const { c } = this
-    this.stage.begin('#FFE0B2', '#FFF8E1')
+    this.stage.begin('#D9C3A0', '#FFF8E1')
+    const sky = c.createLinearGradient(0, 0, 0, LAYOUT.height)
+    sky.addColorStop(0, '#FFF4DA')
+    sky.addColorStop(0.5, '#FFF8E1')
+    sky.addColorStop(1, '#F6E2BD')
+    c.fillStyle = sky
+    c.fillRect(0, 0, LAYOUT.width, LAYOUT.height)
+  }
 
-    // HUD
-    c.textAlign = 'center'
-    c.fillStyle = '#BCAAA4'
-    c.font = '22px sans-serif'
-    c.fillText(t('hud.score'), 360, 60)
-    c.fillStyle = '#5D4037'
-    c.font = 'bold 52px sans-serif'
-    c.fillText(state.score.toLocaleString(), 360, 118)
+  private boardSize() {
+    return SIZE * LAYOUT.cell + (SIZE + 1) * LAYOUT.gap
+  }
 
-    // 보드 배경
-    const boardSize = SIZE * LAYOUT.cell + (SIZE + 1) * LAYOUT.gap
-    c.fillStyle = 'rgb(141 110 99 / 0.2)'
+  private drawBoard() {
+    const { c } = this
+    const size = this.boardSize()
+
+    c.save()
+    c.fillStyle = 'rgb(255 255 255 / 0.5)'
     c.beginPath()
-    c.roundRect(LAYOUT.boardX, LAYOUT.boardY, boardSize, boardSize, 20)
+    c.roundRect(LAYOUT.boardX, LAYOUT.boardY, size, size, 26)
     c.fill()
+    c.strokeStyle = 'rgb(141 110 99 / 0.28)'
+    c.lineWidth = 3
+    c.stroke()
+    c.restore()
 
     for (let row = 0; row < SIZE; row++) {
       for (let col = 0; col < SIZE; col++) {
         const [px, py] = cellPos(col, row)
-        const tile = state.grid[row * SIZE + col]
-        if (!tile) {
-          c.fillStyle = 'rgb(255 255 255 / 0.55)'
-          c.beginPath()
-          c.roundRect(px, py, LAYOUT.cell, LAYOUT.cell, 14)
-          c.fill()
-          continue
-        }
-        const info = TIERS[tile.tier - 1] ?? TIERS[TIERS.length - 1]
-        // 등장은 작게 시작, 합체는 크게 튀었다가 정착
-        const scale =
-          tile.popType === 'spawn' ? 1 - 0.5 * tile.pop : 1 + 0.2 * Math.sin(tile.pop * Math.PI)
-        const size = LAYOUT.cell * scale
-        const off = (LAYOUT.cell - size) / 2
-        c.fillStyle = info.color
+        c.fillStyle = 'rgb(93 64 55 / 0.08)'
         c.beginPath()
-        c.roundRect(px + off, py + off, size, size, 14 * scale)
+        c.roundRect(px, py, LAYOUT.cell, LAYOUT.cell, 18)
         c.fill()
-        c.font = `${Math.round(72 * scale)}px sans-serif`
-        c.textAlign = 'center'
-        c.fillText(info.emoji, px + LAYOUT.cell / 2, py + LAYOUT.cell / 2 + 26 * scale)
       }
     }
+  }
 
-    if (state.score === 0 && state.phase === 'playing') {
-      c.textAlign = 'center'
-      c.fillStyle = '#8D6E63'
-      c.font = '26px sans-serif'
-      c.fillText(t('f2.hint1'), 360, 1050)
-      c.fillText(t('f2.hint2'), 360, 1090)
+  private cellCenter(index: number): [number, number] {
+    const [px, py] = cellPos(index % SIZE, Math.floor(index / SIZE))
+    return [px + LAYOUT.cell / 2, py + LAYOUT.cell / 2]
+  }
+
+  private drawTiles(state: F2State) {
+    const { c } = this
+    for (let i = 0; i < state.grid.length; i++) {
+      const tile = state.grid[i]
+      if (!tile) continue
+      const [cx, cy] = this.cellCenter(i)
+      // 등장은 작게 시작, 합체는 크게 튀었다가 정착
+      const scale =
+        tile.popType === 'spawn' ? 1 - 0.45 * tile.pop : 1 + 0.22 * Math.sin(tile.pop * Math.PI)
+      c.save()
+      drawTile(c, cx, cy, LAYOUT.cell * 0.42 * scale, tile.tier)
+      c.restore()
     }
+  }
+
+  // 슬라이드 중에는 이동 경로상의 타일만 그린다 (새로 생긴 타일은 감춤)
+  private drawSlidingTiles(state: F2State) {
+    const ease = 1 - state.slideT
+    const smooth = ease * ease * (3 - 2 * ease)
+    for (const move of state.slide) {
+      const [fx, fy] = this.cellCenter(move.from)
+      const [tx, ty] = this.cellCenter(move.to)
+      drawTile(
+        this.c,
+        fx + (tx - fx) * smooth,
+        fy + (ty - fy) * smooth,
+        LAYOUT.cell * 0.42,
+        move.tier,
+      )
+    }
+  }
+
+  private drawHud(state: F2State) {
+    const { c } = this
+    c.textAlign = 'center'
+    c.save()
+    c.fillStyle = '#FFFFFF'
+    c.globalAlpha = 0.75
+    c.beginPath()
+    c.roundRect(230, 60, 260, 96, 26)
+    c.fill()
+    c.restore()
+    c.fillStyle = '#5D4037'
+    c.font = 'bold 58px sans-serif'
+    c.fillText(state.score.toLocaleString(), 360, 132)
+  }
+
+  // 텍스트 없는 조작 안내: 좌우로 스와이프하는 표식
+  private drawSwipeHint(state: F2State) {
+    const { c } = this
+    const k = (state.hintTime % 2.2) / 2.2
+    const ease = k < 0.7 ? k / 0.7 : 1
+    const fade = k < 0.7 ? 1 : 1 - (k - 0.7) / 0.3
+    const boardBottom = LAYOUT.boardY + this.boardSize()
+    const x = 240 + 240 * ease
+    const y = boardBottom + 90
+
+    c.save()
+    c.globalAlpha = 0.45 * fade
+    c.strokeStyle = '#8D6E63'
+    c.lineWidth = 3
+    c.setLineDash([8, 10])
+    c.beginPath()
+    c.moveTo(240, y)
+    c.lineTo(x, y)
+    c.stroke()
+    c.setLineDash([])
+
+    c.globalAlpha = 0.7 * fade
+    c.fillStyle = '#8D6E63'
+    c.beginPath()
+    c.arc(x, y, 16, 0, Math.PI * 2)
+    c.fill()
+    c.globalAlpha = 0.35 * fade
+    c.beginPath()
+    c.arc(x, y, 28, 0, Math.PI * 2)
+    c.stroke()
+    c.restore()
   }
 
   destroy() {

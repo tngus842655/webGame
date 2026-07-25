@@ -1,12 +1,7 @@
 import { t } from '@/shared/i18n'
 import { CanvasStage } from '../stage'
-import {
-  BALL,
-  BUTTON_RECTS,
-  LAYOUT,
-  UPGRADES,
-  brickRect,
-} from './config'
+import { drawBall, drawBrick, drawLauncher } from './brickArt'
+import { BALL, BUTTON_RECTS, LAYOUT, UPGRADES, brickRect } from './config'
 import {
   FLASH_DURATION,
   POPUP_DURATION,
@@ -33,75 +28,65 @@ export class BrickRenderer {
   }
 
   draw(state: BrickState) {
-    const { c } = this
-    this.stage.begin('#FFE0B2', '#FFF8E1')
-
-    this.drawHud(state)
+    this.drawBackground()
     this.drawField()
     this.drawBricks(state)
     this.drawFlashes(state)
-    this.drawBalls(state)
     this.drawAim(state)
+    this.drawBalls(state)
+    this.drawHud(state)
     this.drawButtons(state)
     this.drawPopups(state)
 
-    if (state.wave === 1 && state.phase === 'aiming' && state.score === 0) {
-      c.textAlign = 'center'
-      c.fillStyle = '#8D6E63'
-      c.font = '26px sans-serif'
-      c.fillText(t('brick.hint1'), 360, 700)
-      c.fillText(t('brick.hint2'), 360, 740)
+    if (state.wave === 1 && state.phase === 'aiming' && state.score === 0 && !state.aim) {
+      this.drawAimHint(state)
     }
   }
 
-  private drawHud(state: BrickState) {
+  private drawBackground() {
     const { c } = this
-    c.textAlign = 'center'
-    c.fillStyle = '#BCAAA4'
-    c.font = '20px sans-serif'
-    c.fillText(t('brick.wave', { n: state.wave }), 360, 52)
-    c.fillStyle = '#5D4037'
-    c.font = 'bold 48px sans-serif'
-    c.fillText(state.score.toLocaleString(), 360, 108)
-    c.textAlign = 'right'
-    c.fillStyle = '#FF8F00'
-    c.font = 'bold 26px sans-serif'
-    c.fillText(`${state.save.gold.toLocaleString()} G`, 688, 108)
+    this.stage.begin('#D6C0A2', '#FFF8E1')
+    const sky = c.createLinearGradient(0, 0, 0, LAYOUT.height)
+    sky.addColorStop(0, '#FFF3D6')
+    sky.addColorStop(0.5, '#FFF8E1')
+    sky.addColorStop(1, '#F4DFB9')
+    c.fillStyle = sky
+    c.fillRect(0, 0, LAYOUT.width, LAYOUT.height)
   }
 
   private drawField() {
     const { c } = this
-    c.strokeStyle = '#8D6E63'
-    c.lineWidth = 6
+    const x = LAYOUT.fieldLeft - 10
+    const y = LAYOUT.fieldTop - 12
+    const w = LAYOUT.fieldRight - LAYOUT.fieldLeft + 20
+    const h = LAYOUT.launchY - LAYOUT.fieldTop + 12
+
+    c.save()
+    c.fillStyle = 'rgb(255 255 255 / 0.42)'
     c.beginPath()
-    c.moveTo(LAYOUT.fieldLeft - 8, LAYOUT.launchY)
-    c.lineTo(LAYOUT.fieldLeft - 8, LAYOUT.fieldTop - 8)
-    c.lineTo(LAYOUT.fieldRight + 8, LAYOUT.fieldTop - 8)
-    c.lineTo(LAYOUT.fieldRight + 8, LAYOUT.launchY)
+    c.roundRect(x, y, w, h, 18)
+    c.fill()
+    c.strokeStyle = 'rgb(141 110 99 / 0.3)'
+    c.lineWidth = 4
     c.stroke()
+    c.restore()
+
     // 발사선
-    c.strokeStyle = 'rgb(141 110 99 / 0.5)'
+    c.save()
+    c.strokeStyle = 'rgb(141 110 99 / 0.35)'
     c.lineWidth = 3
-    c.setLineDash([12, 10])
+    c.setLineDash([14, 12])
     c.beginPath()
-    c.moveTo(LAYOUT.fieldLeft - 8, LAYOUT.launchY)
-    c.lineTo(LAYOUT.fieldRight + 8, LAYOUT.launchY)
+    c.moveTo(LAYOUT.fieldLeft, LAYOUT.launchY)
+    c.lineTo(LAYOUT.fieldRight, LAYOUT.launchY)
     c.stroke()
-    c.setLineDash([])
+    c.restore()
   }
 
   private drawBricks(state: BrickState) {
-    const { c } = this
     for (const brick of state.bricks) {
       const r = brickRect(brick.col, brick.row)
-      c.fillStyle = `hsl(${(brick.hp * 24) % 360} 65% 55%)`
-      c.beginPath()
-      c.roundRect(r.x, r.y, r.w, r.h, 10)
-      c.fill()
-      c.fillStyle = '#FFFFFF'
-      c.textAlign = 'center'
-      c.font = 'bold 30px sans-serif'
-      c.fillText(String(brick.hp), r.x + r.w / 2, r.y + r.h / 2 + 11)
+      drawBrick(this.c, r.x, r.y, r.w, r.h, brick.hp, brick.maxHp)
     }
   }
 
@@ -109,49 +94,115 @@ export class BrickRenderer {
     const { c } = this
     for (const f of state.flashes) {
       const k = f.age / FLASH_DURATION
-      c.globalAlpha = (1 - k) * 0.8
+      c.save()
+      c.globalAlpha = (1 - k) * 0.85
       c.fillStyle = '#FFFFFF'
+      const grow = k * 12
       c.beginPath()
-      c.roundRect(f.x, f.y, f.w, f.h, 10)
+      c.roundRect(f.x - grow, f.y - grow, f.w + grow * 2, f.h + grow * 2, 12)
       c.fill()
+      c.restore()
     }
-    c.globalAlpha = 1
   }
 
   private drawBalls(state: BrickState) {
-    const { c } = this
-    c.fillStyle = '#FF7043'
     for (const ball of state.balls) {
-      if (!ball.active) continue
-      c.beginPath()
-      c.arc(ball.x, ball.y, BALL.radius, 0, Math.PI * 2)
-      c.fill()
+      if (ball.active) drawBall(this.c, ball.x, ball.y, BALL.radius)
     }
-    // 발사대
-    c.fillStyle = '#5D4037'
-    c.beginPath()
-    c.arc(state.launchX, LAYOUT.launchY, 13, 0, Math.PI * 2)
-    c.fill()
-    if (state.phase === 'aiming') {
-      c.textAlign = 'center'
-      c.fillStyle = '#8D6E63'
-      c.font = 'bold 22px sans-serif'
-      c.fillText(`×${state.save.ballLevel}`, state.launchX, LAYOUT.launchY + 34)
-    }
+    drawLauncher(this.c, state.launchX, LAYOUT.launchY, state.save.ballLevel)
   }
 
+  // 벽 반사까지 반영한 예측 경로
   private drawAim(state: BrickState) {
     if (state.phase !== 'aiming' || !state.aim) return
     const { c } = this
+
+    let x = state.launchX
+    let y = LAYOUT.launchY
+    let dx = state.aim.dx
+    let dy = state.aim.dy
+    const step = 12
+    const maxDist = 1100
+    let drawn = 0
+    let bounces = 0
+
+    c.save()
     c.fillStyle = '#FFB74D'
-    for (let t = 70; t <= 520; t += 45) {
-      const x = state.launchX + state.aim.dx * t
-      const y = LAYOUT.launchY + state.aim.dy * t
-      if (y < LAYOUT.fieldTop || x < LAYOUT.fieldLeft || x > LAYOUT.fieldRight) break
+    for (let dist = 0; dist < maxDist; dist += step) {
+      x += dx * step
+      y += dy * step
+
+      if (x < LAYOUT.fieldLeft + BALL.radius) {
+        x = LAYOUT.fieldLeft + BALL.radius
+        dx = -dx
+        bounces += 1
+      } else if (x > LAYOUT.fieldRight - BALL.radius) {
+        x = LAYOUT.fieldRight - BALL.radius
+        dx = -dx
+        bounces += 1
+      }
+      if (y < LAYOUT.fieldTop + BALL.radius || bounces > 2) break
+
+      // 벽돌에 닿으면 종료
+      let hit = false
+      for (const brick of state.bricks) {
+        const r = brickRect(brick.col, brick.row)
+        if (x > r.x - BALL.radius && x < r.x + r.w + BALL.radius && y > r.y - BALL.radius && y < r.y + r.h + BALL.radius) {
+          hit = true
+          break
+        }
+      }
+      if (hit) break
+
+      drawn += 1
+      if (drawn % 3 !== 0) continue
+      c.globalAlpha = Math.max(0.15, 0.85 - dist / maxDist)
       c.beginPath()
       c.arc(x, y, 5, 0, Math.PI * 2)
       c.fill()
     }
+    c.restore()
+  }
+
+  private drawHud(state: BrickState) {
+    const { c } = this
+    c.textAlign = 'center'
+
+    c.save()
+    c.fillStyle = '#FFFFFF'
+    c.globalAlpha = 0.75
+    c.beginPath()
+    c.roundRect(250, 26, 220, 88, 24)
+    c.fill()
+    c.restore()
+    c.fillStyle = '#5D4037'
+    c.font = 'bold 48px sans-serif'
+    c.fillText(state.score.toLocaleString(), 360, 86)
+
+    // 웨이브
+    c.fillStyle = '#BCAAA4'
+    c.font = '20px sans-serif'
+    c.fillText(t('brick.wave', { n: state.wave }), 360, 136)
+
+    // 골드
+    c.save()
+    c.fillStyle = '#FFFFFF'
+    c.globalAlpha = 0.75
+    c.beginPath()
+    c.roundRect(486, 34, 202, 60, 30)
+    c.fill()
+    c.restore()
+    c.fillStyle = '#FFC107'
+    c.beginPath()
+    c.arc(520, 64, 17, 0, Math.PI * 2)
+    c.fill()
+    c.fillStyle = '#B8860B'
+    c.font = 'bold 20px sans-serif'
+    c.fillText('G', 520, 71)
+    c.textAlign = 'right'
+    c.fillStyle = '#5D4037'
+    c.font = 'bold 26px sans-serif'
+    c.fillText(state.save.gold.toLocaleString(), 672, 73)
   }
 
   private drawButtons(state: BrickState) {
@@ -163,36 +214,89 @@ export class BrickRenderer {
       const cost = upgradeCost(def, level)
       const affordable = state.save.gold >= cost && state.phase === 'aiming'
 
-      c.globalAlpha = state.phase === 'flying' ? 0.5 : 1
-      c.fillStyle = 'rgb(255 255 255 / 0.85)'
+      c.save()
+      if (state.phase === 'flying') c.globalAlpha = 0.45
+
+      // 버튼 바탕
+      c.fillStyle = affordable ? '#4CAF50' : '#FFFFFF'
+      if (!affordable) c.globalAlpha *= 0.8
       c.beginPath()
-      c.roundRect(rect.x, rect.y, rect.w, rect.h, 16)
+      c.roundRect(rect.x, rect.y + 5, rect.w, rect.h, 18)
       c.fill()
+      c.fillStyle = affordable ? '#66BB6A' : '#FFFFFF'
+      c.beginPath()
+      c.roundRect(rect.x, rect.y, rect.w, rect.h, 18)
+      c.fill()
+      c.strokeStyle = affordable ? '#2E7D32' : 'rgb(141 110 99 / 0.25)'
+      c.lineWidth = 3
+      c.stroke()
+
       c.textAlign = 'center'
-      c.fillStyle = '#5D4037'
+      c.fillStyle = affordable ? '#FFFFFF' : '#8D6E63'
       c.font = 'bold 26px sans-serif'
-      c.fillText(`${t(def.label)} Lv.${level}`, rect.x + rect.w / 2, rect.y + 52)
-      c.fillStyle = affordable ? '#43A047' : '#BCAAA4'
+      c.fillText(`${t(def.label)} Lv.${level}`, rect.x + rect.w / 2, rect.y + 50)
+
+      // 비용
+      c.fillStyle = affordable ? '#FFFFFF' : '#BCAAA4'
+      c.beginPath()
+      c.arc(rect.x + rect.w / 2 - 44, rect.y + 88, 13, 0, Math.PI * 2)
+      c.fill()
+      c.fillStyle = affordable ? '#2E7D32' : '#E0D6CF'
+      c.font = 'bold 15px sans-serif'
+      c.fillText('G', rect.x + rect.w / 2 - 44, rect.y + 93)
+      c.fillStyle = affordable ? '#FFFFFF' : '#BCAAA4'
       c.font = 'bold 24px sans-serif'
-      c.fillText(`${cost.toLocaleString()} G`, rect.x + rect.w / 2, rect.y + 95)
-      c.globalAlpha = 1
+      c.fillText(cost.toLocaleString(), rect.x + rect.w / 2 + 22, rect.y + 96)
+      c.restore()
     }
   }
 
   private drawPopups(state: BrickState) {
     const { c } = this
     c.textAlign = 'center'
-    c.font = 'bold 32px sans-serif'
+    c.font = 'bold 34px sans-serif'
     for (const p of state.popups) {
       const k = p.age / POPUP_DURATION
       c.globalAlpha = 1 - k * k
-      c.lineWidth = 6
+      c.lineWidth = 7
       c.strokeStyle = '#FFFFFF'
       c.strokeText(p.text, p.x, p.y)
       c.fillStyle = '#FF6F00'
       c.fillText(p.text, p.x, p.y)
     }
     c.globalAlpha = 1
+  }
+
+  // 텍스트 없는 조작 안내: 발사대에서 위로 당기는 표식
+  private drawAimHint(state: BrickState) {
+    const { c } = this
+    const k = (state.hintTime % 2) / 2
+    const ease = k < 0.7 ? k / 0.7 : 1
+    const fade = k < 0.7 ? 1 : 1 - (k - 0.7) / 0.3
+    const x = state.launchX + 90 * ease
+    const y = LAYOUT.launchY - 150 * ease
+
+    c.save()
+    c.globalAlpha = 0.45 * fade
+    c.strokeStyle = '#8D6E63'
+    c.lineWidth = 3
+    c.setLineDash([8, 10])
+    c.beginPath()
+    c.moveTo(state.launchX, LAYOUT.launchY)
+    c.lineTo(x, y)
+    c.stroke()
+    c.setLineDash([])
+
+    c.globalAlpha = 0.7 * fade
+    c.fillStyle = '#8D6E63'
+    c.beginPath()
+    c.arc(x, y, 16, 0, Math.PI * 2)
+    c.fill()
+    c.globalAlpha = 0.35 * fade
+    c.beginPath()
+    c.arc(x, y, 28, 0, Math.PI * 2)
+    c.stroke()
+    c.restore()
   }
 
   destroy() {

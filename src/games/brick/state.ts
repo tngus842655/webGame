@@ -56,6 +56,7 @@ export interface BrickState {
   save: SaveData
   popups: Popup[]
   flashes: Flash[]
+  hintTime: number // 조작 힌트 애니메이션용
 }
 
 export function loadSave(): SaveData {
@@ -127,6 +128,7 @@ export function createState(): BrickState {
     save: loadSave(),
     popups: [],
     flashes: [],
+    hintTime: 0,
   }
   spawnRow(state)
   return state
@@ -150,6 +152,7 @@ export function clearDangerRows(state: BrickState) {
 }
 
 export function updateEffects(state: BrickState, dt: number) {
+  state.hintTime += dt
   for (const p of state.popups) {
     p.age += dt
     p.y -= 60 * dt

@@ -4,6 +4,7 @@ import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
+import { drawBullet, drawEnemy, drawHero, drawOrb } from './sprites'
 import { CanvasStage } from '../stage'
 import {
   ARENA,
@@ -13,6 +14,83 @@ import {
   scoreOf,
   update,
 } from './state'
+
+function drawHeart(c: CanvasRenderingContext2D, x: number, y: number, r: number, filled: boolean) {
+  c.save()
+  c.translate(x, y)
+  c.beginPath()
+  c.moveTo(0, r * 0.75)
+  c.bezierCurveTo(-r * 1.4, -r * 0.3, -r * 0.5, -r * 1.2, 0, -r * 0.4)
+  c.bezierCurveTo(r * 0.5, -r * 1.2, r * 1.4, -r * 0.3, 0, r * 0.75)
+  c.closePath()
+  if (filled) {
+    c.fillStyle = '#E53935'
+    c.fill()
+    c.strokeStyle = '#9B1B18'
+  } else {
+    c.fillStyle = 'rgb(141 110 99 / 0.18)'
+    c.fill()
+    c.strokeStyle = 'rgb(141 110 99 / 0.35)'
+  }
+  c.lineWidth = 2
+  c.stroke()
+  c.restore()
+}
+
+// 강화 카드 아이콘 (이모지 대신 벡터)
+function drawUpgradeIcon(
+  c: CanvasRenderingContext2D,
+  key: 'damage' | 'firerate' | 'speed' | 'maxhp',
+  x: number,
+  y: number,
+) {
+  c.save()
+  c.translate(x, y)
+  c.lineCap = 'round'
+  c.lineJoin = 'round'
+  switch (key) {
+    case 'damage': // 검
+      c.strokeStyle = '#607D8B'
+      c.lineWidth = 8
+      c.beginPath()
+      c.moveTo(-16, 18)
+      c.lineTo(16, -18)
+      c.stroke()
+      c.strokeStyle = '#8D6E63'
+      c.lineWidth = 7
+      c.beginPath()
+      c.moveTo(-22, 12)
+      c.lineTo(-10, 24)
+      c.stroke()
+      break
+    case 'firerate': // 번개
+      c.fillStyle = '#FFB300'
+      c.beginPath()
+      c.moveTo(4, -22)
+      c.lineTo(-14, 4)
+      c.lineTo(-1, 4)
+      c.lineTo(-5, 22)
+      c.lineTo(14, -4)
+      c.lineTo(1, -4)
+      c.closePath()
+      c.fill()
+      break
+    case 'speed': // 속도선
+      c.strokeStyle = '#29B6F6'
+      c.lineWidth = 6
+      for (const [dy, len] of [[-12, 24], [0, 32], [12, 20]] as Array<[number, number]>) {
+        c.beginPath()
+        c.moveTo(-len / 2, dy)
+        c.lineTo(len / 2, dy)
+        c.stroke()
+      }
+      break
+    case 'maxhp': // 하트
+      drawHeart(c, 0, 0, 18, true)
+      break
+  }
+  c.restore()
+}
 
 const CARD_RECTS = [
   { x: 60, y: 420, w: 600, h: 130 },
@@ -115,124 +193,158 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
 
   const draw = () => {
-    const c = stage.begin('#FFE0B2', '#FFF3E0')
+    const c = stage.begin('#D8C4A6', '#FFF8E1')
 
-    // 아레나 경계
-    c.strokeStyle = '#8D6E63'
-    c.lineWidth = 6
-    c.strokeRect(ARENA.left, ARENA.top, ARENA.right - ARENA.left, ARENA.bottom - ARENA.top)
-
-    // 경험치 오브
-    c.fillStyle = '#66BB6A'
-    for (const orb of state.orbs) {
-      c.beginPath()
-      c.arc(orb.x, orb.y, 9, 0, Math.PI * 2)
-      c.fill()
+    // 아레나 바닥
+    const floor = c.createLinearGradient(0, ARENA.top, 0, ARENA.bottom)
+    floor.addColorStop(0, '#FFF3D6')
+    floor.addColorStop(1, '#F3E0BC')
+    c.fillStyle = floor
+    c.beginPath()
+    c.roundRect(ARENA.left, ARENA.top, ARENA.right - ARENA.left, ARENA.bottom - ARENA.top, 22)
+    c.fill()
+    // 바닥 격자
+    c.save()
+    c.beginPath()
+    c.roundRect(ARENA.left, ARENA.top, ARENA.right - ARENA.left, ARENA.bottom - ARENA.top, 22)
+    c.clip()
+    c.strokeStyle = 'rgb(141 110 99 / 0.09)'
+    c.lineWidth = 2
+    for (let gx = ARENA.left; gx <= ARENA.right; gx += 80) {
+      c.beginPath(); c.moveTo(gx, ARENA.top); c.lineTo(gx, ARENA.bottom); c.stroke()
     }
-
-    // 총알
-    c.fillStyle = '#5D4037'
-    for (const bullet of state.bullets) {
-      c.beginPath()
-      c.arc(bullet.x, bullet.y, 7, 0, Math.PI * 2)
-      c.fill()
+    for (let gy = ARENA.top; gy <= ARENA.bottom; gy += 80) {
+      c.beginPath(); c.moveTo(ARENA.left, gy); c.lineTo(ARENA.right, gy); c.stroke()
     }
+    c.restore()
+    c.strokeStyle = 'rgb(141 110 99 / 0.35)'
+    c.lineWidth = 5
+    c.beginPath()
+    c.roundRect(ARENA.left, ARENA.top, ARENA.right - ARENA.left, ARENA.bottom - ARENA.top, 22)
+    c.stroke()
 
-    // 적
-    for (const enemy of state.enemies) {
-      c.fillStyle = '#EF5350'
-      c.beginPath()
-      c.arc(enemy.x, enemy.y, enemy.r, 0, Math.PI * 2)
-      c.fill()
-      c.fillStyle = '#4A0E0E'
-      c.beginPath()
-      c.arc(enemy.x - 7, enemy.y - 4, 4, 0, Math.PI * 2)
-      c.arc(enemy.x + 7, enemy.y - 4, 4, 0, Math.PI * 2)
-      c.fill()
-    }
+    for (const orb of state.orbs) drawOrb(c, orb.x, orb.y, state.time * 4)
+    for (const bullet of state.bullets) drawBullet(c, bullet.x, bullet.y)
+    for (const enemy of state.enemies) drawEnemy(c, enemy.x, enemy.y, enemy.r, enemy.hp)
 
-    // 플레이어
     const p = state.player
     const blink = p.invuln > 0 && Math.floor(p.invuln * 10) % 2 === 0
-    c.globalAlpha = blink ? 0.35 : 1
-    c.fillStyle = '#42A5F5'
-    c.beginPath()
-    c.arc(p.x, p.y, PLAYER_R, 0, Math.PI * 2)
-    c.fill()
-    c.fillStyle = '#0D2C45'
-    c.beginPath()
-    c.arc(p.x - 8, p.y - 5, 4, 0, Math.PI * 2)
-    c.arc(p.x + 8, p.y - 5, 4, 0, Math.PI * 2)
-    c.fill()
-    c.globalAlpha = 1
+    c.save()
+    if (blink) c.globalAlpha = 0.35
+    drawHero(c, p.x, p.y, PLAYER_R, state.joystick?.dx ?? 0)
+    c.restore()
 
-    // HUD: 시간·킬·체력·경험치
+    // HUD
     c.textAlign = 'center'
+    c.save()
+    c.fillStyle = '#FFFFFF'
+    c.globalAlpha = 0.72
+    c.beginPath()
+    c.roundRect(258, 22, 204, 74, 22)
+    c.fill()
+    c.restore()
     c.fillStyle = '#5D4037'
-    c.font = 'bold 40px sans-serif'
-    c.fillText(t('sv.time', { n: Math.floor(state.time) }), 360, 66)
-    c.font = '22px sans-serif'
+    c.font = 'bold 42px sans-serif'
+    c.fillText(t('sv.time', { n: Math.floor(state.time) }), 360, 74)
+    c.font = '20px sans-serif'
     c.fillStyle = '#BCAAA4'
-    c.fillText(t('sv.kills', { k: state.kills, lv: state.level }), 360, 100)
-    c.textAlign = 'right'
-    c.fillStyle = '#E53935'
-    c.font = 'bold 26px sans-serif'
-    c.fillText('❤'.repeat(Math.max(0, p.hp)), 690, 70)
+    c.fillText(t('sv.kills', { k: state.kills, lv: state.level }), 360, 118)
+
+    // 체력 하트
+    for (let i = 0; i < p.maxHp; i++) {
+      drawHeart(c, ARENA.right - 26 - i * 40, 56, 15, i < p.hp)
+    }
+
     // 경험치 바
-    c.fillStyle = 'rgb(141 110 99 / 0.25)'
-    c.fillRect(ARENA.left, 118, ARENA.right - ARENA.left, 12)
-    c.fillStyle = '#66BB6A'
-    c.fillRect(ARENA.left, 118, (ARENA.right - ARENA.left) * Math.min(1, state.xp / state.xpNeed), 12)
+    c.save()
+    c.fillStyle = 'rgb(141 110 99 / 0.2)'
+    c.beginPath()
+    c.roundRect(ARENA.left, 132, ARENA.right - ARENA.left, 12, 6)
+    c.fill()
+    const xpRatio = Math.min(1, state.xp / state.xpNeed)
+    if (xpRatio > 0) {
+      c.fillStyle = '#66BB6A'
+      c.beginPath()
+      c.roundRect(ARENA.left, 132, (ARENA.right - ARENA.left) * xpRatio, 12, 6)
+      c.fill()
+    }
+    c.restore()
 
     // 조이스틱
     if (state.joystick) {
-      c.strokeStyle = 'rgb(93 64 55 / 0.35)'
-      c.lineWidth = 4
+      c.save()
+      c.globalAlpha = 0.28
+      c.fillStyle = '#5D4037'
       c.beginPath()
-      c.arc(state.joystick.baseX, state.joystick.baseY, 70, 0, Math.PI * 2)
-      c.stroke()
-      c.fillStyle = 'rgb(93 64 55 / 0.35)'
+      c.arc(state.joystick.baseX, state.joystick.baseY, 72, 0, Math.PI * 2)
+      c.fill()
+      c.globalAlpha = 0.55
+      c.fillStyle = '#FFFFFF'
       c.beginPath()
       c.arc(
-        state.joystick.baseX + state.joystick.dx * 70,
-        state.joystick.baseY + state.joystick.dy * 70,
-        26,
+        state.joystick.baseX + state.joystick.dx * 72,
+        state.joystick.baseY + state.joystick.dy * 72,
+        28,
         0,
         Math.PI * 2,
       )
       c.fill()
+      c.restore()
     }
 
     // 레벨업 카드
     if (state.phase === 'levelup') {
-      c.fillStyle = 'rgb(62 39 35 / 0.55)'
+      c.fillStyle = 'rgb(62 39 35 / 0.6)'
       c.fillRect(0, 0, 720, 1280)
       c.textAlign = 'center'
       c.fillStyle = '#FFFFFF'
       c.font = 'bold 40px sans-serif'
-      c.fillText(t('sv.levelup'), 360, 360)
+      c.fillText(t('sv.levelup'), 360, 352)
       for (let i = 0; i < CARD_RECTS.length && i < state.choices.length; i++) {
         const r = CARD_RECTS[i]
         const choice = state.choices[i]
+        c.save()
+        c.fillStyle = '#C8A97E'
+        c.beginPath()
+        c.roundRect(r.x, r.y + 6, r.w, r.h, 20)
+        c.fill()
         c.fillStyle = '#FFF8E1'
         c.beginPath()
-        c.roundRect(r.x, r.y, r.w, r.h, 18)
+        c.roundRect(r.x, r.y, r.w, r.h, 20)
         c.fill()
+        c.strokeStyle = '#8D6E63'
+        c.lineWidth = 3
+        c.stroke()
+        c.restore()
+        drawUpgradeIcon(c, choice.key, r.x + 62, r.y + r.h / 2)
+        c.textAlign = 'left'
         c.fillStyle = '#5D4037'
         c.font = 'bold 32px sans-serif'
-        c.fillText(t(choice.label), r.x + r.w / 2, r.y + 56)
+        c.fillText(t(choice.label), r.x + 116, r.y + 56)
         c.fillStyle = '#8D6E63'
-        c.font = '22px sans-serif'
-        c.fillText(t(choice.desc), r.x + r.w / 2, r.y + 96)
+        c.font = '21px sans-serif'
+        c.fillText(t(choice.desc), r.x + 116, r.y + 94)
+        c.textAlign = 'center'
       }
     }
 
-    if (state.time < 3 && state.phase === 'playing') {
-      c.textAlign = 'center'
-      c.fillStyle = '#8D6E63'
-      c.font = '26px sans-serif'
-      c.fillText(t('sv.hint1'), 360, 1180)
-      c.fillText(t('sv.hint2'), 360, 1220)
+    // 텍스트 없는 조작 안내: 원을 도는 조이스틱 표식
+    if (state.time < 4 && state.phase === 'playing' && !state.joystick) {
+      const a = state.time * 2
+      const bx = 360
+      const by = 1130
+      c.save()
+      c.globalAlpha = 0.3
+      c.fillStyle = '#5D4037'
+      c.beginPath()
+      c.arc(bx, by, 60, 0, Math.PI * 2)
+      c.fill()
+      c.globalAlpha = 0.6
+      c.fillStyle = '#FFFFFF'
+      c.beginPath()
+      c.arc(bx + Math.cos(a) * 42, by + Math.sin(a) * 42, 24, 0, Math.PI * 2)
+      c.fill()
+      c.restore()
     }
   }
 
