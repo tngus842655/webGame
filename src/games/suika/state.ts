@@ -34,9 +34,11 @@ export interface SuikaState {
   score: number
   currentTier: number
   nextTier: number
+  maxTier: number // 이번 판에서 만들어낸 최고 티어 (진화 도표 표시용)
   aimX: number
   cooldown: number
   dangerTime: number
+  playTime: number // 조작 힌트 애니메이션용
   pops: Pop[]
   popups: Popup[]
   sparks: Spark[]
@@ -58,9 +60,11 @@ export function createState(): SuikaState {
     score: 0,
     currentTier: pickDropTier(),
     nextTier: pickDropTier(),
+    maxTier: 0,
     aimX: (BOARD.wallLeft + BOARD.wallRight) / 2,
     cooldown: 0,
     dangerTime: 0,
+    playTime: 0,
     pops: [],
     popups: [],
     sparks: [],
@@ -68,6 +72,7 @@ export function createState(): SuikaState {
 }
 
 export function updateEffects(state: SuikaState, dt: number) {
+  state.playTime += dt
   for (const p of state.pops) p.age += dt
   for (const p of state.popups) {
     p.age += dt

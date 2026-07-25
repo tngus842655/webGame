@@ -34,6 +34,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   world.onMerge = (e) => {
     state.score += e.gained
+    state.maxTier = Math.max(state.maxTier, e.spawnedTier ?? TIERS.length - 1)
     const popRadius = TIERS[e.spawnedTier ?? TIERS.length - 1].radius
     state.pops.push({ x: e.x, y: e.y, r: popRadius, age: 0 })
     state.popups.push({ x: e.x, y: e.y - 40, text: `+${e.gained}`, age: 0 })

@@ -72,26 +72,21 @@ function drawGloss(c: CanvasRenderingContext2D, r: number) {
 function drawStemAndLeaf(c: CanvasRenderingContext2D, tier: number, r: number) {
   // 꼭지가 있는 과일만 (체리·사과·배·복숭아·수박)
   if (![0, 4, 5, 6, 9].includes(tier)) return
-  const len = r * (tier === 0 ? 0.52 : 0.3)
+  // 짧게 — 쌓였을 때 옆 과일을 파고들지 않도록
+  const len = r * (tier === 0 ? 0.3 : 0.16)
   c.save()
   c.strokeStyle = '#6D4C2F'
-  c.lineWidth = Math.max(r * 0.09, 2)
+  c.lineWidth = Math.max(r * 0.08, 2)
   c.lineCap = 'round'
   c.beginPath()
-  c.moveTo(0, -r * 0.88)
-  c.quadraticCurveTo(r * 0.12, -r - len * 0.6, r * 0.26, -r - len)
+  c.moveTo(0, -r * 0.9)
+  c.quadraticCurveTo(r * 0.08, -r - len * 0.7, r * 0.18, -r - len)
   c.stroke()
   // 잎
   c.fillStyle = '#4CAF50'
   c.beginPath()
-  c.ellipse(r * 0.5, -r - len * 0.75, r * 0.26, r * 0.13, -0.5, 0, Math.PI * 2)
+  c.ellipse(r * 0.36, -r - len * 0.85, r * 0.2, r * 0.1, -0.5, 0, Math.PI * 2)
   c.fill()
-  c.strokeStyle = 'rgb(27 94 32 / 0.5)'
-  c.lineWidth = Math.max(r * 0.03, 1)
-  c.beginPath()
-  c.moveTo(r * 0.28, -r - len * 0.62)
-  c.lineTo(r * 0.72, -r - len * 0.88)
-  c.stroke()
   c.restore()
 }
 
