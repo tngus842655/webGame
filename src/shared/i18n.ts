@@ -138,6 +138,25 @@ const en = {
   'merge.gen': 'Spawn',
   'merge.found': 'Score · Best found',
   'merge.ad': '▶ Watch ad to clear low items',
+  'game.match3': 'Jewel Match',
+  'game.tripeaks': 'TriPeaks Solitaire',
+  'game.mahjong': 'Mahjong Solitaire',
+  'game.nonogram': 'Nonogram',
+  'm3.level': 'Level {n}',
+  'm3.goal': 'Goal {n}',
+  'm3.moves': 'Moves {n}',
+  'm3.ad': '▶ Watch ad for +5 moves',
+  'tp.stage': 'Stage {n}',
+  'tp.streak': 'Streak x{n}',
+  'tp.ad': '▶ Watch ad for +3 cards',
+  'mj.stage': 'Stage {n}',
+  'mj.pairs': 'Pairs left {n}',
+  'mj.noMoves': 'No matches left',
+  'mj.ad': '▶ Watch ad to shuffle tiles',
+  'no.puzzle': 'Puzzle {n}',
+  'no.fill': 'Fill',
+  'no.mark': 'Mark',
+  'no.ad': '▶ Watch ad to continue (+1 life)',
 }
 
 const ko: typeof en = {
@@ -240,6 +259,25 @@ const ko: typeof en = {
   'merge.gen': '생성',
   'merge.found': '점수 · 최고 발견',
   'merge.ad': '▶ 광고 보고 하위 아이템 정리',
+  'game.match3': '보석 매치3',
+  'game.tripeaks': '트라이픽스 솔리테어',
+  'game.mahjong': '마작 솔리테어',
+  'game.nonogram': '네모로직',
+  'm3.level': '레벨 {n}',
+  'm3.goal': '목표 {n}',
+  'm3.moves': '이동 {n}',
+  'm3.ad': '▶ 광고 보고 이동 +5',
+  'tp.stage': '스테이지 {n}',
+  'tp.streak': '연속 x{n}',
+  'tp.ad': '▶ 광고 보고 카드 +3',
+  'mj.stage': '스테이지 {n}',
+  'mj.pairs': '남은 짝 {n}',
+  'mj.noMoves': '맞출 짝이 없습니다',
+  'mj.ad': '▶ 광고 보고 패 섞기',
+  'no.puzzle': '퍼즐 {n}',
+  'no.fill': '칠하기',
+  'no.mark': 'X 표시',
+  'no.ad': '▶ 광고 보고 이어하기 (생명 +1)',
 }
 
 // 나머지 언어: 허브·게임오버·광고·제목까지 번역, 게임 내부 텍스트는 en 폴백
@@ -292,6 +330,10 @@ const ja: CoreDict = {
   'game.survivor': 'サバイバー',
   'game.stock': '株式タイクーン',
   'game.merge': 'マージガーデン',
+  'game.match3': 'ジュエルマッチ3',
+  'game.tripeaks': 'トライピークス',
+  'game.mahjong': '麻雀ソリティア',
+  'game.nonogram': 'お絵かきロジック',
 }
 
 const zhCN: CoreDict = {
@@ -341,6 +383,10 @@ const zhCN: CoreDict = {
   'game.survivor': '幸存者',
   'game.stock': '模拟炒股',
   'game.merge': '合成花园',
+  'game.match3': '宝石消消乐',
+  'game.tripeaks': '三峰纸牌',
+  'game.mahjong': '麻将连连看',
+  'game.nonogram': '数织',
 }
 
 const es: CoreDict = {
@@ -390,6 +436,10 @@ const es: CoreDict = {
   'game.survivor': 'Superviviente',
   'game.stock': 'Magnate de Bolsa',
   'game.merge': 'Jardín de Fusión',
+  'game.match3': 'Joyas Match-3',
+  'game.tripeaks': 'Solitario TriPeaks',
+  'game.mahjong': 'Mahjong',
+  'game.nonogram': 'Nonograma',
 }
 
 const ptBR: CoreDict = {
@@ -439,6 +489,10 @@ const ptBR: CoreDict = {
   'game.survivor': 'Sobrevivente',
   'game.stock': 'Magnata da Bolsa',
   'game.merge': 'Jardim de Fusão',
+  'game.match3': 'Joias Combine 3',
+  'game.tripeaks': 'Paciência TriPeaks',
+  'game.mahjong': 'Mahjong',
+  'game.nonogram': 'Nonograma',
 }
 
 const fr: CoreDict = {
@@ -488,6 +542,10 @@ const fr: CoreDict = {
   'game.survivor': 'Survivant',
   'game.stock': 'Magnat de la Bourse',
   'game.merge': 'Jardin de Fusion',
+  'game.match3': 'Match-3 de Joyaux',
+  'game.tripeaks': 'Solitaire TriPeaks',
+  'game.mahjong': 'Mahjong',
+  'game.nonogram': 'Picross',
 }
 
 const de: CoreDict = {
@@ -537,6 +595,10 @@ const de: CoreDict = {
   'game.survivor': 'Survivor',
   'game.stock': 'Börsen-Tycoon',
   'game.merge': 'Merge-Garten',
+  'game.match3': 'Juwelen Match-3',
+  'game.tripeaks': 'TriPeaks Solitär',
+  'game.mahjong': 'Mahjong',
+  'game.nonogram': 'Nonogramm',
 }
 
 const ru: CoreDict = {
@@ -586,6 +648,10 @@ const ru: CoreDict = {
   'game.survivor': 'Выживший',
   'game.stock': 'Биржевой магнат',
   'game.merge': 'Сад слияний',
+  'game.match3': 'Три в ряд',
+  'game.tripeaks': 'Пасьянс Три пика',
+  'game.mahjong': 'Маджонг',
+  'game.nonogram': 'Японский кроссворд',
 }
 
 const id: CoreDict = {
@@ -635,6 +701,10 @@ const id: CoreDict = {
   'game.survivor': 'Penyintas',
   'game.stock': 'Taipan Saham',
   'game.merge': 'Kebun Gabung',
+  'game.match3': 'Permata Match-3',
+  'game.tripeaks': 'Solitaire TriPeaks',
+  'game.mahjong': 'Mahjong',
+  'game.nonogram': 'Nonogram',
 }
 
 const vi: CoreDict = {
@@ -684,6 +754,10 @@ const vi: CoreDict = {
   'game.survivor': 'Người Sống Sót',
   'game.stock': 'Trùm Chứng Khoán',
   'game.merge': 'Vườn Ghép',
+  'game.match3': 'Xếp Kim Cương',
+  'game.tripeaks': 'Bài TriPeaks',
+  'game.mahjong': 'Mạt Chược',
+  'game.nonogram': 'Nonogram',
 }
 
 const th: CoreDict = {
@@ -733,6 +807,10 @@ const th: CoreDict = {
   'game.survivor': 'ผู้รอดชีวิต',
   'game.stock': 'เศรษฐีหุ้น',
   'game.merge': 'สวนรวมร่าง',
+  'game.match3': 'จับคู่อัญมณี',
+  'game.tripeaks': 'ไพ่ไตรพีคส์',
+  'game.mahjong': 'มาจอง',
+  'game.nonogram': 'โนโนแกรม',
 }
 
 const tr: CoreDict = {
@@ -782,6 +860,10 @@ const tr: CoreDict = {
   'game.survivor': 'Hayatta Kalan',
   'game.stock': 'Borsa Kralı',
   'game.merge': 'Birleştirme Bahçesi',
+  'game.match3': 'Mücevher Eşleştirme',
+  'game.tripeaks': 'TriPeaks Solitaire',
+  'game.mahjong': 'Mahjong',
+  'game.nonogram': 'Nonogram',
 }
 
 const messages: Record<Locale, CoreDict> = {

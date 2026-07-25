@@ -10,6 +10,11 @@ export interface DevNote {
 export const DEV_NOTES: DevNote[] = [
   {
     date: '2026-07-25',
+    title: '신규 게임 4종 추가 (1차)',
+    items: ['보석 매치3', '트라이픽스 솔리테어', '마작 솔리테어', '네모로직'],
+  },
+  {
+    date: '2026-07-25',
     title: '미니게임30 오픈',
     items: [
       '수박 합치기',

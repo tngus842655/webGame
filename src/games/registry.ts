@@ -53,4 +53,24 @@ export const GAMES: GameMeta[] = [
     titleKey: 'game.merge',
     loader: () => import('./merge'),
   },
+  {
+    slug: 'match3',
+    titleKey: 'game.match3',
+    loader: () => import('./match3'),
+  },
+  {
+    slug: 'tripeaks',
+    titleKey: 'game.tripeaks',
+    loader: () => import('./tripeaks'),
+  },
+  {
+    slug: 'mahjong',
+    titleKey: 'game.mahjong',
+    loader: () => import('./mahjong'),
+  },
+  {
+    slug: 'nonogram',
+    titleKey: 'game.nonogram',
+    loader: () => import('./nonogram'),
+  },
 ]
