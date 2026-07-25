@@ -19,8 +19,31 @@ function readProvider(user: User | null | undefined): SocialProvider | null {
   return (found?.provider as SocialProvider | undefined) ?? null
 }
 
+// 카카오 기본 scope에는 이메일이 포함되는데, 이메일 동의항목은 비즈앱 전환을 요구한다.
+// 우리는 닉네임만 쓰므로 그것만 요청한다 (구글은 기본값으로 충분)
+function scopesFor(provider: SocialProvider): string | undefined {
+  return provider === 'kakao' ? 'profile_nickname' : undefined
+}
+
+// 계정 전환은 OAuth 리다이렉트를 거치므로 메모리 변수로는 이전 계정을 알 수 없다.
+// 마지막 계정 id를 저장해두고, 달라졌으면 이전 계정의 로컬 최고점을 정리한다
+// (홈 화면이 이전 계정 기록을 새 계정 것처럼 보여주는 문제 방지. 키는 scores.ts와 공유)
+const LAST_USER_KEY = 'webgame:lastUserId'
+
+function clearLocalBestsIfUserChanged(nextId: string) {
+  const last = localStorage.getItem(LAST_USER_KEY)
+  if (last && last !== nextId) {
+    for (const key of Object.keys(localStorage)) {
+      if (key.startsWith('webgame:best:')) localStorage.removeItem(key)
+    }
+  }
+  localStorage.setItem(LAST_USER_KEY, nextId)
+}
+
 supabase.auth.onAuthStateChange((_event, session) => {
   cachedUserId = session?.user.id ?? null
+  // 연동(link)은 id가 그대로라 정리 대상이 아니다 — 다른 계정으로 갈아탄 경우에만 지워진다
+  if (cachedUserId) clearLocalBestsIfUserChanged(cachedUserId)
   linkedProvider.value = readProvider(session?.user)
 })
 
@@ -52,7 +75,7 @@ export async function linkSocial(provider: SocialProvider): Promise<void> {
   sessionStorage.setItem(PENDING_KEY, provider)
   const { error } = await supabase.auth.linkIdentity({
     provider,
-    options: { redirectTo: `${location.origin}/settings` },
+    options: { redirectTo: `${location.origin}/settings`, scopes: scopesFor(provider) },
   })
   if (error) {
     sessionStorage.removeItem(PENDING_KEY)
@@ -65,7 +88,7 @@ export async function signInSocial(provider: SocialProvider): Promise<void> {
   sessionStorage.removeItem(PENDING_KEY)
   const { error } = await supabase.auth.signInWithOAuth({
     provider,
-    options: { redirectTo: `${location.origin}/settings` },
+    options: { redirectTo: `${location.origin}/settings`, scopes: scopesFor(provider) },
   })
   if (error) throw error
 }

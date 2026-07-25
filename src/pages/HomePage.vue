@@ -15,8 +15,7 @@ import {
 
 const ASKED_KEY = 'webgame:accountAsked'
 const router = useRouter()
-// 최초 실행 때만 기존 회원인지 물어본다 (이미 연동했다면 물을 필요가 없다)
-const askAccount = ref(!localStorage.getItem(ASKED_KEY) && !linkedProvider.value)
+const askAccount = ref(false)
 
 function answerAccount(existing: boolean) {
   localStorage.setItem(ASKED_KEY, 'done')
@@ -39,6 +38,13 @@ onMounted(async () => {
   // 최근 7일 플레이 수 기준 인기순 (동률은 레지스트리 순서 유지)
   next.sort((a, b) => (popularity.get(b.slug) ?? 0) - (popularity.get(a.slug) ?? 0))
   cards.value = next
+
+  // 기존 회원 안내는 '기록이 하나도 없는' 첫 실행에서만 의미가 있다.
+  // 세션 조회가 끝난 이 시점이라야 연동 여부(linkedProvider)도 확정된다
+  if (localStorage.getItem(ASKED_KEY)) return
+  const hasRecord = myStats.length > 0 || cards.value.some((card) => card.best !== null)
+  if (hasRecord || linkedProvider.value) localStorage.setItem(ASKED_KEY, 'done')
+  else askAccount.value = true
 })
 </script>
 

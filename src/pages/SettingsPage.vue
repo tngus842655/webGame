@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import {
   linkedProvider,
   linkSocial,
@@ -21,25 +21,48 @@ const lang = ref<Locale>(locale.value)
 const existingAccount = ref<SocialProvider | null>(null)
 const busy = ref<SocialProvider | null>(null)
 const accountError = ref('')
+// 실패 원인을 못 알아본 경우에도 '이미 가입한 계정' 경로를 열어두기 위해 제공자를 기억한다
+const failedProvider = ref<SocialProvider | null>(null)
 // 계정 전환: 게스트를 거치지 않고 곧바로 다른 소셜 계정으로 로그인한다
 const switching = ref(false)
+// 소셜 닉네임이 자동 적용됐을 때의 안내 (랭킹에 실명이 노출될 수 있어 반드시 알린다)
+const nicknameNotice = ref('')
+
+// 소셜 화면에서 뒤로가기로 돌아오면 버튼이 '여는 중…'에 잠긴 채 복원된다
+function resetBusy() {
+  busy.value = null
+}
 
 onMounted(async () => {
+  window.addEventListener('pageshow', resetBusy)
+
   const failed = takeRedirectError()
   if (failed) {
     if (failed.alreadyLinked && failed.provider) existingAccount.value = failed.provider
-    else accountError.value = t('account.failed')
+    else {
+      accountError.value = t('account.failed')
+      failedProvider.value = failed.provider
+    }
   }
 
   try {
     const profile = await fetchMyProfile()
     // 연동 직후 돌아온 경우, 닉네임을 직접 정한 적이 없으면 소셜 닉네임을 쓴다
-    nickname.value = (await adoptSocialNickname(profile).catch(() => null)) ?? profile.nickname
+    const applied = await adoptSocialNickname(profile).catch(() => null)
+    nickname.value = applied ?? profile.nickname
+    if (applied) nicknameNotice.value = t('account.nicknameApplied', { name: applied })
     loaded.value = true
   } catch {
     message.value = t('settings.loadFailed')
   }
 })
+
+onUnmounted(() => window.removeEventListener('pageshow', resetBusy))
+
+function tryExisting() {
+  existingAccount.value = failedProvider.value
+  accountError.value = ''
+}
 
 function providerLabel(provider: SocialProvider) {
   return provider === 'google' ? t('account.google') : t('account.kakao')
@@ -188,6 +211,14 @@ function onLangChange() {
       </template>
 
       <p v-if="accountError" class="message">{{ accountError }}</p>
+      <button
+        v-if="accountError && failedProvider"
+        type="button"
+        class="text-link"
+        @click="tryExisting"
+      >
+        {{ t('account.maybeExists') }}
+      </button>
     </section>
 
     <section class="section">
@@ -199,8 +230,9 @@ function onLangChange() {
       </select>
     </section>
 
-    <section class="section">
+    <section class="section" :class="{ flagged: nicknameNotice }">
       <h2>{{ t('settings.nickname') }}</h2>
+      <p v-if="nicknameNotice" class="notice">{{ nicknameNotice }}</p>
       <div class="nickname-row">
         <input
           v-model="nickname"
@@ -327,6 +359,22 @@ function onLangChange() {
 
 .switch-hint {
   margin: 0 0 10px;
+}
+
+/* 자동으로 정해진 닉네임은 랭킹에 그대로 공개되므로 눈에 띄게 알린다 */
+.section.flagged {
+  border: 1px solid #ffd54f;
+}
+
+.notice {
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  background: #fff8e1;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #6d4c41;
+  word-break: keep-all;
 }
 
 .restore {
