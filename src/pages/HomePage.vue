@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { GAMES } from '@/games/registry'
+import AccountPrompt from '@/shared/AccountPrompt.vue'
+import { linkedProvider } from '@/shared/auth'
 import GameIcon from '@/shared/GameIcon.vue'
 import { t } from '@/shared/i18n'
 import {
@@ -9,6 +12,17 @@ import {
   getLocalBest,
   type MyGameStat,
 } from '@/shared/scores'
+
+const ASKED_KEY = 'webgame:accountAsked'
+const router = useRouter()
+// 최초 실행 때만 기존 회원인지 물어본다 (이미 연동했다면 물을 필요가 없다)
+const askAccount = ref(!localStorage.getItem(ASKED_KEY) && !linkedProvider.value)
+
+function answerAccount(existing: boolean) {
+  localStorage.setItem(ASKED_KEY, 'done')
+  askAccount.value = false
+  if (existing) void router.push('/settings')
+}
 
 // 첫 화면은 로컬 데이터로 즉시 그리고, 서버 응답이 오면 순위·인기순으로 갱신한다
 const cards = ref(
@@ -54,6 +68,8 @@ onMounted(async () => {
         <small v-else-if="game.best !== null">{{ t('home.best', { n: game.best.toLocaleString() }) }}</small>
       </RouterLink>
     </main>
+
+    <AccountPrompt v-if="askAccount" @answer="answerAccount" />
   </div>
 </template>
 

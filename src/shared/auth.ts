@@ -1,6 +1,28 @@
+import { ref } from 'vue'
+import type { User } from '@supabase/supabase-js'
 import { supabase } from './supabase'
 
+export type SocialProvider = 'google' | 'kakao'
+
+// 연동 요청을 보낸 제공자 — OAuth 리다이렉트로 돌아왔을 때 어떤 버튼이었는지 알기 위해 남긴다
+const PENDING_KEY = 'webgame:pendingProvider'
+
 let cachedUserId: string | null = null
+
+// 현재 계정에 연결된 소셜 제공자 (없으면 게스트) — 설정 화면과 허브 팝업이 함께 본다
+export const linkedProvider = ref<SocialProvider | null>(null)
+
+function readProvider(user: User | null | undefined): SocialProvider | null {
+  const found = user?.identities?.find(
+    (identity) => identity.provider === 'google' || identity.provider === 'kakao',
+  )
+  return (found?.provider as SocialProvider | undefined) ?? null
+}
+
+supabase.auth.onAuthStateChange((_event, session) => {
+  cachedUserId = session?.user.id ?? null
+  linkedProvider.value = readProvider(session?.user)
+})
 
 // 세션이 없으면 익명 로그인으로 부트스트랩 (DESIGN.md 6장 인증 흐름)
 export async function ensureUserId(): Promise<string> {
@@ -22,4 +44,63 @@ export async function getCurrentUserId(): Promise<string | null> {
   if (cachedUserId) return cachedUserId
   const { data } = await supabase.auth.getSession()
   return data.session?.user.id ?? null
+}
+
+// 지금 쓰던 계정에 소셜 identity를 붙인다 — user_id가 그대로라 점수·랭킹이 유지된다
+export async function linkSocial(provider: SocialProvider): Promise<void> {
+  await ensureUserId()
+  sessionStorage.setItem(PENDING_KEY, provider)
+  const { error } = await supabase.auth.linkIdentity({
+    provider,
+    options: { redirectTo: `${location.origin}/settings` },
+  })
+  if (error) {
+    sessionStorage.removeItem(PENDING_KEY)
+    throw error
+  }
+}
+
+// 이미 다른 기기에서 연동해둔 계정으로 로그인 — 그 계정의 기록을 그대로 이어받는다
+export async function signInSocial(provider: SocialProvider): Promise<void> {
+  sessionStorage.removeItem(PENDING_KEY)
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: { redirectTo: `${location.origin}/settings` },
+  })
+  if (error) throw error
+}
+
+export interface RedirectError {
+  provider: SocialProvider | null
+  // 이 소셜 계정이 이미 다른 계정에 물려 있다 = 기존 회원 → 로그인으로 불러오면 된다
+  alreadyLinked: boolean
+}
+
+// OAuth 리다이렉트가 실패로 돌아온 경우를 한 번만 읽고 주소창을 정리한다
+export function takeRedirectError(): RedirectError | null {
+  const query = new URLSearchParams(location.search)
+  const hash = new URLSearchParams(location.hash.replace(/^#/, ''))
+  const provider = sessionStorage.getItem(PENDING_KEY) as SocialProvider | null
+  sessionStorage.removeItem(PENDING_KEY)
+
+  if (!query.get('error') && !hash.get('error')) return null
+  const code = query.get('error_code') ?? hash.get('error_code') ?? ''
+  const description = query.get('error_description') ?? hash.get('error_description') ?? ''
+  history.replaceState(null, '', location.pathname)
+  return {
+    provider,
+    alreadyLinked: code === 'identity_already_exists' || /already/i.test(description),
+  }
+}
+
+// 연동된 소셜 계정의 표시 이름 (닉네임 자동 설정용). 서버에서 최신 identity도 함께 갱신한다
+export async function fetchSocialName(): Promise<string | null> {
+  const { data } = await supabase.auth.getUser()
+  linkedProvider.value = readProvider(data.user)
+  if (!data.user || !linkedProvider.value) return null
+  const meta = data.user.user_metadata ?? {}
+  const raw = meta.name ?? meta.full_name ?? meta.preferred_username ?? meta.user_name
+  if (typeof raw !== 'string') return null
+  const name = raw.trim().slice(0, 12)
+  return name.length >= 1 ? name : null
 }
