@@ -38,4 +38,16 @@ export const GAMES: GameMeta[] = [
     thumbnail: '🌧️',
     loader: () => import('./dodge'),
   },
+  {
+    slug: 'golf',
+    title: '미니 골프',
+    thumbnail: '⛳',
+    loader: () => import('./golf'),
+  },
+  {
+    slug: 'survivor',
+    title: '서바이버',
+    thumbnail: '⚔️',
+    loader: () => import('./survivor'),
+  },
 ]
