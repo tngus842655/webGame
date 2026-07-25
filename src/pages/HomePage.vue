@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { GAMES } from '@/games/registry'
+import AccountPrompt from '@/shared/AccountPrompt.vue'
+import { linkedProvider } from '@/shared/auth'
 import GameIcon from '@/shared/GameIcon.vue'
 import { t } from '@/shared/i18n'
 import {
@@ -9,6 +12,16 @@ import {
   getLocalBest,
   type MyGameStat,
 } from '@/shared/scores'
+
+const ASKED_KEY = 'webgame:accountAsked'
+const router = useRouter()
+const askAccount = ref(false)
+
+function answerAccount(existing: boolean) {
+  localStorage.setItem(ASKED_KEY, 'done')
+  askAccount.value = false
+  if (existing) void router.push('/settings')
+}
 
 // 첫 화면은 로컬 데이터로 즉시 그리고, 서버 응답이 오면 순위·인기순으로 갱신한다
 const cards = ref(
@@ -25,6 +38,13 @@ onMounted(async () => {
   // 최근 7일 플레이 수 기준 인기순 (동률은 레지스트리 순서 유지)
   next.sort((a, b) => (popularity.get(b.slug) ?? 0) - (popularity.get(a.slug) ?? 0))
   cards.value = next
+
+  // 기존 회원 안내는 '기록이 하나도 없는' 첫 실행에서만 의미가 있다.
+  // 세션 조회가 끝난 이 시점이라야 연동 여부(linkedProvider)도 확정된다
+  if (localStorage.getItem(ASKED_KEY)) return
+  const hasRecord = myStats.length > 0 || cards.value.some((card) => card.best !== null)
+  if (hasRecord || linkedProvider.value) localStorage.setItem(ASKED_KEY, 'done')
+  else askAccount.value = true
 })
 </script>
 
@@ -54,6 +74,8 @@ onMounted(async () => {
         <small v-else-if="game.best !== null">{{ t('home.best', { n: game.best.toLocaleString() }) }}</small>
       </RouterLink>
     </main>
+
+    <AccountPrompt v-if="askAccount" @answer="answerAccount" />
   </div>
 </template>
 
