@@ -89,6 +89,11 @@ function onLangChange() {
       </label>
     </section>
 
+    <RouterLink class="menu-link" to="/notes">
+      <span>{{ t('notes.title') }}</span>
+      <span class="arrow">›</span>
+    </RouterLink>
+
     <p v-if="message" class="message">{{ message }}</p>
     <p class="hint">{{ t('settings.guest') }}</p>
   </div>
@@ -175,6 +180,23 @@ function onLangChange() {
   width: 20px;
   height: 20px;
   accent-color: #43a047;
+}
+
+.menu-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: #fff;
+  border-radius: 16px;
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.menu-link .arrow {
+  color: #bcaaa4;
+  font-size: 20px;
 }
 
 .hint {

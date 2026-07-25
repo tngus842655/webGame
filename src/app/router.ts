@@ -5,6 +5,7 @@ import RankingHubPage from '@/pages/RankingHubPage.vue'
 import RankingPage from '@/pages/RankingPage.vue'
 import SettingsPage from '@/pages/SettingsPage.vue'
 import StatsPage from '@/pages/StatsPage.vue'
+import DevNotesPage from '@/pages/DevNotesPage.vue'
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -15,6 +16,7 @@ export const router = createRouter({
     { path: '/ranking/:slug', component: RankingPage },
     { path: '/settings', component: SettingsPage },
     { path: '/stats', component: StatsPage },
+    { path: '/notes', component: DevNotesPage },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
 })
