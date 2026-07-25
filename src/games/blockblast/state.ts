@@ -30,9 +30,11 @@ export interface BBState {
   grid: number[] // GRID×GRID, 0=빈칸, n>0 = COLORS[n-1]
   tray: (Piece | null)[]
   streak: number
+  streakAge: number // 콤보 배지 팝 연출용
   popups: Popup[]
   clearFx: ClearFx[]
   placedOnce: boolean // 첫 플레이 힌트용
+  hintTime: number // 힌트·강조 애니메이션 시간
 }
 
 function randomFrom(shapes: PieceShape[]): Piece {
@@ -56,9 +58,11 @@ export function createState(): BBState {
     grid: new Array<number>(GRID * GRID).fill(0),
     tray: [randomFrom(SHAPES), randomFrom(SHAPES), randomFrom(SHAPES)],
     streak: 0,
+    streakAge: 0,
     popups: [],
     clearFx: [],
     placedOnce: false,
+    hintTime: 0,
   }
 }
 
@@ -185,6 +189,7 @@ export function placePiece(
   let gained = SCORING.perCell * piece.shape.cells.length
   if (lines > 0) {
     state.streak += 1
+    state.streakAge = 0
     gained += SCORING.lineBase * lines * lines + (state.streak - 1) * SCORING.streakBonus
   } else {
     state.streak = 0
@@ -202,6 +207,8 @@ export function placePiece(
 }
 
 export function updateEffects(state: BBState, dt: number) {
+  state.hintTime += dt
+  state.streakAge += dt
   for (const p of state.popups) {
     p.age += dt
     p.y -= 60 * dt
