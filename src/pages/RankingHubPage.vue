@@ -1,6 +1,18 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
 import { GAMES } from '@/games/registry'
 import { t } from '@/shared/i18n'
+import { fetchPopularity } from '@/shared/scores'
+
+// 홈과 동일한 인기순 정렬 (서버 응답 전에는 레지스트리 순서)
+const games = ref([...GAMES])
+
+onMounted(async () => {
+  const popularity = await fetchPopularity().catch(() => new Map<string, number>())
+  games.value = [...GAMES].sort(
+    (a, b) => (popularity.get(b.slug) ?? 0) - (popularity.get(a.slug) ?? 0),
+  )
+})
 </script>
 
 <template>
@@ -11,7 +23,7 @@ import { t } from '@/shared/i18n'
     </header>
 
     <ul class="game-list">
-      <li v-for="game in GAMES" :key="game.slug">
+      <li v-for="game in games" :key="game.slug">
         <RouterLink class="row" :to="`/ranking/${game.slug}`">
           <span class="thumb">{{ game.thumbnail }}</span>
           <span class="title">{{ t(game.titleKey) }}</span>
