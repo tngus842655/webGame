@@ -5,7 +5,7 @@ import { GAMES } from '@/games/registry'
 import type { GameModule } from '@/games/types'
 import { createGameContext } from '@/shared/gameContext'
 import { t } from '@/shared/i18n'
-import { recordPlaySession } from '@/shared/playSessions'
+import { startPlayTracking } from '@/shared/playSessions'
 
 const route = useRoute()
 const router = useRouter()
@@ -13,8 +13,7 @@ const host = ref<HTMLDivElement | null>(null)
 
 let game: GameModule | null = null
 let disposed = false
-let startedAt = 0
-let playedSlug = ''
+let stopTracking: (() => void) | null = null
 
 onMounted(async () => {
   const slug = String(route.params.slug)
@@ -28,18 +27,15 @@ onMounted(async () => {
   if (disposed) return
   game = mod.default
   game.mount(host.value, createGameContext(slug))
-  playedSlug = slug
-  startedAt = performance.now()
+  stopTracking = startPlayTracking(slug)
 })
 
 onBeforeUnmount(() => {
   disposed = true
   game?.unmount()
   game = null
-  // 통계용 체류 시간 기록 (게임 코드와 무관하게 화면 진입~이탈로 측정)
-  if (playedSlug && startedAt > 0) {
-    void recordPlaySession(playedSlug, (performance.now() - startedAt) / 1000)
-  }
+  stopTracking?.()
+  stopTracking = null
 })
 </script>
 
