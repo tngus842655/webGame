@@ -1,6 +1,7 @@
 -- 플레이 세션 기록 + 플레이 시간 기반 인기도 + 공개 통계
+-- 여러 번 실행해도 안전하도록 작성 (기존 객체는 정리 후 재생성)
 
-create table public.play_sessions (
+create table if not exists public.play_sessions (
   id bigint generated always as identity primary key,
   user_id uuid not null references public.profiles (id) on delete cascade,
   game_slug text not null,
@@ -9,13 +10,16 @@ create table public.play_sessions (
   created_at timestamptz not null default now()
 );
 
-create index play_sessions_stats_idx on public.play_sessions (game_slug, created_at desc);
+create index if not exists play_sessions_stats_idx
+  on public.play_sessions (game_slug, created_at desc);
 
 alter table public.play_sessions enable row level security;
 
+drop policy if exists "play_sessions_select_all" on public.play_sessions;
 create policy "play_sessions_select_all" on public.play_sessions
   for select using (true);
 
+drop policy if exists "play_sessions_insert_own" on public.play_sessions;
 create policy "play_sessions_insert_own" on public.play_sessions
   for insert with check (auth.uid() = user_id);
 -- update/delete 정책 없음 = 금지
@@ -38,13 +42,16 @@ begin
 end;
 $$;
 
+drop trigger if exists play_sessions_rate_limit on public.play_sessions;
 create trigger play_sessions_rate_limit
   before insert on public.play_sessions
   for each row execute function public.check_session_rate_limit();
 
 -- 인기도 = 최근 7일 총 플레이 시간 × sqrt(고유 이용자 수)
 -- 시간만 쓰면 소수 헤비유저에 휘둘리고, 횟수만 쓰면 짧은 게임이 유리해지므로 둘을 결합한다
-create or replace function public.get_game_popularity()
+-- (반환 형태가 바뀌므로 create or replace가 아닌 drop 후 재생성)
+drop function if exists public.get_game_popularity();
+create function public.get_game_popularity()
 returns table (game_slug text, plays bigint, total_seconds bigint, players bigint, score numeric)
 language sql
 stable
@@ -63,7 +70,8 @@ as $$
 $$;
 
 -- 통계 페이지용: 기간을 지정해 게임별 지표를 한 번에 조회 (누구나 열람 가능)
-create or replace function public.get_game_stats(p_days int default 7)
+drop function if exists public.get_game_stats(int);
+create function public.get_game_stats(p_days int default 7)
 returns table (
   game_slug text,
   plays bigint,
