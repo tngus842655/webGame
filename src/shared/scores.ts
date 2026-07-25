@@ -27,6 +27,31 @@ export async function saveScore(slug: string, score: number): Promise<void> {
   }
 }
 
+export interface MyGameStat {
+  game_slug: string
+  best_score: number
+  rank: number
+}
+
+// 내 게임별 최고점·순위 (세션 없으면 익명 로그인 후 조회)
+export async function fetchMyStats(): Promise<MyGameStat[]> {
+  await ensureUserId()
+  const { data, error } = await supabase.rpc('get_my_stats')
+  if (error) throw error
+  return (data ?? []) as MyGameStat[]
+}
+
+// 게임별 최근 7일 플레이 수 (인기순 정렬용)
+export async function fetchPopularity(): Promise<Map<string, number>> {
+  const { data, error } = await supabase.rpc('get_game_popularity')
+  if (error) throw error
+  const map = new Map<string, number>()
+  for (const row of (data ?? []) as Array<{ game_slug: string; plays: number }>) {
+    map.set(row.game_slug, Number(row.plays))
+  }
+  return map
+}
+
 export interface LeaderboardEntry {
   user_id: string
   nickname: string

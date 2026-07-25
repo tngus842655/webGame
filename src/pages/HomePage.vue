@@ -1,9 +1,30 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
 import { GAMES } from '@/games/registry'
 import { t } from '@/shared/i18n'
-import { getLocalBest } from '@/shared/scores'
+import {
+  fetchMyStats,
+  fetchPopularity,
+  getLocalBest,
+  type MyGameStat,
+} from '@/shared/scores'
 
-const cards = GAMES.map((game) => ({ ...game, best: getLocalBest(game.slug) }))
+// 첫 화면은 로컬 데이터로 즉시 그리고, 서버 응답이 오면 순위·인기순으로 갱신한다
+const cards = ref(
+  GAMES.map((game) => ({ ...game, best: getLocalBest(game.slug), stat: null as MyGameStat | null })),
+)
+
+onMounted(async () => {
+  const [popularity, myStats] = await Promise.all([
+    fetchPopularity().catch(() => new Map<string, number>()),
+    fetchMyStats().catch(() => [] as MyGameStat[]),
+  ])
+  const statBySlug = new Map(myStats.map((stat) => [stat.game_slug, stat]))
+  const next = cards.value.map((card) => ({ ...card, stat: statBySlug.get(card.slug) ?? null }))
+  // 최근 7일 플레이 수 기준 인기순 (동률은 레지스트리 순서 유지)
+  next.sort((a, b) => (popularity.get(b.slug) ?? 0) - (popularity.get(a.slug) ?? 0))
+  cards.value = next
+})
 </script>
 
 <template>
@@ -25,7 +46,10 @@ const cards = GAMES.map((game) => ({ ...game, best: getLocalBest(game.slug) }))
       >
         <span class="thumb">{{ game.thumbnail }}</span>
         <strong>{{ t(game.titleKey) }}</strong>
-        <small v-if="game.best !== null">{{ t('home.best', { n: game.best.toLocaleString() }) }}</small>
+        <small v-if="game.stat">
+          {{ t('home.myRank', { score: game.stat.best_score.toLocaleString(), rank: game.stat.rank }) }}
+        </small>
+        <small v-else-if="game.best !== null">{{ t('home.best', { n: game.best.toLocaleString() }) }}</small>
       </RouterLink>
     </main>
   </div>
