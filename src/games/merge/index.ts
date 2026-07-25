@@ -1,7 +1,8 @@
 import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
-import type { GameContext, GameModule } from '../types'
+import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
+import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import {
   COLS,
@@ -18,22 +19,17 @@ import {
   updateEffects,
 } from './state'
 
-interface Session {
-  destroy(): void
-}
-
-function createSession(host: HTMLElement, ctx: GameContext): Session {
-  const wrapper = document.createElement('div')
-  wrapper.style.cssText = 'position:absolute;inset:0;overflow:hidden;'
-  host.appendChild(wrapper)
-
-  const stage = new CanvasStage(wrapper, LAYOUT.width, LAYOUT.height)
+function createSession(host: HTMLElement, ctx: GameContext) {
+  const shell = createGameShell(host, (dt) => {
+    updateEffects(state, dt)
+    draw()
+  })
+  const stage = new CanvasStage(shell.wrapper, LAYOUT.width, LAYOUT.height)
   const state = createState()
-  let destroyed = false
   let adClearUsed = false
   let drag: { from: number; x: number; y: number } | null = null
 
-  const overlay = createGameOverOverlay(wrapper, {
+  const overlay = createGameOverOverlay(shell.wrapper, {
     adButtonLabel: '▶ 광고 보고 하위 아이템 정리',
     onRetry() {
       if (state.phase !== 'over') return
@@ -49,7 +45,7 @@ function createSession(host: HTMLElement, ctx: GameContext): Session {
   async function clearWithAd() {
     if (state.phase !== 'over' || adClearUsed) return
     const rewarded = await ctx.showRewardAd('merge_clear')
-    if (destroyed || !rewarded || state.phase !== 'over') return
+    if (shell.isDestroyed() || !rewarded || state.phase !== 'over') return
     adClearUsed = true
     clearLowestItems(state)
     state.phase = 'playing'
@@ -61,7 +57,7 @@ function createSession(host: HTMLElement, ctx: GameContext): Session {
     vibrate(120)
     const prevBest = await ctx.getBestScore()
     await ctx.submitScore(state.score)
-    if (destroyed || state.phase !== 'over') return
+    if (shell.isDestroyed() || state.phase !== 'over') return
     overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adClearUsed)
   }
 
@@ -206,50 +202,9 @@ function createSession(host: HTMLElement, ctx: GameContext): Session {
     }
   }
 
-  let rafId = 0
-  let last = performance.now()
-  const frame = (now: number) => {
-    rafId = requestAnimationFrame(frame)
-    const dt = Math.min((now - last) / 1000, 0.05)
-    last = now
-    updateEffects(state, dt)
-    draw()
-  }
-
-  const onVisibility = () => {
-    if (destroyed) return
-    if (document.hidden) {
-      cancelAnimationFrame(rafId)
-    } else {
-      last = performance.now()
-      rafId = requestAnimationFrame(frame)
-    }
-  }
-  document.addEventListener('visibilitychange', onVisibility)
-  rafId = requestAnimationFrame(frame)
-
-  return {
-    destroy() {
-      destroyed = true
-      cancelAnimationFrame(rafId)
-      document.removeEventListener('visibilitychange', onVisibility)
-      detachInput()
-      stage.destroy()
-      wrapper.remove()
-    },
-  }
+  shell.addCleanup(detachInput)
+  shell.addCleanup(() => stage.destroy())
+  return shell
 }
 
-let session: Session | null = null
-
-const mergeGame: GameModule = {
-  mount(host, ctx) {
-    session = createSession(host, ctx)
-  },
-  unmount() {
-    session?.destroy()
-    session = null
-  },
-}
-
-export default mergeGame
+export default defineGame(createSession)

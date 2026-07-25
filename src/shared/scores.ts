@@ -11,14 +11,16 @@ export function getLocalBest(slug: string): number | null {
 }
 
 // 점수는 Supabase에 제출하고, localStorage에도 병행 저장한다 (오프라인 대비)
+// DB check 제약(0~1,000,000)을 넘으면 insert 자체가 거부되므로 미리 클램프한다
 export async function saveScore(slug: string, score: number): Promise<void> {
+  const safe = Math.max(0, Math.min(1_000_000, Math.floor(score)))
   const localBest = getLocalBest(slug) ?? 0
-  if (score > localBest) localStorage.setItem(bestKey(slug), String(score))
+  if (safe > localBest) localStorage.setItem(bestKey(slug), String(safe))
   try {
     const userId = await ensureUserId()
     const { error } = await supabase
       .from('scores')
-      .insert({ user_id: userId, game_slug: slug, score })
+      .insert({ user_id: userId, game_slug: slug, score: safe })
     if (error) throw error
   } catch {
     // 오프라인·로그인 실패 시 로컬 기록만 남긴다

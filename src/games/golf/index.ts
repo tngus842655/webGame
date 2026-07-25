@@ -1,7 +1,8 @@
 import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
-import type { GameContext, GameModule } from '../types'
+import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
+import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import {
   BALL_R,
@@ -16,36 +17,48 @@ import {
   stepBall,
 } from './state'
 
-interface Session {
-  destroy(): void
-}
-
-function createSession(host: HTMLElement, ctx: GameContext): Session {
-  const wrapper = document.createElement('div')
-  wrapper.style.cssText = 'position:absolute;inset:0;overflow:hidden;'
-  host.appendChild(wrapper)
-
-  const stage = new CanvasStage(wrapper, 720, 1280)
+function createSession(host: HTMLElement, ctx: GameContext) {
+  const shell = createGameShell(host, (dt) => {
+    if (state.phase === 'playing') {
+      if (state.sunkTimer > 0) {
+        state.sunkTimer -= dt
+        if (state.sunkTimer <= 0) {
+          if (state.holeIndex + 1 >= LEVELS.length) {
+            state.phase = 'over'
+            void courseComplete()
+          } else {
+            loadHole(state, state.holeIndex + 1)
+          }
+        }
+      } else if (state.moving) {
+        const result = stepBall(state, dt)
+        if (result.sunk) onSunk()
+      }
+    }
+    if (sunkPopup) {
+      sunkPopup.age += dt
+      if (sunkPopup.age > 0.9) sunkPopup = null
+    }
+    draw()
+  })
+  const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  let destroyed = false
   let dragStart: { x: number; y: number } | null = null
   let sunkPopup: { text: string; age: number } | null = null
 
-  const overlay = createGameOverOverlay(wrapper, {
-    adButtonLabel: '',
+  const overlay = createGameOverOverlay(shell.wrapper, {
     onRetry() {
       if (state.phase !== 'over') return
       Object.assign(state, createState())
       overlay.hide()
     },
-    onContinue() {},
   })
 
   async function courseComplete() {
     playGameOver()
     const prevBest = await ctx.getBestScore()
     await ctx.submitScore(state.score)
-    if (destroyed || state.phase !== 'over') return
+    if (shell.isDestroyed() || state.phase !== 'over') return
     overlay.show(state.score, prevBest, false)
   }
 
@@ -174,70 +187,9 @@ function createSession(host: HTMLElement, ctx: GameContext): Session {
     }
   }
 
-  let rafId = 0
-  let last = performance.now()
-  const frame = (now: number) => {
-    rafId = requestAnimationFrame(frame)
-    const dt = Math.min((now - last) / 1000, 0.05)
-    last = now
-
-    if (state.phase === 'playing') {
-      if (state.sunkTimer > 0) {
-        state.sunkTimer -= dt
-        if (state.sunkTimer <= 0) {
-          if (state.holeIndex + 1 >= LEVELS.length) {
-            state.phase = 'over'
-            void courseComplete()
-          } else {
-            loadHole(state, state.holeIndex + 1)
-          }
-        }
-      } else if (state.moving) {
-        const result = stepBall(state, dt)
-        if (result.sunk) onSunk()
-      }
-    }
-    if (sunkPopup) {
-      sunkPopup.age += dt
-      if (sunkPopup.age > 0.9) sunkPopup = null
-    }
-    draw()
-  }
-
-  const onVisibility = () => {
-    if (destroyed) return
-    if (document.hidden) {
-      cancelAnimationFrame(rafId)
-    } else {
-      last = performance.now()
-      rafId = requestAnimationFrame(frame)
-    }
-  }
-  document.addEventListener('visibilitychange', onVisibility)
-  rafId = requestAnimationFrame(frame)
-
-  return {
-    destroy() {
-      destroyed = true
-      cancelAnimationFrame(rafId)
-      document.removeEventListener('visibilitychange', onVisibility)
-      detachInput()
-      stage.destroy()
-      wrapper.remove()
-    },
-  }
+  shell.addCleanup(detachInput)
+  shell.addCleanup(() => stage.destroy())
+  return shell
 }
 
-let session: Session | null = null
-
-const golfGame: GameModule = {
-  mount(host, ctx) {
-    session = createSession(host, ctx)
-  },
-  unmount() {
-    session?.destroy()
-    session = null
-  },
-}
-
-export default golfGame
+export default defineGame(createSession)

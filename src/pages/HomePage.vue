@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { GAMES } from '@/games/registry'
+import { getLocalBest } from '@/shared/scores'
+
+const cards = GAMES.map((game) => ({ ...game, best: getLocalBest(game.slug) }))
 </script>
 
 <template>
@@ -9,14 +12,12 @@ import { GAMES } from '@/games/registry'
       <RouterLink class="settings-link" to="/settings" aria-label="설정">⚙️</RouterLink>
     </header>
 
-    <main class="game-list">
-      <article v-for="game in GAMES" :key="game.slug" class="game-card">
+    <main class="game-grid">
+      <article v-for="game in cards" :key="game.slug" class="game-card">
         <RouterLink class="card-main" :to="`/play/${game.slug}`">
           <span class="thumb">{{ game.thumbnail }}</span>
-          <span class="info">
-            <strong>{{ game.title }}</strong>
-            <small>바로 플레이</small>
-          </span>
+          <strong>{{ game.title }}</strong>
+          <small>{{ game.best !== null ? `최고 ${game.best.toLocaleString()}` : '바로 플레이' }}</small>
         </RouterLink>
         <RouterLink class="rank-link" :to="`/ranking/${game.slug}`">랭킹 보기</RouterLink>
       </article>
@@ -44,13 +45,15 @@ import { GAMES } from '@/games/registry'
   font-size: 22px;
 }
 
-.game-list {
-  display: flex;
-  flex-direction: column;
+.game-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
 
 .game-card {
+  display: flex;
+  flex-direction: column;
   background: #fff;
   border-radius: 16px;
   padding: 14px;
@@ -59,38 +62,35 @@ import { GAMES } from '@/games/registry'
 
 .card-main {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 4px;
+  text-align: center;
 }
 
 .thumb {
   display: grid;
   place-items: center;
-  width: 56px;
-  height: 56px;
-  font-size: 34px;
+  width: 64px;
+  height: 64px;
+  font-size: 40px;
   background: #fff8e1;
-  border-radius: 12px;
+  border-radius: 14px;
+  margin-bottom: 4px;
 }
 
-.info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+.card-main strong {
+  font-size: 16px;
 }
 
-.info strong {
-  font-size: 18px;
-}
-
-.info small {
+.card-main small {
   color: #bcaaa4;
 }
 
 .rank-link {
-  display: inline-block;
   margin-top: 10px;
-  font-size: 14px;
+  font-size: 13px;
   color: #8d6e63;
+  text-align: center;
 }
 </style>
