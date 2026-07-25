@@ -50,4 +50,16 @@ export const GAMES: GameMeta[] = [
     thumbnail: '⚔️',
     loader: () => import('./survivor'),
   },
+  {
+    slug: 'stock',
+    title: '모의 주식 타이쿤',
+    thumbnail: '📈',
+    loader: () => import('./stock'),
+  },
+  {
+    slug: 'merge',
+    title: '머지 가든',
+    thumbnail: '🌱',
+    loader: () => import('./merge'),
+  },
 ]
