@@ -6,6 +6,7 @@ import RankingPage from '@/pages/RankingPage.vue'
 import SettingsPage from '@/pages/SettingsPage.vue'
 import StatsPage from '@/pages/StatsPage.vue'
 import DevNotesPage from '@/pages/DevNotesPage.vue'
+import PrivacyPage from '@/pages/PrivacyPage.vue'
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -17,6 +18,7 @@ export const router = createRouter({
     { path: '/settings', component: SettingsPage },
     { path: '/stats', component: StatsPage },
     { path: '/notes', component: DevNotesPage },
+    { path: '/privacy', component: PrivacyPage },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
 })
