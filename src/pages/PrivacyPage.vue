@@ -48,7 +48,7 @@ const CONTACT_EMAIL = 'tngus842655@gmail.com'
       <p>서비스는 개인정보를 제3자에게 제공하지 않으며, 운영을 위해 아래 업체에 처리를 위탁합니다. 위탁 업체의 서버는 국외(미국)에 위치할 수 있습니다.</p>
       <ul>
         <li>Supabase Inc. — 계정 인증, 데이터베이스 보관</li>
-        <li>Cloudflare Inc. — 웹 호스팅, 콘텐츠 전송</li>
+        <li>Vercel Inc. — 웹 호스팅, 콘텐츠 전송</li>
       </ul>
 
       <h2>5. 이용자의 권리</h2>
