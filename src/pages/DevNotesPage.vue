@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { DEV_NOTES } from '@/shared/devNotes'
 import { t } from '@/shared/i18n'
+
+// 최신 기록이 위로
+const notes = computed(() => [...DEV_NOTES].sort((a, b) => b.date.localeCompare(a.date)))
 </script>
 
 <template>
@@ -11,7 +15,7 @@ import { t } from '@/shared/i18n'
     </header>
 
     <ol class="timeline">
-      <li v-for="(note, i) in DEV_NOTES" :key="i" class="entry">
+      <li v-for="(note, i) in notes" :key="i" class="entry">
         <div class="marker" />
         <article class="card">
           <div class="meta">
