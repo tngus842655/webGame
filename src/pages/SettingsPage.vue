@@ -193,13 +193,7 @@ function onLangChange() {
                 d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"
               />
             </svg>
-            <span>
-              {{
-                busy === 'google'
-                  ? t('account.linking')
-                  : t(switching ? 'account.signInGoogle' : 'account.linkGoogle')
-              }}
-            </span>
+            <span>{{ busy === 'google' ? t('account.linking') : t('account.google') }}</span>
           </button>
           <button
             type="button"
@@ -213,13 +207,7 @@ function onLangChange() {
                 d="M12 3.4c-5.08 0-9.2 3.26-9.2 7.27 0 2.55 1.67 4.79 4.19 6.08-.18.66-.67 2.46-.77 2.84-.12.48.18.47.37.34.15-.1 2.39-1.62 3.36-2.29.66.1 1.35.15 2.05.15 5.08 0 9.2-3.26 9.2-7.12S17.08 3.4 12 3.4z"
               />
             </svg>
-            <span>
-              {{
-                busy === 'kakao'
-                  ? t('account.linking')
-                  : t(switching ? 'account.signInKakao' : 'account.linkKakao')
-              }}
-            </span>
+            <span>{{ busy === 'kakao' ? t('account.linking') : t('account.kakao') }}</span>
           </button>
         </div>
 
@@ -303,11 +291,12 @@ function onLangChange() {
 
 .social-row {
   display: flex;
-  flex-direction: column;
   gap: 8px;
 }
 
 .social {
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
