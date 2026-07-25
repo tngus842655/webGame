@@ -39,7 +39,7 @@ export const LOCALES: Array<{ code: Locale; label: string }> = [
 const STORAGE_KEY = 'webgame:locale'
 
 const en = {
-  'app.title': 'Game Hub',
+  'app.title': 'MiniGame30',
   'home.play': 'Play now',
   'home.best': 'Best {n}',
   'home.ranking': 'Rankings',
@@ -149,7 +149,7 @@ const en = {
 }
 
 const ko: typeof en = {
-  'app.title': '게임 허브',
+  'app.title': '미니게임30',
   'home.play': '바로 플레이',
   'home.best': '최고 {n}',
   'home.ranking': '랭킹 보기',
@@ -262,7 +262,7 @@ const ko: typeof en = {
 type CoreDict = Partial<typeof en>
 
 const ja: CoreDict = {
-  'app.title': 'ゲームハブ',
+  'app.title': 'MiniGame30',
   'home.play': '今すぐプレイ',
   'home.best': 'ベスト {n}',
   'home.ranking': 'ランキング',
@@ -310,7 +310,7 @@ const ja: CoreDict = {
 }
 
 const zhCN: CoreDict = {
-  'app.title': '游戏中心',
+  'app.title': 'MiniGame30',
   'home.play': '立即游玩',
   'home.best': '最高 {n}',
   'home.ranking': '排行榜',
@@ -358,7 +358,7 @@ const zhCN: CoreDict = {
 }
 
 const es: CoreDict = {
-  'app.title': 'Centro de Juegos',
+  'app.title': 'MiniGame30',
   'home.play': 'Jugar',
   'home.best': 'Récord {n}',
   'home.ranking': 'Clasificación',
@@ -406,7 +406,7 @@ const es: CoreDict = {
 }
 
 const ptBR: CoreDict = {
-  'app.title': 'Central de Jogos',
+  'app.title': 'MiniGame30',
   'home.play': 'Jogar',
   'home.best': 'Melhor {n}',
   'home.ranking': 'Ranking',
@@ -454,7 +454,7 @@ const ptBR: CoreDict = {
 }
 
 const fr: CoreDict = {
-  'app.title': 'Hub de Jeux',
+  'app.title': 'MiniGame30',
   'home.play': 'Jouer',
   'home.best': 'Record {n}',
   'home.ranking': 'Classement',
@@ -502,7 +502,7 @@ const fr: CoreDict = {
 }
 
 const de: CoreDict = {
-  'app.title': 'Spiele-Hub',
+  'app.title': 'MiniGame30',
   'home.play': 'Spielen',
   'home.best': 'Bestwert {n}',
   'home.ranking': 'Rangliste',
@@ -550,7 +550,7 @@ const de: CoreDict = {
 }
 
 const ru: CoreDict = {
-  'app.title': 'Центр игр',
+  'app.title': 'MiniGame30',
   'home.play': 'Играть',
   'home.best': 'Рекорд {n}',
   'home.ranking': 'Рейтинг',
@@ -598,7 +598,7 @@ const ru: CoreDict = {
 }
 
 const id: CoreDict = {
-  'app.title': 'Pusat Game',
+  'app.title': 'MiniGame30',
   'home.play': 'Main',
   'home.best': 'Terbaik {n}',
   'home.ranking': 'Peringkat',
@@ -646,7 +646,7 @@ const id: CoreDict = {
 }
 
 const vi: CoreDict = {
-  'app.title': 'Trung tâm Game',
+  'app.title': 'MiniGame30',
   'home.play': 'Chơi ngay',
   'home.best': 'Kỷ lục {n}',
   'home.ranking': 'Bảng xếp hạng',
@@ -694,7 +694,7 @@ const vi: CoreDict = {
 }
 
 const th: CoreDict = {
-  'app.title': 'ศูนย์เกม',
+  'app.title': 'MiniGame30',
   'home.play': 'เล่นเลย',
   'home.best': 'สถิติ {n}',
   'home.ranking': 'อันดับ',
@@ -742,7 +742,7 @@ const th: CoreDict = {
 }
 
 const tr: CoreDict = {
-  'app.title': 'Oyun Merkezi',
+  'app.title': 'MiniGame30',
   'home.play': 'Oyna',
   'home.best': 'Rekor {n}',
   'home.ranking': 'Sıralama',
