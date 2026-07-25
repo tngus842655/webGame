@@ -18,6 +18,17 @@ const ASKED_KEY = 'webgame:accountAsked'
 const router = useRouter()
 const askAccount = ref(false)
 
+// 기록이 없어도 빈 문자열을 반환해 한 줄을 차지한다 (CSS에서 높이 확보)
+function scoreLabel(card: { best: number | null; stat: MyGameStat | null }): string {
+  if (card.stat) {
+    return t('home.myRank', {
+      score: card.stat.best_score.toLocaleString(),
+      rank: card.stat.rank,
+    })
+  }
+  return card.best === null ? '' : t('home.best', { n: card.best.toLocaleString() })
+}
+
 function answerAccount(existing: boolean) {
   localStorage.setItem(ASKED_KEY, 'done')
   askAccount.value = false
@@ -70,10 +81,7 @@ onMounted(async () => {
       >
         <span class="thumb"><GameIcon :slug="game.slug" /></span>
         <strong>{{ t(game.titleKey) }}</strong>
-        <small v-if="game.stat">
-          {{ t('home.myRank', { score: game.stat.best_score.toLocaleString(), rank: game.stat.rank }) }}
-        </small>
-        <small v-else-if="game.best !== null">{{ t('home.best', { n: game.best.toLocaleString() }) }}</small>
+        <small>{{ scoreLabel(game) }}</small>
       </RouterLink>
     </main>
 
@@ -138,8 +146,15 @@ onMounted(async () => {
   word-break: keep-all;
 }
 
+/* 서버에서 순위가 도착하기 전에도 카드 높이가 같도록 한 줄을 비워둔다 */
 .game-card small {
   font-size: 11px;
+  line-height: 14px;
+  min-height: 14px;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   color: #bcaaa4;
 }
 </style>
