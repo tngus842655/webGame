@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { LOCALES, locale, setLocale, t, type Locale } from '@/shared/i18n'
 import { fetchMyNickname, updateMyNickname } from '@/shared/profile'
 import { isSoundEnabled, setSoundEnabled } from '@/shared/sound'
 
@@ -8,20 +9,21 @@ const loaded = ref(false)
 const saving = ref(false)
 const message = ref('')
 const sound = ref(isSoundEnabled())
+const lang = ref<Locale>(locale.value)
 
 onMounted(async () => {
   try {
     nickname.value = await fetchMyNickname()
     loaded.value = true
   } catch {
-    message.value = '프로필을 불러오지 못했습니다. 네트워크를 확인해주세요.'
+    message.value = t('settings.loadFailed')
   }
 })
 
 async function save() {
   const name = nickname.value.trim()
   if (name.length < 2 || name.length > 12) {
-    message.value = '닉네임은 2~12자로 입력해주세요.'
+    message.value = t('settings.lengthError')
     return
   }
   saving.value = true
@@ -29,9 +31,9 @@ async function save() {
   try {
     await updateMyNickname(name)
     nickname.value = name
-    message.value = '저장했습니다! 랭킹에 바로 반영됩니다.'
+    message.value = t('settings.saved')
   } catch {
-    message.value = '저장에 실패했습니다. 잠시 후 다시 시도해주세요.'
+    message.value = t('settings.saveFailed')
   } finally {
     saving.value = false
   }
@@ -40,42 +42,55 @@ async function save() {
 function onSoundChange() {
   setSoundEnabled(sound.value)
 }
+
+function onLangChange() {
+  setLocale(lang.value)
+}
 </script>
 
 <template>
   <div class="settings">
     <header class="settings-header">
       <RouterLink class="back" to="/">←</RouterLink>
-      <h1>설정</h1>
+      <h1>{{ t('settings.title') }}</h1>
     </header>
 
     <section class="section">
-      <h2>닉네임</h2>
+      <h2>{{ t('settings.language') }}</h2>
+      <select v-model="lang" class="lang-select" @change="onLangChange">
+        <option v-for="option in LOCALES" :key="option.code" :value="option.code">
+          {{ option.label }}
+        </option>
+      </select>
+    </section>
+
+    <section class="section">
+      <h2>{{ t('settings.nickname') }}</h2>
       <div class="nickname-row">
         <input
           v-model="nickname"
           type="text"
           maxlength="12"
-          placeholder="2~12자"
+          :placeholder="t('settings.placeholder')"
           :disabled="!loaded"
         />
         <button type="button" :disabled="!loaded || saving" @click="save">
-          {{ saving ? '저장 중…' : '저장' }}
+          {{ saving ? t('settings.saving') : t('settings.save') }}
         </button>
       </div>
-      <p class="hint">랭킹에 표시되는 이름입니다.</p>
+      <p class="hint">{{ t('settings.nicknameHint') }}</p>
     </section>
 
     <section class="section">
-      <h2>사운드</h2>
+      <h2>{{ t('settings.sound') }}</h2>
       <label class="toggle-row">
         <input v-model="sound" type="checkbox" @change="onSoundChange" />
-        효과음 켜기
+        {{ t('settings.soundOn') }}
       </label>
     </section>
 
     <p v-if="message" class="message">{{ message }}</p>
-    <p class="hint">게스트 계정으로 플레이 중입니다. 소셜 로그인 연결은 추후 제공됩니다.</p>
+    <p class="hint">{{ t('settings.guest') }}</p>
   </div>
 </template>
 
@@ -110,6 +125,15 @@ function onSoundChange() {
 .section h2 {
   font-size: 16px;
   margin-bottom: 10px;
+}
+
+.lang-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d7ccc8;
+  border-radius: 10px;
+  font: inherit;
+  background: #fff;
 }
 
 .nickname-row {

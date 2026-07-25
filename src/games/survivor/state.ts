@@ -28,17 +28,19 @@ export interface Orb {
   y: number
 }
 
+import type { TranslationKey } from '@/shared/i18n'
+
 export interface UpgradeOption {
   key: 'damage' | 'firerate' | 'speed' | 'maxhp'
-  label: string
-  desc: string
+  label: TranslationKey
+  desc: TranslationKey
 }
 
 export const UPGRADE_POOL: UpgradeOption[] = [
-  { key: 'damage', label: '공격력 +1', desc: '총알 데미지 증가' },
-  { key: 'firerate', label: '연사 +20%', desc: '공격 속도 증가' },
-  { key: 'speed', label: '이동속도 +12%', desc: '더 빠르게 움직임' },
-  { key: 'maxhp', label: '최대 체력 +1', desc: '체력 1 회복 포함' },
+  { key: 'damage', label: 'sv.dmg', desc: 'sv.dmgDesc' },
+  { key: 'firerate', label: 'sv.rate', desc: 'sv.rateDesc' },
+  { key: 'speed', label: 'sv.spd', desc: 'sv.spdDesc' },
+  { key: 'maxhp', label: 'sv.hp', desc: 'sv.hpDesc' },
 ]
 
 export interface SurvivorState {

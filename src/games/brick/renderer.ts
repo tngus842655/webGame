@@ -1,3 +1,4 @@
+import { t } from '@/shared/i18n'
 import { CanvasStage } from '../stage'
 import {
   BALL,
@@ -48,8 +49,8 @@ export class BrickRenderer {
       c.textAlign = 'center'
       c.fillStyle = '#8D6E63'
       c.font = '26px sans-serif'
-      c.fillText('드래그로 조준하고, 놓으면 발사!', 360, 700)
-      c.fillText('골드를 모아 아래 버튼으로 강해지세요', 360, 740)
+      c.fillText(t('brick.hint1'), 360, 700)
+      c.fillText(t('brick.hint2'), 360, 740)
     }
   }
 
@@ -58,7 +59,7 @@ export class BrickRenderer {
     c.textAlign = 'center'
     c.fillStyle = '#BCAAA4'
     c.font = '20px sans-serif'
-    c.fillText(`웨이브 ${state.wave}`, 360, 52)
+    c.fillText(t('brick.wave', { n: state.wave }), 360, 52)
     c.fillStyle = '#5D4037'
     c.font = 'bold 48px sans-serif'
     c.fillText(state.score.toLocaleString(), 360, 108)
@@ -170,7 +171,7 @@ export class BrickRenderer {
       c.textAlign = 'center'
       c.fillStyle = '#5D4037'
       c.font = 'bold 26px sans-serif'
-      c.fillText(`${def.label} Lv.${level}`, rect.x + rect.w / 2, rect.y + 52)
+      c.fillText(`${t(def.label)} Lv.${level}`, rect.x + rect.w / 2, rect.y + 52)
       c.fillStyle = affordable ? '#43A047' : '#BCAAA4'
       c.font = 'bold 24px sans-serif'
       c.fillText(`${cost.toLocaleString()} G`, rect.x + rect.w / 2, rect.y + 95)

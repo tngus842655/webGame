@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { GAMES } from '@/games/registry'
+import { t } from '@/shared/i18n'
 import { getLocalBest } from '@/shared/scores'
 
 const cards = GAMES.map((game) => ({ ...game, best: getLocalBest(game.slug) }))
@@ -8,18 +9,18 @@ const cards = GAMES.map((game) => ({ ...game, best: getLocalBest(game.slug) }))
 <template>
   <div class="home">
     <header class="home-header">
-      <h1>웹게임 허브</h1>
-      <RouterLink class="settings-link" to="/settings" aria-label="설정">⚙️</RouterLink>
+      <h1>{{ t('app.title') }}</h1>
+      <RouterLink class="settings-link" to="/settings" :aria-label="t('settings.title')">⚙️</RouterLink>
     </header>
 
     <main class="game-grid">
       <article v-for="game in cards" :key="game.slug" class="game-card">
         <RouterLink class="card-main" :to="`/play/${game.slug}`">
           <span class="thumb">{{ game.thumbnail }}</span>
-          <strong>{{ game.title }}</strong>
-          <small>{{ game.best !== null ? `최고 ${game.best.toLocaleString()}` : '바로 플레이' }}</small>
+          <strong>{{ t(game.titleKey) }}</strong>
+          <small>{{ game.best !== null ? t('home.best', { n: game.best.toLocaleString() }) : t('home.play') }}</small>
         </RouterLink>
-        <RouterLink class="rank-link" :to="`/ranking/${game.slug}`">랭킹 보기</RouterLink>
+        <RouterLink class="rank-link" :to="`/ranking/${game.slug}`">{{ t('home.ranking') }}</RouterLink>
       </article>
     </main>
   </div>

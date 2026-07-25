@@ -57,7 +57,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   let adContinueUsed = false
 
   const overlay = createGameOverOverlay(shell.wrapper, {
-    adButtonLabel: '▶ 광고 보고 이어하기 (통 비우기)',
+    adLabelKey: 'suika.ad',
     onRetry() {
       if (state.phase !== 'over') return
       adContinueUsed = false

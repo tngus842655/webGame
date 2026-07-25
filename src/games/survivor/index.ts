@@ -1,3 +1,4 @@
+import { t } from '@/shared/i18n'
 import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
@@ -38,7 +39,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   let adReviveUsed = false
 
   const overlay = createGameOverOverlay(shell.wrapper, {
-    adButtonLabel: '▶ 광고 보고 부활하기',
+    adLabelKey: 'sv.ad',
     onRetry() {
       if (state.phase !== 'over') return
       adReviveUsed = false
@@ -169,10 +170,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.textAlign = 'center'
     c.fillStyle = '#5D4037'
     c.font = 'bold 40px sans-serif'
-    c.fillText(`${Math.floor(state.time)}초`, 360, 66)
+    c.fillText(t('sv.time', { n: Math.floor(state.time) }), 360, 66)
     c.font = '22px sans-serif'
     c.fillStyle = '#BCAAA4'
-    c.fillText(`처치 ${state.kills} · Lv.${state.level}`, 360, 100)
+    c.fillText(t('sv.kills', { k: state.kills, lv: state.level }), 360, 100)
     c.textAlign = 'right'
     c.fillStyle = '#E53935'
     c.font = 'bold 26px sans-serif'
@@ -209,7 +210,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.textAlign = 'center'
       c.fillStyle = '#FFFFFF'
       c.font = 'bold 40px sans-serif'
-      c.fillText('레벨 업! 강화를 선택하세요', 360, 360)
+      c.fillText(t('sv.levelup'), 360, 360)
       for (let i = 0; i < CARD_RECTS.length && i < state.choices.length; i++) {
         const r = CARD_RECTS[i]
         const choice = state.choices[i]
@@ -219,10 +220,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         c.fill()
         c.fillStyle = '#5D4037'
         c.font = 'bold 32px sans-serif'
-        c.fillText(choice.label, r.x + r.w / 2, r.y + 56)
+        c.fillText(t(choice.label), r.x + r.w / 2, r.y + 56)
         c.fillStyle = '#8D6E63'
         c.font = '22px sans-serif'
-        c.fillText(choice.desc, r.x + r.w / 2, r.y + 96)
+        c.fillText(t(choice.desc), r.x + r.w / 2, r.y + 96)
       }
     }
 
@@ -230,8 +231,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.textAlign = 'center'
       c.fillStyle = '#8D6E63'
       c.font = '26px sans-serif'
-      c.fillText('드래그 = 이동, 공격은 자동!', 360, 1180)
-      c.fillText('초록 구슬을 모아 레벨업 하세요', 360, 1220)
+      c.fillText(t('sv.hint1'), 360, 1180)
+      c.fillText(t('sv.hint2'), 360, 1220)
     }
   }
 

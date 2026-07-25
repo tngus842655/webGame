@@ -1,3 +1,4 @@
+import { t, type TranslationKey } from '@/shared/i18n'
 import { playDrop, playGameOver, playMerge } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
@@ -16,11 +17,22 @@ import {
 } from './state'
 
 const CHART = { x: 50, y: 220, w: 620, h: 480 }
-const BUTTONS = [
-  { x: 50, y: 1060, w: 300, h: 90, label: '매수 50%', action: 'buy' as const, portion: 0.5 },
-  { x: 370, y: 1060, w: 300, h: 90, label: '풀매수', action: 'buy' as const, portion: 1 },
-  { x: 50, y: 1165, w: 300, h: 90, label: '매도 50%', action: 'sell' as const, portion: 0.5 },
-  { x: 370, y: 1165, w: 300, h: 90, label: '전량 매도', action: 'sell' as const, portion: 1 },
+
+interface TradeButton {
+  x: number
+  y: number
+  w: number
+  h: number
+  label: TranslationKey
+  action: 'buy' | 'sell'
+  portion: number
+}
+
+const BUTTONS: TradeButton[] = [
+  { x: 50, y: 1060, w: 300, h: 90, label: 'stock.buy50', action: 'buy', portion: 0.5 },
+  { x: 370, y: 1060, w: 300, h: 90, label: 'stock.buyAll', action: 'buy', portion: 1 },
+  { x: 50, y: 1165, w: 300, h: 90, label: 'stock.sell50', action: 'sell', portion: 0.5 },
+  { x: 370, y: 1165, w: 300, h: 90, label: 'stock.sellAll', action: 'sell', portion: 1 },
 ]
 
 function createSession(host: HTMLElement, ctx: GameContext) {
@@ -33,7 +45,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   let adExtendUsed = false
 
   const overlay = createGameOverOverlay(shell.wrapper, {
-    adButtonLabel: '▶ 광고 보고 30초 연장',
+    adLabelKey: 'stock.ad',
     onRetry() {
       if (state.phase !== 'over') return
       adExtendUsed = false
@@ -88,7 +100,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     onUp() {},
   })
 
-  const won = (n: number) => `${n.toLocaleString()}원`
+  const money = (n: number) => t('stock.money', { n: n.toLocaleString() })
 
   const draw = () => {
     const c = stage.begin('#FFE0B2', '#FFF8E1')
@@ -105,14 +117,14 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.textAlign = 'center'
     c.fillStyle = '#BCAAA4'
     c.font = '20px sans-serif'
-    c.fillText('총자산', 360, 52)
+    c.fillText(t('stock.asset'), 360, 52)
     c.fillStyle = '#5D4037'
     c.font = 'bold 44px sans-serif'
-    c.fillText(won(asset), 360, 102)
+    c.fillText(money(asset), 360, 102)
     c.fillStyle = profit >= 0 ? '#E53935' : '#1E88E5'
     c.font = 'bold 24px sans-serif'
     const pct = ((profit / START_CASH) * 100).toFixed(2)
-    c.fillText(`${profit >= 0 ? '+' : ''}${won(profit)} (${pct}%)`, 360, 136)
+    c.fillText(`${profit >= 0 ? '+' : ''}${money(profit)} (${pct}%)`, 360, 136)
 
     // 차트
     c.fillStyle = 'rgb(255 255 255 / 0.75)'
@@ -139,10 +151,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.textAlign = 'center'
     c.fillStyle = '#5D4037'
     c.font = 'bold 40px sans-serif'
-    c.fillText(won(state.price), 360, CHART.y + CHART.h + 58)
+    c.fillText(money(state.price), 360, CHART.y + CHART.h + 58)
     c.fillStyle = '#BCAAA4'
     c.font = '20px sans-serif'
-    c.fillText('현재가 (가상 코인)', 360, CHART.y + CHART.h + 90)
+    c.fillText(t('stock.price'), 360, CHART.y + CHART.h + 90)
 
     // 뉴스 배너
     if (state.eventText) {
@@ -152,13 +164,17 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fill()
       c.fillStyle = state.drift > 0 ? '#C62828' : '#1565C0'
       c.font = 'bold 26px sans-serif'
-      c.fillText(state.eventText, 360, 880)
+      c.fillText(t(state.eventText), 360, 880)
     }
 
     // 보유 현황
     c.fillStyle = '#8D6E63'
     c.font = '24px sans-serif'
-    c.fillText(`현금 ${won(Math.round(state.cash))} · 보유 ${state.qty.toLocaleString()}개`, 360, 990)
+    c.fillText(
+      t('stock.holdings', { c: money(Math.round(state.cash)), q: state.qty.toLocaleString() }),
+      360,
+      990,
+    )
 
     // 버튼
     for (const button of BUTTONS) {
@@ -169,13 +185,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fill()
       c.fillStyle = '#FFFFFF'
       c.font = 'bold 30px sans-serif'
-      c.fillText(button.label, button.x + button.w / 2, button.y + button.h / 2 + 11)
+      c.fillText(t(button.label), button.x + button.w / 2, button.y + button.h / 2 + 11)
     }
 
     if (state.timeLeft > ROUND_SECONDS - 4 && state.phase === 'playing') {
       c.fillStyle = '#8D6E63'
       c.font = '24px sans-serif'
-      c.fillText('90초 동안 사고팔아 수익을 내세요! 뉴스에 주목!', 360, 940)
+      c.fillText(t('stock.hint'), 360, 940)
     }
   }
 
