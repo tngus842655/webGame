@@ -118,6 +118,56 @@ defineProps<{ slug: string }>()
       <circle cx="24" cy="9" r="2" fill="#FFF176" />
     </g>
 
+    <!-- 보석 매치3 -->
+    <g v-else-if="slug === 'match3'">
+      <path d="M10 6 L17 10 L17 18 L10 22 L3 18 L3 10 Z" fill="#E5407A" />
+      <path d="M10 6 L17 10 L10 14 L3 10 Z" fill="#FF7FA8" />
+      <path d="M31 4 L40 12 L31 21 L22 12 Z" fill="#3D9BF0" />
+      <path d="M31 4 L40 12 L31 12 Z" fill="#7EC4FF" />
+      <circle cx="12" cy="35" r="8.5" fill="#FFB300" />
+      <circle cx="9.5" cy="32.5" r="3" fill="#FFE082" />
+      <path d="M34 27 L38 34 L45 35 L39.5 40 L41 47 L34 43.5 L27 47 L28.5 40 L23 35 L30 34 Z" fill="#8E4DC8" transform="scale(0.92) translate(2 0)" />
+    </g>
+
+    <!-- 트라이픽스 솔리테어 -->
+    <g v-else-if="slug === 'tripeaks'">
+      <rect x="4" y="12" width="16" height="22" rx="3" fill="#ECEFF1" transform="rotate(-12 12 23)" />
+      <rect x="28" y="12" width="16" height="22" rx="3" fill="#CFD8DC" transform="rotate(12 36 23)" />
+      <rect x="15" y="9" width="18" height="26" rx="3" fill="#FFFFFF" stroke="#B0BEC5" stroke-width="1.4" />
+      <path d="M24 15 C21 12 16 14 17 18 C18 21 24 25 24 25 C24 25 30 21 31 18 C32 14 27 12 24 15 Z" fill="#E5393C" />
+      <path d="M8 40 L14 44 M34 44 L40 40" stroke="#8D6E63" stroke-width="2.6" stroke-linecap="round" />
+      <circle cx="24" cy="41" r="4.5" fill="#FFB300" />
+      <circle cx="22.6" cy="39.6" r="1.5" fill="#FFE082" />
+    </g>
+
+    <!-- 마작 솔리테어 -->
+    <g v-else-if="slug === 'mahjong'">
+      <rect x="7" y="16" width="18" height="24" rx="3.5" fill="#C8E6C9" />
+      <rect x="7" y="16" width="18" height="20" rx="3.5" fill="#F5F5F0" />
+      <circle cx="16" cy="26" r="5.5" fill="#43A047" />
+      <circle cx="16" cy="26" r="2.4" fill="#F5F5F0" />
+      <rect x="24" y="8" width="18" height="24" rx="3.5" fill="#FFCCBC" />
+      <rect x="24" y="8" width="18" height="20" rx="3.5" fill="#FFFFFF" />
+      <circle cx="30" cy="14" r="2.6" fill="#E5393C" />
+      <circle cx="36" cy="14" r="2.6" fill="#1565C0" />
+      <circle cx="30" cy="21" r="2.6" fill="#1565C0" />
+      <circle cx="36" cy="21" r="2.6" fill="#E5393C" />
+      <rect x="16" y="30" width="18" height="14" rx="3.5" fill="#D7CCC8" opacity="0.55" />
+    </g>
+
+    <!-- 네모로직 -->
+    <g v-else-if="slug === 'nonogram'">
+      <rect x="12" y="12" width="32" height="32" rx="4" fill="#FFFFFF" stroke="#B0BEC5" stroke-width="1.6" />
+      <rect x="14" y="14" width="9" height="9" fill="#37474F" rx="1.5" />
+      <rect x="24" y="14" width="9" height="9" fill="#37474F" rx="1.5" />
+      <rect x="24" y="24" width="9" height="9" fill="#37474F" rx="1.5" />
+      <rect x="34" y="24" width="9" height="9" fill="#42A5F5" rx="1.5" />
+      <rect x="14" y="34" width="9" height="9" fill="#42A5F5" rx="1.5" />
+      <path d="M35.5 35.5 L41.5 41.5 M41.5 35.5 L35.5 41.5" stroke="#E5393C" stroke-width="2.2" stroke-linecap="round" />
+      <path d="M6 16 h3 M6 26 h3 M6 36 h3" stroke="#607D8B" stroke-width="2.4" stroke-linecap="round" />
+      <path d="M16 6 v3 M26 6 v3 M36 6 v3" stroke="#607D8B" stroke-width="2.4" stroke-linecap="round" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />
