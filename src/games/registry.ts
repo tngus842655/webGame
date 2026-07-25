@@ -26,4 +26,16 @@ export const GAMES: GameMeta[] = [
     thumbnail: '🍒',
     loader: () => import('./fruit2048'),
   },
+  {
+    slug: 'runner',
+    title: '무한 러너',
+    thumbnail: '🏃',
+    loader: () => import('./runner'),
+  },
+  {
+    slug: 'dodge',
+    title: '낙하물 회피',
+    thumbnail: '🌧️',
+    loader: () => import('./dodge'),
+  },
 ]
