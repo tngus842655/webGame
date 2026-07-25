@@ -41,13 +41,13 @@ export async function fetchMyStats(): Promise<MyGameStat[]> {
   return (data ?? []) as MyGameStat[]
 }
 
-// 게임별 최근 7일 플레이 수 (인기순 정렬용)
+// 게임별 인기도 점수 (최근 7일 플레이 시간 × sqrt(이용자 수))
 export async function fetchPopularity(): Promise<Map<string, number>> {
   const { data, error } = await supabase.rpc('get_game_popularity')
   if (error) throw error
   const map = new Map<string, number>()
-  for (const row of (data ?? []) as Array<{ game_slug: string; plays: number }>) {
-    map.set(row.game_slug, Number(row.plays))
+  for (const row of (data ?? []) as Array<{ game_slug: string; score: number }>) {
+    map.set(row.game_slug, Number(row.score))
   }
   return map
 }

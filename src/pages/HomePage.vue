@@ -34,6 +34,7 @@ onMounted(async () => {
       <h1>{{ t('app.title') }}</h1>
       <nav class="header-links">
         <RouterLink to="/ranking" :aria-label="t('home.ranking')">🏆</RouterLink>
+        <RouterLink to="/stats" :aria-label="t('stats.title')">📊</RouterLink>
         <RouterLink to="/settings" :aria-label="t('settings.title')">⚙️</RouterLink>
       </nav>
     </header>
