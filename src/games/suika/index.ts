@@ -1,151 +1,166 @@
-import type { GameModule } from '../types'
+import type { GameContext, GameModule } from '../types'
+import { BOARD, RULES, TIERS } from './config'
+import { attachInput } from './input'
+import { SuikaRenderer } from './renderer'
+import { createState, pickDropTier, updateEffects } from './state'
+import { SuikaWorld } from './world'
 
-// M1 더미 모듈: 허브 ↔ 게임 수명주기(mount/unmount) 계약 검증용.
-// M2에서 실제 수박게임(matter.js)으로 교체한다.
-
-interface Ball {
-  x: number
-  y: number
-  vx: number
-  vy: number
-  r: number
-  hue: number
-}
+const STEP_MS = 1000 / 60
 
 interface Session {
-  stop(): void
+  destroy(): void
 }
 
-const GRAVITY = 2200
-const BOUNCE = 0.72
-const MAX_DT = 0.032
-const MAX_BALLS = 40
+function createSession(host: HTMLElement, ctx: GameContext): Session {
+  const wrapper = document.createElement('div')
+  wrapper.style.cssText = 'position:absolute;inset:0;overflow:hidden;'
+  host.appendChild(wrapper)
 
-function start(host: HTMLElement): Session {
-  const canvas = document.createElement('canvas')
-  canvas.style.width = '100%'
-  canvas.style.height = '100%'
-  canvas.style.display = 'block'
-  canvas.style.touchAction = 'none'
-  host.appendChild(canvas)
+  const renderer = new SuikaRenderer(wrapper)
+  const world = new SuikaWorld()
+  const state = createState()
+  let destroyed = false
 
-  const ctx2d = canvas.getContext('2d')
-  if (!ctx2d) {
-    canvas.remove()
-    return { stop() {} }
+  world.onMerge = (e) => {
+    state.score += e.gained
+    const popRadius = TIERS[e.spawnedTier ?? TIERS.length - 1].radius
+    state.pops.push({ x: e.x, y: e.y, r: popRadius, age: 0 })
+    state.popups.push({ x: e.x, y: e.y - 40, text: `+${e.gained}`, age: 0 })
   }
 
-  const balls: Ball[] = []
-  let width = 0
-  let height = 0
+  const overlay = createOverlay(wrapper, () => {
+    if (state.phase !== 'over') return
+    world.reset()
+    Object.assign(state, createState())
+    overlay.style.display = 'none'
+  })
 
-  const resize = () => {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2)
-    width = host.clientWidth
-    height = host.clientHeight
-    canvas.width = Math.round(width * dpr)
-    canvas.height = Math.round(height * dpr)
-    ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0)
+  const clampAim = (x: number) => {
+    const r = TIERS[state.currentTier].radius
+    return Math.min(BOARD.wallRight - 7 - r, Math.max(BOARD.wallLeft + 7 + r, x))
   }
-  const observer = new ResizeObserver(resize)
-  observer.observe(host)
-  resize()
 
-  const spawn = (x: number, y: number) => {
-    balls.push({
-      x,
-      y,
-      vx: (Math.random() - 0.5) * 200,
-      vy: 0,
-      r: 18 + Math.random() * 26,
-      hue: Math.floor(Math.random() * 360),
-    })
-    if (balls.length > MAX_BALLS) balls.shift()
-  }
-  spawn(width / 2, 80)
+  const detachInput = attachInput(renderer.canvas, {
+    onAim(clientX, clientY) {
+      if (state.phase !== 'playing') return
+      state.aimX = clampAim(renderer.toBoard(clientX, clientY).x)
+    },
+    onRelease(clientX) {
+      if (state.phase !== 'playing' || state.cooldown > 0) return
+      const x = clampAim(renderer.toBoard(clientX, 0).x)
+      world.addFruit(state.currentTier, x, BOARD.dropY)
+      state.currentTier = state.nextTier
+      state.nextTier = pickDropTier()
+      state.aimX = clampAim(x)
+      state.cooldown = RULES.dropCooldown
+    },
+  })
 
-  const onPointerDown = (e: PointerEvent) => {
-    const rect = canvas.getBoundingClientRect()
-    spawn(e.clientX - rect.left, e.clientY - rect.top)
-  }
-  canvas.addEventListener('pointerdown', onPointerDown)
-
-  const draw = () => {
-    ctx2d.fillStyle = '#FFF8E1'
-    ctx2d.fillRect(0, 0, width, height)
-
-    for (const b of balls) {
-      ctx2d.fillStyle = `hsl(${b.hue} 70% 60%)`
-      ctx2d.beginPath()
-      ctx2d.arc(b.x, b.y, b.r, 0, Math.PI * 2)
-      ctx2d.fill()
-
-      const eye = Math.max(b.r * 0.1, 2)
-      ctx2d.fillStyle = '#3E2723'
-      ctx2d.beginPath()
-      ctx2d.arc(b.x - b.r * 0.3, b.y - b.r * 0.2, eye, 0, Math.PI * 2)
-      ctx2d.arc(b.x + b.r * 0.3, b.y - b.r * 0.2, eye, 0, Math.PI * 2)
-      ctx2d.fill()
-      ctx2d.strokeStyle = '#3E2723'
-      ctx2d.lineWidth = Math.max(b.r * 0.06, 1.5)
-      ctx2d.beginPath()
-      ctx2d.arc(b.x, b.y + b.r * 0.15, b.r * 0.3, 0.2 * Math.PI, 0.8 * Math.PI)
-      ctx2d.stroke()
+  const checkDanger = (dt: number) => {
+    let danger = false
+    for (const { body, tier } of world.fruitBodies()) {
+      const top = body.position.y - TIERS[tier].radius
+      if (top < BOARD.dangerY && body.speed < RULES.settleSpeed) {
+        danger = true
+        break
+      }
     }
+    state.dangerTime = danger ? state.dangerTime + dt : 0
+    if (state.dangerTime >= RULES.gameOverSeconds) void gameOver()
+  }
 
-    ctx2d.fillStyle = '#8D6E63'
-    ctx2d.font = '14px sans-serif'
-    ctx2d.textAlign = 'center'
-    ctx2d.fillText('탭해서 공 생성 — M1 더미 게임 (M2에서 교체)', width / 2, 60)
+  async function gameOver() {
+    state.phase = 'over'
+    const prevBest = await ctx.getBestScore()
+    await ctx.submitScore(state.score)
+    if (destroyed || state.phase !== 'over') return
+    showOverlay(overlay, state.score, prevBest)
   }
 
   let rafId = 0
   let last = performance.now()
+  let acc = 0
+
   const frame = (now: number) => {
-    const dt = Math.min((now - last) / 1000, MAX_DT)
+    rafId = requestAnimationFrame(frame)
+    const dt = Math.min((now - last) / 1000, 0.05)
     last = now
 
-    for (const b of balls) {
-      b.vy += GRAVITY * dt
-      b.x += b.vx * dt
-      b.y += b.vy * dt
-      if (b.x < b.r) {
-        b.x = b.r
-        b.vx = -b.vx * BOUNCE
-      } else if (b.x > width - b.r) {
-        b.x = width - b.r
-        b.vx = -b.vx * BOUNCE
+    if (state.phase === 'playing') {
+      acc += dt * 1000
+      let steps = 0
+      while (acc >= STEP_MS && steps < 3) {
+        world.step(STEP_MS)
+        acc -= STEP_MS
+        steps += 1
       }
-      if (b.y > height - b.r) {
-        b.y = height - b.r
-        b.vy = -b.vy * BOUNCE
-        b.vx *= 0.98
-      }
+      if (steps === 3) acc = 0 // 프레임 드랍 시 물리 스텝 누적 방지
+      state.cooldown = Math.max(0, state.cooldown - dt)
+      checkDanger(dt)
     }
-
-    draw()
-    rafId = requestAnimationFrame(frame)
+    updateEffects(state, dt)
+    renderer.draw(state, world)
   }
+
+  // 백그라운드 전환 시 물리·렌더 일시정지 (DESIGN.md 7.6)
+  const onVisibility = () => {
+    if (destroyed) return
+    if (document.hidden) {
+      cancelAnimationFrame(rafId)
+    } else {
+      last = performance.now()
+      rafId = requestAnimationFrame(frame)
+    }
+  }
+  document.addEventListener('visibilitychange', onVisibility)
   rafId = requestAnimationFrame(frame)
 
   return {
-    stop() {
+    destroy() {
+      destroyed = true
       cancelAnimationFrame(rafId)
-      observer.disconnect()
-      canvas.removeEventListener('pointerdown', onPointerDown)
-      canvas.remove()
+      document.removeEventListener('visibilitychange', onVisibility)
+      detachInput()
+      world.destroy()
+      renderer.destroy()
+      wrapper.remove()
     },
   }
+}
+
+function createOverlay(parent: HTMLElement, onRetry: () => void): HTMLDivElement {
+  const el = document.createElement('div')
+  el.style.cssText =
+    'position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:rgb(62 39 35 / 0.55);color:#fff;text-align:center;'
+  el.innerHTML = `
+    <h2 style="font-size:32px;">게임 오버</h2>
+    <p data-score style="font-size:24px;"></p>
+    <p data-best style="font-size:16px;opacity:.85;"></p>
+    <button type="button" style="margin-top:8px;padding:12px 32px;border:none;border-radius:24px;font-size:18px;font-weight:bold;background:#43A047;color:#fff;cursor:pointer;">다시하기</button>`
+  el.querySelector('button')?.addEventListener('click', onRetry)
+  parent.appendChild(el)
+  return el
+}
+
+function showOverlay(el: HTMLDivElement, score: number, prevBest: number | null) {
+  const scoreEl = el.querySelector('[data-score]')
+  const bestEl = el.querySelector('[data-best]')
+  if (scoreEl) scoreEl.textContent = `점수 ${score.toLocaleString()}`
+  if (bestEl) {
+    bestEl.textContent =
+      prevBest === null || score > prevBest ? '🎉 신기록!' : `최고 기록 ${prevBest.toLocaleString()}`
+  }
+  el.style.display = 'flex'
 }
 
 let session: Session | null = null
 
 const suikaGame: GameModule = {
-  mount(host) {
-    session = start(host)
+  mount(host, ctx) {
+    session = createSession(host, ctx)
   },
   unmount() {
-    session?.stop()
+    session?.destroy()
     session = null
   },
 }
