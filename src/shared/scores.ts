@@ -41,15 +41,37 @@ export async function fetchMyStats(): Promise<MyGameStat[]> {
   return (data ?? []) as MyGameStat[]
 }
 
-// 게임별 인기도 점수 (최근 7일 플레이 시간 × sqrt(이용자 수))
-export async function fetchPopularity(): Promise<Map<string, number>> {
-  const { data, error } = await supabase.rpc('get_game_popularity')
-  if (error) throw error
-  const map = new Map<string, number>()
-  for (const row of (data ?? []) as Array<{ game_slug: string; score: number }>) {
-    map.set(row.game_slug, Number(row.score))
+const POPULARITY_KEY = 'webgame:popularity'
+
+// 인기도(최근 7일 플레이 시간 × sqrt(이용자 수))는 서버에서 받아오므로 첫 렌더에 쓸 수 없다.
+// 마지막 응답을 저장해 두고 첫 렌더부터 그 순서로 그린다 — 화면을 보는 도중 카드가 움직이지 않도록
+// 새로 받은 값은 캐시만 갱신하고 다음 진입부터 반영한다.
+function cachedPopularity(): Map<string, number> {
+  try {
+    return new Map(JSON.parse(localStorage.getItem(POPULARITY_KEY) ?? '[]'))
+  } catch {
+    return new Map()
   }
-  return map
+}
+
+// 동률(기록이 아직 없는 신규 게임 포함)은 레지스트리 순서 유지 — sort는 안정 정렬
+export function sortByPopularity<T extends { slug: string }>(games: readonly T[]): T[] {
+  const popularity = cachedPopularity()
+  return [...games].sort((a, b) => (popularity.get(b.slug) ?? 0) - (popularity.get(a.slug) ?? 0))
+}
+
+export async function refreshPopularity(): Promise<void> {
+  try {
+    const { data, error } = await supabase.rpc('get_game_popularity')
+    if (error) return
+    const rows = (data ?? []) as Array<{ game_slug: string; score: number }>
+    localStorage.setItem(
+      POPULARITY_KEY,
+      JSON.stringify(rows.map((row) => [row.game_slug, Number(row.score)])),
+    )
+  } catch {
+    // 캐시가 그대로 남아 다음 진입에도 마지막 순서를 유지한다
+  }
 }
 
 export interface LeaderboardEntry {

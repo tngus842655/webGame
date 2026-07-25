@@ -8,8 +8,9 @@ import GameIcon from '@/shared/GameIcon.vue'
 import { t } from '@/shared/i18n'
 import {
   fetchMyStats,
-  fetchPopularity,
   getLocalBest,
+  refreshPopularity,
+  sortByPopularity,
   type MyGameStat,
 } from '@/shared/scores'
 
@@ -23,21 +24,22 @@ function answerAccount(existing: boolean) {
   if (existing) void router.push('/settings')
 }
 
-// 첫 화면은 로컬 데이터로 즉시 그리고, 서버 응답이 오면 순위·인기순으로 갱신한다
+// 카드 순서는 캐시된 인기순으로 처음부터 확정하고, 서버 응답으로는 내 기록만 채운다
 const cards = ref(
-  GAMES.map((game) => ({ ...game, best: getLocalBest(game.slug), stat: null as MyGameStat | null })),
+  sortByPopularity(GAMES).map((game) => ({
+    ...game,
+    best: getLocalBest(game.slug),
+    stat: null as MyGameStat | null,
+  })),
 )
 
 onMounted(async () => {
-  const [popularity, myStats] = await Promise.all([
-    fetchPopularity().catch(() => new Map<string, number>()),
+  const [, myStats] = await Promise.all([
+    refreshPopularity(),
     fetchMyStats().catch(() => [] as MyGameStat[]),
   ])
   const statBySlug = new Map(myStats.map((stat) => [stat.game_slug, stat]))
-  const next = cards.value.map((card) => ({ ...card, stat: statBySlug.get(card.slug) ?? null }))
-  // 최근 7일 플레이 수 기준 인기순 (동률은 레지스트리 순서 유지)
-  next.sort((a, b) => (popularity.get(b.slug) ?? 0) - (popularity.get(a.slug) ?? 0))
-  cards.value = next
+  cards.value = cards.value.map((card) => ({ ...card, stat: statBySlug.get(card.slug) ?? null }))
 
   // 기존 회원 안내는 '기록이 하나도 없는' 첫 실행에서만 의미가 있다.
   // 세션 조회가 끝난 이 시점이라야 연동 여부(linkedProvider)도 확정된다

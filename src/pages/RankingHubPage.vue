@@ -1,18 +1,15 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted } from 'vue'
 import { GAMES } from '@/games/registry'
 import GameIcon from '@/shared/GameIcon.vue'
 import { t } from '@/shared/i18n'
-import { fetchPopularity } from '@/shared/scores'
+import { refreshPopularity, sortByPopularity } from '@/shared/scores'
 
-// 홈과 동일한 인기순 정렬 (서버 응답 전에는 레지스트리 순서)
-const games = ref([...GAMES])
+// 홈과 동일한 인기순 정렬 — 캐시로 첫 렌더부터 확정하고, 새 값은 다음 진입에 반영한다
+const games = sortByPopularity(GAMES)
 
-onMounted(async () => {
-  const popularity = await fetchPopularity().catch(() => new Map<string, number>())
-  games.value = [...GAMES].sort(
-    (a, b) => (popularity.get(b.slug) ?? 0) - (popularity.get(a.slug) ?? 0),
-  )
+onMounted(() => {
+  void refreshPopularity()
 })
 </script>
 
