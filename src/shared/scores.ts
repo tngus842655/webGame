@@ -1,4 +1,3 @@
-import type { GameContext } from '@/games/types'
 import { ensureUserId } from './auth'
 import { supabase } from './supabase'
 
@@ -6,30 +5,23 @@ function bestKey(slug: string) {
   return `webgame:best:${slug}`
 }
 
-function readLocalBest(slug: string): number | null {
+export function getLocalBest(slug: string): number | null {
   const raw = localStorage.getItem(bestKey(slug))
   return raw === null ? null : Number(raw)
 }
 
 // 점수는 Supabase에 제출하고, localStorage에도 병행 저장한다 (오프라인 대비)
-export function createGameContext(slug: string): GameContext {
-  return {
-    async submitScore(score: number) {
-      const localBest = readLocalBest(slug) ?? 0
-      if (score > localBest) localStorage.setItem(bestKey(slug), String(score))
-      try {
-        const userId = await ensureUserId()
-        const { error } = await supabase
-          .from('scores')
-          .insert({ user_id: userId, game_slug: slug, score })
-        if (error) throw error
-      } catch {
-        // 오프라인·로그인 실패 시 로컬 기록만 남긴다
-      }
-    },
-    async getBestScore() {
-      return readLocalBest(slug)
-    },
+export async function saveScore(slug: string, score: number): Promise<void> {
+  const localBest = getLocalBest(slug) ?? 0
+  if (score > localBest) localStorage.setItem(bestKey(slug), String(score))
+  try {
+    const userId = await ensureUserId()
+    const { error } = await supabase
+      .from('scores')
+      .insert({ user_id: userId, game_slug: slug, score })
+    if (error) throw error
+  } catch {
+    // 오프라인·로그인 실패 시 로컬 기록만 남긴다
   }
 }
 

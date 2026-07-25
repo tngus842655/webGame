@@ -3,7 +3,7 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { GAMES } from '@/games/registry'
 import type { GameModule } from '@/games/types'
-import { createGameContext } from '@/shared/scores'
+import { createGameContext } from '@/shared/gameContext'
 
 const route = useRoute()
 const router = useRouter()
