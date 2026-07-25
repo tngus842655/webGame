@@ -1,6 +1,6 @@
 import { CanvasStage } from '../stage'
 import { BOARD, TIERS } from './config'
-import { drawFruit } from './fruitArt'
+import { drawFruit } from '../fruitArt'
 import { POP_DURATION, POPUP_DURATION, SPARK_DURATION, type SuikaState } from './state'
 import type { SuikaWorld } from './world'
 

@@ -1,4 +1,4 @@
-import { SIZE, SPAWN_TIER2_CHANCE, TIERS, tierValue } from './config'
+import { MAX_TIER, SIZE, SPAWN_TIER2_CHANCE, tierValue } from './config'
 
 export type Phase = 'playing' | 'over'
 export type Direction = 'left' | 'right' | 'up' | 'down'
@@ -9,10 +9,22 @@ export interface Tile {
   popType: 'spawn' | 'merge'
 }
 
+// 슬라이드 애니메이션용 — 타일이 어디서 어디로 이동했는지
+export interface SlideMove {
+  from: number
+  to: number
+  tier: number // 이동 중 보여줄 티어(합체 전 티어)
+}
+
+export const SLIDE_DURATION = 0.11
+
 export interface F2State {
   phase: Phase
   score: number
   grid: (Tile | null)[]
+  slide: SlideMove[]
+  slideT: number // 1 → 0으로 감소
+  hintTime: number // 조작 힌트 애니메이션용
   // 광고 되돌리기용 직전 상태
   prevGrid: (Tile | null)[] | null
   prevScore: number
@@ -37,6 +49,9 @@ export function createState(): F2State {
     phase: 'playing',
     score: 0,
     grid: new Array<Tile | null>(SIZE * SIZE).fill(null),
+    slide: [],
+    slideT: 0,
+    hintTime: 0,
     prevGrid: null,
     prevScore: 0,
   }
@@ -95,27 +110,45 @@ export function move(state: F2State, dir: Direction): MoveResult {
   let moved = false
   let gained = 0
   let maxMergedTier = 0
+  const slide: SlideMove[] = []
 
   for (const line of buildLines(dir)) {
-    const tiles = line.map((i) => state.grid[i]).filter((t): t is Tile => t !== null)
-    const merged: Tile[] = []
-    for (let i = 0; i < tiles.length; i++) {
-      const current = tiles[i]
-      const next = tiles[i + 1]
-      if (next && next.tier === current.tier && current.tier < TIERS.length) {
-        const tier = current.tier + 1
-        merged.push({ tier, pop: 1, popType: 'merge' })
+    // 이동 전 위치를 함께 들고 다녀야 애니메이션을 만들 수 있다
+    const src = line
+      .map((idx) => ({ idx, tile: state.grid[idx] }))
+      .filter((e): e is { idx: number; tile: Tile } => e.tile !== null)
+
+    const out: Array<{ tile: Tile; sources: Array<{ idx: number; tier: number }> }> = []
+    for (let i = 0; i < src.length; i++) {
+      const current = src[i]
+      const next = src[i + 1]
+      if (next && next.tile.tier === current.tile.tier && current.tile.tier < MAX_TIER) {
+        const tier = current.tile.tier + 1
+        out.push({
+          tile: { tier, pop: 1, popType: 'merge' },
+          sources: [
+            { idx: current.idx, tier: current.tile.tier },
+            { idx: next.idx, tier: next.tile.tier },
+          ],
+        })
         gained += tierValue(tier)
         maxMergedTier = Math.max(maxMergedTier, tier)
         i++ // 한 타일은 한 번만 합체
       } else {
-        merged.push(current)
+        out.push({ tile: current.tile, sources: [{ idx: current.idx, tier: current.tile.tier }] })
       }
     }
+
     for (let i = 0; i < line.length; i++) {
-      const tile = merged[i] ?? null
-      if ((state.grid[line[i]]?.tier ?? 0) !== (tile?.tier ?? 0)) moved = true
-      state.grid[line[i]] = tile
+      const target = line[i]
+      const entry = out[i]
+      state.grid[target] = entry?.tile ?? null
+      if (!entry) continue
+      if (entry.sources.length > 1) moved = true
+      for (const source of entry.sources) {
+        if (source.idx !== target) moved = true
+        slide.push({ from: source.idx, to: target, tier: source.tier })
+      }
     }
   }
 
@@ -124,6 +157,8 @@ export function move(state: F2State, dir: Direction): MoveResult {
     state.prevGrid = snapshot
     state.prevScore = state.score
     state.score += gained
+    state.slide = slide
+    state.slideT = 1
     spawnTile(state)
     gameOver = !hasMoves(state.grid)
     if (gameOver) state.phase = 'over'
@@ -137,11 +172,19 @@ export function undo(state: F2State): boolean {
   state.grid = state.prevGrid
   state.score = state.prevScore
   state.prevGrid = null
+  state.slide = []
+  state.slideT = 0
   state.phase = 'playing'
   return true
 }
 
 export function updateEffects(state: F2State, dt: number) {
+  state.hintTime += dt
+  if (state.slideT > 0) {
+    state.slideT = Math.max(0, state.slideT - dt / SLIDE_DURATION)
+    if (state.slideT === 0) state.slide = []
+    return // 슬라이드 중에는 등장·합체 연출을 멈춘다
+  }
   for (const tile of state.grid) {
     if (tile && tile.pop > 0) tile.pop = Math.max(0, tile.pop - dt / 0.18)
   }

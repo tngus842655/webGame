@@ -1,4 +1,4 @@
-import { TIERS } from './config'
+import { TIERS } from './suika/config'
 
 // 과일 벡터 아트 — 이미지 에셋 없이 티어마다 고유한 형태·무늬를 그린다.
 // 공통: 입체 그라데이션 → 티어별 무늬 → 하이라이트 → 얼굴
