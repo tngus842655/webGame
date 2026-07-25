@@ -1,6 +1,7 @@
 import { t } from '@/shared/i18n'
 import { CanvasStage } from '../stage'
 import { BOARD, TIERS } from './config'
+import { drawFruit } from './fruitArt'
 import { POP_DURATION, POPUP_DURATION, SPARK_DURATION, type SuikaState } from './state'
 import type { SuikaWorld } from './world'
 
@@ -94,49 +95,7 @@ export class SuikaRenderer {
   }
 
   private drawFruit(x: number, y: number, angle: number, tier: number, radius = TIERS[tier].radius) {
-    const t = TIERS[tier]
-    const { c } = this
-    c.save()
-    c.translate(x, y)
-    c.rotate(angle)
-
-    c.fillStyle = t.color
-    c.beginPath()
-    c.arc(0, 0, radius, 0, Math.PI * 2)
-    c.fill()
-
-    if (tier === TIERS.length - 1) {
-      c.save()
-      c.clip()
-      c.strokeStyle = 'rgb(27 46 27 / 0.55)'
-      c.lineWidth = radius * 0.16
-      for (const dx of [-0.55, 0, 0.55]) {
-        c.beginPath()
-        c.ellipse(dx * radius, 0, radius * 0.08, radius * 1.05, 0, 0, Math.PI * 2)
-        c.stroke()
-      }
-      c.restore()
-    }
-
-    const eye = Math.max(radius * 0.1, 2.5)
-    const eyeX = radius * 0.3
-    const eyeY = -radius * 0.18
-    c.fillStyle = t.faceColor
-    c.beginPath()
-    c.moveTo(-eyeX + eye, eyeY)
-    c.arc(-eyeX, eyeY, eye, 0, Math.PI * 2)
-    c.moveTo(eyeX + eye, eyeY)
-    c.arc(eyeX, eyeY, eye, 0, Math.PI * 2)
-    c.fill()
-
-    c.strokeStyle = t.faceColor
-    c.lineWidth = Math.max(radius * 0.07, 2)
-    c.lineCap = 'round'
-    c.beginPath()
-    c.arc(0, radius * 0.12, radius * 0.32, 0.15 * Math.PI, 0.85 * Math.PI)
-    c.stroke()
-
-    c.restore()
+    drawFruit(this.c, x, y, angle, tier, radius)
   }
 
   private drawEffects(state: SuikaState) {

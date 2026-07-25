@@ -15,22 +15,23 @@ export interface FruitTier {
   name: string
   radius: number
   mergeScore: number
-  color: string
+  color: string // 본체 기본색 (그라데이션 중심)
+  dark: string // 가장자리 음영·장식 선 색
   faceColor: string
   dropWeight: number // 0이면 드롭으로 등장하지 않음
 }
 
 export const TIERS: FruitTier[] = [
-  { name: '체리', radius: 26, mergeScore: 1, color: '#E53935', faceColor: '#3E2723', dropWeight: 30 },
-  { name: '딸기', radius: 36, mergeScore: 3, color: '#EC407A', faceColor: '#4A0E24', dropWeight: 25 },
-  { name: '포도', radius: 42, mergeScore: 6, color: '#AB47BC', faceColor: '#311B92', dropWeight: 20 },
-  { name: '오렌지', radius: 50, mergeScore: 10, color: '#FFA726', faceColor: '#3E2723', dropWeight: 15 },
-  { name: '사과', radius: 62, mergeScore: 15, color: '#EF5350', faceColor: '#3E2723', dropWeight: 10 },
-  { name: '배', radius: 70, mergeScore: 21, color: '#D4E157', faceColor: '#33691E', dropWeight: 0 },
-  { name: '복숭아', radius: 78, mergeScore: 28, color: '#FFAB91', faceColor: '#4E342E', dropWeight: 0 },
-  { name: '파인애플', radius: 88, mergeScore: 36, color: '#FFD54F', faceColor: '#5D4037', dropWeight: 0 },
-  { name: '멜론', radius: 98, mergeScore: 45, color: '#C5E1A5', faceColor: '#33691E', dropWeight: 0 },
-  { name: '수박', radius: 115, mergeScore: 55, color: '#4CAF50', faceColor: '#1B2E1B', dropWeight: 0 },
+  { name: '체리', radius: 26, mergeScore: 1, color: '#EF3E36', dark: '#8E1B18', faceColor: '#4A1010', dropWeight: 30 },
+  { name: '딸기', radius: 36, mergeScore: 3, color: '#F2456E', dark: '#9B1B47', faceColor: '#4A0E24', dropWeight: 25 },
+  { name: '포도', radius: 42, mergeScore: 6, color: '#A855C4', dark: '#5E2469', faceColor: '#33124A', dropWeight: 20 },
+  { name: '오렌지', radius: 50, mergeScore: 10, color: '#FFA22B', dark: '#C86A00', faceColor: '#5A2E00', dropWeight: 15 },
+  { name: '사과', radius: 62, mergeScore: 15, color: '#F0503F', dark: '#98221F', faceColor: '#4A1410', dropWeight: 10 },
+  { name: '배', radius: 70, mergeScore: 21, color: '#D9E45C', dark: '#8C9A25', faceColor: '#3E4A12', dropWeight: 0 },
+  { name: '복숭아', radius: 78, mergeScore: 28, color: '#FFB299', dark: '#DE7C5A', faceColor: '#7A3A24', dropWeight: 0 },
+  { name: '파인애플', radius: 88, mergeScore: 36, color: '#FFCE45', dark: '#B08319', faceColor: '#5D4008', dropWeight: 0 },
+  { name: '멜론', radius: 98, mergeScore: 45, color: '#C9E39B', dark: '#7E9F55', faceColor: '#33501E', dropWeight: 0 },
+  { name: '수박', radius: 115, mergeScore: 55, color: '#5CB85C', dark: '#17591B', faceColor: '#0F2E12', dropWeight: 0 },
 ]
 
 // 수박+수박 합체 시 둘 다 소멸하며 받는 보너스
