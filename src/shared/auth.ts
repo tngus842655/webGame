@@ -19,12 +19,6 @@ function readProvider(user: User | null | undefined): SocialProvider | null {
   return (found?.provider as SocialProvider | undefined) ?? null
 }
 
-// 카카오 기본 scope에는 이메일이 포함되는데, 이메일 동의항목은 비즈앱 전환을 요구한다.
-// 우리는 닉네임만 쓰므로 그것만 요청한다 (구글은 기본값으로 충분)
-function scopesFor(provider: SocialProvider): string | undefined {
-  return provider === 'kakao' ? 'profile_nickname' : undefined
-}
-
 // 계정 전환은 OAuth 리다이렉트를 거치므로 메모리 변수로는 이전 계정을 알 수 없다.
 // 마지막 계정 id를 저장해두고, 달라졌으면 이전 계정의 로컬 최고점을 정리한다
 // (홈 화면이 이전 계정 기록을 새 계정 것처럼 보여주는 문제 방지. 키는 scores.ts와 공유)
@@ -75,7 +69,7 @@ export async function linkSocial(provider: SocialProvider): Promise<void> {
   sessionStorage.setItem(PENDING_KEY, provider)
   const { error } = await supabase.auth.linkIdentity({
     provider,
-    options: { redirectTo: `${location.origin}/settings`, scopes: scopesFor(provider) },
+    options: { redirectTo: `${location.origin}/settings` },
   })
   if (error) {
     sessionStorage.removeItem(PENDING_KEY)
@@ -88,7 +82,7 @@ export async function signInSocial(provider: SocialProvider): Promise<void> {
   sessionStorage.removeItem(PENDING_KEY)
   const { error } = await supabase.auth.signInWithOAuth({
     provider,
-    options: { redirectTo: `${location.origin}/settings`, scopes: scopesFor(provider) },
+    options: { redirectTo: `${location.origin}/settings` },
   })
   if (error) throw error
 }
