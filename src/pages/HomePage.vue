@@ -10,18 +10,23 @@ const cards = GAMES.map((game) => ({ ...game, best: getLocalBest(game.slug) }))
   <div class="home">
     <header class="home-header">
       <h1>{{ t('app.title') }}</h1>
-      <RouterLink class="settings-link" to="/settings" :aria-label="t('settings.title')">⚙️</RouterLink>
+      <nav class="header-links">
+        <RouterLink to="/ranking" :aria-label="t('home.ranking')">🏆</RouterLink>
+        <RouterLink to="/settings" :aria-label="t('settings.title')">⚙️</RouterLink>
+      </nav>
     </header>
 
     <main class="game-grid">
-      <article v-for="game in cards" :key="game.slug" class="game-card">
-        <RouterLink class="card-main" :to="`/play/${game.slug}`">
-          <span class="thumb">{{ game.thumbnail }}</span>
-          <strong>{{ t(game.titleKey) }}</strong>
-          <small>{{ game.best !== null ? t('home.best', { n: game.best.toLocaleString() }) : t('home.play') }}</small>
-        </RouterLink>
-        <RouterLink class="rank-link" :to="`/ranking/${game.slug}`">{{ t('home.ranking') }}</RouterLink>
-      </article>
+      <RouterLink
+        v-for="game in cards"
+        :key="game.slug"
+        class="game-card"
+        :to="`/play/${game.slug}`"
+      >
+        <span class="thumb">{{ game.thumbnail }}</span>
+        <strong>{{ t(game.titleKey) }}</strong>
+        <small v-if="game.best !== null">{{ t('home.best', { n: game.best.toLocaleString() }) }}</small>
+      </RouterLink>
     </main>
   </div>
 </template>
@@ -42,56 +47,49 @@ const cards = GAMES.map((game) => ({ ...game, best: getLocalBest(game.slug) }))
   font-size: 24px;
 }
 
-.settings-link {
+.header-links {
+  display: flex;
+  gap: 14px;
   font-size: 22px;
 }
 
 .game-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
 }
 
 .game-card {
   display: flex;
   flex-direction: column;
-  background: #fff;
-  border-radius: 16px;
-  padding: 14px;
-  box-shadow: 0 2px 8px rgb(93 64 55 / 0.08);
-}
-
-.card-main {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
+  padding: 12px 6px 10px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgb(93 64 55 / 0.08);
   text-align: center;
 }
 
 .thumb {
   display: grid;
   place-items: center;
-  width: 64px;
-  height: 64px;
-  font-size: 40px;
+  width: 48px;
+  height: 48px;
+  font-size: 30px;
   background: #fff8e1;
-  border-radius: 14px;
-  margin-bottom: 4px;
+  border-radius: 12px;
+  margin-bottom: 2px;
 }
 
-.card-main strong {
-  font-size: 16px;
-}
-
-.card-main small {
-  color: #bcaaa4;
-}
-
-.rank-link {
-  margin-top: 10px;
+.game-card strong {
   font-size: 13px;
-  color: #8d6e63;
-  text-align: center;
+  line-height: 1.25;
+  word-break: keep-all;
+}
+
+.game-card small {
+  font-size: 11px;
+  color: #bcaaa4;
 }
 </style>

@@ -38,7 +38,7 @@ watch(period, load)
 <template>
   <div class="ranking">
     <header class="ranking-header">
-      <RouterLink class="back" to="/">←</RouterLink>
+      <RouterLink class="back" to="/ranking">←</RouterLink>
       <h1>{{ t('ranking.title', { name: game ? t(game.titleKey) : t('ranking.unknown') }) }}</h1>
     </header>
 
