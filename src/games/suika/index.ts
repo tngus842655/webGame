@@ -1,5 +1,6 @@
 import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
 import type { GameContext, GameModule } from '../types'
+import { createGameOverOverlay } from '../overlay'
 import { BOARD, RULES, TIERS } from './config'
 import { attachInput } from './input'
 import { SuikaRenderer } from './renderer'
@@ -46,13 +47,14 @@ function createSession(host: HTMLElement, ctx: GameContext): Session {
 
   let adContinueUsed = false
 
-  const overlay = createOverlay(wrapper, {
+  const overlay = createGameOverOverlay(wrapper, {
+    adButtonLabel: '▶ 광고 보고 이어하기 (통 비우기)',
     onRetry() {
       if (state.phase !== 'over') return
       adContinueUsed = false
       world.reset()
       Object.assign(state, createState())
-      overlay.style.display = 'none'
+      overlay.hide()
     },
     onContinue() {
       void continueWithAd()
@@ -69,7 +71,7 @@ function createSession(host: HTMLElement, ctx: GameContext): Session {
     state.phase = 'playing'
     state.dangerTime = 0
     state.cooldown = 0
-    overlay.style.display = 'none'
+    overlay.hide()
   }
 
   const clampAim = (x: number) => {
@@ -114,7 +116,7 @@ function createSession(host: HTMLElement, ctx: GameContext): Session {
     const prevBest = await ctx.getBestScore()
     await ctx.submitScore(state.score)
     if (destroyed || state.phase !== 'over') return
-    showOverlay(overlay, state.score, prevBest, ctx.isRewardAdReady() && !adContinueUsed)
+    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adContinueUsed)
   }
 
   let rafId = 0
@@ -166,40 +168,6 @@ function createSession(host: HTMLElement, ctx: GameContext): Session {
       wrapper.remove()
     },
   }
-}
-
-interface OverlayHandlers {
-  onRetry(): void
-  onContinue(): void
-}
-
-function createOverlay(parent: HTMLElement, handlers: OverlayHandlers): HTMLDivElement {
-  const el = document.createElement('div')
-  el.style.cssText =
-    'position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:rgb(62 39 35 / 0.55);color:#fff;text-align:center;'
-  el.innerHTML = `
-    <h2 style="font-size:32px;">게임 오버</h2>
-    <p data-score style="font-size:24px;"></p>
-    <p data-best style="font-size:16px;opacity:.85;"></p>
-    <button data-ad type="button" style="margin-top:8px;padding:12px 32px;border:none;border-radius:24px;font-size:18px;font-weight:bold;background:#43A047;color:#fff;cursor:pointer;">▶ 광고 보고 이어하기 (통 비우기)</button>
-    <button data-retry type="button" style="padding:12px 32px;border:none;border-radius:24px;font-size:18px;font-weight:bold;background:#8D6E63;color:#fff;cursor:pointer;">다시하기</button>`
-  el.querySelector('[data-ad]')?.addEventListener('click', handlers.onContinue)
-  el.querySelector('[data-retry]')?.addEventListener('click', handlers.onRetry)
-  parent.appendChild(el)
-  return el
-}
-
-function showOverlay(el: HTMLDivElement, score: number, prevBest: number | null, canContinue: boolean) {
-  const scoreEl = el.querySelector('[data-score]')
-  const bestEl = el.querySelector('[data-best]')
-  const adBtn = el.querySelector<HTMLButtonElement>('[data-ad]')
-  if (scoreEl) scoreEl.textContent = `점수 ${score.toLocaleString()}`
-  if (bestEl) {
-    bestEl.textContent =
-      prevBest === null || score > prevBest ? '🎉 신기록!' : `최고 기록 ${prevBest.toLocaleString()}`
-  }
-  if (adBtn) adBtn.style.display = canContinue ? '' : 'none'
-  el.style.display = 'flex'
 }
 
 let session: Session | null = null

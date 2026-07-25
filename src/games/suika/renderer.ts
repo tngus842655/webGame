@@ -1,66 +1,29 @@
+import { CanvasStage } from '../stage'
 import { BOARD, TIERS } from './config'
 import { POP_DURATION, POPUP_DURATION, SPARK_DURATION, type SuikaState } from './state'
 import type { SuikaWorld } from './world'
 
-// 논리 좌표 720×1280을 레터박스로 스케일링해 그린다 (DESIGN.md 7.1, 7.6)
+// 논리 좌표 720×1280 스테이지 위에 게임을 그린다 (DESIGN.md 7.1, 7.6)
 export class SuikaRenderer {
-  readonly canvas: HTMLCanvasElement
-
+  private readonly stage: CanvasStage
   private readonly c: CanvasRenderingContext2D
-  private readonly host: HTMLElement
-  private readonly observer: ResizeObserver
-  private dpr = 1
-  private scale = 1
-  private offsetX = 0
-  private offsetY = 0
-  private cssW = 0
-  private cssH = 0
 
   constructor(host: HTMLElement) {
-    this.host = host
-    this.canvas = document.createElement('canvas')
-    this.canvas.style.cssText =
-      'position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;user-select:none;-webkit-user-select:none;'
-    host.appendChild(this.canvas)
-
-    const c = this.canvas.getContext('2d')
-    if (!c) throw new Error('Canvas 2D를 사용할 수 없습니다')
-    this.c = c
-
-    this.observer = new ResizeObserver(() => this.resize())
-    this.observer.observe(host)
-    this.resize()
+    this.stage = new CanvasStage(host, BOARD.width, BOARD.height)
+    this.c = this.stage.c
   }
 
-  private resize() {
-    this.dpr = Math.min(window.devicePixelRatio || 1, 2)
-    this.cssW = this.host.clientWidth
-    this.cssH = this.host.clientHeight
-    this.canvas.width = Math.round(this.cssW * this.dpr)
-    this.canvas.height = Math.round(this.cssH * this.dpr)
-    this.scale = Math.min(this.cssW / BOARD.width, this.cssH / BOARD.height)
-    this.offsetX = (this.cssW - BOARD.width * this.scale) / 2
-    this.offsetY = (this.cssH - BOARD.height * this.scale) / 2
+  get canvas() {
+    return this.stage.canvas
   }
 
   toBoard(clientX: number, clientY: number): { x: number; y: number } {
-    const rect = this.canvas.getBoundingClientRect()
-    return {
-      x: (clientX - rect.left - this.offsetX) / this.scale,
-      y: (clientY - rect.top - this.offsetY) / this.scale,
-    }
+    return this.stage.toBoard(clientX, clientY)
   }
 
   draw(state: SuikaState, world: SuikaWorld) {
     const { c } = this
-    c.setTransform(this.dpr, 0, 0, this.dpr, 0, 0)
-    c.fillStyle = '#FFE0B2'
-    c.fillRect(0, 0, this.cssW, this.cssH)
-
-    const s = this.dpr * this.scale
-    c.setTransform(s, 0, 0, s, this.dpr * this.offsetX, this.dpr * this.offsetY)
-    c.fillStyle = '#FFF8E1'
-    c.fillRect(0, 0, BOARD.width, BOARD.height)
+    this.stage.begin('#FFE0B2', '#FFF8E1')
 
     this.drawJar()
     this.drawDangerLine(state)
@@ -231,7 +194,6 @@ export class SuikaRenderer {
   }
 
   destroy() {
-    this.observer.disconnect()
-    this.canvas.remove()
+    this.stage.destroy()
   }
 }

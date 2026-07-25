@@ -8,4 +8,10 @@ export const GAMES: GameMeta[] = [
     thumbnail: '🍉',
     loader: () => import('./suika'),
   },
+  {
+    slug: 'blockblast',
+    title: '블록 블라스트',
+    thumbnail: '🟦',
+    loader: () => import('./blockblast'),
+  },
 ]
