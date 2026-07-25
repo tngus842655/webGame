@@ -21,6 +21,8 @@ const lang = ref<Locale>(locale.value)
 const existingAccount = ref<SocialProvider | null>(null)
 const busy = ref<SocialProvider | null>(null)
 const accountError = ref('')
+// 계정 전환: 게스트를 거치지 않고 곧바로 다른 소셜 계정으로 로그인한다
+const switching = ref(false)
 
 onMounted(async () => {
   const failed = takeRedirectError()
@@ -54,7 +56,8 @@ async function link(provider: SocialProvider) {
   }
 }
 
-async function restore(provider: SocialProvider) {
+// 기존 기록 불러오기 · 계정 전환 공통 — 해당 소셜 계정으로 바로 로그인한다
+async function signIn(provider: SocialProvider) {
   busy.value = provider
   accountError.value = ''
   try {
@@ -103,21 +106,33 @@ function onLangChange() {
     <section class="section">
       <h2>{{ t('account.title') }}</h2>
 
-      <p v-if="linkedProvider" class="linked">
-        {{ t('account.linked', { provider: providerLabel(linkedProvider) }) }}
-      </p>
+      <template v-if="linkedProvider && !switching">
+        <p class="linked">
+          {{ t('account.linked', { provider: providerLabel(linkedProvider) }) }}
+        </p>
+        <button type="button" class="text-link" @click="switching = true">
+          {{ t('account.switch') }}
+        </button>
+      </template>
 
       <template v-else>
         <div v-if="existingAccount" class="restore">
           <p>{{ t('account.exists', { provider: providerLabel(existingAccount) }) }}</p>
           <p class="warn">{{ t('account.existsWarn') }}</p>
-          <button type="button" @click="restore(existingAccount)">
+          <button type="button" @click="signIn(existingAccount)">
             {{ busy === existingAccount ? t('account.linking') : t('account.restore') }}
           </button>
         </div>
 
+        <p v-if="switching" class="hint switch-hint">{{ t('account.switchHint') }}</p>
+
         <div class="social-row">
-          <button type="button" class="social google" :disabled="!!busy" @click="link('google')">
+          <button
+            type="button"
+            class="social google"
+            :disabled="!!busy"
+            @click="switching ? signIn('google') : link('google')"
+          >
             <svg class="logo" viewBox="0 0 48 48" aria-hidden="true">
               <path
                 fill="#4285f4"
@@ -136,19 +151,40 @@ function onLangChange() {
                 d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"
               />
             </svg>
-            <span>{{ busy === 'google' ? t('account.linking') : t('account.linkGoogle') }}</span>
+            <span>
+              {{
+                busy === 'google'
+                  ? t('account.linking')
+                  : t(switching ? 'account.signInGoogle' : 'account.linkGoogle')
+              }}
+            </span>
           </button>
-          <button type="button" class="social kakao" :disabled="!!busy" @click="link('kakao')">
+          <button
+            type="button"
+            class="social kakao"
+            :disabled="!!busy"
+            @click="switching ? signIn('kakao') : link('kakao')"
+          >
             <svg class="logo" viewBox="0 0 24 24" aria-hidden="true">
               <path
                 fill="#3c1e1e"
                 d="M12 3.4c-5.08 0-9.2 3.26-9.2 7.27 0 2.55 1.67 4.79 4.19 6.08-.18.66-.67 2.46-.77 2.84-.12.48.18.47.37.34.15-.1 2.39-1.62 3.36-2.29.66.1 1.35.15 2.05.15 5.08 0 9.2-3.26 9.2-7.12S17.08 3.4 12 3.4z"
               />
             </svg>
-            <span>{{ busy === 'kakao' ? t('account.linking') : t('account.linkKakao') }}</span>
+            <span>
+              {{
+                busy === 'kakao'
+                  ? t('account.linking')
+                  : t(switching ? 'account.signInKakao' : 'account.linkKakao')
+              }}
+            </span>
           </button>
         </div>
-        <p class="hint">{{ t('account.hint') }}</p>
+
+        <button v-if="switching" type="button" class="text-link" @click="switching = false">
+          {{ t('account.cancel') }}
+        </button>
+        <p v-else class="hint">{{ t('account.hint') }}</p>
       </template>
 
       <p v-if="accountError" class="message">{{ accountError }}</p>
@@ -274,6 +310,23 @@ function onLangChange() {
 .linked {
   font-size: 14px;
   color: #5d4037;
+}
+
+/* 계정 전환·취소 — 자주 쓰지 않는 동작이라 버튼 대신 옅은 링크로 둔다 */
+.text-link {
+  margin-top: 10px;
+  padding: 2px 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  color: #a1887f;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.switch-hint {
+  margin: 0 0 10px;
 }
 
 .restore {
