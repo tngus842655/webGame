@@ -1,3 +1,4 @@
+// 게임 공통 포인터 입력 (down/move/up, 포인터 캡처 포함)
 export interface PointerHandlers {
   onDown(clientX: number, clientY: number): void
   onMove(clientX: number, clientY: number): void

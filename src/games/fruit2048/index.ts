@@ -2,16 +2,10 @@ import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
 import type { GameContext, GameModule } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
-import { LAYOUT } from './config'
-import { BBRenderer, type DragState } from './renderer'
-import {
-  createState,
-  dragTarget,
-  pieceSize,
-  placePiece,
-  replaceTrayWithSmall,
-  updateEffects,
-} from './state'
+import { F2Renderer } from './renderer'
+import { createState, move, undo, updateEffects, type Direction } from './state'
+
+const SWIPE_THRESHOLD = 40 // 보드 좌표 기준 최소 스와이프 거리
 
 interface Session {
   destroy(): void
@@ -22,34 +16,33 @@ function createSession(host: HTMLElement, ctx: GameContext): Session {
   wrapper.style.cssText = 'position:absolute;inset:0;overflow:hidden;'
   host.appendChild(wrapper)
 
-  const renderer = new BBRenderer(wrapper)
+  const renderer = new F2Renderer(wrapper)
   const state = createState()
   let destroyed = false
-  let adSwapUsed = false
-  let drag: DragState | null = null
+  let adUndoUsed = false
+  let swipeStart: { x: number; y: number } | null = null
 
   const overlay = createGameOverOverlay(wrapper, {
-    adButtonLabel: '▶ 광고 보고 블록 교체',
+    adButtonLabel: '▶ 광고 보고 한 수 되돌리기',
     onRetry() {
       if (state.phase !== 'over') return
-      adSwapUsed = false
+      adUndoUsed = false
       Object.assign(state, createState())
       overlay.hide()
     },
     onContinue() {
-      void swapWithAd()
+      void undoWithAd()
     },
   })
 
-  // 광고 보상: 남은 블록을 소형 블록으로 교체하고 이어하기 (판당 1회)
-  async function swapWithAd() {
-    if (state.phase !== 'over' || adSwapUsed) return
-    const rewarded = await ctx.showRewardAd('blockblast_swap')
+  async function undoWithAd() {
+    if (state.phase !== 'over' || adUndoUsed) return
+    const rewarded = await ctx.showRewardAd('fruit2048_undo')
     if (destroyed || !rewarded || state.phase !== 'over') return
-    adSwapUsed = true
-    replaceTrayWithSmall(state)
-    state.phase = 'playing'
-    overlay.hide()
+    if (undo(state)) {
+      adUndoUsed = true
+      overlay.hide()
+    }
   }
 
   async function gameOver() {
@@ -58,48 +51,40 @@ function createSession(host: HTMLElement, ctx: GameContext): Session {
     const prevBest = await ctx.getBestScore()
     await ctx.submitScore(state.score)
     if (destroyed || state.phase !== 'over') return
-    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adSwapUsed)
-  }
-
-  const hitTray = (x: number, y: number): number => {
-    for (let i = 0; i < LAYOUT.traySlots.length; i++) {
-      if (Math.abs(x - LAYOUT.traySlots[i]) <= 100 && Math.abs(y - LAYOUT.trayY) <= 100) return i
-    }
-    return -1
+    overlay.show(
+      state.score,
+      prevBest,
+      ctx.isRewardAdReady() && !adUndoUsed && state.prevGrid !== null,
+    )
   }
 
   const detachInput = attachInput(renderer.canvas, {
     onDown(clientX, clientY) {
       if (state.phase !== 'playing') return
-      const p = renderer.toBoard(clientX, clientY)
-      const i = hitTray(p.x, p.y)
-      if (i >= 0 && state.tray[i]) drag = { trayIndex: i, x: p.x, y: p.y }
+      swipeStart = renderer.toBoard(clientX, clientY)
     },
-    onMove(clientX, clientY) {
-      if (!drag) return
+    onMove() {},
+    onUp(clientX, clientY) {
+      if (!swipeStart || state.phase !== 'playing') {
+        swipeStart = null
+        return
+      }
       const p = renderer.toBoard(clientX, clientY)
-      drag.x = p.x
-      drag.y = p.y
-    },
-    onUp() {
-      if (!drag) return
-      const current = drag
-      drag = null
-      const piece = state.tray[current.trayIndex]
-      if (!piece || state.phase !== 'playing') return
-      const { col, row } = dragTarget(piece, current.x, current.y)
-      const result = placePiece(state, current.trayIndex, col, row)
-      if (!result) return
+      const dx = p.x - swipeStart.x
+      const dy = p.y - swipeStart.y
+      swipeStart = null
+      if (Math.max(Math.abs(dx), Math.abs(dy)) < SWIPE_THRESHOLD) return
 
+      let dir: Direction
+      if (Math.abs(dx) > Math.abs(dy)) dir = dx > 0 ? 'right' : 'left'
+      else dir = dy > 0 ? 'down' : 'up'
+
+      const result = move(state, dir)
+      if (!result.moved) return
       playDrop()
-      const { w, h } = pieceSize(piece)
-      const cx = LAYOUT.boardX + (col + w / 2) * LAYOUT.cell
-      const cy = LAYOUT.boardY + (row + h / 2) * LAYOUT.cell
-      state.popups.push({ x: cx, y: cy - 20, text: `+${result.gained}`, age: 0 })
-      if (result.linesCleared > 0) {
-        playMerge(1 + result.linesCleared)
-        vibrate(15)
-        for (const cell of result.clearedCells) state.clearFx.push({ ...cell, age: 0 })
+      if (result.gained > 0) {
+        playMerge(result.maxMergedTier)
+        vibrate(10)
       }
       if (result.gameOver) void gameOver()
     },
@@ -112,7 +97,7 @@ function createSession(host: HTMLElement, ctx: GameContext): Session {
     const dt = Math.min((now - last) / 1000, 0.05)
     last = now
     updateEffects(state, dt)
-    renderer.draw(state, drag)
+    renderer.draw(state)
   }
 
   const onVisibility = () => {
@@ -141,7 +126,7 @@ function createSession(host: HTMLElement, ctx: GameContext): Session {
 
 let session: Session | null = null
 
-const blockBlastGame: GameModule = {
+const fruit2048Game: GameModule = {
   mount(host, ctx) {
     session = createSession(host, ctx)
   },
@@ -151,4 +136,4 @@ const blockBlastGame: GameModule = {
   },
 }
 
-export default blockBlastGame
+export default fruit2048Game

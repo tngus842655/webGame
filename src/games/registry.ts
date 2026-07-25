@@ -14,4 +14,16 @@ export const GAMES: GameMeta[] = [
     thumbnail: '🟦',
     loader: () => import('./blockblast'),
   },
+  {
+    slug: 'brick',
+    title: '벽돌깨기 RPG',
+    thumbnail: '🧱',
+    loader: () => import('./brick'),
+  },
+  {
+    slug: 'fruit2048',
+    title: '과일 2048',
+    thumbnail: '🍒',
+    loader: () => import('./fruit2048'),
+  },
 ]
