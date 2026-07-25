@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { GAMES } from '@/games/registry'
+import GameIcon from '@/shared/GameIcon.vue'
 import { t } from '@/shared/i18n'
 import { fetchPopularity } from '@/shared/scores'
 
@@ -25,7 +26,7 @@ onMounted(async () => {
     <ul class="game-list">
       <li v-for="game in games" :key="game.slug">
         <RouterLink class="row" :to="`/ranking/${game.slug}`">
-          <span class="thumb">{{ game.thumbnail }}</span>
+          <span class="thumb"><GameIcon :slug="game.slug" /></span>
           <span class="title">{{ t(game.titleKey) }}</span>
           <span class="arrow">›</span>
         </RouterLink>
@@ -72,7 +73,9 @@ onMounted(async () => {
 }
 
 .thumb {
-  font-size: 24px;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
 }
 
 .title {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { GAMES } from '@/games/registry'
+import GameIcon from '@/shared/GameIcon.vue'
 import { t } from '@/shared/i18n'
 import {
   fetchMyStats,
@@ -44,7 +45,7 @@ onMounted(async () => {
         class="game-card"
         :to="`/play/${game.slug}`"
       >
-        <span class="thumb">{{ game.thumbnail }}</span>
+        <span class="thumb"><GameIcon :slug="game.slug" /></span>
         <strong>{{ t(game.titleKey) }}</strong>
         <small v-if="game.stat">
           {{ t('home.myRank', { score: game.stat.best_score.toLocaleString(), rank: game.stat.rank }) }}
