@@ -1,3 +1,4 @@
+import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
 import type { GameContext, GameModule } from '../types'
 import { BOARD, RULES, TIERS } from './config'
 import { attachInput } from './input'
@@ -26,6 +27,21 @@ function createSession(host: HTMLElement, ctx: GameContext): Session {
     const popRadius = TIERS[e.spawnedTier ?? TIERS.length - 1].radius
     state.pops.push({ x: e.x, y: e.y, r: popRadius, age: 0 })
     state.popups.push({ x: e.x, y: e.y - 40, text: `+${e.gained}`, age: 0 })
+    const color = TIERS[e.tier].color
+    for (let i = 0; i < 8; i++) {
+      const angle = (Math.PI * 2 * i) / 8 + Math.random() * 0.5
+      const speed = 250 + Math.random() * 200
+      state.sparks.push({
+        x: e.x,
+        y: e.y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 150,
+        age: 0,
+        color,
+      })
+    }
+    playMerge(e.tier)
+    vibrate(15)
   }
 
   const overlay = createOverlay(wrapper, () => {
@@ -49,6 +65,7 @@ function createSession(host: HTMLElement, ctx: GameContext): Session {
       if (state.phase !== 'playing' || state.cooldown > 0) return
       const x = clampAim(renderer.toBoard(clientX, 0).x)
       world.addFruit(state.currentTier, x, BOARD.dropY)
+      playDrop()
       state.currentTier = state.nextTier
       state.nextTier = pickDropTier()
       state.aimX = clampAim(x)
@@ -71,6 +88,8 @@ function createSession(host: HTMLElement, ctx: GameContext): Session {
 
   async function gameOver() {
     state.phase = 'over'
+    playGameOver()
+    vibrate(120)
     const prevBest = await ctx.getBestScore()
     await ctx.submitScore(state.score)
     if (destroyed || state.phase !== 'over') return

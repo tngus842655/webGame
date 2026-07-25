@@ -16,8 +16,18 @@ export interface Popup {
   age: number
 }
 
+export interface Spark {
+  x: number
+  y: number
+  vx: number
+  vy: number
+  age: number
+  color: string
+}
+
 export const POP_DURATION = 0.35
 export const POPUP_DURATION = 0.8
+export const SPARK_DURATION = 0.5
 
 export interface SuikaState {
   phase: Phase
@@ -29,6 +39,7 @@ export interface SuikaState {
   dangerTime: number
   pops: Pop[]
   popups: Popup[]
+  sparks: Spark[]
 }
 
 export function pickDropTier(): number {
@@ -52,6 +63,7 @@ export function createState(): SuikaState {
     dangerTime: 0,
     pops: [],
     popups: [],
+    sparks: [],
   }
 }
 
@@ -61,6 +73,13 @@ export function updateEffects(state: SuikaState, dt: number) {
     p.age += dt
     p.y -= 60 * dt
   }
+  for (const s of state.sparks) {
+    s.age += dt
+    s.x += s.vx * dt
+    s.y += s.vy * dt
+    s.vy += 900 * dt
+  }
   state.pops = state.pops.filter((p) => p.age < POP_DURATION)
   state.popups = state.popups.filter((p) => p.age < POPUP_DURATION)
+  state.sparks = state.sparks.filter((s) => s.age < SPARK_DURATION)
 }

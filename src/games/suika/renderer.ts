@@ -1,5 +1,5 @@
 import { BOARD, TIERS } from './config'
-import { POP_DURATION, POPUP_DURATION, type SuikaState } from './state'
+import { POP_DURATION, POPUP_DURATION, SPARK_DURATION, type SuikaState } from './state'
 import type { SuikaWorld } from './world'
 
 // 논리 좌표 720×1280을 레터박스로 스케일링해 그린다 (DESIGN.md 7.1, 7.6)
@@ -77,12 +77,22 @@ export class SuikaRenderer {
       this.drawFruit(state.aimX, BOARD.dropY, 0, state.currentTier)
     }
 
-    for (const { body, tier } of world.fruitBodies()) {
+    const fruits = world.fruitBodies()
+    for (const { body, tier } of fruits) {
       this.drawFruit(body.position.x, body.position.y, body.angle, tier)
     }
 
     this.drawEffects(state)
     this.drawHud(state)
+
+    // 첫 플레이 힌트: 아직 아무것도 안 떨어뜨렸을 때만
+    if (state.phase === 'playing' && state.score === 0 && fruits.length === 0) {
+      c.textAlign = 'center'
+      c.fillStyle = '#8D6E63'
+      c.font = '26px sans-serif'
+      c.fillText('드래그로 조준하고, 놓으면 떨어져요!', 360, 560)
+      c.fillText('같은 과일끼리 닿으면 합쳐집니다', 360, 600)
+    }
   }
 
   private drawJar() {
@@ -167,6 +177,15 @@ export class SuikaRenderer {
 
   private drawEffects(state: SuikaState) {
     const { c } = this
+    for (const s of state.sparks) {
+      const k = s.age / SPARK_DURATION
+      c.globalAlpha = 1 - k
+      c.fillStyle = s.color
+      c.beginPath()
+      c.arc(s.x, s.y, 8 * (1 - k) + 3, 0, Math.PI * 2)
+      c.fill()
+    }
+    c.globalAlpha = 1
     for (const p of state.pops) {
       const k = p.age / POP_DURATION
       c.globalAlpha = 1 - k
