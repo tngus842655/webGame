@@ -3,7 +3,7 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { GAMES } from '@/games/registry'
 import type { GameModule } from '@/games/types'
-import { createLocalGameContext } from '@/shared/scores'
+import { createGameContext } from '@/shared/scores'
 
 const route = useRoute()
 const router = useRouter()
@@ -23,7 +23,7 @@ onMounted(async () => {
   // 로드 완료 전에 페이지를 떠났으면 mount하지 않는다
   if (disposed) return
   game = mod.default
-  game.mount(host.value, createLocalGameContext(slug))
+  game.mount(host.value, createGameContext(slug))
 })
 
 onBeforeUnmount(() => {

@@ -1,7 +1,7 @@
 <template>
   <div class="stub-page">
     <h1>설정</h1>
-    <p>닉네임·로그인은 M3, 사운드 설정은 M4 단계에서 구현됩니다.</p>
+    <p>닉네임·소셜 로그인·사운드 설정은 M4 단계에서 구현됩니다.</p>
     <RouterLink to="/">← 홈으로</RouterLink>
   </div>
 </template>

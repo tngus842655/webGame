@@ -1,16 +1,57 @@
 import type { GameContext } from '@/games/types'
+import { ensureUserId } from './auth'
+import { supabase } from './supabase'
 
-// M3에서 Supabase 제출로 교체하고, localStorage 저장은 오프라인 대비로 병행 유지한다
-export function createLocalGameContext(slug: string): GameContext {
-  const key = `webgame:best:${slug}`
+function bestKey(slug: string) {
+  return `webgame:best:${slug}`
+}
+
+function readLocalBest(slug: string): number | null {
+  const raw = localStorage.getItem(bestKey(slug))
+  return raw === null ? null : Number(raw)
+}
+
+// 점수는 Supabase에 제출하고, localStorage에도 병행 저장한다 (오프라인 대비)
+export function createGameContext(slug: string): GameContext {
   return {
     async submitScore(score: number) {
-      const best = Number(localStorage.getItem(key) ?? '0')
-      if (score > best) localStorage.setItem(key, String(score))
+      const localBest = readLocalBest(slug) ?? 0
+      if (score > localBest) localStorage.setItem(bestKey(slug), String(score))
+      try {
+        const userId = await ensureUserId()
+        const { error } = await supabase
+          .from('scores')
+          .insert({ user_id: userId, game_slug: slug, score })
+        if (error) throw error
+      } catch {
+        // 오프라인·로그인 실패 시 로컬 기록만 남긴다
+      }
     },
     async getBestScore() {
-      const raw = localStorage.getItem(key)
-      return raw === null ? null : Number(raw)
+      return readLocalBest(slug)
     },
   }
+}
+
+export interface LeaderboardEntry {
+  user_id: string
+  nickname: string
+  best_score: number
+  achieved_at: string
+}
+
+export async function fetchLeaderboard(
+  slug: string,
+  period: 'week' | 'all',
+  limit = 50,
+): Promise<LeaderboardEntry[]> {
+  const since =
+    period === 'week' ? new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString() : null
+  const { data, error } = await supabase.rpc('get_leaderboard', {
+    p_game_slug: slug,
+    p_since: since,
+    p_limit: limit,
+  })
+  if (error) throw error
+  return (data ?? []) as LeaderboardEntry[]
 }
