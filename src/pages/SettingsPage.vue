@@ -126,6 +126,25 @@ function onLangChange() {
       <h1>{{ t('settings.title') }}</h1>
     </header>
 
+    <section class="section" :class="{ flagged: nicknameNotice }">
+      <h2>{{ t('settings.nickname') }}</h2>
+      <p v-if="nicknameNotice" class="notice">{{ nicknameNotice }}</p>
+      <div class="nickname-row">
+        <input
+          v-model="nickname"
+          type="text"
+          maxlength="12"
+          :placeholder="t('settings.placeholder')"
+          :disabled="!loaded"
+        />
+        <button type="button" :disabled="!loaded || saving" @click="save">
+          {{ saving ? t('settings.saving') : t('settings.save') }}
+        </button>
+      </div>
+      <p v-if="message" class="message">{{ message }}</p>
+      <p class="hint">{{ t('settings.nicknameHint') }}</p>
+    </section>
+
     <section class="section">
       <h2>{{ t('account.title') }}</h2>
 
@@ -222,6 +241,14 @@ function onLangChange() {
     </section>
 
     <section class="section">
+      <h2>{{ t('settings.sound') }}</h2>
+      <label class="toggle-row">
+        <input v-model="sound" type="checkbox" @change="onSoundChange" />
+        {{ t('settings.soundOn') }}
+      </label>
+    </section>
+
+    <section class="section">
       <h2>{{ t('settings.language') }}</h2>
       <select v-model="lang" class="lang-select" @change="onLangChange">
         <option v-for="option in LOCALES" :key="option.code" :value="option.code">
@@ -230,38 +257,14 @@ function onLangChange() {
       </select>
     </section>
 
-    <section class="section" :class="{ flagged: nicknameNotice }">
-      <h2>{{ t('settings.nickname') }}</h2>
-      <p v-if="nicknameNotice" class="notice">{{ nicknameNotice }}</p>
-      <div class="nickname-row">
-        <input
-          v-model="nickname"
-          type="text"
-          maxlength="12"
-          :placeholder="t('settings.placeholder')"
-          :disabled="!loaded"
-        />
-        <button type="button" :disabled="!loaded || saving" @click="save">
-          {{ saving ? t('settings.saving') : t('settings.save') }}
-        </button>
-      </div>
-      <p class="hint">{{ t('settings.nicknameHint') }}</p>
-    </section>
-
-    <section class="section">
-      <h2>{{ t('settings.sound') }}</h2>
-      <label class="toggle-row">
-        <input v-model="sound" type="checkbox" @change="onSoundChange" />
-        {{ t('settings.soundOn') }}
-      </label>
-    </section>
-
     <RouterLink class="menu-link" to="/notes">
       <span>{{ t('notes.title') }}</span>
       <span class="arrow">›</span>
     </RouterLink>
 
-    <p v-if="message" class="message">{{ message }}</p>
+    <footer class="settings-footer">
+      <RouterLink to="/privacy">{{ t('privacy.title') }}</RouterLink>
+    </footer>
   </div>
 </template>
 
@@ -481,5 +484,17 @@ function onLangChange() {
   padding: 4px 2px;
   font-size: 14px;
   color: #5d4037;
+}
+
+.settings-footer {
+  margin-top: 20px;
+  padding-bottom: 12px;
+  text-align: center;
+}
+
+.settings-footer a {
+  font-size: 12px;
+  color: #bcaaa4;
+  text-decoration: underline;
 }
 </style>
