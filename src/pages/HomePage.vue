@@ -51,6 +51,11 @@ const shelves = computed(() => [
   { key: 'more', title: t('home.sectionMore'), games: ranked.value.slice(3) },
 ])
 
+// 1~3위만 메달로 꾸민다
+function rankClass(rank: number): string {
+  return rank <= 3 ? `medal m${rank}` : ''
+}
+
 // 휴지통에 아무것도 없으면 입구를 만들지 않는다
 const trashCount = trashedGames(GAMES).length
 
@@ -94,7 +99,9 @@ onMounted(async () => {
             class="game-card"
             :to="`/play/${game.slug}`"
           >
-            <span v-if="game.rank !== null" class="rank">{{ game.rank }}</span>
+            <span v-if="game.rank !== null" class="rank" :class="rankClass(game.rank)">
+              {{ game.rank }}
+            </span>
             <span class="thumb"><GameIcon :slug="game.slug" /></span>
             <strong>{{ t(game.titleKey) }}</strong>
             <small>{{ scoreLabel(game) }}</small>
@@ -202,11 +209,41 @@ onMounted(async () => {
 /* 카드 크기는 그대로 두고 왼쪽 위 여백에 얹는다 */
 .game-card .rank {
   position: absolute;
-  top: 6px;
-  left: 8px;
-  font-size: 11px;
+  top: 5px;
+  left: 5px;
+  display: grid;
+  place-items: center;
+  min-width: 21px;
+  height: 21px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #f3eeec;
+  color: #a1887f;
+  font-size: 12px;
   font-weight: bold;
-  color: #d7ccc8;
+  line-height: 1;
+}
+
+/* 1~3위는 메달로 */
+.game-card .rank.medal {
+  color: #fff;
+  font-size: 13px;
+  text-shadow: 0 1px 1px rgb(0 0 0 / 0.2);
+}
+
+.game-card .rank.m1 {
+  background: linear-gradient(#ffd54f, #f9a825);
+  box-shadow: 0 2px 6px rgb(249 168 37 / 0.5);
+}
+
+.game-card .rank.m2 {
+  background: linear-gradient(#eceff1, #b0bec5);
+  box-shadow: 0 2px 6px rgb(120 144 156 / 0.4);
+}
+
+.game-card .rank.m3 {
+  background: linear-gradient(#d9a679, #b07d4e);
+  box-shadow: 0 2px 6px rgb(141 110 99 / 0.4);
 }
 
 .thumb {

@@ -95,14 +95,23 @@ const cards = trashedGames(GAMES).map((game) => ({
   text-align: center;
 }
 
-/* 홈과 같은 자리 — 카드 크기는 그대로 두고 왼쪽 위 여백에 얹는다 */
+/* 홈과 같은 모양 — 카드 크기는 그대로 두고 왼쪽 위 여백에 얹는다.
+   여기 있는 게임은 30위 밖이라 메달은 붙지 않는다 */
 .rank {
   position: absolute;
-  top: 6px;
-  left: 8px;
-  font-size: 11px;
+  top: 5px;
+  left: 5px;
+  display: grid;
+  place-items: center;
+  min-width: 21px;
+  height: 21px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #f3eeec;
+  color: #a1887f;
+  font-size: 12px;
   font-weight: bold;
-  color: #d7ccc8;
+  line-height: 1;
 }
 
 .thumb {
