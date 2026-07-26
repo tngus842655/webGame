@@ -6,7 +6,9 @@ export const PLAYER_W = 56
 export const PLAYER_H = 64
 export const GRAVITY = 3600
 export const JUMP_V = -1250
-export const AIR_BAR_TOP = GROUND_Y - 240 // 공중 장애물(점프 금지 구간)
+// 공중 장애물 = 천장에서 내려온 벽. 아래 틈으로만 지나갈 수 있으니 점프하면 죽는다.
+// 예전에는 허공에 뜬 막대라 높이 뛰면 위로 넘어가졌고, 넘어야 하는지 지나야 하는지가 불분명했다.
+export const AIR_BAR_BOTTOM = GROUND_Y - 100
 
 export type Phase = 'playing' | 'over'
 
@@ -36,8 +38,9 @@ export interface RunnerState {
   coinTimer: number
 }
 
+// 예전엔 34초면 최고 속도에 닿아 그 뒤로 난이도가 멈췄다 — 천천히, 더 멀리 오르게 바꿨다
 export function speedAt(time: number): number {
-  return Math.min(900, 420 + time * 14)
+  return Math.min(1300, 420 + time * 10)
 }
 
 export function scoreOf(state: RunnerState): number {
@@ -80,14 +83,18 @@ export function update(state: RunnerState, dt: number): UpdateResult {
 
   state.spawnTimer -= dt
   if (state.spawnTimer <= 0) {
-    state.spawnTimer = 0.75 + Math.random() * 0.9
+    // 간격을 시간이 아니라 거리로 잡는다. 시간 기준이면 후반 속도에서 점프 체공(0.69초)보다
+    // 짧은 간격이 나와 피할 수 없는 조합이 생긴다.
+    state.spawnTimer = (680 + Math.random() * 560) / speed
     if (Math.random() < 0.3) {
-      state.obstacles.push({ x: 760, w: 90, h: 70, air: true })
+      state.obstacles.push({ x: 760, w: 90, h: 0, air: true })
     } else {
+      // 높이 150짜리는 초반 저속에서 점프 성공 창이 14ms뿐이라 사실상 못 넘었다.
+      // 최악 조건에서도 100ms는 남도록 낮췄다.
       state.obstacles.push({
         x: 760,
-        w: 40 + Math.random() * 60,
-        h: 60 + Math.random() * 90,
+        w: 40 + Math.random() * 50,
+        h: 55 + Math.random() * 60,
         air: false,
       })
     }
@@ -95,9 +102,14 @@ export function update(state: RunnerState, dt: number): UpdateResult {
 
   state.coinTimer -= dt
   if (state.coinTimer <= 0) {
-    state.coinTimer = 2.5 + Math.random() * 2
-    const y = GROUND_Y - (200 + Math.random() * 160)
-    for (let k = 0; k < 3; k++) state.coins.push({ x: 760 + k * 70, y })
+    // 장애물과 겹치면 코인을 먹으러 가다 죽는다 — 자리가 비었고 곧 생기지도 않을 때만 놓는다
+    if (state.spawnTimer < 0.6 || state.obstacles.some((o) => o.x + o.w > 700 && o.x < 1000)) {
+      state.coinTimer = 0.5
+    } else {
+      state.coinTimer = 2.5 + Math.random() * 2
+      const y = GROUND_Y - (200 + Math.random() * 160)
+      for (let k = 0; k < 3; k++) state.coins.push({ x: 760 + k * 70, y })
+    }
   }
 
   for (const o of state.obstacles) o.x -= speed * dt
@@ -125,8 +137,8 @@ export function update(state: RunnerState, dt: number): UpdateResult {
   const px1 = PLAYER_X - PLAYER_W / 2
   const px2 = PLAYER_X + PLAYER_W / 2
   for (const o of state.obstacles) {
-    const oy1 = o.air ? AIR_BAR_TOP : GROUND_Y - o.h
-    const oy2 = o.air ? AIR_BAR_TOP + o.h : GROUND_Y
+    const oy1 = o.air ? 0 : GROUND_Y - o.h
+    const oy2 = o.air ? AIR_BAR_BOTTOM : GROUND_Y
     if (px2 > o.x && px1 < o.x + o.w && state.playerY > oy1 && top < oy2) {
       state.phase = 'over'
       return { died: true, coinsTaken }

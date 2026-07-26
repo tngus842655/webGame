@@ -5,7 +5,7 @@ import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import {
-  AIR_BAR_TOP,
+  AIR_BAR_BOTTOM,
   GROUND_Y,
   JUMP_V,
   PLAYER_H,
@@ -130,33 +130,32 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     // 장애물
     for (const o of state.obstacles) {
       if (o.air) {
-        // 공중 가시 막대
+        // 천장에서 내려온 벽 — 아래 틈으로만 지나갈 수 있다는 게 한눈에 보여야 한다
+        const h = AIR_BAR_BOTTOM
         c.save()
-        c.fillStyle = '#E65100'
-        c.beginPath()
-        c.roundRect(o.x, AIR_BAR_TOP + 4, o.w, o.h, 10)
-        c.fill()
-        const grad = c.createLinearGradient(o.x, AIR_BAR_TOP, o.x, AIR_BAR_TOP + o.h)
-        grad.addColorStop(0, '#FFB74D')
-        grad.addColorStop(1, '#F57C00')
+        const grad = c.createLinearGradient(o.x, 0, o.x, h)
+        grad.addColorStop(0, '#F57C00')
+        grad.addColorStop(1, '#FFB74D')
         c.fillStyle = grad
         c.beginPath()
-        c.roundRect(o.x, AIR_BAR_TOP, o.w, o.h, 10)
+        c.roundRect(o.x, -20, o.w, h + 20, [0, 0, 12, 12])
         c.fill()
-        // 경고 줄무늬
+        // 아래끝 경고 줄무늬 (지나갈 틈의 높이를 눈으로 재게 해준다)
         c.save()
         c.beginPath()
-        c.roundRect(o.x, AIR_BAR_TOP, o.w, o.h, 10)
+        c.rect(o.x, h - 70, o.w, 70)
         c.clip()
         c.strokeStyle = 'rgb(62 39 35 / 0.35)'
         c.lineWidth = 9
-        for (let sx = -o.h; sx < o.w + o.h; sx += 26) {
+        for (let sx = -70; sx < o.w + 70; sx += 26) {
           c.beginPath()
-          c.moveTo(o.x + sx, AIR_BAR_TOP + o.h)
-          c.lineTo(o.x + sx + o.h, AIR_BAR_TOP)
+          c.moveTo(o.x + sx, h)
+          c.lineTo(o.x + sx + 70, h - 70)
           c.stroke()
         }
         c.restore()
+        c.fillStyle = '#E65100'
+        c.fillRect(o.x, h - 8, o.w, 8)
         c.restore()
       } else {
         // 바위

@@ -40,10 +40,12 @@ export const SPAWN_R = 470
 const BULLET_SPEED = 900
 const FIRE_COOLDOWN = 0.15
 
-export const rotSpeed = (t: number) => Math.min(4.0, 2.0 + t * 0.015)
-const enemySpeed = (t: number) => Math.min(85, 40 + t * 0.5)
-const spawnInterval = (t: number) => Math.max(0.6, 1.5 - t * 0.007)
-const armoredChance = (t: number) => Math.min(0.35, t * 0.004)
+// 상한은 2분 안쪽에서 전부 걸려 그 뒤로는 난이도가 멈춰 있었다.
+// 잘하는 사람이 무한히 버티면 세션만 늘어지고 점수도 부풀어서, 5분 부근까지 계속 오르게 폈다.
+export const rotSpeed = (t: number) => Math.min(6.5, 2.0 + t * 0.015)
+const enemySpeed = (t: number) => Math.min(140, 40 + t * 0.5)
+const spawnInterval = (t: number) => Math.max(0.32, 1.5 - t * 0.007)
+const armoredChance = (t: number) => Math.min(0.6, t * 0.004)
 
 export function createState(): OrbitState {
   return {
