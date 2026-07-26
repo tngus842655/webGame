@@ -48,6 +48,12 @@ onMounted(async () => {
   }
 })
 
+// 상단 고정을 풀면 순서 값도 지운다 — 다시 켤 때 예전 숫자가 되살아나지 않도록
+function toggleFeatured(flag: GameFlag) {
+  if (!flag.featured) flag.sortOrder = 0
+  return save(flag)
+}
+
 async function save(flag: GameFlag) {
   saving.value = flag.slug
   error.value = ''
@@ -104,18 +110,21 @@ async function moveToTrash() {
           </div>
           <div class="controls">
             <label>
-              <input v-model="row.flag.featured" type="checkbox" @change="save(row.flag)" />
+              <input
+                v-model="row.flag.featured"
+                type="checkbox"
+                @change="toggleFeatured(row.flag)"
+              />
               {{ t('admin.featured') }}
             </label>
-            <!-- 순서는 상단 고정된 것끼리만 쓰인다 — 아니면 눌러도 소용없다는 걸 보여준다 -->
-            <label class="order" :class="{ off: !row.flag.featured }">
+            <!-- 순서는 상단 고정된 것끼리만 쓰인다 -->
+            <label v-if="row.flag.featured" class="order">
               {{ t('admin.order') }}
               <input
                 v-model.number="row.flag.sortOrder"
                 type="number"
                 min="0"
                 max="99"
-                :disabled="!row.flag.featured"
                 @change="save(row.flag)"
               />
             </label>
@@ -291,13 +300,6 @@ async function moveToTrash() {
   font: inherit;
 }
 
-.order.off {
-  opacity: 0.4;
-}
-
-.order input:disabled {
-  background: #f5f5f5;
-}
 
 .dim {
   position: fixed;
