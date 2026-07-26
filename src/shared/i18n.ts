@@ -332,6 +332,15 @@ const en = {
   'wd.copied': 'Copied!',
   'wd.answer': 'Answer: {word}',
   'wd.ad': '▶ Watch ad for one more row',
+  'game.omok': 'Gomoku',
+  'om.win': 'You win! 🔥 {n} streak',
+  'om.lose': 'You lost…',
+  'om.you': 'Your turn (black)',
+  'om.think': 'AI is thinking…',
+  'om.undo': '▶ Watch ad to undo a move',
+  'game.deck': 'Card Battler',
+  'game.autochess': 'Auto Battler',
+  'game.roulette': 'Daily Roulette',
 }
 
 const ko: typeof en = {
@@ -628,6 +637,15 @@ const ko: typeof en = {
   'wd.copied': '복사됐어요!',
   'wd.answer': '정답: {word}',
   'wd.ad': '▶ 광고 보고 한 줄 더',
+  'game.omok': '오목',
+  'om.win': '승리! 🔥 {n}연승',
+  'om.lose': '패배…',
+  'om.you': '당신 차례 (흑)',
+  'om.think': 'AI가 생각 중…',
+  'om.undo': '▶ 광고 보고 한 수 무르기',
+  'game.deck': '카드 배틀',
+  'game.autochess': '오토 배틀',
+  'game.roulette': '룰렛 데일리',
 }
 
 // 나머지 언어: 허브·게임오버·광고·제목까지 번역, 게임 내부 텍스트는 en 폴백
@@ -715,6 +733,10 @@ const ja: CoreDict = {
   'game.reigns': '王国カード',
   'game.focus': '集中の木',
   'game.wordle': 'ハングルワードル',
+  'game.omok': '五目並べ',
+  'game.deck': 'カードバトル',
+  'game.autochess': 'オートバトラー',
+  'game.roulette': 'デイリールーレット',
 }
 
 const zhCN: CoreDict = {
@@ -799,6 +821,10 @@ const zhCN: CoreDict = {
   'game.reigns': '王国卡牌',
   'game.focus': '专注之树',
   'game.wordle': '韩文猜词',
+  'game.omok': '五子棋',
+  'game.deck': '卡牌战斗',
+  'game.autochess': '自走棋',
+  'game.roulette': '每日转盘',
 }
 
 const es: CoreDict = {
@@ -883,6 +909,10 @@ const es: CoreDict = {
   'game.reigns': 'Cartas del Reino',
   'game.focus': 'Árbol de Enfoque',
   'game.wordle': 'Wordle Hangul',
+  'game.omok': 'Gomoku',
+  'game.deck': 'Batalla de Cartas',
+  'game.autochess': 'Auto Batalla',
+  'game.roulette': 'Ruleta Diaria',
 }
 
 const ptBR: CoreDict = {
@@ -967,6 +997,10 @@ const ptBR: CoreDict = {
   'game.reigns': 'Cartas do Reino',
   'game.focus': 'Árvore do Foco',
   'game.wordle': 'Wordle Hangul',
+  'game.omok': 'Gomoku',
+  'game.deck': 'Batalha de Cartas',
+  'game.autochess': 'Auto Batalha',
+  'game.roulette': 'Roleta Diária',
 }
 
 const fr: CoreDict = {
@@ -1051,6 +1085,10 @@ const fr: CoreDict = {
   'game.reigns': 'Cartes du Royaume',
   'game.focus': 'Arbre de Focus',
   'game.wordle': 'Wordle Hangeul',
+  'game.omok': 'Gomoku',
+  'game.deck': 'Bataille de Cartes',
+  'game.autochess': 'Auto-Bataille',
+  'game.roulette': 'Roulette du Jour',
 }
 
 const de: CoreDict = {
@@ -1135,6 +1173,10 @@ const de: CoreDict = {
   'game.reigns': 'Königreich-Karten',
   'game.focus': 'Fokus-Baum',
   'game.wordle': 'Hangul-Wordle',
+  'game.omok': 'Gomoku',
+  'game.deck': 'Kartenkampf',
+  'game.autochess': 'Auto-Battler',
+  'game.roulette': 'Tägliches Glücksrad',
 }
 
 const ru: CoreDict = {
@@ -1219,6 +1261,10 @@ const ru: CoreDict = {
   'game.reigns': 'Карты королевства',
   'game.focus': 'Дерево фокуса',
   'game.wordle': 'Хангыль-вордл',
+  'game.omok': 'Гомоку',
+  'game.deck': 'Карточные бои',
+  'game.autochess': 'Автобатлер',
+  'game.roulette': 'Рулетка дня',
 }
 
 const id: CoreDict = {
@@ -1303,6 +1349,10 @@ const id: CoreDict = {
   'game.reigns': 'Kartu Kerajaan',
   'game.focus': 'Pohon Fokus',
   'game.wordle': 'Wordle Hangul',
+  'game.omok': 'Gomoku',
+  'game.deck': 'Pertarungan Kartu',
+  'game.autochess': 'Auto Battler',
+  'game.roulette': 'Roulette Harian',
 }
 
 const vi: CoreDict = {
@@ -1387,6 +1437,10 @@ const vi: CoreDict = {
   'game.reigns': 'Bài Vương Quốc',
   'game.focus': 'Cây Tập Trung',
   'game.wordle': 'Wordle Hangul',
+  'game.omok': 'Cờ Ca-rô',
+  'game.deck': 'Đấu Bài',
+  'game.autochess': 'Cờ Tự Đấu',
+  'game.roulette': 'Vòng Quay Mỗi Ngày',
 }
 
 const th: CoreDict = {
@@ -1471,6 +1525,10 @@ const th: CoreDict = {
   'game.reigns': 'ไพ่ราชอาณาจักร',
   'game.focus': 'ต้นไม้สมาธิ',
   'game.wordle': 'เวิร์ดเดิลฮันกึล',
+  'game.omok': 'โกะโมกุ',
+  'game.deck': 'การ์ดแบทเทิล',
+  'game.autochess': 'ออโต้แบทเทิล',
+  'game.roulette': 'วงล้อรายวัน',
 }
 
 const tr: CoreDict = {
@@ -1555,6 +1613,10 @@ const tr: CoreDict = {
   'game.reigns': 'Krallık Kartları',
   'game.focus': 'Odak Ağacı',
   'game.wordle': 'Hangıl Wordle',
+  'game.omok': 'Gomoku',
+  'game.deck': 'Kart Savaşı',
+  'game.autochess': 'Oto Savaş',
+  'game.roulette': 'Günlük Çark',
 }
 
 const messages: Record<Locale, CoreDict> = {

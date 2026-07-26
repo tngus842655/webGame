@@ -331,6 +331,19 @@ defineProps<{ slug: string }>()
       <rect x="8" y="32" width="32" height="8" rx="2.5" fill="#CFD8DC" />
     </g>
 
+    <!-- 오목 -->
+    <g v-else-if="slug === 'omok'">
+      <rect x="4" y="4" width="40" height="40" rx="7" fill="#D7A86E" />
+      <path d="M12 8 V40 M22 8 V40 M32 8 V40 M8 14 H40 M8 24 H40 M8 34 H40" stroke="#8D6E63" stroke-width="1.4" />
+      <circle cx="22" cy="24" r="5.5" fill="#212121" />
+      <circle cx="32" cy="14" r="5.5" fill="#FAFAFA" stroke="#BDBDBD" stroke-width="1" />
+      <circle cx="12" cy="34" r="5.5" fill="#212121" />
+      <circle cx="32" cy="34" r="5.5" fill="#FAFAFA" stroke="#BDBDBD" stroke-width="1" />
+      <circle cx="12" cy="14" r="5.5" fill="#212121" />
+      <circle cx="20.5" cy="22.5" r="1.6" fill="#616161" />
+      <circle cx="10.5" cy="12.5" r="1.6" fill="#616161" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />

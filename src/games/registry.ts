@@ -133,4 +133,9 @@ export const GAMES: GameMeta[] = [
     titleKey: 'game.wordle',
     loader: () => import('./wordle'),
   },
+  {
+    slug: 'omok',
+    titleKey: 'game.omok',
+    loader: () => import('./omok'),
+  },
 ]
