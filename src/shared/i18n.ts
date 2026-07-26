@@ -66,8 +66,8 @@ const en = {
   // 운영자 전용 화면 — 다른 언어는 en 폴백으로 둔다
   'admin.title': 'Admin',
   'admin.hint':
-    'Games checked as Top go on the New shelf at the top of the home screen (up to 3). Order is their place within that shelf, lower first. The rest stay in popularity order: the top 3 fill the Popular shelf and everything below goes on the last one. An orange rank on the right means the game dropped out of the top 30. Changes show up the next time the home screen opens.',
-  'admin.featured': 'Top',
+    'Games checked as New go on the New shelf at the top of the home screen (up to 3). Order is their place within that shelf, lower first. The rest stay in popularity order: the top 3 fill the Popular shelf and everything below goes on the last one. An orange rank on the right means the game dropped out of the top 30. Changes show up the next time the home screen opens.',
+  'admin.featured': 'New',
   'admin.hidden': 'Hide',
   'admin.order': 'Order',
   'admin.saveFailed': 'Could not save.',
@@ -295,8 +295,8 @@ const ko: typeof en = {
   'notes.title': '개발자 노트',
   'admin.title': '관리자',
   'admin.hint':
-    '상단을 체크한 게임은 홈 맨 위 신규 칸에 올라갑니다(최대 3개). 순서는 그 안에서의 자리이고 작을수록 앞입니다. 나머지는 인기순으로, 1~3위가 인기 칸에 서고 그 아래가 마지막 칸입니다. 오른쪽 순위가 주황색이면 30위 밖으로 밀린 게임입니다. 바뀐 내용은 홈에 다시 들어갈 때 반영됩니다.',
-  'admin.featured': '상단',
+    '신규를 체크한 게임은 홈 맨 위 신규 칸에 올라갑니다(최대 3개). 순서는 그 안에서의 자리이고 작을수록 앞입니다. 나머지는 인기순으로, 1~3위가 인기 칸에 서고 그 아래가 마지막 칸입니다. 오른쪽 순위가 주황색이면 30위 밖으로 밀린 게임입니다. 바뀐 내용은 홈에 다시 들어갈 때 반영됩니다.',
+  'admin.featured': '신규',
   'admin.hidden': '숨김',
   'admin.order': '순서',
   'admin.saveFailed': '저장하지 못했어요.',
