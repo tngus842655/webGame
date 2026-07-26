@@ -28,7 +28,7 @@ onMounted(async () => {
   try {
     const titleBySlug = new Map(GAMES.map((game) => [game.slug, game.titleKey]))
     // 휴지통 게임도 사용자가 계속 즐길 수 있어 순위가 움직인다 — 되돌릴지 판단하는 재료다
-    const ranks = popularityRanks()
+    const ranks = popularityRanks(GAMES)
     const flags = await fetchGameFlags()
     rows.value = flags
       .filter((flag): flag is GameFlag & { trashedAt: string } => !!flag.trashedAt)

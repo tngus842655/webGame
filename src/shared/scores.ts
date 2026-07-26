@@ -127,11 +127,16 @@ export function cacheGameFlags(rows: Array<[string, CachedFlag]>): void {
   localStorage.setItem(FLAGS_KEY, JSON.stringify(rows))
 }
 
-// 인기 순위 (1위부터). 관리자 화면에서 '상위 30위 밖' 후보를 가려내는 데 쓴다.
-// 기록이 없는 게임은 순위가 없어 지도에 들어가지 않는다.
-export function popularityRanks(): Map<string, number> {
-  const sorted = [...cachedPopularity().entries()].sort((a, b) => b[1] - a[1])
-  return new Map(sorted.map(([slug], index) => [slug, index + 1]))
+// 인기 순위 (1위부터). 기록이 없는 게임은 순위가 없어 지도에 들어가지 않는다.
+// 반드시 현재 등록된 게임만 넘길 것 — 인기도 캐시에는 이미 지운 게임의 기록도 섞여
+// 있는데(play_sessions는 남는다), 그것까지 세면 화면에 없는 번호가 중간에 빈다.
+export function popularityRanks(games: readonly { slug: string }[]): Map<string, number> {
+  const popularity = cachedPopularity()
+  const ranked = games
+    .map((game) => ({ slug: game.slug, score: popularity.get(game.slug) }))
+    .filter((entry) => entry.score !== undefined)
+    .sort((a, b) => b.score! - a.score!)
+  return new Map(ranked.map((entry, index) => [entry.slug, index + 1]))
 }
 
 // 홈 화면이 '신규' 칸을 가르는 데 쓴다 (관리자가 상단에 올린 게임)

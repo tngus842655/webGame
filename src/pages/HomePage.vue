@@ -29,7 +29,7 @@ function scoreLabel(card: { best: number | null; stat: MyGameStat | null }): str
 
 // 카드 순서는 캐시된 인기순으로 처음부터 확정하고, 서버 응답으로는 내 기록만 채운다.
 // 순위 숫자도 같은 캐시에서 나온다 — 아직 기록이 없는 게임은 숫자가 없다.
-const ranks = popularityRanks()
+const ranks = popularityRanks(GAMES)
 const cards = ref(
   sortByPopularity(GAMES).map((game) => ({
     ...game,

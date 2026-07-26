@@ -7,7 +7,7 @@ import { t } from '@/shared/i18n'
 import { getLocalBest, popularityRanks, trashedGames } from '@/shared/scores'
 
 // 순위는 홈과 같은 기준으로 매긴다 — 그래서 홈에서 비어 보이는 번호가 여기에 있다
-const ranks = popularityRanks()
+const ranks = popularityRanks(GAMES)
 const cards = trashedGames(GAMES).map((game) => ({
   ...game,
   rank: ranks.get(game.slug) ?? null,

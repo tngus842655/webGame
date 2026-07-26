@@ -33,8 +33,8 @@ const trashedCount = computed(() => all.value.length - rows.value.length)
 onMounted(async () => {
   try {
     const bySlug = new Map((await fetchGameFlags()).map((flag) => [flag.slug, flag]))
-    const ranks = popularityRanks()
-    // 등록 순서 그대로 — 숨긴 게임도 여기서는 보여야 다시 켤 수 있다
+    const ranks = popularityRanks(GAMES)
+    // 홈과 같은 인기순으로 세운다 — 기록이 없는 게임은 순위가 없어 맨 뒤로 간다
     all.value = GAMES.map((game) => ({
       slug: game.slug,
       titleKey: game.titleKey,
@@ -46,7 +46,7 @@ onMounted(async () => {
         sortOrder: 0,
         trashedAt: null,
       },
-    }))
+    })).sort((a, b) => (a.rank ?? Infinity) - (b.rank ?? Infinity))
   } catch {
     failed.value = true
   } finally {
