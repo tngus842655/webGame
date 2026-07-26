@@ -135,7 +135,7 @@ export class BrickRenderer {
     for (const ball of state.balls) {
       if (ball.active) drawBall(this.c, ball.x, ball.y, BALL.radius)
     }
-    drawLauncher(this.c, state.launchX, LAYOUT.launchY, state.save.ballLevel)
+    drawLauncher(this.c, state.launchX, LAYOUT.launchY, state.run.ballLevel)
   }
 
   // 벽 반사까지 반영한 예측 경로
@@ -228,7 +228,7 @@ export class BrickRenderer {
     c.textAlign = 'right'
     c.fillStyle = '#5D4037'
     c.font = 'bold 26px sans-serif'
-    c.fillText(state.save.gold.toLocaleString(), 672, 73)
+    c.fillText(state.run.gold.toLocaleString(), 672, 73)
   }
 
   private drawButtons(state: BrickState) {
@@ -236,9 +236,9 @@ export class BrickRenderer {
     for (let i = 0; i < UPGRADES.length; i++) {
       const def = UPGRADES[i]
       const rect = BUTTON_RECTS[i]
-      const level = upgradeLevel(state.save, def.key)
+      const level = upgradeLevel(state.run, def.key)
       const cost = upgradeCost(def, level)
-      const affordable = state.save.gold >= cost && state.phase === 'aiming'
+      const affordable = state.run.gold >= cost && state.phase === 'aiming'
 
       c.save()
       if (state.phase === 'flying') c.globalAlpha = 0.45

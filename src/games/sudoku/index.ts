@@ -112,12 +112,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   const onPuzzleClear = async () => {
     let points = clearPoints(state)
-    if (state.daily) {
-      // 오늘 첫 데일리 클리어면 스트릭을 쌓고 보너스를 준다
-      const { streak, first } = recordDailyClear()
-      state.streak = streak
-      if (first) points += streak * 150
-    }
+    // 스트릭은 출석 표시일 뿐 점수에는 넣지 않는다 —
+    // 지난 날들의 기록이 오늘 점수에 얹히면 순위표가 실력을 재지 못한다
+    if (state.daily) state.streak = recordDailyClear().streak
     playMerge(6)
     vibrate(30)
     state.phase = 'clearing'

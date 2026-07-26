@@ -29,7 +29,7 @@ defineProps<{ slug: string }>()
       <rect x="26" y="26" width="17" height="6" rx="3" fill="#CE94E6" />
     </g>
 
-    <!-- 벽돌깨기 RPG -->
+    <!-- 벽돌깨기 -->
     <g v-else-if="slug === 'brick'">
       <rect x="4" y="6" width="18" height="10" rx="2.5" fill="#EF5350" />
       <rect x="26" y="6" width="18" height="10" rx="2.5" fill="#FFB300" />

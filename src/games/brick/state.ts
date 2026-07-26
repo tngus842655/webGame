@@ -1,4 +1,4 @@
-import { LAYOUT, MAX_ROWS, SAVE_KEY, WAVE, type UpgradeDef } from './config'
+import { LAYOUT, MAX_ROWS, WAVE, type UpgradeDef } from './config'
 
 export type Phase = 'aiming' | 'flying' | 'over'
 
@@ -17,11 +17,16 @@ export interface Ball {
   active: boolean
 }
 
-// 런이 끝나도 유지되는 영구 성장 (RPG 요소)
-export interface SaveData {
+// 한 판 안에서만 자라는 강화. 판이 끝나면 함께 사라진다 —
+// 이전 판의 성장이 남으면 순위표가 실력이 아니라 누적 플레이 시간을 재게 된다.
+export interface RunUpgrades {
   gold: number
   attackLevel: number // 공 1개당 타격 데미지
   ballLevel: number // 발사하는 공 개수
+}
+
+export function freshUpgrades(): RunUpgrades {
+  return { gold: 0, attackLevel: 1, ballLevel: 3 }
 }
 
 export interface Popup {
@@ -53,49 +58,27 @@ export interface BrickState {
   toLaunch: number
   launchTimer: number
   firstLandedX: number | null
-  save: SaveData
+  run: RunUpgrades
   popups: Popup[]
   flashes: Flash[]
   hintTime: number // 조작 힌트 애니메이션용
-}
-
-export function loadSave(): SaveData {
-  try {
-    const raw = localStorage.getItem(SAVE_KEY)
-    if (raw) {
-      const parsed = JSON.parse(raw) as Partial<SaveData>
-      return {
-        gold: Math.max(0, Number(parsed.gold) || 0),
-        attackLevel: Math.max(1, Number(parsed.attackLevel) || 1),
-        ballLevel: Math.max(1, Number(parsed.ballLevel) || 3),
-      }
-    }
-  } catch {
-    // 손상된 저장 데이터는 초기화
-  }
-  return { gold: 0, attackLevel: 1, ballLevel: 3 }
-}
-
-export function persistSave(save: SaveData) {
-  localStorage.setItem(SAVE_KEY, JSON.stringify(save))
 }
 
 export function upgradeCost(def: UpgradeDef, level: number): number {
   return Math.round(def.baseCost * Math.pow(def.growth, level - 1))
 }
 
-export function upgradeLevel(save: SaveData, key: UpgradeDef['key']): number {
-  return key === 'attack' ? save.attackLevel : save.ballLevel
+export function upgradeLevel(run: RunUpgrades, key: UpgradeDef['key']): number {
+  return key === 'attack' ? run.attackLevel : run.ballLevel
 }
 
 export function tryPurchase(state: BrickState, def: UpgradeDef): boolean {
-  const level = upgradeLevel(state.save, def.key)
+  const level = upgradeLevel(state.run, def.key)
   const cost = upgradeCost(def, level)
-  if (state.save.gold < cost) return false
-  state.save.gold -= cost
-  if (def.key === 'attack') state.save.attackLevel += 1
-  else state.save.ballLevel += 1
-  persistSave(state.save)
+  if (state.run.gold < cost) return false
+  state.run.gold -= cost
+  if (def.key === 'attack') state.run.attackLevel += 1
+  else state.run.ballLevel += 1
   return true
 }
 
@@ -125,7 +108,7 @@ export function createState(): BrickState {
     toLaunch: 0,
     launchTimer: 0,
     firstLandedX: null,
-    save: loadSave(),
+    run: freshUpgrades(),
     popups: [],
     flashes: [],
     hintTime: 0,

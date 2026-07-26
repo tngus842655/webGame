@@ -23,8 +23,8 @@ const ko: Record<string, Guide> = {
   },
   brick: {
     goal: '공을 튕겨 벽돌을 부수세요. 벽돌이 바닥까지 내려오면 끝입니다.',
-    how: '아래에서 당겨 각도를 정하고 놓으면 공이 날아갑니다.',
-    score: '웨이브를 오래 버틸수록 점수가 쌓입니다.',
+    how: '아래에서 당겨 각도를 정하고 놓으면 공이 날아갑니다. 부순 벽돌로 얻은 골드는 아래 두 버튼에서 공격력·공 개수로 바꿉니다.',
+    score: '웨이브를 오래 버틸수록 점수가 쌓입니다. 강화는 판마다 처음부터 다시 쌓습니다.',
   },
   fruit2048: {
     goal: '같은 숫자 과일을 밀어 붙여 합치세요. 더 이상 움직일 수 없으면 끝입니다.',
@@ -166,8 +166,8 @@ const en: Record<string, Guide> = {
   },
   brick: {
     goal: 'Bounce the ball to break bricks. If bricks reach the bottom, the run ends.',
-    how: 'Pull back from the bottom to aim, release to launch.',
-    score: 'Survive more waves to score higher.',
+    how: 'Pull back from the bottom to aim, release to launch. Spend the gold you earn on attack or extra balls.',
+    score: 'Survive more waves to score higher. Upgrades start over every run.',
   },
   fruit2048: {
     goal: 'Slide matching fruits together to merge them. No moves left means game over.',

@@ -1,4 +1,4 @@
-// 벽돌깨기 RPG 밸런스·레이아웃 수치는 전부 이 파일에서만 조정한다
+// 벽돌깨기 밸런스·레이아웃 수치는 전부 이 파일에서만 조정한다
 
 export const LAYOUT = {
   width: 720,
@@ -57,5 +57,3 @@ export const BUTTON_RECTS = [
   { x: 40, y: 1110, w: 310, h: 130 },
   { x: 370, y: 1110, w: 310, h: 130 },
 ]
-
-export const SAVE_KEY = 'webgame:brick:save'
