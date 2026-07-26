@@ -9,6 +9,7 @@ import {
 } from '@/shared/auth'
 import { LOCALES, locale, setLocale, t, type Locale } from '@/shared/i18n'
 import { adoptSocialNickname, fetchMyProfile, updateMyNickname } from '@/shared/profile'
+import { isMusicEnabled, setMusicEnabled } from '@/shared/music'
 import { isSoundEnabled, setSoundEnabled } from '@/shared/sound'
 
 const nickname = ref('')
@@ -16,6 +17,7 @@ const loaded = ref(false)
 const saving = ref(false)
 const message = ref('')
 const sound = ref(isSoundEnabled())
+const music = ref(isMusicEnabled())
 const lang = ref<Locale>(locale.value)
 // 연동하려는 계정이 이미 다른 계정에 붙어 있을 때 = 기존 회원 → 불러오기 안내
 const existingAccount = ref<SocialProvider | null>(null)
@@ -108,6 +110,10 @@ async function save() {
   } finally {
     saving.value = false
   }
+}
+
+function onMusicChange() {
+  setMusicEnabled(music.value)
 }
 
 function onSoundChange() {
@@ -233,6 +239,10 @@ function onLangChange() {
       <label class="toggle-row">
         <input v-model="sound" type="checkbox" @change="onSoundChange" />
         {{ t('settings.soundOn') }}
+      </label>
+      <label class="toggle-row">
+        <input v-model="music" type="checkbox" @change="onMusicChange" />
+        {{ t('settings.musicOn') }}
       </label>
     </section>
 

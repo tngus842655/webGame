@@ -63,6 +63,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   async function gameOver() {
     playGameOver()
+    vibrate(120)
     const score = Math.min(1_000_000, totalAssets(state))
     const prevBest = await ctx.getBestScore()
     await ctx.submitScore(score)

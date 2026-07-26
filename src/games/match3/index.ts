@@ -145,6 +145,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     state.phase = 'over'
     state.selected = null
     playGameOver()
+    vibrate(120)
     const prevBest = await ctx.getBestScore()
     await ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return

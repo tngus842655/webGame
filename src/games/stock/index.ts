@@ -1,5 +1,5 @@
 import { t, type TranslationKey } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge } from '@/shared/sound'
+import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -69,6 +69,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   async function gameOver() {
     playGameOver()
+    vibrate(120)
     const score = scoreOf(state)
     const prevBest = await ctx.getBestScore()
     await ctx.submitScore(score)
@@ -91,6 +92,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
           if (ok) {
             if (button.action === 'buy') playDrop()
             else playMerge(3)
+            vibrate(10) // 체결 손맛
           }
           return
         }

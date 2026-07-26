@@ -77,6 +77,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   async function gameOver() {
     playGameOver()
+    vibrate(120)
     const score = meters(state.maxHeight)
     const prevBest = await ctx.getBestScore()
     await ctx.submitScore(score)

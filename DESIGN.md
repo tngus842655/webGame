@@ -52,6 +52,7 @@ src/
 │  ├─ scores.ts             # 점수 제출·랭킹·인기도 조회 (+localStorage 병행)
 │  ├─ playSessions.ts       # 플레이 시간 기록 (인기 순위·통계 근거)
 │  ├─ ads.ts                # 리워드 광고 추상화 (H5 Games Ads / 개발용 스텁 / 미노출)
+│  ├─ music.ts             # BGM 재생 (public/bgm/*.mp3, 파일 없으면 무음)
 │  └─ i18n.ts / sound.ts / GameIcon.vue / AccountPrompt.vue / devNotes.ts
 └─ styles/
 ```
@@ -91,6 +92,15 @@ src/
 - 닉네임을 직접 정하지 않은 유저는 연동 시 소셜 닉네임 자동 적용
 - 필요한 외부 설정: 구글/카카오 콘솔 + Supabase(Manual Linking ON,
   Kakao는 Allow users without an email ON) — 상세는 마이그레이션 파일 주석 참고
+
+### 소리
+
+- `sound.ts` — WebAudio 신스 효과음. 오디오 에셋 0개를 유지한다.
+- `music.ts` — BGM. `public/bgm/`에 `action.mp3` / `puzzle.mp3` / `sim.mp3` 세 개를 넣으면
+  `bgmFor(slug)`가 게임별로 골라 반복 재생한다. 파일이 없으면 조용히 넘어가므로
+  음원 없이도 앱은 그대로 돈다. 효과음과 별도 토글(설정 화면)을 둔다.
+- 음원 라이선스는 상업적 이용 가능 + 광고 게재 가능한 것만 쓴다(NC 조건 금지).
+  저작자 표시가 필요한 곡을 쓰면 개발노트 화면에 크레딧을 남긴다.
 
 ### 리워드 광고
 
