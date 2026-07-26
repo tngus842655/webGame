@@ -108,4 +108,9 @@ export const GAMES: GameMeta[] = [
     titleKey: 'game.autochess',
     loader: () => import('./autochess'),
   },
+  {
+    slug: 'stack',
+    titleKey: 'game.stack',
+    loader: () => import('./stack'),
+  },
 ]

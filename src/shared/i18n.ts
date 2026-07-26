@@ -269,6 +269,10 @@ const en = {
   'ac.s2': 'Archer',
   'ac.s3': 'Guard',
   'ac.s4': 'Mage',
+  'game.stack': 'Tower Stack',
+  'st.floor': 'Floor {n}',
+  'st.perfect': 'Perfect!',
+  'st.ad': '▶ Watch ad to get half the width back',
 }
 
 const ko: typeof en = {
@@ -499,6 +503,10 @@ const ko: typeof en = {
   'ac.s2': '궁수',
   'ac.s3': '방패병',
   'ac.s4': '마법사',
+  'game.stack': '탑 쌓기',
+  'st.floor': '{n}층',
+  'st.perfect': '완벽!',
+  'st.ad': '▶ 광고 보고 폭 절반 복구',
 }
 
 // 나머지 언어: 허브·게임오버·광고·제목까지 번역, 게임 내부 텍스트는 en 폴백
@@ -699,6 +707,10 @@ const ja: CoreDict = {
   'game.omok': '五目並べ',
   'game.deck': 'カードバトル',
   'game.autochess': 'オートバトラー',
+  'game.stack': 'タワースタック',
+  'st.floor': '{n}階',
+  'st.perfect': 'パーフェクト！',
+  'st.ad': '▶ 広告を見て幅を半分回復',
 }
 
 const zhCN: CoreDict = {
@@ -896,6 +908,10 @@ const zhCN: CoreDict = {
   'game.omok': '五子棋',
   'game.deck': '卡牌战斗',
   'game.autochess': '自走棋',
+  'game.stack': '搭高塔',
+  'st.floor': '第{n}层',
+  'st.perfect': '完美！',
+  'st.ad': '▶ 看广告恢复一半宽度',
 }
 
 const es: CoreDict = {
@@ -1093,6 +1109,10 @@ const es: CoreDict = {
   'game.omok': 'Gomoku',
   'game.deck': 'Batalla de Cartas',
   'game.autochess': 'Auto Batalla',
+  'game.stack': 'Torre de Bloques',
+  'st.floor': 'Piso {n}',
+  'st.perfect': '¡Perfecto!',
+  'st.ad': '▶ Ver anuncio y recuperar media anchura',
 }
 
 const ptBR: CoreDict = {
@@ -1290,6 +1310,10 @@ const ptBR: CoreDict = {
   'game.omok': 'Gomoku',
   'game.deck': 'Batalha de Cartas',
   'game.autochess': 'Auto Batalha',
+  'game.stack': 'Torre de Blocos',
+  'st.floor': 'Andar {n}',
+  'st.perfect': 'Perfeito!',
+  'st.ad': '▶ Ver anúncio e recuperar metade da largura',
 }
 
 const fr: CoreDict = {
@@ -1487,6 +1511,10 @@ const fr: CoreDict = {
   'game.omok': 'Gomoku',
   'game.deck': 'Bataille de Cartes',
   'game.autochess': 'Auto-Bataille',
+  'game.stack': 'Tour de Blocs',
+  'st.floor': 'Étage {n}',
+  'st.perfect': 'Parfait !',
+  'st.ad': '▶ Pub pour récupérer la moitié de la largeur',
 }
 
 const de: CoreDict = {
@@ -1684,6 +1712,10 @@ const de: CoreDict = {
   'game.omok': 'Gomoku',
   'game.deck': 'Kartenkampf',
   'game.autochess': 'Auto-Battler',
+  'game.stack': 'Turmbau',
+  'st.floor': 'Etage {n}',
+  'st.perfect': 'Perfekt!',
+  'st.ad': '▶ Werbung ansehen: halbe Breite zurück',
 }
 
 const ru: CoreDict = {
@@ -1881,6 +1913,10 @@ const ru: CoreDict = {
   'game.omok': 'Гомоку',
   'game.deck': 'Карточные бои',
   'game.autochess': 'Автобатлер',
+  'game.stack': 'Башня',
+  'st.floor': 'Этаж {n}',
+  'st.perfect': 'Идеально!',
+  'st.ad': '▶ Реклама: вернуть половину ширины',
 }
 
 const id: CoreDict = {
@@ -2078,6 +2114,10 @@ const id: CoreDict = {
   'game.omok': 'Gomoku',
   'game.deck': 'Pertarungan Kartu',
   'game.autochess': 'Auto Battler',
+  'game.stack': 'Susun Menara',
+  'st.floor': 'Lantai {n}',
+  'st.perfect': 'Sempurna!',
+  'st.ad': '▶ Tonton iklan, lebar kembali setengah',
 }
 
 const vi: CoreDict = {
@@ -2275,6 +2315,10 @@ const vi: CoreDict = {
   'game.omok': 'Cờ Ca-rô',
   'game.deck': 'Đấu Bài',
   'game.autochess': 'Cờ Tự Đấu',
+  'game.stack': 'Xếp Tháp',
+  'st.floor': 'Tầng {n}',
+  'st.perfect': 'Hoàn hảo!',
+  'st.ad': '▶ Xem quảng cáo để hồi nửa chiều rộng',
 }
 
 const th: CoreDict = {
@@ -2472,6 +2516,10 @@ const th: CoreDict = {
   'game.omok': 'โกะโมกุ',
   'game.deck': 'การ์ดแบทเทิล',
   'game.autochess': 'ออโต้แบทเทิล',
+  'game.stack': 'ต่อหอคอย',
+  'st.floor': 'ชั้น {n}',
+  'st.perfect': 'สมบูรณ์แบบ!',
+  'st.ad': '▶ ดูโฆษณาเพื่อคืนความกว้างครึ่งหนึ่ง',
 }
 
 const tr: CoreDict = {
@@ -2669,6 +2717,10 @@ const tr: CoreDict = {
   'game.omok': 'Gomoku',
   'game.deck': 'Kart Savaşı',
   'game.autochess': 'Oto Savaş',
+  'game.stack': 'Kule Kur',
+  'st.floor': '{n}. kat',
+  'st.perfect': 'Mükemmel!',
+  'st.ad': '▶ Reklam izle, genişliğin yarısı geri gelsin',
 }
 
 const messages: Record<Locale, CoreDict> = {

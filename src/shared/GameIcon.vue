@@ -275,6 +275,20 @@ defineProps<{ slug: string }>()
     </g>
 
 
+    <!-- 탑 쌓기 -->
+    <g v-else-if="slug === 'stack'">
+      <rect x="7" y="35" width="34" height="8" rx="2" fill="#42A5F5" />
+      <rect x="7" y="35" width="34" height="2.6" rx="1.3" fill="#90CAF9" />
+      <rect x="10" y="26" width="28" height="8" rx="2" fill="#26C6DA" />
+      <rect x="10" y="26" width="28" height="2.6" rx="1.3" fill="#80DEEA" />
+      <rect x="15" y="17" width="20" height="8" rx="2" fill="#66BB6A" />
+      <rect x="15" y="17" width="20" height="2.6" rx="1.3" fill="#A5D6A7" />
+      <rect x="24" y="6" width="16" height="8" rx="2" fill="#FFCA28" />
+      <rect x="24" y="6" width="16" height="2.6" rx="1.3" fill="#FFE082" />
+      <path d="M20 10 L9 10" stroke="#FFCA28" stroke-width="2" stroke-linecap="round" />
+      <path d="M12 7 L9 10 L12 13" stroke="#FFCA28" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />

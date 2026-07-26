@@ -116,6 +116,11 @@ const ko: Record<string, Guide> = {
     how: '상점에서 유닛을 사고, 같은 유닛을 겹쳐 끌면 한 단계 강해집니다.',
     score: '라운드를 오래 버틸수록 점수가 쌓입니다.',
   },
+  stack: {
+    goal: '좌우로 왕복하는 블록을 탑 꼭대기에 얹으세요. 삐져나온 만큼 폭이 깎이고, 얹을 폭이 남지 않으면 끝입니다.',
+    how: '화면 아무 곳이나 탭하면 그 자리에 놓입니다.',
+    score: '한 층에 10점. 정확히 맞추면 폭이 조금 돌아오고 연속으로 맞출수록 점수가 커집니다.',
+  },
 }
 
 const en: Record<string, Guide> = {
@@ -223,6 +228,11 @@ const en: Record<string, Guide> = {
     goal: 'Buy units, place them, and win the auto battles. Losing costs health.',
     how: 'Buy from the shop and drag matching units together to upgrade them.',
     score: 'Score builds the longer you survive.',
+  },
+  stack: {
+    goal: 'Land the sliding block on top of your tower. Whatever hangs over is shaved off, and once there is nothing left to land on, the run ends.',
+    how: 'Tap anywhere to drop the block where it is.',
+    score: '10 per floor. A dead-centre landing wins back a little width and pays more the longer your streak holds.',
   },
 }
 
@@ -332,6 +342,11 @@ const ja: Record<string, Guide> = {
     how: 'ショップで購入し、同じユニットどうしをドラッグして強化します。',
     score: '長く生き残るほど点数が伸びます。',
   },
+  stack: {
+    goal: '左右に往復するブロックを塔の上に乗せましょう。はみ出した分だけ幅が削られ、乗せる幅がなくなると終了です。',
+    how: '画面のどこでもタップするとその位置に置かれます。',
+    score: '1階ごとに10点。ぴったり乗せると幅が少し戻り、連続で決めるほど点数が伸びます。',
+  },
 }
 
 const zhCN: Record<string, Guide> = {
@@ -439,6 +454,11 @@ const zhCN: Record<string, Guide> = {
     goal: '购买单位并布阵，赢下自动战斗。战败会扣生命。',
     how: '在商店购买，把相同单位拖到一起升级。',
     score: '活得越久分数越高。',
+  },
+  stack: {
+    goal: '把左右移动的方块叠到塔顶。超出的部分会被削掉，没有落脚的宽度就结束。',
+    how: '点击屏幕任意位置即可放下方块。',
+    score: '每层10分。正中叠放能收回一点宽度，连续命中得分更高。',
   },
 }
 
@@ -548,6 +568,11 @@ const es: Record<string, Guide> = {
     how: 'Compra en la tienda y arrastra unidades iguales para mejorarlas.',
     score: 'Cuanto más sobrevivas, más puntos.',
   },
+  stack: {
+    goal: 'Coloca el bloque que se desliza sobre la torre. Lo que sobresale se recorta y, cuando no queda ancho, termina la partida.',
+    how: 'Toca en cualquier parte para soltar el bloque donde está.',
+    score: '10 por piso. Un centrado perfecto recupera algo de ancho y paga más en racha.',
+  },
 }
 
 const ptBR: Record<string, Guide> = {
@@ -655,6 +680,11 @@ const ptBR: Record<string, Guide> = {
     goal: 'Compre unidades, posicione-as e vença as batalhas automáticas. Perder custa vida.',
     how: 'Compre na loja e arraste unidades iguais para melhorá-las.',
     score: 'Quanto mais sobreviver, mais pontos.',
+  },
+  stack: {
+    goal: 'Encaixe o bloco deslizante no topo da torre. O que sobra é cortado e, quando não resta largura, a partida acaba.',
+    how: 'Toque em qualquer lugar para soltar o bloco onde ele está.',
+    score: '10 por andar. Acertar no centro devolve um pouco de largura e vale mais em sequência.',
   },
 }
 
@@ -764,6 +794,11 @@ const fr: Record<string, Guide> = {
     how: 'Achète en boutique et fais glisser deux unités identiques pour les améliorer.',
     score: 'Plus tu survis, plus tu marques.',
   },
+  stack: {
+    goal: 'Pose le bloc qui glisse au sommet de la tour. Ce qui dépasse est rogné, et quand il ne reste plus de largeur, la partie s\'arrête.',
+    how: 'Touche n\'importe où pour lâcher le bloc à sa position.',
+    score: '10 par étage. Un centrage parfait récupère un peu de largeur et rapporte plus en série.',
+  },
 }
 
 const de: Record<string, Guide> = {
@@ -871,6 +906,11 @@ const de: Record<string, Guide> = {
     goal: 'Kauf Einheiten, stell sie auf und gewinn die automatischen Kämpfe. Verlieren kostet Gesundheit.',
     how: 'Im Laden kaufen und gleiche Einheiten aufeinanderziehen zum Aufwerten.',
     score: 'Je länger du überlebst, desto mehr Punkte.',
+  },
+  stack: {
+    goal: 'Setze den pendelnden Block oben auf den Turm. Was übersteht, wird abgeschnitten – bleibt keine Breite übrig, ist Schluss.',
+    how: 'Tippe irgendwo, um den Block dort abzusetzen.',
+    score: '10 pro Etage. Ein perfekt zentrierter Block gibt etwas Breite zurück und bringt in Serie mehr.',
   },
 }
 
@@ -980,6 +1020,11 @@ const ru: Record<string, Guide> = {
     how: 'Покупайте в магазине и перетаскивайте одинаковых бойцов друг на друга для улучшения.',
     score: 'Чем дольше выживаете, тем больше очков.',
   },
+  stack: {
+    goal: 'Ставьте скользящий блок на вершину башни. Выступающая часть срезается, а когда ставить уже некуда — конец.',
+    how: 'Нажмите в любом месте, чтобы опустить блок там, где он есть.',
+    score: '10 за этаж. Точное попадание в центр возвращает немного ширины и даёт больше в серии.',
+  },
 }
 
 const id: Record<string, Guide> = {
@@ -1087,6 +1132,11 @@ const id: Record<string, Guide> = {
     goal: 'Beli unit, tempatkan, dan menangkan pertarungan otomatis. Kalah mengurangi nyawa.',
     how: 'Beli di toko dan seret unit yang sama untuk meningkatkannya.',
     score: 'Semakin lama bertahan, semakin tinggi nilainya.',
+  },
+  stack: {
+    goal: 'Tumpuk balok yang bergerak ke puncak menara. Bagian yang menjorok terpotong, dan kalau lebarnya habis permainan berakhir.',
+    how: 'Ketuk di mana saja untuk menjatuhkan balok di posisinya.',
+    score: '10 per lantai. Pas di tengah mengembalikan sedikit lebar dan makin besar saat beruntun.',
   },
 }
 
@@ -1196,6 +1246,11 @@ const vi: Record<string, Guide> = {
     how: 'Mua ở cửa hàng và kéo các quân giống nhau vào nhau để nâng cấp.',
     score: 'Sống sót càng lâu điểm càng cao.',
   },
+  stack: {
+    goal: 'Đặt khối đang trượt lên đỉnh tháp. Phần nhô ra bị cắt mất, và khi không còn chỗ đặt thì kết thúc.',
+    how: 'Chạm bất kỳ đâu để thả khối tại vị trí đó.',
+    score: '10 điểm mỗi tầng. Đặt trúng giữa sẽ hồi lại chút chiều rộng và càng liên tiếp càng nhiều điểm.',
+  },
 }
 
 const th: Record<string, Guide> = {
@@ -1304,6 +1359,11 @@ const th: Record<string, Guide> = {
     how: 'ซื้อจากร้านค้าและลากหน่วยแบบเดียวกันมารวมเพื่ออัปเกรด',
     score: 'อยู่รอดยิ่งนานยิ่งได้คะแนนสูง',
   },
+  stack: {
+    goal: 'วางบล็อกที่เลื่อนไปมาลงบนยอดหอคอย ส่วนที่ล้นจะถูกเฉือนออก และเมื่อไม่มีที่ให้วางก็จบเกม',
+    how: 'แตะที่ใดก็ได้เพื่อวางบล็อกตรงตำแหน่งนั้น',
+    score: 'ชั้นละ 10 คะแนน วางตรงกลางพอดีจะได้ความกว้างคืนเล็กน้อยและยิ่งต่อเนื่องยิ่งได้มาก',
+  },
 }
 
 const tr: Record<string, Guide> = {
@@ -1411,6 +1471,11 @@ const tr: Record<string, Guide> = {
     goal: 'Birim satın al, yerleştir ve otomatik savaşları kazan. Kaybetmek can götürür.',
     how: 'Dükkândan satın al ve aynı birimleri üst üste sürükleyip yükselt.',
     score: 'Ne kadar uzun hayatta kalırsan o kadar çok puan.',
+  },
+  stack: {
+    goal: 'Sağa sola giden bloğu kulenin tepesine oturt. Taşan kısım kesilir; oturacak genişlik kalmazsa oyun biter.',
+    how: 'Bloğu bulunduğu yere bırakmak için ekranın herhangi bir yerine dokun.',
+    score: 'Her kat 10 puan. Tam ortaya oturtmak biraz genişlik geri verir ve seri uzadıkça puan artar.',
   },
 }
 const TABLES: Record<Locale, Record<string, Guide>> = {
