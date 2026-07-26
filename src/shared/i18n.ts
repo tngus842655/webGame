@@ -301,6 +301,10 @@ const en = {
   'ic.undoAd': '▶ Watch ad to undo',
   'ic.clear': 'Board clear! +{n}',
   'ic.ad': '▶ Watch ad for 5 more moves',
+  'game.marblejar': 'Marble Jars',
+  'mj.hint': 'Pick a jar for this marble',
+  'mj.colors': '{n} colours in play',
+  'mj.ad': '▶ Watch ad to empty one jar',
 }
 
 const ko: typeof en = {
@@ -563,6 +567,10 @@ const ko: typeof en = {
   'ic.undoAd': '▶ 광고 보고 되돌리기',
   'ic.clear': '판 완성! +{n}',
   'ic.ad': '▶ 광고 보고 이동 5회 더',
+  'game.marblejar': '구슬 정리함',
+  'mj.hint': '이 구슬을 넣을 통을 고르세요',
+  'mj.colors': '나오는 색 {n}종',
+  'mj.ad': '▶ 광고 보고 통 하나 비우기',
 }
 
 // 나머지 언어: 허브·게임오버·광고·제목까지 번역, 게임 내부 텍스트는 en 폴백
@@ -795,6 +803,10 @@ const ja: CoreDict = {
   'ic.undoAd': '▶ 広告を見て一手戻す',
   'ic.clear': '面クリア！ +{n}',
   'ic.ad': '▶ 広告を見て移動+5回',
+  'game.marblejar': 'ビーズ整理箱',
+  'mj.hint': 'この玉を入れる筒を選びましょう',
+  'mj.colors': '出る色 {n}種',
+  'mj.ad': '▶ 広告を見て筒を1本空ける',
 }
 
 const zhCN: CoreDict = {
@@ -1024,6 +1036,10 @@ const zhCN: CoreDict = {
   'ic.undoAd': '▶ 看广告撤销一步',
   'ic.clear': '过关！ +{n}',
   'ic.ad': '▶ 看广告再加5步',
+  'game.marblejar': '弹珠整理筒',
+  'mj.hint': '选一个筒放这颗弹珠',
+  'mj.colors': '出现颜色 {n}种',
+  'mj.ad': '▶ 看广告清空一个筒',
 }
 
 const es: CoreDict = {
@@ -1253,6 +1269,10 @@ const es: CoreDict = {
   'ic.undoAd': '▶ Ver anuncio para deshacer',
   'ic.clear': '¡Tablero superado! +{n}',
   'ic.ad': '▶ Ver anuncio por 5 movimientos más',
+  'game.marblejar': 'Tarros de Canicas',
+  'mj.hint': 'Elige un tarro para esta canica',
+  'mj.colors': '{n} colores en juego',
+  'mj.ad': '▶ Ver anuncio y vaciar un tarro',
 }
 
 const ptBR: CoreDict = {
@@ -1482,6 +1502,10 @@ const ptBR: CoreDict = {
   'ic.undoAd': '▶ Ver anúncio para desfazer',
   'ic.clear': 'Tabuleiro concluído! +{n}',
   'ic.ad': '▶ Ver anúncio por 5 movimentos extras',
+  'game.marblejar': 'Potes de Bolinhas',
+  'mj.hint': 'Escolha um pote para esta bolinha',
+  'mj.colors': '{n} cores em jogo',
+  'mj.ad': '▶ Ver anúncio e esvaziar um pote',
 }
 
 const fr: CoreDict = {
@@ -1711,6 +1735,10 @@ const fr: CoreDict = {
   'ic.undoAd': '▶ Pub pour annuler un coup',
   'ic.clear': 'Plateau réussi ! +{n}',
   'ic.ad': '▶ Pub pour 5 coups de plus',
+  'game.marblejar': 'Bocaux à Billes',
+  'mj.hint': 'Choisis un bocal pour cette bille',
+  'mj.colors': '{n} couleurs en jeu',
+  'mj.ad': '▶ Pub pour vider un bocal',
 }
 
 const de: CoreDict = {
@@ -1940,6 +1968,10 @@ const de: CoreDict = {
   'ic.undoAd': '▶ Werbung ansehen: Zug zurück',
   'ic.clear': 'Feld geschafft! +{n}',
   'ic.ad': '▶ Werbung ansehen: 5 Züge mehr',
+  'game.marblejar': 'Murmelgläser',
+  'mj.hint': 'Wähle ein Glas für diese Murmel',
+  'mj.colors': '{n} Farben im Spiel',
+  'mj.ad': '▶ Werbung ansehen: ein Glas leeren',
 }
 
 const ru: CoreDict = {
@@ -2169,6 +2201,10 @@ const ru: CoreDict = {
   'ic.undoAd': '▶ Реклама: отменить ход',
   'ic.clear': 'Поле пройдено! +{n}',
   'ic.ad': '▶ Реклама: +5 ходов',
+  'game.marblejar': 'Банки с шариками',
+  'mj.hint': 'Выберите банку для этого шарика',
+  'mj.colors': 'Цветов в игре: {n}',
+  'mj.ad': '▶ Реклама: опустошить одну банку',
 }
 
 const id: CoreDict = {
@@ -2398,6 +2434,10 @@ const id: CoreDict = {
   'ic.undoAd': '▶ Tonton iklan untuk batalkan langkah',
   'ic.clear': 'Papan selesai! +{n}',
   'ic.ad': '▶ Tonton iklan untuk 5 langkah lagi',
+  'game.marblejar': 'Tabung Kelereng',
+  'mj.hint': 'Pilih tabung untuk kelereng ini',
+  'mj.colors': '{n} warna beredar',
+  'mj.ad': '▶ Tonton iklan untuk kosongkan satu tabung',
 }
 
 const vi: CoreDict = {
@@ -2627,6 +2667,10 @@ const vi: CoreDict = {
   'ic.undoAd': '▶ Xem quảng cáo để hoàn một lượt',
   'ic.clear': 'Xong bảng! +{n}',
   'ic.ad': '▶ Xem quảng cáo thêm 5 lượt',
+  'game.marblejar': 'Ống Xếp Bi',
+  'mj.hint': 'Chọn ống để đặt viên bi này',
+  'mj.colors': 'Có {n} màu',
+  'mj.ad': '▶ Xem quảng cáo để dốc một ống',
 }
 
 const th: CoreDict = {
@@ -2856,6 +2900,10 @@ const th: CoreDict = {
   'ic.undoAd': '▶ ดูโฆษณาเพื่อย้อนกลับ',
   'ic.clear': 'ผ่านกระดาน! +{n}',
   'ic.ad': '▶ ดูโฆษณาเพื่อรับอีก 5 ครั้ง',
+  'game.marblejar': 'กระบอกจัดลูกแก้ว',
+  'mj.hint': 'เลือกกระบอกสำหรับลูกแก้วนี้',
+  'mj.colors': 'มี {n} สี',
+  'mj.ad': '▶ ดูโฆษณาเพื่อเทกระบอกหนึ่งใบ',
 }
 
 const tr: CoreDict = {
@@ -3085,6 +3133,10 @@ const tr: CoreDict = {
   'ic.undoAd': '▶ Reklam izle, hamleyi geri al',
   'ic.clear': 'Tahta tamam! +{n}',
   'ic.ad': '▶ Reklam izle, 5 hamle daha al',
+  'game.marblejar': 'Misket Kavanozları',
+  'mj.hint': 'Bu misket için bir kavanoz seç',
+  'mj.colors': 'Oyunda {n} renk',
+  'mj.ad': '▶ Reklam izle, bir kavanozu boşalt',
 }
 
 const messages: Record<Locale, CoreDict> = {

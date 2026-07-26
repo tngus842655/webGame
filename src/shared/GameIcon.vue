@@ -376,6 +376,21 @@ defineProps<{ slug: string }>()
       <circle cx="17.8" cy="12.6" r="1" fill="#0D1B22" />
     </g>
 
+    <!-- 구슬 정리함 -->
+    <g v-else-if="slug === 'marblejar'">
+      <rect x="4" y="18" width="9" height="26" rx="3" fill="#FFFFFF" opacity="0.12" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.4" />
+      <rect x="15.5" y="18" width="9" height="26" rx="3" fill="#FFFFFF" opacity="0.12" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.4" />
+      <rect x="27" y="18" width="9" height="26" rx="3" fill="#FFFFFF" opacity="0.12" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.4" />
+      <rect x="38.5" y="18" width="9" height="26" rx="3" fill="#FFFFFF" opacity="0.12" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.4" />
+      <circle cx="8.5" cy="40" r="3.6" fill="#EF5350" />
+      <circle cx="8.5" cy="32.5" r="3.6" fill="#EF5350" />
+      <circle cx="20" cy="40" r="3.6" fill="#42A5F5" />
+      <circle cx="31.5" cy="40" r="3.6" fill="#66BB6A" />
+      <circle cx="31.5" cy="32.5" r="3.6" fill="#FFCA28" />
+      <circle cx="24" cy="8" r="6.5" fill="#AB47BC" />
+      <ellipse cx="21.8" cy="5.8" rx="2" ry="1.3" fill="#FFFFFF" opacity="0.5" transform="rotate(-30 21.8 5.8)" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />

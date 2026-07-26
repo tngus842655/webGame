@@ -148,4 +148,9 @@ export const GAMES: GameMeta[] = [
     titleKey: 'game.iceslide',
     loader: () => import('./iceslide'),
   },
+  {
+    slug: 'marblejar',
+    titleKey: 'game.marblejar',
+    loader: () => import('./marblejar'),
+  },
 ]

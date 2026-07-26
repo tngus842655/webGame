@@ -156,6 +156,11 @@ const ko: Record<string, Guide> = {
     how: '상하좌우로 쓸면 벽이나 바위에 부딪힐 때까지 미끄러집니다. 판마다 되돌리기 3회가 공짜입니다.',
     score: '별 하나에 50점, 판을 깰 때마다 100점 이상을 더 받습니다.',
   },
+  marblejar: {
+    goal: '통 하나가 같은 색으로 가득 차면 비워지고 점수가 됩니다. 통에는 정해진 색이 없어요. 네 통이 다 차면 끝입니다.',
+    how: '구슬을 넣을 통을 탭하세요. 색이 섞인 통은 다시 비워지지 않으니 흐리게 표시됩니다.',
+    score: '구슬 하나에 5점, 통을 비울 때마다 120점. 비운 횟수가 쌓이면 나오는 색이 한 종씩 늘어납니다.',
+  },
 }
 
 const en: Record<string, Guide> = {
@@ -303,6 +308,11 @@ const en: Record<string, Guide> = {
     goal: 'Collect every star to move on to the next board. Run out of moves and the game ends.',
     how: 'Swipe in any direction and the penguin slides until a wall or rock stops it. Each board gives 3 free undos.',
     score: '50 per star plus 100+ for each board cleared.',
+  },
+  marblejar: {
+    goal: 'A jar filled with a single colour empties out and scores. No jar has a fixed colour. When all four are full, the run ends.',
+    how: 'Tap the jar you want the marble to go in. A jar with mixed colours can never empty, so it is dimmed.',
+    score: '5 per marble and 120 per jar emptied. Every few jars emptied adds another colour to the mix.',
   },
 }
 
@@ -452,6 +462,11 @@ const ja: Record<string, Guide> = {
     how: '上下左右になぞると、壁か岩にぶつかるまで滑ります。面ごとに一手戻しが3回無料です。',
     score: '星1つ50点、面をクリアするたびに100点以上。',
   },
+  marblejar: {
+    goal: '筒が同じ色でいっぱいになると空になって得点です。筒に決まった色はありません。4本すべて埋まると終了です。',
+    how: '玉を入れる筒をタップします。色が混ざった筒は二度と空にならないので薄く表示されます。',
+    score: '玉1つ5点、筒を空けるごとに120点。空けた回数が増えると出る色が1種ずつ増えます。',
+  },
 }
 
 const zhCN: Record<string, Guide> = {
@@ -599,6 +614,11 @@ const zhCN: Record<string, Guide> = {
     goal: '收齐所有星星即可进入下一盘。步数用完就结束。',
     how: '上下左右滑动，企鹅会一直滑到撞上墙或石头。每盘有3次免费撤销。',
     score: '每颗星50分，每过一盘再加100分以上。',
+  },
+  marblejar: {
+    goal: '筒里装满同一种颜色就会清空并得分。筒本身没有固定颜色。四个筒都满了就结束。',
+    how: '点击想放入的筒。混色的筒再也无法清空，所以会变暗。',
+    score: '每颗弹珠5分，清空一个筒120分。清空次数累积后出现的颜色会多一种。',
   },
 }
 
@@ -748,6 +768,11 @@ const es: Record<string, Guide> = {
     how: 'Desliza en cualquier dirección y el pingüino patina hasta que un muro o roca lo detenga. Cada tablero da 3 deshacer gratis.',
     score: '50 por estrella y 100+ por tablero superado.',
   },
+  marblejar: {
+    goal: 'Un tarro lleno de un solo color se vacía y puntúa. Ningún tarro tiene color fijo. Cuando los cuatro se llenan, termina.',
+    how: 'Toca el tarro donde quieres la canica. Un tarro con colores mezclados ya no puede vaciarse y se atenúa.',
+    score: '5 por canica y 120 por tarro vaciado. Cada pocos vaciados entra un color más en juego.',
+  },
 }
 
 const ptBR: Record<string, Guide> = {
@@ -895,6 +920,11 @@ const ptBR: Record<string, Guide> = {
     goal: 'Junte todas as estrelas para ir ao próximo tabuleiro. Se os movimentos acabarem, o jogo termina.',
     how: 'Deslize em qualquer direção e o pinguim escorrega até parar numa parede ou pedra. Cada tabuleiro dá 3 desfazer grátis.',
     score: '50 por estrela e 100+ por tabuleiro concluído.',
+  },
+  marblejar: {
+    goal: 'Um pote cheio de uma só cor se esvazia e pontua. Nenhum pote tem cor fixa. Quando os quatro enchem, a partida acaba.',
+    how: 'Toque no pote onde quer a bolinha. Um pote com cores misturadas nunca mais esvazia, por isso fica apagado.',
+    score: '5 por bolinha e 120 por pote esvaziado. A cada poucos potes entra mais uma cor no jogo.',
   },
 }
 
@@ -1044,6 +1074,11 @@ const fr: Record<string, Guide> = {
     how: 'Balaye dans une direction : le pingouin glisse jusqu\'à un mur ou un rocher. Chaque plateau offre 3 annulations gratuites.',
     score: '50 par étoile et 100+ par plateau réussi.',
   },
+  marblejar: {
+    goal: 'Un bocal rempli d\'une seule couleur se vide et rapporte des points. Aucun bocal n\'a de couleur fixe. Quand les quatre sont pleins, c\'est fini.',
+    how: 'Touche le bocal où mettre la bille. Un bocal aux couleurs mélangées ne se vide plus, il est donc grisé.',
+    score: '5 par bille et 120 par bocal vidé. Tous les quelques bocaux vidés, une couleur de plus entre en jeu.',
+  },
 }
 
 const de: Record<string, Guide> = {
@@ -1191,6 +1226,11 @@ const de: Record<string, Guide> = {
     goal: 'Sammle alle Sterne, um aufs nächste Feld zu kommen. Sind die Züge aufgebraucht, ist Schluss.',
     how: 'In eine Richtung wischen – der Pinguin rutscht, bis Wand oder Fels ihn stoppt. Pro Feld gibt es 3 kostenlose Rücknahmen.',
     score: '50 pro Stern und 100+ pro geschafftem Feld.',
+  },
+  marblejar: {
+    goal: 'Ein Glas voll einer einzigen Farbe leert sich und bringt Punkte. Kein Glas hat eine feste Farbe. Sind alle vier voll, ist Schluss.',
+    how: 'Tippe das Glas an, in das die Murmel soll. Ein gemischtes Glas leert sich nie wieder und wird abgedunkelt.',
+    score: '5 pro Murmel und 120 pro geleertem Glas. Nach ein paar Leerungen kommt eine Farbe dazu.',
   },
 }
 
@@ -1340,6 +1380,11 @@ const ru: Record<string, Guide> = {
     how: 'Свайп в любую сторону: пингвин скользит, пока его не остановит стена или камень. На каждом поле 3 бесплатные отмены.',
     score: '50 за звезду и 100+ за пройденное поле.',
   },
+  marblejar: {
+    goal: 'Банка, заполненная одним цветом, опустошается и даёт очки. Цвет банки не задан заранее. Когда все четыре полны — конец.',
+    how: 'Нажмите на банку, куда положить шарик. Банка со смешанными цветами уже никогда не опустеет — она затемнена.',
+    score: '5 за шарик и 120 за опустошённую банку. Через несколько опустошений в игру входит ещё один цвет.',
+  },
 }
 
 const id: Record<string, Guide> = {
@@ -1487,6 +1532,11 @@ const id: Record<string, Guide> = {
     goal: 'Kumpulkan semua bintang untuk lanjut ke papan berikutnya. Kalau langkah habis, permainan berakhir.',
     how: 'Geser ke arah mana pun dan pinguin meluncur sampai dinding atau batu menghentikannya. Tiap papan memberi 3 batal gratis.',
     score: '50 per bintang plus 100+ tiap papan selesai.',
+  },
+  marblejar: {
+    goal: 'Tabung yang penuh satu warna akan dikosongkan dan memberi poin. Tabung tidak punya warna tetap. Kalau keempatnya penuh, permainan berakhir.',
+    how: 'Ketuk tabung tujuan kelereng. Tabung yang warnanya tercampur tak bisa dikosongkan lagi, jadi ditampilkan pudar.',
+    score: '5 per kelereng dan 120 per tabung yang dikosongkan. Tiap beberapa kali, satu warna baru masuk.',
   },
 }
 
@@ -1636,6 +1686,11 @@ const vi: Record<string, Guide> = {
     how: 'Quét theo hướng nào cũng được, chim sẽ trượt tới khi gặp tường hay tảng đá. Mỗi bảng có 3 lần hoàn lại miễn phí.',
     score: '50 điểm mỗi sao và hơn 100 điểm mỗi bảng hoàn thành.',
   },
+  marblejar: {
+    goal: 'Ống chứa toàn một màu sẽ được dốc ra và tính điểm. Ống không có màu cố định. Khi cả bốn ống đầy là kết thúc.',
+    how: 'Chạm vào ống muốn đặt viên bi. Ống đã lẫn màu thì không bao giờ dốc được nữa nên bị làm mờ.',
+    score: '5 điểm mỗi viên và 120 điểm mỗi ống dốc được. Cứ vài lần dốc lại thêm một màu mới.',
+  },
 }
 
 const th: Record<string, Guide> = {
@@ -1784,6 +1839,11 @@ const th: Record<string, Guide> = {
     how: 'ปัดทิศไหนก็ได้ เพนกวินจะไถลจนชนกำแพงหรือก้อนหิน แต่ละกระดานย้อนกลับได้ฟรี 3 ครั้ง',
     score: 'ดาวละ 50 คะแนน และผ่านกระดานได้อีก 100 คะแนนขึ้นไป',
   },
+  marblejar: {
+    goal: 'กระบอกที่เต็มด้วยสีเดียวจะถูกเทออกและได้คะแนน กระบอกไม่มีสีประจำ ถ้าเต็มทั้งสี่ใบก็จบเกม',
+    how: 'แตะกระบอกที่ต้องการใส่ลูกแก้ว กระบอกที่สีปนกันจะเทออกไม่ได้อีกจึงแสดงแบบจาง',
+    score: 'ลูกละ 5 คะแนน เทกระบอกได้ 120 คะแนน เทไปหลายครั้งจะมีสีใหม่เพิ่มเข้ามา',
+  },
 }
 
 const tr: Record<string, Guide> = {
@@ -1931,6 +1991,11 @@ const tr: Record<string, Guide> = {
     goal: 'Bir sonraki tahtaya geçmek için bütün yıldızları topla. Hamleler biterse oyun sona erer.',
     how: 'Herhangi bir yöne kaydır; penguen duvara ya da kayaya çarpana kadar kayar. Her tahtada 3 ücretsiz geri alma var.',
     score: 'Yıldız başına 50, geçilen her tahta için 100+ puan.',
+  },
+  marblejar: {
+    goal: 'Tek renkle dolan kavanoz boşalır ve puan verir. Hiçbir kavanozun sabit rengi yok. Dördü de dolarsa oyun biter.',
+    how: 'Misketi koymak istediğin kavanoza dokun. Renkleri karışan kavanoz bir daha boşalmaz, bu yüzden soluk görünür.',
+    score: 'Misket başına 5, boşalan kavanoz başına 120 puan. Birkaç boşaltmada bir yeni renk oyuna girer.',
   },
 }
 const TABLES: Record<Locale, Record<string, Guide>> = {
