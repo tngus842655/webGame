@@ -88,13 +88,6 @@ defineProps<{ slug: string }>()
       <path d="M28 27 L28 33" stroke="#8D6E63" stroke-width="3.4" stroke-linecap="round" />
     </g>
 
-    <!-- 모의 주식 -->
-    <g v-else-if="slug === 'stock'">
-      <rect x="3" y="6" width="42" height="36" rx="6" fill="#FFFFFF" stroke="#CFD8DC" stroke-width="2" />
-      <path d="M8 34 L18 24 L25 29 L40 12" stroke="#E5393C" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-      <path d="M8 34 L18 24 L25 29 L40 12 L40 37 L8 37 Z" fill="#E5393C" opacity="0.14" />
-      <path d="M33 12 h7 v7" stroke="#E5393C" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-    </g>
 
     <!-- 머지 가든 -->
     <g v-else-if="slug === 'merge'">
@@ -129,20 +122,6 @@ defineProps<{ slug: string }>()
       <circle cx="22.6" cy="39.6" r="1.5" fill="#FFE082" />
     </g>
 
-    <!-- 마작 솔리테어 -->
-    <g v-else-if="slug === 'mahjong'">
-      <rect x="7" y="16" width="18" height="24" rx="3.5" fill="#C8E6C9" />
-      <rect x="7" y="16" width="18" height="20" rx="3.5" fill="#F5F5F0" />
-      <circle cx="16" cy="26" r="5.5" fill="#43A047" />
-      <circle cx="16" cy="26" r="2.4" fill="#F5F5F0" />
-      <rect x="24" y="8" width="18" height="24" rx="3.5" fill="#FFCCBC" />
-      <rect x="24" y="8" width="18" height="20" rx="3.5" fill="#FFFFFF" />
-      <circle cx="30" cy="14" r="2.6" fill="#E5393C" />
-      <circle cx="36" cy="14" r="2.6" fill="#1565C0" />
-      <circle cx="30" cy="21" r="2.6" fill="#1565C0" />
-      <circle cx="36" cy="21" r="2.6" fill="#E5393C" />
-      <rect x="16" y="30" width="18" height="14" rx="3.5" fill="#D7CCC8" opacity="0.55" />
-    </g>
 
     <!-- 네모로직 -->
     <g v-else-if="slug === 'nonogram'">
@@ -235,26 +214,6 @@ defineProps<{ slug: string }>()
       <circle cx="36" cy="38" r="3" fill="none" stroke="#E1BEE7" stroke-width="1.4" />
     </g>
 
-    <!-- 부동산 타이쿤 -->
-    <g v-else-if="slug === 'estate'">
-      <rect x="4" y="4" width="40" height="40" rx="7" fill="#455A64" />
-      <rect x="8" y="20" width="11" height="20" rx="2" fill="#90A4AE" />
-      <rect x="10.5" y="23" width="2.6" height="2.6" fill="#ECEFF1" />
-      <rect x="14.5" y="23" width="2.6" height="2.6" fill="#ECEFF1" />
-      <rect x="10.5" y="28" width="2.6" height="2.6" fill="#ECEFF1" />
-      <rect x="14.5" y="28" width="2.6" height="2.6" fill="#ECEFF1" />
-      <rect x="21" y="12" width="13" height="28" rx="2" fill="#CFD8DC" />
-      <rect x="24" y="16" width="3" height="3" fill="#546E7A" />
-      <rect x="29" y="16" width="3" height="3" fill="#546E7A" />
-      <rect x="24" y="22" width="3" height="3" fill="#546E7A" />
-      <rect x="29" y="22" width="3" height="3" fill="#546E7A" />
-      <rect x="24" y="28" width="3" height="3" fill="#546E7A" />
-      <rect x="29" y="28" width="3" height="3" fill="#546E7A" />
-      <rect x="36" y="26" width="8" height="14" rx="2" fill="#78909C" />
-      <path d="M8 14 L15 7 L22 14" stroke="#E5393C" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-      <circle cx="38" cy="12" r="6" fill="#FFB300" />
-      <text x="38" y="15.4" font-size="9" font-weight="bold" fill="#7A4F01" text-anchor="middle">$</text>
-    </g>
 
     <!-- 편의점 운영 -->
     <g v-else-if="slug === 'store'">
@@ -268,16 +227,6 @@ defineProps<{ slug: string }>()
       <rect x="30.5" y="35" width="3" height="7" fill="#3E2723" />
     </g>
 
-    <!-- 유튜버 시뮬 -->
-    <g v-else-if="slug === 'tuber'">
-      <rect x="4" y="4" width="40" height="40" rx="7" fill="#FCE4EC" />
-      <rect x="8" y="12" width="32" height="22" rx="5" fill="#D32F2F" />
-      <path d="M21 18 L29 23 L21 28 Z" fill="#FFFFFF" />
-      <path d="M14 38 h20" stroke="#B71C1C" stroke-width="2.6" stroke-linecap="round" />
-      <path d="M18 41.5 h12" stroke="#EF9A9A" stroke-width="2.4" stroke-linecap="round" />
-      <circle cx="39" cy="10" r="5.5" fill="#FF6F00" />
-      <path d="M39 7.4 v3.2 l2 1.6" stroke="#FFF3E0" stroke-width="1.6" fill="none" stroke-linecap="round" />
-    </g>
 
     <!-- 국가 운영 -->
     <g v-else-if="slug === 'reigns'">

@@ -39,11 +39,6 @@ export const GAMES: GameMeta[] = [
     loader: () => import('./survivor'),
   },
   {
-    slug: 'stock',
-    titleKey: 'game.stock',
-    loader: () => import('./stock'),
-  },
-  {
     slug: 'merge',
     titleKey: 'game.merge',
     loader: () => import('./merge'),
@@ -57,11 +52,6 @@ export const GAMES: GameMeta[] = [
     slug: 'tripeaks',
     titleKey: 'game.tripeaks',
     loader: () => import('./tripeaks'),
-  },
-  {
-    slug: 'mahjong',
-    titleKey: 'game.mahjong',
-    loader: () => import('./mahjong'),
   },
   {
     slug: 'nonogram',
@@ -99,19 +89,9 @@ export const GAMES: GameMeta[] = [
     loader: () => import('./orbit'),
   },
   {
-    slug: 'estate',
-    titleKey: 'game.estate',
-    loader: () => import('./estate'),
-  },
-  {
     slug: 'store',
     titleKey: 'game.store',
     loader: () => import('./store'),
-  },
-  {
-    slug: 'tuber',
-    titleKey: 'game.tuber',
-    loader: () => import('./tuber'),
   },
   {
     slug: 'reigns',

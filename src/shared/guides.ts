@@ -46,11 +46,6 @@ const ko: Record<string, Guide> = {
     how: '끌어서 이동만 하면 공격은 자동입니다. 레벨업 때 강화를 하나 고르세요.',
     score: '처치 수와 생존 시간을 더해 계산합니다.',
   },
-  stock: {
-    goal: '90초 동안 싸게 사서 비싸게 팔아 자산을 불리세요.',
-    how: '매수·매도 버튼으로 사고팝니다. 뉴스가 뜨면 가격이 크게 움직여요.',
-    score: '처음 자본보다 얼마나 더 벌었는지가 점수입니다.',
-  },
   merge: {
     goal: '같은 식물끼리 합쳐 황금 화분을 만드세요. 제한 시간 안에 목표 개수를 채우면 다음 단계로 갑니다.',
     how: '생성 버튼으로 씨앗을 놓고, 같은 그림끼리 끌어다 겹치세요.',
@@ -65,11 +60,6 @@ const ko: Record<string, Guide> = {
     goal: '바닥에 놓인 카드보다 숫자가 하나 크거나 작은 카드를 걷어내 산을 치우세요.',
     how: '조건에 맞는 카드를 탭합니다. 낼 카드가 없으면 더미에서 한 장 뒤집으세요.',
     score: '연속으로 걷어낼수록 배수가 붙습니다.',
-  },
-  mahjong: {
-    goal: '같은 그림의 패 두 장을 찾아 모두 걷어내세요.',
-    how: '좌우가 트인 패만 고를 수 있습니다. 두 장을 차례로 탭하세요.',
-    score: '스테이지를 넘길수록 점수가 쌓입니다.',
   },
   nonogram: {
     goal: '가장자리 숫자를 힌트 삼아 칸을 칠해 그림을 완성하세요. 세 번 틀리면 끝입니다.',
@@ -106,20 +96,10 @@ const ko: Record<string, Guide> = {
     how: '포신이 저절로 돌아갑니다. 적과 일직선이 되는 순간 탭해서 쏘세요.',
     score: '연속으로 맞힐수록 보너스가 커집니다.',
   },
-  estate: {
-    goal: '3분 동안 부동산을 사고팔아 자산을 최대한 불리세요.',
-    how: '매물마다 매수·매도 버튼이 있습니다. 보유하고 있으면 임대료가 계속 들어와요.',
-    score: '끝났을 때의 총자산이 점수입니다.',
-  },
   store: {
     goal: '손님이 원하는 상품을 제때 진열하세요. 헛걸음이 쌓여 평판이 바닥나면 폐업입니다.',
     how: '진열대를 탭해 창고 재고를 채우고, 재고가 떨어지면 발주하세요.',
     score: '누적 매출이 점수입니다.',
-  },
-  tuber: {
-    goal: '3분 동안 영상을 올려 구독자를 최대한 모으세요.',
-    how: '주제를 고른 뒤 촬영·편집·썸네일 세 번의 타이밍을 맞추세요. 초록 한가운데에서 멈추면 잘 만든 영상입니다.',
-    score: '모은 구독자 수가 점수입니다.',
   },
   reigns: {
     goal: '민심·국고·군사·외교 중 하나라도 바닥나거나 넘치면 왕좌에서 내려옵니다.',
@@ -184,11 +164,6 @@ const en: Record<string, Guide> = {
     how: 'Just drag to move — attacks are automatic. Pick an upgrade on level up.',
     score: 'Kills plus time survived.',
   },
-  stock: {
-    goal: 'Buy low, sell high and grow your money in 90 seconds.',
-    how: 'Use the buy and sell buttons. News events swing the price hard.',
-    score: 'How much you made above your starting cash.',
-  },
   merge: {
     goal: 'Merge plants into golden pots. Reach the target count in time to advance a stage.',
     how: 'Tap Spawn to drop seeds, then drag matching plants onto each other.',
@@ -203,11 +178,6 @@ const en: Record<string, Guide> = {
     goal: 'Clear the peaks by taking cards one rank above or below the base card.',
     how: 'Tap any card that fits. Out of moves? Flip a card from the stock.',
     score: 'Longer streaks build a multiplier.',
-  },
-  mahjong: {
-    goal: 'Find matching pairs and clear the whole board.',
-    how: 'Only tiles free on the left or right can be picked. Tap two of them.',
-    score: 'Score builds as you clear stages.',
   },
   nonogram: {
     goal: 'Use the edge numbers to fill the picture. Three mistakes end the run.',
@@ -244,20 +214,10 @@ const en: Record<string, Guide> = {
     how: 'The turret spins on its own — tap to fire when it lines up.',
     score: 'Consecutive hits build a bonus.',
   },
-  estate: {
-    goal: 'Trade property for three minutes and grow your assets.',
-    how: 'Each listing has buy and sell buttons. Holdings earn rent continuously.',
-    score: 'Your total assets at the end.',
-  },
   store: {
     goal: 'Restock what customers want in time. Enough angry customers and you close down.',
     how: 'Tap a shelf to restock from storage, and order more when storage runs low.',
     score: 'Total revenue.',
-  },
-  tuber: {
-    goal: 'Post videos for three minutes and gather as many subscribers as you can.',
-    how: 'Pick a topic, then time three taps — filming, editing, thumbnail. Stop in the green centre for a better video.',
-    score: 'Subscribers gained.',
   },
   reigns: {
     goal: 'If people, treasury, army or diplomacy hits zero or overflows, you lose the throne.',
