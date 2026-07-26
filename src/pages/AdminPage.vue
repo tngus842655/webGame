@@ -60,8 +60,13 @@ async function save(flag: GameFlag) {
   }
 }
 
-async function moveToTrash(row: Row) {
-  if (!confirm(t('admin.trashConfirm', { name: t(row.titleKey) }))) return
+// 버리기 확인 — 브라우저 confirm()은 앱 밖 창처럼 보여서 직접 그린다
+const pending = ref<Row | null>(null)
+
+async function moveToTrash() {
+  const row = pending.value
+  if (!row) return
+  pending.value = null
   const next = { ...row.flag, trashedAt: new Date().toISOString() }
   await save(next)
   if (!error.value) row.flag = next
@@ -118,13 +123,27 @@ async function moveToTrash(row: Row) {
                 @change="save(row.flag)"
               />
             </label>
-            <button type="button" class="trash-btn" @click="moveToTrash(row)">
+            <button type="button" class="trash-btn" @click="pending = row">
               {{ t('admin.toTrash') }}
             </button>
           </div>
         </div>
       </li>
     </ul>
+
+    <div v-if="pending" class="dim" @click="pending = null">
+      <div class="dialog" @click.stop>
+        <p class="ask">{{ t('admin.trashConfirm', { name: t(pending.titleKey) }) }}</p>
+        <div class="dialog-buttons">
+          <button type="button" class="cancel" @click="pending = null">
+            {{ t('account.cancel') }}
+          </button>
+          <button type="button" class="danger" @click="moveToTrash">
+            {{ t('admin.toTrash') }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -282,6 +301,61 @@ async function moveToTrash(row: Row) {
 
 .order input:disabled {
   background: #f5f5f5;
+}
+
+.dim {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgb(62 39 35 / 0.45);
+}
+
+.dialog {
+  width: 100%;
+  max-width: 320px;
+  padding: 22px 20px 16px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 12px 32px rgb(62 39 35 / 0.25);
+}
+
+.ask {
+  font-size: 15px;
+  line-height: 1.55;
+  color: #4e342e;
+  text-align: center;
+  word-break: keep-all;
+}
+
+.dialog-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.dialog-buttons button {
+  flex: 1;
+  padding: 13px 0;
+  border: none;
+  border-radius: 13px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.cancel {
+  background: #efebe9;
+  color: #6d4c41;
+}
+
+.danger {
+  background: #e65100;
+  color: #fff;
 }
 
 .trash-btn {
