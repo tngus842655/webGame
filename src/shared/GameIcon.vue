@@ -368,6 +368,24 @@ defineProps<{ slug: string }>()
       <circle cx="34" cy="16" r="2" fill="#FFFFFF" opacity="0.65" />
     </g>
 
+    <!-- 룰렛 데일리 -->
+    <g v-else-if="slug === 'roulette'">
+      <rect x="4" y="4" width="40" height="40" rx="7" fill="#6A1B9A" />
+      <g>
+        <path d="M24 26 L24 8 A18 18 0 0 1 36.7 13.3 Z" fill="#EF5350" />
+        <path d="M24 26 L36.7 13.3 A18 18 0 0 1 42 26 Z" fill="#42A5F5" />
+        <path d="M24 26 L42 26 A18 18 0 0 1 36.7 38.7 Z" fill="#FFB300" />
+        <path d="M24 26 L36.7 38.7 A18 18 0 0 1 24 44 Z" fill="#66BB6A" />
+        <path d="M24 26 L24 44 A18 18 0 0 1 11.3 38.7 Z" fill="#AB47BC" />
+        <path d="M24 26 L11.3 38.7 A18 18 0 0 1 6 26 Z" fill="#26C6DA" />
+        <path d="M24 26 L6 26 A18 18 0 0 1 11.3 13.3 Z" fill="#FF7043" />
+        <path d="M24 26 L11.3 13.3 A18 18 0 0 1 24 8 Z" fill="#9CCC65" />
+      </g>
+      <circle cx="24" cy="26" r="18" fill="none" stroke="#FFD54F" stroke-width="2.4" />
+      <circle cx="24" cy="26" r="5" fill="#4A148C" stroke="#FFD54F" stroke-width="1.6" />
+      <path d="M20 6 L24 12 L28 6 Z" fill="#FFD54F" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />

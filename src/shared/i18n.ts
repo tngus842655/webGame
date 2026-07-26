@@ -364,6 +364,11 @@ const en = {
   'ac.s3': 'Guard',
   'ac.s4': 'Mage',
   'game.roulette': 'Daily Roulette',
+  'rl.today': "Today's winnings",
+  'rl.spin': 'Spin!',
+  'rl.tomorrow': 'Come back tomorrow! 🎁',
+  'rl.bonus': '🔥 {n}-day streak bonus +{p}%',
+  'rl.ad': '▶ Watch ad for +2 spins',
 }
 
 const ko: typeof en = {
@@ -692,6 +697,11 @@ const ko: typeof en = {
   'ac.s3': '방패병',
   'ac.s4': '마법사',
   'game.roulette': '룰렛 데일리',
+  'rl.today': '오늘 획득',
+  'rl.spin': '돌리기!',
+  'rl.tomorrow': '내일 또 만나요! 🎁',
+  'rl.bonus': '🔥 연속 {n}일 보너스 +{p}%',
+  'rl.ad': '▶ 광고 보고 스핀 +2',
 }
 
 // 나머지 언어: 허브·게임오버·광고·제목까지 번역, 게임 내부 텍스트는 en 폴백
