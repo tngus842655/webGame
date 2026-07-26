@@ -146,7 +146,9 @@ export function loadLevel(state: PipesState, level: number) {
   }
   let wet = computeWet(size, masks, source)
   if (isSolved(size, masks, wet)) {
-    masks[source] = rotateCW(masks[source])
+    // 회전해도 모양이 안 변하는 십자(15)는 피해서 하나 돌려 섞인 상태를 보장
+    const i = masks.findIndex((m) => m !== 15)
+    masks[i] = rotateCW(masks[i])
     wet = computeWet(size, masks, source)
   }
   state.level = level
