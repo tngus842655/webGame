@@ -57,8 +57,9 @@ export function createGameShell(host: HTMLElement, onFrame: (dt: number) => void
 
 export interface GameSession {
   destroy(): void
-  // 지금까지의 점수 (게임오버 시 제출하는 값과 같은 식) — 중도 이탈 기록 보존에 쓰인다
-  getScore(): number
+  // 지금까지의 점수 (게임오버 시 제출하는 값과 같은 식) — 중도 이탈 기록 보존에 쓰인다.
+  // 제한 시간을 다 써야 결과가 확정되는 게임은 생략한다 = 완주했을 때만 기록
+  getScore?(): number
 }
 
 // GameModule의 mount/unmount 보일러플레이트 제거용
@@ -75,7 +76,7 @@ export function defineGame(
       session = null
     },
     currentScore() {
-      return session?.getScore() ?? 0
+      return session?.getScore?.() ?? 0
     },
   }
 }
