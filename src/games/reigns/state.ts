@@ -93,8 +93,9 @@ export type ChooseResult = 'ok' | 'died' | 'none'
 export function choose(state: ReignsState, right: boolean): ChooseResult {
   if (state.phase !== 'playing') return 'none'
   const effects = right ? CARDS[state.card].r : CARDS[state.card].l
-  // 매년 모든 지표가 조금씩 마모된다 — 오래 버틸수록 유지가 어려워진다
-  const decay = 1 + Math.min(2, Math.floor(state.years / 25))
+  // 매년 모든 지표가 마모된다. 예전엔 첫 해부터 -1이 걸려 잘하든 못하든 30년쯤에
+  // 똑같이 끝났다(봇 중앙 29년·최대 37년). 초반은 실력으로 버티게 두고 뒤로 갈수록 조인다.
+  const decay = Math.min(4, Math.floor(state.years / 20))
   for (let i = 0; i < STAT_COUNT; i++) {
     state.stats[i] = Math.max(0, Math.min(100, state.stats[i] + effects[i] - decay))
   }

@@ -71,7 +71,9 @@ export interface TickEvents {
   delivered: boolean
 }
 
-const spawnInterval = (t: number) => Math.max(0.35, 3.2 - t * 0.01)
+// 하한 0.35초는 초당 3회 남짓이라 손이 빠른 사람은 영영 안 망했다.
+// 사람이 낼 수 있는 탭 속도 바깥까지 조여 판이 끝나게 한다.
+const spawnInterval = (t: number) => Math.max(0.22, 3.2 - t * 0.009)
 const WALK_IN = 1.0
 const LEAVE = 0.9
 
