@@ -228,15 +228,6 @@ defineProps<{ slug: string }>()
     </g>
 
 
-    <!-- 국가 운영 -->
-    <g v-else-if="slug === 'reigns'">
-      <rect x="4" y="4" width="40" height="40" rx="7" fill="#5D4037" />
-      <rect x="15" y="14" width="24" height="28" rx="3.5" fill="#BCAAA4" transform="rotate(8 27 28)" />
-      <rect x="9" y="12" width="24" height="28" rx="3.5" fill="#EFEBE9" />
-      <circle cx="21" cy="22" r="4.5" fill="#8D6E63" />
-      <path d="M14 32 h14 M14 36 h10" stroke="#A1887F" stroke-width="2" stroke-linecap="round" />
-      <path d="M17 6 L21 9 L24 5 L27 9 L31 6 L30 11 H18 Z" fill="#FFB300" />
-    </g>
 
 
     <!-- 한글 워들 -->

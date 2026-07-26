@@ -101,11 +101,6 @@ const ko: Record<string, Guide> = {
     how: '진열대를 탭해 창고 재고를 채우고, 재고가 떨어지면 발주하세요.',
     score: '누적 매출이 점수입니다.',
   },
-  reigns: {
-    goal: '민심·국고·군사·외교 중 하나라도 바닥나거나 넘치면 왕좌에서 내려옵니다.',
-    how: '안건 카드에서 두 선택지 중 하나를 고르세요. 어떤 지표가 움직이는지 아이콘으로 귀띔해 줍니다.',
-    score: '버틴 재위 년수가 점수입니다.',
-  },
   wordle: {
     goal: '숨은 두 글자 단어를 여섯 번 안에 맞히세요.',
     how: '자음·모음을 눌러 여섯 칸을 채우고 입력하세요. 초록은 자리까지 정답, 노랑은 자리만 틀린 것입니다.',
@@ -218,11 +213,6 @@ const en: Record<string, Guide> = {
     goal: 'Restock what customers want in time. Enough angry customers and you close down.',
     how: 'Tap a shelf to restock from storage, and order more when storage runs low.',
     score: 'Total revenue.',
-  },
-  reigns: {
-    goal: 'If people, treasury, army or diplomacy hits zero or overflows, you lose the throne.',
-    how: 'Choose one of two answers on each card. Icons hint at which stats move.',
-    score: 'Years you stayed on the throne.',
   },
   wordle: {
     goal: 'Guess the hidden two-syllable word within six tries.',
