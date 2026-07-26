@@ -368,12 +368,6 @@ const en = {
   'ac.s2': 'Archer',
   'ac.s3': 'Guard',
   'ac.s4': 'Mage',
-  'game.roulette': 'Daily Roulette',
-  'rl.today': "Today's winnings",
-  'rl.spin': 'Spin!',
-  'rl.tomorrow': 'Come back tomorrow! 🎁',
-  'rl.bonus': '🔥 {n}-day streak bonus +{p}%',
-  'rl.ad': '▶ Watch ad for +2 spins',
 }
 
 const ko: typeof en = {
@@ -706,12 +700,6 @@ const ko: typeof en = {
   'ac.s2': '궁수',
   'ac.s3': '방패병',
   'ac.s4': '마법사',
-  'game.roulette': '룰렛 데일리',
-  'rl.today': '오늘 획득',
-  'rl.spin': '돌리기!',
-  'rl.tomorrow': '내일 또 만나요! 🎁',
-  'rl.bonus': '🔥 연속 {n}일 보너스 +{p}%',
-  'rl.ad': '▶ 광고 보고 스핀 +2',
 }
 
 // 나머지 언어: 허브·게임오버·광고·제목까지 번역, 게임 내부 텍스트는 en 폴백
@@ -807,7 +795,6 @@ const ja: CoreDict = {
   'game.omok': '五目並べ',
   'game.deck': 'カードバトル',
   'game.autochess': 'オートバトラー',
-  'game.roulette': 'デイリールーレット',
 }
 
 const zhCN: CoreDict = {
@@ -900,7 +887,6 @@ const zhCN: CoreDict = {
   'game.omok': '五子棋',
   'game.deck': '卡牌战斗',
   'game.autochess': '自走棋',
-  'game.roulette': '每日转盘',
 }
 
 const es: CoreDict = {
@@ -993,7 +979,6 @@ const es: CoreDict = {
   'game.omok': 'Gomoku',
   'game.deck': 'Batalla de Cartas',
   'game.autochess': 'Auto Batalla',
-  'game.roulette': 'Ruleta Diaria',
 }
 
 const ptBR: CoreDict = {
@@ -1086,7 +1071,6 @@ const ptBR: CoreDict = {
   'game.omok': 'Gomoku',
   'game.deck': 'Batalha de Cartas',
   'game.autochess': 'Auto Batalha',
-  'game.roulette': 'Roleta Diária',
 }
 
 const fr: CoreDict = {
@@ -1179,7 +1163,6 @@ const fr: CoreDict = {
   'game.omok': 'Gomoku',
   'game.deck': 'Bataille de Cartes',
   'game.autochess': 'Auto-Bataille',
-  'game.roulette': 'Roulette du Jour',
 }
 
 const de: CoreDict = {
@@ -1272,7 +1255,6 @@ const de: CoreDict = {
   'game.omok': 'Gomoku',
   'game.deck': 'Kartenkampf',
   'game.autochess': 'Auto-Battler',
-  'game.roulette': 'Tägliches Glücksrad',
 }
 
 const ru: CoreDict = {
@@ -1365,7 +1347,6 @@ const ru: CoreDict = {
   'game.omok': 'Гомоку',
   'game.deck': 'Карточные бои',
   'game.autochess': 'Автобатлер',
-  'game.roulette': 'Рулетка дня',
 }
 
 const id: CoreDict = {
@@ -1458,7 +1439,6 @@ const id: CoreDict = {
   'game.omok': 'Gomoku',
   'game.deck': 'Pertarungan Kartu',
   'game.autochess': 'Auto Battler',
-  'game.roulette': 'Roulette Harian',
 }
 
 const vi: CoreDict = {
@@ -1551,7 +1531,6 @@ const vi: CoreDict = {
   'game.omok': 'Cờ Ca-rô',
   'game.deck': 'Đấu Bài',
   'game.autochess': 'Cờ Tự Đấu',
-  'game.roulette': 'Vòng Quay Mỗi Ngày',
 }
 
 const th: CoreDict = {
@@ -1644,7 +1623,6 @@ const th: CoreDict = {
   'game.omok': 'โกะโมกุ',
   'game.deck': 'การ์ดแบทเทิล',
   'game.autochess': 'ออโต้แบทเทิล',
-  'game.roulette': 'วงล้อรายวัน',
 }
 
 const tr: CoreDict = {
@@ -1737,7 +1715,6 @@ const tr: CoreDict = {
   'game.omok': 'Gomoku',
   'game.deck': 'Kart Savaşı',
   'game.autochess': 'Oto Savaş',
-  'game.roulette': 'Günlük Çark',
 }
 
 const messages: Record<Locale, CoreDict> = {

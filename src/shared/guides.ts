@@ -146,11 +146,6 @@ const ko: Record<string, Guide> = {
     how: '상점에서 유닛을 사고, 같은 유닛을 겹쳐 끌면 한 단계 강해집니다.',
     score: '라운드를 오래 버틸수록 점수가 쌓입니다.',
   },
-  roulette: {
-    goal: '하루 세 번 돌려 최대한 많이 받으세요.',
-    how: '돌리기 버튼을 누르면 됩니다.',
-    score: '오늘 받은 금액이 점수이고, 매일 오면 보너스가 붙습니다.',
-  },
 }
 
 const en: Record<string, Guide> = {
@@ -288,11 +283,6 @@ const en: Record<string, Guide> = {
     goal: 'Buy units, place them, and win the auto battles. Losing costs health.',
     how: 'Buy from the shop and drag matching units together to upgrade them.',
     score: 'Score builds the longer you survive.',
-  },
-  roulette: {
-    goal: 'Three free spins a day — win as much as you can.',
-    how: 'Just press the spin button.',
-    score: "Today's winnings, with a bonus for coming back daily.",
   },
 }
 
