@@ -118,4 +118,9 @@ export const GAMES: GameMeta[] = [
     titleKey: 'game.sortgate',
     loader: () => import('./sortgate'),
   },
+  {
+    slug: 'numorder',
+    titleKey: 'game.numorder',
+    loader: () => import('./numorder'),
+  },
 ]

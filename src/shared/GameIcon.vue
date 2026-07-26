@@ -301,6 +301,18 @@ defineProps<{ slug: string }>()
       <path d="M37 9.5 L39.5 12 L37 14.5" stroke="#B0BEC5" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
     </g>
 
+    <!-- 숫자 줄 세우기 -->
+    <g v-else-if="slug === 'numorder'">
+      <rect x="6" y="4" width="24" height="9" rx="2.5" fill="#37507A" />
+      <text x="18" y="11.4" font-size="7" font-weight="bold" fill="#FFFFFF" text-anchor="middle">14</text>
+      <rect x="6" y="16" width="24" height="9" rx="2.5" fill="#66BB6A" opacity="0.28" stroke="#66BB6A" stroke-width="1.6" />
+      <rect x="6" y="28" width="24" height="9" rx="2.5" fill="#37507A" />
+      <text x="18" y="35.4" font-size="7" font-weight="bold" fill="#FFFFFF" text-anchor="middle">52</text>
+      <rect x="6" y="39" width="24" height="6" rx="2" fill="#FFFFFF" opacity="0.08" />
+      <rect x="33" y="15" width="12" height="16" rx="3" fill="#FFF8E1" />
+      <text x="39" y="26" font-size="8" font-weight="bold" fill="#3E2723" text-anchor="middle">31</text>
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />

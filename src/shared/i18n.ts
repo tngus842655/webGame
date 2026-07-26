@@ -275,6 +275,10 @@ const en = {
   'st.ad': '▶ Watch ad to get half the width back',
   'game.sortgate': 'Sorting Duty',
   'sg.ad': '▶ Watch ad for one more life',
+  'game.numorder': 'Number Line-up',
+  'nm.round': 'Board {n}',
+  'nm.clear': 'Board complete! +{n}',
+  'nm.ad': '▶ Watch ad to empty the blocking slot',
 }
 
 const ko: typeof en = {
@@ -511,6 +515,10 @@ const ko: typeof en = {
   'st.ad': '▶ 광고 보고 폭 절반 복구',
   'game.sortgate': '분류 반장',
   'sg.ad': '▶ 광고 보고 목숨 하나 더',
+  'game.numorder': '숫자 줄 세우기',
+  'nm.round': '{n}판',
+  'nm.clear': '한 판 완성! +{n}',
+  'nm.ad': '▶ 광고 보고 막힌 칸 비우기',
 }
 
 // 나머지 언어: 허브·게임오버·광고·제목까지 번역, 게임 내부 텍스트는 en 폴백
@@ -717,6 +725,10 @@ const ja: CoreDict = {
   'st.ad': '▶ 広告を見て幅を半分回復',
   'game.sortgate': '仕分け係',
   'sg.ad': '▶ 広告を見てライフ+1',
+  'game.numorder': '数字ならべ',
+  'nm.round': '{n}面',
+  'nm.clear': '1面クリア！ +{n}',
+  'nm.ad': '▶ 広告を見て詰まった枠を空ける',
 }
 
 const zhCN: CoreDict = {
@@ -920,6 +932,10 @@ const zhCN: CoreDict = {
   'st.ad': '▶ 看广告恢复一半宽度',
   'game.sortgate': '分类小队长',
   'sg.ad': '▶ 看广告多一条命',
+  'game.numorder': '数字排队',
+  'nm.round': '第{n}盘',
+  'nm.clear': '一盘完成！ +{n}',
+  'nm.ad': '▶ 看广告清空堵住的格子',
 }
 
 const es: CoreDict = {
@@ -1123,6 +1139,10 @@ const es: CoreDict = {
   'st.ad': '▶ Ver anuncio y recuperar media anchura',
   'game.sortgate': 'Clasificador Veloz',
   'sg.ad': '▶ Ver anuncio por una vida más',
+  'game.numorder': 'Fila de Números',
+  'nm.round': 'Tablero {n}',
+  'nm.clear': '¡Tablero completo! +{n}',
+  'nm.ad': '▶ Ver anuncio y vaciar la casilla que bloquea',
 }
 
 const ptBR: CoreDict = {
@@ -1326,6 +1346,10 @@ const ptBR: CoreDict = {
   'st.ad': '▶ Ver anúncio e recuperar metade da largura',
   'game.sortgate': 'Classificador Veloz',
   'sg.ad': '▶ Ver anúncio e ganhar uma vida',
+  'game.numorder': 'Fila de Números',
+  'nm.round': 'Tabuleiro {n}',
+  'nm.clear': 'Tabuleiro completo! +{n}',
+  'nm.ad': '▶ Ver anúncio e esvaziar a casa que travou',
 }
 
 const fr: CoreDict = {
@@ -1529,6 +1553,10 @@ const fr: CoreDict = {
   'st.ad': '▶ Pub pour récupérer la moitié de la largeur',
   'game.sortgate': 'Chef du Tri',
   'sg.ad': '▶ Pub pour une vie de plus',
+  'game.numorder': 'File de Nombres',
+  'nm.round': 'Plateau {n}',
+  'nm.clear': 'Plateau complet ! +{n}',
+  'nm.ad': '▶ Pub pour vider la case qui bloque',
 }
 
 const de: CoreDict = {
@@ -1732,6 +1760,10 @@ const de: CoreDict = {
   'st.ad': '▶ Werbung ansehen: halbe Breite zurück',
   'game.sortgate': 'Sortierdienst',
   'sg.ad': '▶ Werbung ansehen: ein Leben mehr',
+  'game.numorder': 'Zahlenreihe',
+  'nm.round': 'Feld {n}',
+  'nm.clear': 'Feld voll! +{n}',
+  'nm.ad': '▶ Werbung ansehen: blockierendes Fach leeren',
 }
 
 const ru: CoreDict = {
@@ -1935,6 +1967,10 @@ const ru: CoreDict = {
   'st.ad': '▶ Реклама: вернуть половину ширины',
   'game.sortgate': 'Сортировщик',
   'sg.ad': '▶ Реклама: ещё одна жизнь',
+  'game.numorder': 'Числа по порядку',
+  'nm.round': 'Поле {n}',
+  'nm.clear': 'Поле собрано! +{n}',
+  'nm.ad': '▶ Реклама: освободить мешающую ячейку',
 }
 
 const id: CoreDict = {
@@ -2138,6 +2174,10 @@ const id: CoreDict = {
   'st.ad': '▶ Tonton iklan, lebar kembali setengah',
   'game.sortgate': 'Petugas Sortir',
   'sg.ad': '▶ Tonton iklan untuk satu nyawa lagi',
+  'game.numorder': 'Baris Angka',
+  'nm.round': 'Papan {n}',
+  'nm.clear': 'Papan penuh! +{n}',
+  'nm.ad': '▶ Tonton iklan untuk kosongkan kotak penghalang',
 }
 
 const vi: CoreDict = {
@@ -2341,6 +2381,10 @@ const vi: CoreDict = {
   'st.ad': '▶ Xem quảng cáo để hồi nửa chiều rộng',
   'game.sortgate': 'Phân Loại Nhanh',
   'sg.ad': '▶ Xem quảng cáo thêm một mạng',
+  'game.numorder': 'Xếp Số Thứ Tự',
+  'nm.round': 'Bảng {n}',
+  'nm.clear': 'Hoàn thành bảng! +{n}',
+  'nm.ad': '▶ Xem quảng cáo để trống ô đang chặn',
 }
 
 const th: CoreDict = {
@@ -2544,6 +2588,10 @@ const th: CoreDict = {
   'st.ad': '▶ ดูโฆษณาเพื่อคืนความกว้างครึ่งหนึ่ง',
   'game.sortgate': 'หัวหน้าคัดแยก',
   'sg.ad': '▶ ดูโฆษณาเพื่อรับชีวิตเพิ่ม',
+  'game.numorder': 'เรียงเลขเข้าแถว',
+  'nm.round': 'กระดานที่ {n}',
+  'nm.clear': 'เต็มกระดาน! +{n}',
+  'nm.ad': '▶ ดูโฆษณาเพื่อเคลียร์ช่องที่ขวางอยู่',
 }
 
 const tr: CoreDict = {
@@ -2747,6 +2795,10 @@ const tr: CoreDict = {
   'st.ad': '▶ Reklam izle, genişliğin yarısı geri gelsin',
   'game.sortgate': 'Ayırma Nöbeti',
   'sg.ad': '▶ Reklam izle, bir can daha al',
+  'game.numorder': 'Sayı Sırası',
+  'nm.round': '{n}. tahta',
+  'nm.clear': 'Tahta tamam! +{n}',
+  'nm.ad': '▶ Reklam izle, tıkayan kutuyu boşalt',
 }
 
 const messages: Record<Locale, CoreDict> = {

@@ -126,6 +126,11 @@ const ko: Record<string, Guide> = {
     how: '좌우로 밀거나 화면의 좌우 절반을 탭하세요.',
     score: '한 개에 20점, 연속으로 맞히면 최대 50점까지 오릅니다.',
   },
+  numorder: {
+    goal: '카드를 위에서 아래로 커지도록 빈 칸에 끼워 넣으세요. 넣을 수 있는 칸이 없으면 끝입니다.',
+    how: '테두리가 살아 있는 칸을 탭하면 손에 든 카드가 들어갑니다.',
+    score: '뒤로 갈수록 한 칸에 주는 점수가 커지고, 16칸을 다 채우면 300점을 더 받고 새 판이 시작됩니다.',
+  },
 }
 
 const en: Record<string, Guide> = {
@@ -243,6 +248,11 @@ const en: Record<string, Guide> = {
     goal: 'Read the two boxes up top and push each shape into the one it belongs to. The rule swaps every few shapes and the boxes flash when it does. Three mistakes end the run.',
     how: 'Swipe left or right, or tap the left or right half of the screen.',
     score: '20 per shape, rising to 50 as your streak grows.',
+  },
+  numorder: {
+    goal: 'Slot each card so the column grows from top to bottom. When no slot fits the card, the run ends.',
+    how: 'Tap one of the outlined slots to drop the card you are holding.',
+    score: 'Later slots pay more, and filling all 16 adds 300 and starts a fresh board.',
   },
 }
 
@@ -362,6 +372,11 @@ const ja: Record<string, Guide> = {
     how: '左右にスワイプするか、画面の左右半分をタップします。',
     score: '1個20点、連続で正解すると最大50点まで上がります。',
   },
+  numorder: {
+    goal: 'カードを上から下へ大きくなるように空き枠へ入れましょう。入る枠がなくなると終了です。',
+    how: '枠線が光っているマスをタップすると手持ちのカードが入ります。',
+    score: '後半の枠ほど点数が高く、16枠すべて埋めると300点を追加して新しい盤が始まります。',
+  },
 }
 
 const zhCN: Record<string, Guide> = {
@@ -479,6 +494,11 @@ const zhCN: Record<string, Guide> = {
     goal: '看清上方两个箱子的标准，把图形推向正确的一侧。标准每隔几个就会整体更换，更换时箱子会闪烁。错三次结束。',
     how: '左右滑动，或点击屏幕左右半边。',
     score: '每个20分，连对越多最高可达50分。',
+  },
+  numorder: {
+    goal: '把卡片放进空格，让数字从上到下越来越大。没有格子可放时结束。',
+    how: '点击带亮边框的格子，手上的卡片就会放进去。',
+    score: '越靠后的格子分数越高，填满16格再加300分并开始新的一盘。',
   },
 }
 
@@ -598,6 +618,11 @@ const es: Record<string, Guide> = {
     how: 'Desliza a izquierda o derecha, o toca la mitad izquierda o derecha de la pantalla.',
     score: '20 por figura, hasta 50 según crece tu racha.',
   },
+  numorder: {
+    goal: 'Coloca cada carta para que la columna crezca de arriba abajo. Si ninguna casilla sirve, termina la partida.',
+    how: 'Toca una de las casillas resaltadas para soltar la carta que tienes.',
+    score: 'Las casillas más avanzadas pagan más, y llenar las 16 suma 300 y abre un tablero nuevo.',
+  },
 }
 
 const ptBR: Record<string, Guide> = {
@@ -715,6 +740,11 @@ const ptBR: Record<string, Guide> = {
     goal: 'Olhe o critério das duas caixas e empurre cada figura para o lado certo. O critério muda por completo a cada poucas figuras e as caixas piscam quando isso acontece. Três erros encerram a partida.',
     how: 'Deslize para a esquerda ou direita, ou toque na metade esquerda ou direita da tela.',
     score: '20 por figura, chegando a 50 conforme a sequência cresce.',
+  },
+  numorder: {
+    goal: 'Encaixe cada carta para a coluna crescer de cima para baixo. Quando nenhuma casa serve, a partida acaba.',
+    how: 'Toque numa das casas destacadas para soltar a carta que está na mão.',
+    score: 'Casas mais avançadas valem mais, e preencher todas as 16 soma 300 e abre um tabuleiro novo.',
   },
 }
 
@@ -834,6 +864,11 @@ const fr: Record<string, Guide> = {
     how: 'Balaye à gauche ou à droite, ou touche la moitié gauche ou droite de l\'écran.',
     score: '20 par forme, jusqu\'à 50 selon ta série.',
   },
+  numorder: {
+    goal: 'Place chaque carte pour que la colonne grandisse de haut en bas. Si aucune case ne convient, la partie s\'arrête.',
+    how: 'Touche une des cases entourées pour y déposer la carte en main.',
+    score: 'Les cases tardives rapportent plus, et remplir les 16 ajoute 300 points et lance un nouveau plateau.',
+  },
 }
 
 const de: Record<string, Guide> = {
@@ -951,6 +986,11 @@ const de: Record<string, Guide> = {
     goal: 'Lies das Kriterium der beiden Kisten und schiebe jede Form auf die richtige Seite. Alle paar Formen wird das Kriterium komplett getauscht – dann blinken die Kisten. Drei Fehler beenden die Runde.',
     how: 'Nach links oder rechts wischen oder die linke bzw. rechte Bildschirmhälfte antippen.',
     score: '20 pro Form, mit wachsender Serie bis zu 50.',
+  },
+  numorder: {
+    goal: 'Setze jede Karte so, dass die Spalte von oben nach unten wächst. Passt keine Lücke mehr, ist die Runde vorbei.',
+    how: 'Tippe auf ein umrandetes Fach, um die Karte in der Hand abzulegen.',
+    score: 'Späte Fächer bringen mehr, und alle 16 gefüllt gibt 300 extra und ein neues Feld.',
   },
 }
 
@@ -1070,6 +1110,11 @@ const ru: Record<string, Guide> = {
     how: 'Свайп влево или вправо либо нажатие на левую или правую половину экрана.',
     score: '20 за фигуру, до 50 по мере роста серии.',
   },
+  numorder: {
+    goal: 'Ставьте карты так, чтобы числа росли сверху вниз. Если подходящей ячейки нет — конец.',
+    how: 'Нажмите на подсвеченную ячейку, чтобы положить карту из руки.',
+    score: 'Чем дальше ячейка, тем больше очков; все 16 заполнены — плюс 300 и новое поле.',
+  },
 }
 
 const id: Record<string, Guide> = {
@@ -1187,6 +1232,11 @@ const id: Record<string, Guide> = {
     goal: 'Baca kriteria pada dua kotak di atas dan dorong tiap bentuk ke sisi yang benar. Kriterianya berganti total setiap beberapa bentuk, dan kotaknya berkedip saat itu terjadi. Tiga kesalahan berarti tamat.',
     how: 'Geser ke kiri atau kanan, atau ketuk separuh kiri atau kanan layar.',
     score: '20 per bentuk, naik sampai 50 seiring rentetan.',
+  },
+  numorder: {
+    goal: 'Sisipkan tiap kartu agar angkanya membesar dari atas ke bawah. Kalau tak ada kotak yang cocok, permainan berakhir.',
+    how: 'Ketuk salah satu kotak bergaris untuk menaruh kartu di tangan.',
+    score: 'Kotak yang lebih belakang bernilai lebih besar, dan mengisi 16 kotak menambah 300 lalu membuka papan baru.',
   },
 }
 
@@ -1306,6 +1356,11 @@ const vi: Record<string, Guide> = {
     how: 'Quét sang trái hoặc phải, hoặc chạm vào nửa trái/phải màn hình.',
     score: '20 điểm mỗi hình, tăng tới 50 khi chuỗi đúng dài hơn.',
   },
+  numorder: {
+    goal: 'Đặt từng thẻ sao cho số lớn dần từ trên xuống dưới. Khi không còn ô nào vừa thì kết thúc.',
+    how: 'Chạm vào ô đang được viền sáng để đặt thẻ đang giữ.',
+    score: 'Ô càng về sau càng nhiều điểm, đầy cả 16 ô được thêm 300 và mở bảng mới.',
+  },
 }
 
 const th: Record<string, Guide> = {
@@ -1424,6 +1479,11 @@ const th: Record<string, Guide> = {
     how: 'ปัดซ้ายหรือขวา หรือแตะครึ่งซ้าย/ขวาของหน้าจอ',
     score: 'รูปละ 20 คะแนน ต่อเนื่องได้สูงสุด 50 คะแนน',
   },
+  numorder: {
+    goal: 'ใส่การ์ดให้ตัวเลขเพิ่มขึ้นจากบนลงล่าง ถ้าไม่มีช่องที่ใส่ได้ก็จบเกม',
+    how: 'แตะช่องที่มีขอบเรืองแสงเพื่อวางการ์ดที่ถืออยู่',
+    score: 'ช่องท้าย ๆ ได้คะแนนมากขึ้น เต็มทั้ง 16 ช่องได้เพิ่ม 300 แล้วเริ่มกระดานใหม่',
+  },
 }
 
 const tr: Record<string, Guide> = {
@@ -1541,6 +1601,11 @@ const tr: Record<string, Guide> = {
     goal: 'Üstteki iki kutunun ölçütüne bak ve her şekli doğru tarafa it. Ölçüt her birkaç şekilde tamamen değişir, değişirken kutular parlar. Üç hata oyunu bitirir.',
     how: 'Sola ya da sağa kaydır, veya ekranın sol/sağ yarısına dokun.',
     score: 'Şekil başına 20 puan, seri uzadıkça 50 puana kadar çıkar.',
+  },
+  numorder: {
+    goal: 'Kartları, sayılar yukarıdan aşağıya büyüyecek şekilde boş kutulara yerleştir. Uyan kutu kalmazsa oyun biter.',
+    how: 'Elindeki kartı bırakmak için çerçevesi parlayan kutulardan birine dokun.',
+    score: 'Sondaki kutular daha çok puan verir; 16 kutunun tamamı dolarsa 300 puan eklenir ve yeni tahta açılır.',
   },
 }
 const TABLES: Record<Locale, Record<string, Guide>> = {
