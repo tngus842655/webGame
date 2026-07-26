@@ -204,6 +204,21 @@ defineProps<{ slug: string }>()
       <circle cx="24" cy="32" r="4" fill="#1E88E5" />
     </g>
 
+    <!-- 점프 챌린지 -->
+    <g v-else-if="slug === 'jump'">
+      <rect x="4" y="4" width="40" height="40" rx="7" fill="#8ED0F5" />
+      <rect x="6" y="38" width="16" height="6" rx="3" fill="#8D6E63" />
+      <rect x="6" y="36" width="16" height="4" rx="2" fill="#66BB6A" />
+      <rect x="28" y="22" width="14" height="5" rx="2.5" fill="#8D6E63" />
+      <rect x="28" y="20" width="14" height="4" rx="2" fill="#66BB6A" />
+      <ellipse cx="10" cy="12" rx="6" ry="3" fill="#FFFFFF" opacity="0.8" />
+      <rect x="12" y="22" width="12" height="11" rx="5" fill="#FF7043" transform="rotate(-14 18 27)" />
+      <circle cx="16.5" cy="24.5" r="1.7" fill="#FFFFFF" />
+      <circle cx="21.5" cy="23.5" r="1.7" fill="#FFFFFF" />
+      <path d="M26 33 Q22 36 20 34" stroke="#E64A19" stroke-width="2" fill="none" stroke-linecap="round" />
+      <path d="M33 14 L35 10 L37 14 M35 10 V17" stroke="#FFFFFF" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />

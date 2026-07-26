@@ -189,6 +189,7 @@ const en = {
   'df.summon': 'Summon {n}G',
   'df.ad': '▶ Watch ad to revive (5 lives)',
   'game.jump': 'Jump Challenge',
+  'jc.ad': '▶ Watch ad for +60s',
 }
 
 const ko: typeof en = {
@@ -342,6 +343,7 @@ const ko: typeof en = {
   'df.summon': '소환 {n}G',
   'df.ad': '▶ 광고 보고 부활 (생명 5)',
   'game.jump': '점프 챌린지',
+  'jc.ad': '▶ 광고 보고 60초 연장',
 }
 
 // 나머지 언어: 허브·게임오버·광고·제목까지 번역, 게임 내부 텍스트는 en 폴백

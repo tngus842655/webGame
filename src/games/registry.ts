@@ -88,4 +88,9 @@ export const GAMES: GameMeta[] = [
     titleKey: 'game.defense',
     loader: () => import('./defense'),
   },
+  {
+    slug: 'jump',
+    titleKey: 'game.jump',
+    loader: () => import('./jump'),
+  },
 ]
