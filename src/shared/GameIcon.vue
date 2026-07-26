@@ -391,6 +391,23 @@ defineProps<{ slug: string }>()
       <ellipse cx="21.8" cy="5.8" rx="2" ry="1.3" fill="#FFFFFF" opacity="0.5" transform="rotate(-30 21.8 5.8)" />
     </g>
 
+    <!-- 대나무 타기 -->
+    <g v-else-if="slug === 'bamboo'">
+      <rect x="4" y="4" width="40" height="40" rx="8" fill="#16351F" />
+      <rect x="19" y="4" width="14" height="40" fill="#7CB342" />
+      <rect x="20.5" y="4" width="3.5" height="40" fill="#FFFFFF" opacity="0.18" />
+      <rect x="19" y="15" width="14" height="2.6" fill="#558B2F" />
+      <rect x="19" y="30" width="14" height="2.6" fill="#558B2F" />
+      <path d="M33 12 Q39 9 43 12" stroke="#33691E" stroke-width="2.6" fill="none" stroke-linecap="round" />
+      <ellipse cx="41" cy="10" rx="2.4" ry="4.6" fill="#558B2F" transform="rotate(38 41 10)" />
+      <circle cx="10" cy="26" r="3" fill="#2E2E2E" />
+      <circle cx="18" cy="26" r="3" fill="#2E2E2E" />
+      <circle cx="14" cy="30" r="7.5" fill="#F5F5F5" />
+      <ellipse cx="11.4" cy="29" rx="2" ry="2.5" fill="#2E2E2E" />
+      <ellipse cx="16.6" cy="29" rx="2" ry="2.5" fill="#2E2E2E" />
+      <circle cx="14" cy="33.4" r="1.4" fill="#2E2E2E" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />

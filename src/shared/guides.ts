@@ -161,6 +161,11 @@ const ko: Record<string, Guide> = {
     how: '구슬을 넣을 통을 탭하세요. 색이 섞인 통은 다시 비워지지 않으니 흐리게 표시됩니다.',
     score: '구슬 하나에 5점, 통을 비울 때마다 120점. 비운 횟수가 쌓이면 나오는 색이 한 종씩 늘어납니다.',
   },
+  bamboo: {
+    goal: '가지를 피해 대나무를 오르세요. 가지에 부딪히거나 시간 막대가 다하면 끝입니다.',
+    how: '화면 좌우 절반 중 가지가 없는 쪽을 탭하면 한 마디 오릅니다.',
+    score: '한 마디에 10점. 오를 때마다 시간이 조금 채워지므로 쉬면 그만큼 줄어듭니다.',
+  },
 }
 
 const en: Record<string, Guide> = {
@@ -313,6 +318,11 @@ const en: Record<string, Guide> = {
     goal: 'A jar filled with a single colour empties out and scores. No jar has a fixed colour. When all four are full, the run ends.',
     how: 'Tap the jar you want the marble to go in. A jar with mixed colours can never empty, so it is dimmed.',
     score: '5 per marble and 120 per jar emptied. Every few jars emptied adds another colour to the mix.',
+  },
+  bamboo: {
+    goal: 'Climb the bamboo while dodging branches. Hit one, or let the time bar empty, and the run ends.',
+    how: 'Tap the left or right half — whichever side has no branch — to climb one joint.',
+    score: '10 per joint. Each climb tops the time bar up a little, so pausing drains it.',
   },
 }
 
@@ -467,6 +477,11 @@ const ja: Record<string, Guide> = {
     how: '玉を入れる筒をタップします。色が混ざった筒は二度と空にならないので薄く表示されます。',
     score: '玉1つ5点、筒を空けるごとに120点。空けた回数が増えると出る色が1種ずつ増えます。',
   },
+  bamboo: {
+    goal: '枝を避けて竹をのぼりましょう。枝にぶつかるか時間ゲージが尽きると終了です。',
+    how: '画面の左右半分のうち枝がない側をタップすると1節のぼります。',
+    score: '1節10点。のぼるたびに時間が少し足されるので、休むと減っていきます。',
+  },
 }
 
 const zhCN: Record<string, Guide> = {
@@ -619,6 +634,11 @@ const zhCN: Record<string, Guide> = {
     goal: '筒里装满同一种颜色就会清空并得分。筒本身没有固定颜色。四个筒都满了就结束。',
     how: '点击想放入的筒。混色的筒再也无法清空，所以会变暗。',
     score: '每颗弹珠5分，清空一个筒120分。清空次数累积后出现的颜色会多一种。',
+  },
+  bamboo: {
+    goal: '避开竹枝往上爬。撞到枝条或时间条耗尽就结束。',
+    how: '点击屏幕左右半边中没有竹枝的一侧，就往上爬一节。',
+    score: '每节10分。每爬一节会补一点时间，所以停下来就会减少。',
   },
 }
 
@@ -773,6 +793,11 @@ const es: Record<string, Guide> = {
     how: 'Toca el tarro donde quieres la canica. Un tarro con colores mezclados ya no puede vaciarse y se atenúa.',
     score: '5 por canica y 120 por tarro vaciado. Cada pocos vaciados entra un color más en juego.',
   },
+  bamboo: {
+    goal: 'Trepa el bambú esquivando las ramas. Si chocas o se agota la barra de tiempo, termina.',
+    how: 'Toca la mitad izquierda o derecha, la que no tenga rama, para subir un nudo.',
+    score: '10 por nudo. Cada subida rellena un poco el tiempo, así que pararse lo consume.',
+  },
 }
 
 const ptBR: Record<string, Guide> = {
@@ -925,6 +950,11 @@ const ptBR: Record<string, Guide> = {
     goal: 'Um pote cheio de uma só cor se esvazia e pontua. Nenhum pote tem cor fixa. Quando os quatro enchem, a partida acaba.',
     how: 'Toque no pote onde quer a bolinha. Um pote com cores misturadas nunca mais esvazia, por isso fica apagado.',
     score: '5 por bolinha e 120 por pote esvaziado. A cada poucos potes entra mais uma cor no jogo.',
+  },
+  bamboo: {
+    goal: 'Suba o bambu desviando dos galhos. Se bater num galho ou a barra de tempo zerar, a partida acaba.',
+    how: 'Toque na metade esquerda ou direita — a que não tem galho — para subir um nó.',
+    score: '10 por nó. Cada subida repõe um pouco de tempo, então parar consome.',
   },
 }
 
@@ -1079,6 +1109,11 @@ const fr: Record<string, Guide> = {
     how: 'Touche le bocal où mettre la bille. Un bocal aux couleurs mélangées ne se vide plus, il est donc grisé.',
     score: '5 par bille et 120 par bocal vidé. Tous les quelques bocaux vidés, une couleur de plus entre en jeu.',
   },
+  bamboo: {
+    goal: 'Grimpe le bambou en évitant les branches. Une collision ou la jauge de temps vide et c\'est fini.',
+    how: 'Touche la moitié gauche ou droite — celle sans branche — pour monter d\'un nœud.',
+    score: '10 par nœud. Chaque montée remplit un peu la jauge, donc s\'arrêter la vide.',
+  },
 }
 
 const de: Record<string, Guide> = {
@@ -1231,6 +1266,11 @@ const de: Record<string, Guide> = {
     goal: 'Ein Glas voll einer einzigen Farbe leert sich und bringt Punkte. Kein Glas hat eine feste Farbe. Sind alle vier voll, ist Schluss.',
     how: 'Tippe das Glas an, in das die Murmel soll. Ein gemischtes Glas leert sich nie wieder und wird abgedunkelt.',
     score: '5 pro Murmel und 120 pro geleertem Glas. Nach ein paar Leerungen kommt eine Farbe dazu.',
+  },
+  bamboo: {
+    goal: 'Klettere den Bambus hoch und weiche Ästen aus. Ein Treffer oder eine leere Zeitleiste beendet die Runde.',
+    how: 'Tippe die linke oder rechte Hälfte an – die ohne Ast – um einen Knoten höher zu steigen.',
+    score: '10 pro Knoten. Jeder Aufstieg füllt die Zeitleiste ein wenig, Pausen leeren sie.',
   },
 }
 
@@ -1385,6 +1425,11 @@ const ru: Record<string, Guide> = {
     how: 'Нажмите на банку, куда положить шарик. Банка со смешанными цветами уже никогда не опустеет — она затемнена.',
     score: '5 за шарик и 120 за опустошённую банку. Через несколько опустошений в игру входит ещё один цвет.',
   },
+  bamboo: {
+    goal: 'Поднимайтесь по бамбуку, уклоняясь от ветвей. Удар о ветку или пустая шкала времени — конец.',
+    how: 'Нажимайте на ту половину экрана, где нет ветки, — так подниметесь на одно колено.',
+    score: '10 за колено. Каждый подъём немного пополняет время, поэтому пауза его тратит.',
+  },
 }
 
 const id: Record<string, Guide> = {
@@ -1537,6 +1582,11 @@ const id: Record<string, Guide> = {
     goal: 'Tabung yang penuh satu warna akan dikosongkan dan memberi poin. Tabung tidak punya warna tetap. Kalau keempatnya penuh, permainan berakhir.',
     how: 'Ketuk tabung tujuan kelereng. Tabung yang warnanya tercampur tak bisa dikosongkan lagi, jadi ditampilkan pudar.',
     score: '5 per kelereng dan 120 per tabung yang dikosongkan. Tiap beberapa kali, satu warna baru masuk.',
+  },
+  bamboo: {
+    goal: 'Panjat bambu sambil menghindari dahan. Kena dahan atau bar waktu habis berarti tamat.',
+    how: 'Ketuk separuh kiri atau kanan — yang tidak ada dahannya — untuk naik satu ruas.',
+    score: '10 per ruas. Setiap panjatan mengisi sedikit waktu, jadi berhenti berarti menyusut.',
   },
 }
 
@@ -1691,6 +1741,11 @@ const vi: Record<string, Guide> = {
     how: 'Chạm vào ống muốn đặt viên bi. Ống đã lẫn màu thì không bao giờ dốc được nữa nên bị làm mờ.',
     score: '5 điểm mỗi viên và 120 điểm mỗi ống dốc được. Cứ vài lần dốc lại thêm một màu mới.',
   },
+  bamboo: {
+    goal: 'Leo lên cây tre và tránh các cành. Đụng cành hoặc hết thanh thời gian là kết thúc.',
+    how: 'Chạm nửa trái hoặc nửa phải màn hình — bên không có cành — để leo lên một đốt.',
+    score: '10 điểm mỗi đốt. Mỗi lần leo được hồi chút thời gian, nên dừng lại là bị trừ.',
+  },
 }
 
 const th: Record<string, Guide> = {
@@ -1844,6 +1899,11 @@ const th: Record<string, Guide> = {
     how: 'แตะกระบอกที่ต้องการใส่ลูกแก้ว กระบอกที่สีปนกันจะเทออกไม่ได้อีกจึงแสดงแบบจาง',
     score: 'ลูกละ 5 คะแนน เทกระบอกได้ 120 คะแนน เทไปหลายครั้งจะมีสีใหม่เพิ่มเข้ามา',
   },
+  bamboo: {
+    goal: 'ปีนต้นไผ่ขึ้นไปโดยเลี่ยงกิ่ง ถ้าชนกิ่งหรือหลอดเวลาหมดก็จบเกม',
+    how: 'แตะครึ่งซ้ายหรือขวาที่ไม่มีกิ่งเพื่อปีนขึ้นหนึ่งปล้อง',
+    score: 'ปล้องละ 10 คะแนน ทุกครั้งที่ปีนจะเติมเวลาเล็กน้อย ดังนั้นหยุดพักคือเวลาลด',
+  },
 }
 
 const tr: Record<string, Guide> = {
@@ -1996,6 +2056,11 @@ const tr: Record<string, Guide> = {
     goal: 'Tek renkle dolan kavanoz boşalır ve puan verir. Hiçbir kavanozun sabit rengi yok. Dördü de dolarsa oyun biter.',
     how: 'Misketi koymak istediğin kavanoza dokun. Renkleri karışan kavanoz bir daha boşalmaz, bu yüzden soluk görünür.',
     score: 'Misket başına 5, boşalan kavanoz başına 120 puan. Birkaç boşaltmada bir yeni renk oyuna girer.',
+  },
+  bamboo: {
+    goal: 'Dallardan kaçarak bambuya tırman. Bir dala çarparsan ya da süre biterse oyun sona erer.',
+    how: 'Bir boğum yükselmek için ekranın dalsız olan yarısına dokun.',
+    score: 'Boğum başına 10 puan. Her tırmanış süreyi biraz doldurur, durmak ise tüketir.',
   },
 }
 const TABLES: Record<Locale, Record<string, Guide>> = {

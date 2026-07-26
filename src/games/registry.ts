@@ -153,4 +153,9 @@ export const GAMES: GameMeta[] = [
     titleKey: 'game.marblejar',
     loader: () => import('./marblejar'),
   },
+  {
+    slug: 'bamboo',
+    titleKey: 'game.bamboo',
+    loader: () => import('./bamboo'),
+  },
 ]

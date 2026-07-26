@@ -305,6 +305,10 @@ const en = {
   'mj.hint': 'Pick a jar for this marble',
   'mj.colors': '{n} colours in play',
   'mj.ad': '▶ Watch ad to empty one jar',
+  'game.bamboo': 'Bamboo Climb',
+  'bm.height': '{n} joints up',
+  'bm.hint': 'Tap the side with no branch',
+  'bm.ad': '▶ Watch ad to refill time and continue',
 }
 
 const ko: typeof en = {
@@ -571,6 +575,10 @@ const ko: typeof en = {
   'mj.hint': '이 구슬을 넣을 통을 고르세요',
   'mj.colors': '나오는 색 {n}종',
   'mj.ad': '▶ 광고 보고 통 하나 비우기',
+  'game.bamboo': '대나무 타기',
+  'bm.height': '{n}마디',
+  'bm.hint': '가지가 없는 쪽을 탭하세요',
+  'bm.ad': '▶ 광고 보고 시간 채워 이어하기',
 }
 
 // 나머지 언어: 허브·게임오버·광고·제목까지 번역, 게임 내부 텍스트는 en 폴백
@@ -807,6 +815,10 @@ const ja: CoreDict = {
   'mj.hint': 'この玉を入れる筒を選びましょう',
   'mj.colors': '出る色 {n}種',
   'mj.ad': '▶ 広告を見て筒を1本空ける',
+  'game.bamboo': '竹のぼり',
+  'bm.height': '{n}節',
+  'bm.hint': '枝がない側をタップ',
+  'bm.ad': '▶ 広告を見て時間を満たして続ける',
 }
 
 const zhCN: CoreDict = {
@@ -1040,6 +1052,10 @@ const zhCN: CoreDict = {
   'mj.hint': '选一个筒放这颗弹珠',
   'mj.colors': '出现颜色 {n}种',
   'mj.ad': '▶ 看广告清空一个筒',
+  'game.bamboo': '爬竹子',
+  'bm.height': '第{n}节',
+  'bm.hint': '点没有竹枝的那一侧',
+  'bm.ad': '▶ 看广告补满时间继续',
 }
 
 const es: CoreDict = {
@@ -1273,6 +1289,10 @@ const es: CoreDict = {
   'mj.hint': 'Elige un tarro para esta canica',
   'mj.colors': '{n} colores en juego',
   'mj.ad': '▶ Ver anuncio y vaciar un tarro',
+  'game.bamboo': 'Trepa el Bambú',
+  'bm.height': '{n} nudos',
+  'bm.hint': 'Toca el lado sin rama',
+  'bm.ad': '▶ Ver anuncio, rellenar tiempo y seguir',
 }
 
 const ptBR: CoreDict = {
@@ -1506,6 +1526,10 @@ const ptBR: CoreDict = {
   'mj.hint': 'Escolha um pote para esta bolinha',
   'mj.colors': '{n} cores em jogo',
   'mj.ad': '▶ Ver anúncio e esvaziar um pote',
+  'game.bamboo': 'Sobe no Bambu',
+  'bm.height': '{n} nós',
+  'bm.hint': 'Toque no lado sem galho',
+  'bm.ad': '▶ Ver anúncio, encher o tempo e continuar',
 }
 
 const fr: CoreDict = {
@@ -1739,6 +1763,10 @@ const fr: CoreDict = {
   'mj.hint': 'Choisis un bocal pour cette bille',
   'mj.colors': '{n} couleurs en jeu',
   'mj.ad': '▶ Pub pour vider un bocal',
+  'game.bamboo': 'Grimpe au Bambou',
+  'bm.height': '{n} nœuds',
+  'bm.hint': 'Touche le côté sans branche',
+  'bm.ad': '▶ Pub pour refaire le plein de temps',
 }
 
 const de: CoreDict = {
@@ -1972,6 +2000,10 @@ const de: CoreDict = {
   'mj.hint': 'Wähle ein Glas für diese Murmel',
   'mj.colors': '{n} Farben im Spiel',
   'mj.ad': '▶ Werbung ansehen: ein Glas leeren',
+  'game.bamboo': 'Bambus-Klettern',
+  'bm.height': '{n} Knoten',
+  'bm.hint': 'Tippe die Seite ohne Ast an',
+  'bm.ad': '▶ Werbung ansehen: Zeit auffüllen',
 }
 
 const ru: CoreDict = {
@@ -2205,6 +2237,10 @@ const ru: CoreDict = {
   'mj.hint': 'Выберите банку для этого шарика',
   'mj.colors': 'Цветов в игре: {n}',
   'mj.ad': '▶ Реклама: опустошить одну банку',
+  'game.bamboo': 'Вверх по бамбуку',
+  'bm.height': 'Колен: {n}',
+  'bm.hint': 'Нажимайте сторону без ветки',
+  'bm.ad': '▶ Реклама: пополнить время и продолжить',
 }
 
 const id: CoreDict = {
@@ -2438,6 +2474,10 @@ const id: CoreDict = {
   'mj.hint': 'Pilih tabung untuk kelereng ini',
   'mj.colors': '{n} warna beredar',
   'mj.ad': '▶ Tonton iklan untuk kosongkan satu tabung',
+  'game.bamboo': 'Panjat Bambu',
+  'bm.height': '{n} ruas',
+  'bm.hint': 'Ketuk sisi yang tidak ada dahannya',
+  'bm.ad': '▶ Tonton iklan, isi waktu, lanjut',
 }
 
 const vi: CoreDict = {
@@ -2671,6 +2711,10 @@ const vi: CoreDict = {
   'mj.hint': 'Chọn ống để đặt viên bi này',
   'mj.colors': 'Có {n} màu',
   'mj.ad': '▶ Xem quảng cáo để dốc một ống',
+  'game.bamboo': 'Leo Tre',
+  'bm.height': '{n} đốt',
+  'bm.hint': 'Chạm phía không có cành',
+  'bm.ad': '▶ Xem quảng cáo để đầy thời gian và tiếp tục',
 }
 
 const th: CoreDict = {
@@ -2904,6 +2948,10 @@ const th: CoreDict = {
   'mj.hint': 'เลือกกระบอกสำหรับลูกแก้วนี้',
   'mj.colors': 'มี {n} สี',
   'mj.ad': '▶ ดูโฆษณาเพื่อเทกระบอกหนึ่งใบ',
+  'game.bamboo': 'ปีนไผ่',
+  'bm.height': '{n} ปล้อง',
+  'bm.hint': 'แตะฝั่งที่ไม่มีกิ่ง',
+  'bm.ad': '▶ ดูโฆษณาเพื่อเติมเวลาและไปต่อ',
 }
 
 const tr: CoreDict = {
@@ -3137,6 +3185,10 @@ const tr: CoreDict = {
   'mj.hint': 'Bu misket için bir kavanoz seç',
   'mj.colors': 'Oyunda {n} renk',
   'mj.ad': '▶ Reklam izle, bir kavanozu boşalt',
+  'game.bamboo': 'Bambuya Tırman',
+  'bm.height': '{n} boğum',
+  'bm.hint': 'Dalı olmayan tarafa dokun',
+  'bm.ad': '▶ Reklam izle, süreyi doldur, devam et',
 }
 
 const messages: Record<Locale, CoreDict> = {
