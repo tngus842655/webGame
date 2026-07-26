@@ -11,10 +11,9 @@ export const MAX_LEVEL = 12
 // 최종 단계(황금 화분)는 버튼으로 나오지 않는다: 합쳐서만 만들 수 있다
 const SPAWN_PERCENT = [38, 22, 12, 8, 6, 4.5, 3.5, 2.5, 1.8, 1.2, 0.5] as const
 
-// 스테이지 클리어 시 남은 1초당 점수 — 점수의 주인공
-export const TIME_BONUS = 120
-// 시간 초과 시 보드 최고 단계를 점수로 환산하는 배수
-const FAIL_MULTIPLIER = 2
+// 점수는 다른 게임과 자릿수를 맞춘다: 화분 하나 = 100점, 남은 시간 1초 = 5점
+const HARVEST_POINTS = 100
+export const TIME_BONUS = 5
 
 // 스테이지 목표: n단계 = 황금 화분 n개
 export function stageGoal(stage: number): number {
@@ -22,9 +21,9 @@ export function stageGoal(stage: number): number {
 }
 
 // 제한 시간: 목표가 늘수록 시간도 늘지만 화분 1개당 여유는 계속 줄어든다.
-// 1단계는 누구나 끝낼 수 있게 넉넉히, 이후로는 손이 빨라야 따라간다
+// 1단계도 손을 놀리면 못 깨는 수준이고, 위로 갈수록 빠듯해진다
 export function stageSeconds(stage: number): number {
-  return 300 + (stage - 1) * 110
+  return 210 + (stage - 1) * 85
 }
 
 export const LAYOUT = {
@@ -158,8 +157,6 @@ export function dropItem(state: MergeState, from: number, to: number): DropResul
 
   const newLevel = item.level + 1
   state.grid[from] = null
-  // 단계가 오를수록 커지지만, 시간 보너스를 넘지 않도록 눌러 둔다
-  state.score += Math.max(1, 2 ** (newLevel - 3))
   state.discovered = Math.max(state.discovered, newLevel)
   state.hintDone = true
   result.merged = true
@@ -168,6 +165,7 @@ export function dropItem(state: MergeState, from: number, to: number): DropResul
   if (newLevel >= MAX_LEVEL) {
     state.grid[to] = null // 수확
     state.goldMade += 1
+    state.score += HARVEST_POINTS
     result.harvested = true
     if (state.goldMade >= stageGoal(state.stage)) {
       // 남은 시간을 점수로 환산하고 다음 스테이지 준비
@@ -210,8 +208,8 @@ export function update(state: MergeState, dt: number): TickEvents {
     state.timeLeft -= dt
     if (state.timeLeft <= 0) {
       state.timeLeft = 0
-      // 못 채운 스테이지에서도 키워낸 만큼은 점수로 인정한다
-      state.lastBonus = 2 ** maxBoardLevel(state) * FAIL_MULTIPLIER
+      // 못 채운 스테이지에서도 키워낸 만큼은 점수로 인정한다 (단계가 높을수록 크게)
+      state.lastBonus = 2 ** Math.max(0, maxBoardLevel(state) - 4)
       state.score = Math.min(1_000_000, state.score + state.lastBonus)
       state.phase = 'over'
       events.timeUp = true

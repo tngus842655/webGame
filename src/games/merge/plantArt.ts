@@ -220,26 +220,52 @@ const LEVELS: Draw[] = [
     c.fill()
     c.restore()
   },
-  // 12 황금 화분
+  // 12 황금 화분 — 이름 그대로 화분이 주인공. 꽃은 장식으로만 얹는다
   (c, r) => {
+    // 몸통: 아래로 좁아지는 사다리꼴 + 금속 그라데이션(왼쪽 광원)
+    const body = c.createLinearGradient(-r * 0.6, 0, r * 0.6, 0)
+    body.addColorStop(0, '#8D6E00')
+    body.addColorStop(0.28, '#FFE082')
+    body.addColorStop(0.55, '#FFC107')
+    body.addColorStop(1, '#7A5D00')
+    c.fillStyle = body
+    c.beginPath()
+    c.moveTo(-r * 0.5, -r * 0.02)
+    c.lineTo(r * 0.5, -r * 0.02)
+    c.lineTo(r * 0.34, r * 0.74)
+    c.lineTo(-r * 0.34, r * 0.74)
+    c.closePath()
+    c.fill()
+
+    // 테두리(림) — 화분임을 한눈에 알리는 요소
+    const rim = c.createLinearGradient(0, -r * 0.26, 0, r * 0.02)
+    rim.addColorStop(0, '#FFF8E1')
+    rim.addColorStop(0.5, '#FFD54F')
+    rim.addColorStop(1, '#C79100')
+    c.fillStyle = rim
+    c.beginPath()
+    c.roundRect(-r * 0.6, -r * 0.24, r * 1.2, r * 0.26, r * 0.09)
+    c.fill()
+
+    // 몸통 하이라이트 + 굽
+    c.fillStyle = 'rgb(255 255 255 / 0.5)'
+    c.beginPath()
+    c.ellipse(-r * 0.2, r * 0.3, r * 0.07, r * 0.26, 0.06, 0, Math.PI * 2)
+    c.fill()
     c.fillStyle = '#C79100'
     c.beginPath()
-    c.roundRect(-r * 0.5, r * 0.3, r, r * 0.55, r * 0.12)
+    c.roundRect(-r * 0.4, r * 0.68, r * 0.8, r * 0.12, r * 0.05)
     c.fill()
-    const grad = c.createLinearGradient(0, r * 0.1, 0, r * 0.5)
-    grad.addColorStop(0, '#FFE082')
-    grad.addColorStop(1, '#FFB300')
-    c.fillStyle = grad
-    c.beginPath()
-    c.roundRect(-r * 0.54, r * 0.16, r * 1.08, r * 0.26, r * 0.1)
-    c.fill()
+
+    // 화분 위로 살짝 보이는 금빛 꽃 (작게)
     c.strokeStyle = '#C79100'
-    c.lineWidth = Math.max(r * 0.11, 3)
+    c.lineWidth = Math.max(r * 0.07, 2)
     c.beginPath()
-    c.moveTo(0, r * 0.2)
-    c.lineTo(0, -r * 0.16)
+    c.moveTo(0, -r * 0.2)
+    c.lineTo(0, -r * 0.42)
     c.stroke()
-    bloom(c, r, -0.42, 1, '#FFD54F', '#FF8F00', 8)
+    bloom(c, r, -0.56, 0.5, '#FFD54F', '#FF8F00', 6)
+
     // 반짝임
     c.fillStyle = '#FFFDE7'
     for (const [sx, sy, ss] of [[-0.62, -0.5, 0.1], [0.6, -0.62, 0.08], [0.5, 0.02, 0.06]] as Array<[number, number, number]>) {
