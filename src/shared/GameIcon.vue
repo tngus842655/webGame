@@ -246,6 +246,27 @@ defineProps<{ slug: string }>()
       <circle cx="36" cy="38" r="3" fill="none" stroke="#E1BEE7" stroke-width="1.4" />
     </g>
 
+    <!-- 부동산 타이쿤 -->
+    <g v-else-if="slug === 'estate'">
+      <rect x="4" y="4" width="40" height="40" rx="7" fill="#455A64" />
+      <rect x="8" y="20" width="11" height="20" rx="2" fill="#90A4AE" />
+      <rect x="10.5" y="23" width="2.6" height="2.6" fill="#ECEFF1" />
+      <rect x="14.5" y="23" width="2.6" height="2.6" fill="#ECEFF1" />
+      <rect x="10.5" y="28" width="2.6" height="2.6" fill="#ECEFF1" />
+      <rect x="14.5" y="28" width="2.6" height="2.6" fill="#ECEFF1" />
+      <rect x="21" y="12" width="13" height="28" rx="2" fill="#CFD8DC" />
+      <rect x="24" y="16" width="3" height="3" fill="#546E7A" />
+      <rect x="29" y="16" width="3" height="3" fill="#546E7A" />
+      <rect x="24" y="22" width="3" height="3" fill="#546E7A" />
+      <rect x="29" y="22" width="3" height="3" fill="#546E7A" />
+      <rect x="24" y="28" width="3" height="3" fill="#546E7A" />
+      <rect x="29" y="28" width="3" height="3" fill="#546E7A" />
+      <rect x="36" y="26" width="8" height="14" rx="2" fill="#78909C" />
+      <path d="M8 14 L15 7 L22 14" stroke="#E5393C" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="38" cy="12" r="6" fill="#FFB300" />
+      <text x="38" y="15.4" font-size="9" font-weight="bold" fill="#7A4F01" text-anchor="middle">$</text>
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />
