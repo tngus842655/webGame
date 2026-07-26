@@ -182,6 +182,8 @@ const en = {
   'sd.streak': '🔥 Streak {n}',
   'sd.ad': '▶ Watch ad to continue (+1 life)',
   'game.pipes': 'Pipe Connect',
+  'pp.level': 'Level {n}',
+  'pp.ad': '▶ Watch ad for +30s',
   'game.defense': 'Tower Defense',
   'game.jump': 'Jump Challenge',
 }
@@ -330,6 +332,8 @@ const ko: typeof en = {
   'sd.streak': '🔥 연속 {n}일',
   'sd.ad': '▶ 광고 보고 이어하기 (생명 +1)',
   'game.pipes': '파이프 연결',
+  'pp.level': '레벨 {n}',
+  'pp.ad': '▶ 광고 보고 30초 연장',
   'game.defense': '타워 디펜스',
   'game.jump': '점프 챌린지',
 }

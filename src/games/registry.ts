@@ -78,4 +78,9 @@ export const GAMES: GameMeta[] = [
     titleKey: 'game.sudoku',
     loader: () => import('./sudoku'),
   },
+  {
+    slug: 'pipes',
+    titleKey: 'game.pipes',
+    loader: () => import('./pipes'),
+  },
 ]

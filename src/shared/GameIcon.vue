@@ -180,6 +180,17 @@ defineProps<{ slug: string }>()
       <text x="37" y="41" font-size="10" font-weight="bold" fill="#263238" text-anchor="middle">1</text>
     </g>
 
+    <!-- 파이프 연결 -->
+    <g v-else-if="slug === 'pipes'">
+      <rect x="4" y="4" width="40" height="40" rx="6" fill="#E3F2FD" />
+      <path d="M14 4 V24 H34 V44" stroke="#29B6F6" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M34 14 H44" stroke="#90A4AE" stroke-width="7" stroke-linecap="round" />
+      <path d="M4 34 H14" stroke="#90A4AE" stroke-width="7" stroke-linecap="round" />
+      <rect x="9" y="-1" width="10" height="10" rx="3" fill="#43A047" />
+      <circle cx="34" cy="44" r="5" fill="#FFB300" />
+      <circle cx="34" cy="44" r="2.2" fill="#FFFFFF" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />
