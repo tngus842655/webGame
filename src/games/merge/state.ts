@@ -59,6 +59,11 @@ function emptyIndices(grid: (Item | null)[]): number[] {
   return out
 }
 
+// 빈 칸이 남아 있는지 — 생성 버튼 활성 조건
+export function hasEmptyCell(state: MergeState): boolean {
+  return state.grid.some((item) => item === null)
+}
+
 function hasMergePair(grid: (Item | null)[]): boolean {
   const seen = new Set<number>()
   for (const item of grid) {

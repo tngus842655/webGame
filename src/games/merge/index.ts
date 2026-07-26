@@ -16,6 +16,7 @@ import {
   createState,
   dropItem,
   generate,
+  hasEmptyCell,
   indexAt,
   updateEffects,
 } from './state'
@@ -23,12 +24,14 @@ import {
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
     updateEffects(state, dt)
+    genShake = Math.max(0, genShake - dt)
     draw()
   })
   const stage = new CanvasStage(shell.wrapper, LAYOUT.width, LAYOUT.height)
   const state = createState()
   let adClearUsed = false
   let drag: { from: number; x: number; y: number } | null = null
+  let genShake = 0 // 자리가 없을 때 생성 버튼 흔들림
 
   const overlay = createGameOverOverlay(shell.wrapper, {
     adLabelKey: 'merge.ad',
@@ -77,6 +80,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         if (result.ok) {
           playDrop()
           if (result.gameOver) void gameOver()
+        } else if (!hasEmptyCell(state)) {
+          // 자리가 없어 생성이 막힌 경우 — 왜 안 되는지 바로 알 수 있게 반응을 준다
+          genShake = 0.35
+          vibrate(40)
         }
         return
       }
@@ -188,9 +195,20 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       }
     }
 
-    // 생성 버튼
-    const ready = state.genCooldown <= 0
+    // 자리가 없으면 무엇을 해야 하는지 알린다 (게임오버는 여기서 합칠 짝까지 없을 때)
+    const roomLeft = hasEmptyCell(state)
+    if (!roomLeft && state.phase === 'playing') {
+      c.textAlign = 'center'
+      c.fillStyle = '#8D6E63'
+      c.font = 'bold 26px sans-serif'
+      c.fillText(t('merge.full'), 320, 168)
+    }
+
+    // 생성 버튼 (쿨다운 중이거나 자리가 없으면 비활성)
+    const ready = state.genCooldown <= 0 && roomLeft
     const gb = LAYOUT.genButton
+    c.save()
+    if (genShake > 0) c.translate(Math.sin(state.hintTime * 60) * 8 * (genShake / 0.35), 0)
     c.save()
     c.fillStyle = ready ? '#2E7D32' : '#9E9E9E'
     c.beginPath()
@@ -200,7 +218,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.beginPath()
     c.roundRect(gb.x, gb.y, gb.w, gb.h, 24)
     c.fill()
-    if (!ready) {
+    if (state.genCooldown > 0) {
       c.save()
       c.beginPath()
       c.roundRect(gb.x, gb.y, gb.w, gb.h, 24)
@@ -215,6 +233,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.fillStyle = '#FFFFFF'
     c.font = 'bold 34px sans-serif'
     c.fillText(t('merge.gen'), gb.x + gb.w / 2 + 30, gb.y + gb.h / 2 + 12)
+    c.restore()
 
     // 텍스트 없는 조작 안내: 생성 버튼 → 보드로 끌어가는 표식
     if (!state.hintDone && state.phase === 'playing' && !drag) {
