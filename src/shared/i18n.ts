@@ -327,6 +327,11 @@ const en = {
   'fc.new': 'Plant a new tree',
   'fc.ad': '▶ Watch ad to revive the tree',
   'game.wordle': 'Hangul Wordle',
+  'wd.enter': 'Enter',
+  'wd.share': 'Share',
+  'wd.copied': 'Copied!',
+  'wd.answer': 'Answer: {word}',
+  'wd.ad': '▶ Watch ad for one more row',
 }
 
 const ko: typeof en = {
@@ -618,6 +623,11 @@ const ko: typeof en = {
   'fc.new': '새 나무 심기',
   'fc.ad': '▶ 광고 보고 나무 살리기',
   'game.wordle': '한글 워들',
+  'wd.enter': '입력',
+  'wd.share': '공유',
+  'wd.copied': '복사됐어요!',
+  'wd.answer': '정답: {word}',
+  'wd.ad': '▶ 광고 보고 한 줄 더',
 }
 
 // 나머지 언어: 허브·게임오버·광고·제목까지 번역, 게임 내부 텍스트는 en 폴백

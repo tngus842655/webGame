@@ -128,4 +128,9 @@ export const GAMES: GameMeta[] = [
     titleKey: 'game.focus',
     loader: () => import('./focus'),
   },
+  {
+    slug: 'wordle',
+    titleKey: 'game.wordle',
+    loader: () => import('./wordle'),
+  },
 ]

@@ -313,6 +313,24 @@ defineProps<{ slug: string }>()
       <circle cx="38" cy="10" r="4.6" fill="#FFEE58" />
     </g>
 
+    <!-- 한글 워들 -->
+    <g v-else-if="slug === 'wordle'">
+      <rect x="4" y="4" width="40" height="40" rx="7" fill="#ECEFF1" />
+      <rect x="8" y="8" width="10" height="10" rx="2.5" fill="#6AAA64" />
+      <rect x="19" y="8" width="10" height="10" rx="2.5" fill="#C9B458" />
+      <rect x="30" y="8" width="10" height="10" rx="2.5" fill="#787C7E" />
+      <rect x="8" y="19" width="10" height="10" rx="2.5" fill="#787C7E" />
+      <rect x="19" y="19" width="10" height="10" rx="2.5" fill="#6AAA64" />
+      <rect x="30" y="19" width="10" height="10" rx="2.5" fill="#C9B458" />
+      <text x="13" y="16" font-size="8" font-weight="bold" fill="#FFFFFF" text-anchor="middle">ㅎ</text>
+      <text x="24" y="16" font-size="8" font-weight="bold" fill="#FFFFFF" text-anchor="middle">ㅏ</text>
+      <text x="35" y="16" font-size="8" font-weight="bold" fill="#FFFFFF" text-anchor="middle">ㄴ</text>
+      <text x="13" y="27" font-size="8" font-weight="bold" fill="#FFFFFF" text-anchor="middle">ㄱ</text>
+      <text x="24" y="27" font-size="8" font-weight="bold" fill="#FFFFFF" text-anchor="middle">ㅡ</text>
+      <text x="35" y="27" font-size="8" font-weight="bold" fill="#FFFFFF" text-anchor="middle">ㄹ</text>
+      <rect x="8" y="32" width="32" height="8" rx="2.5" fill="#CFD8DC" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />
