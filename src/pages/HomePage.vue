@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { GAMES } from '@/games/registry'
-import GameIcon from '@/shared/GameIcon.vue'
+import GameCard from '@/shared/GameCard.vue'
 import { t } from '@/shared/i18n'
 import {
   featuredSlugs,
@@ -51,11 +51,6 @@ const shelves = computed(() => [
   { key: 'more', title: t('home.sectionMore'), games: ranked.value.slice(3) },
 ])
 
-// 1~3위만 메달로 꾸민다
-function rankClass(rank: number): string {
-  return rank <= 3 ? `medal m${rank}` : ''
-}
-
 // 휴지통에 아무것도 없으면 입구를 만들지 않는다
 const trashCount = trashedGames(GAMES).length
 
@@ -93,19 +88,14 @@ onMounted(async () => {
       >
         <h2>{{ shelf.title }}</h2>
         <div class="game-grid">
-          <RouterLink
+          <GameCard
             v-for="game in shelf.games"
             :key="game.slug"
-            class="game-card"
-            :to="`/play/${game.slug}`"
-          >
-            <span v-if="game.rank !== null" class="rank" :class="rankClass(game.rank)">
-              {{ game.rank }}
-            </span>
-            <span class="thumb"><GameIcon :slug="game.slug" /></span>
-            <strong>{{ t(game.titleKey) }}</strong>
-            <small>{{ scoreLabel(game) }}</small>
-          </RouterLink>
+            :slug="game.slug"
+            :title-key="game.titleKey"
+            :rank="game.rank"
+            :label="scoreLabel(game)"
+          />
         </div>
       </section>
     </main>
@@ -193,76 +183,6 @@ onMounted(async () => {
   gap: 10px;
 }
 
-.game-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 12px 6px 10px;
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 2px 8px rgb(93 64 55 / 0.08);
-  text-align: center;
-}
-
-/* 카드 크기는 그대로 두고 왼쪽 위 여백에 얹는다 */
-.game-card .rank {
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  display: grid;
-  place-items: center;
-  min-width: 21px;
-  height: 21px;
-  padding: 0 5px;
-  border-radius: 999px;
-  background: #f3eeec;
-  color: #a1887f;
-  font-size: 12px;
-  font-weight: bold;
-  line-height: 1;
-}
-
-/* 1~3위는 메달로 */
-.game-card .rank.medal {
-  color: #fff;
-  font-size: 13px;
-  text-shadow: 0 1px 1px rgb(0 0 0 / 0.2);
-}
-
-.game-card .rank.m1 {
-  background: linear-gradient(#ffd54f, #f9a825);
-  box-shadow: 0 2px 6px rgb(249 168 37 / 0.5);
-}
-
-.game-card .rank.m2 {
-  background: linear-gradient(#eceff1, #b0bec5);
-  box-shadow: 0 2px 6px rgb(120 144 156 / 0.4);
-}
-
-.game-card .rank.m3 {
-  background: linear-gradient(#d9a679, #b07d4e);
-  box-shadow: 0 2px 6px rgb(141 110 99 / 0.4);
-}
-
-.thumb {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  font-size: 30px;
-  background: #fff8e1;
-  border-radius: 12px;
-  margin-bottom: 2px;
-}
-
-.game-card strong {
-  font-size: 13px;
-  line-height: 1.25;
-  word-break: keep-all;
-}
-
 .trash-entry {
   display: flex;
   align-items: center;
@@ -279,15 +199,4 @@ onMounted(async () => {
   color: #bcaaa4;
 }
 
-/* 서버에서 순위가 도착하기 전에도 카드 높이가 같도록 한 줄을 비워둔다 */
-.game-card small {
-  font-size: 11px;
-  line-height: 14px;
-  min-height: 14px;
-  max-width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  color: #bcaaa4;
-}
 </style>

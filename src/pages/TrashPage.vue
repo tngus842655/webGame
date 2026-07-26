@@ -2,7 +2,7 @@
 // 사용자용 휴지통 — 주 목록에서 내려간 게임을 계속 즐길 수 있게 모아둔다.
 // 관리자가 숨김까지 건 게임은 여기서도 빠진다.
 import { GAMES } from '@/games/registry'
-import GameIcon from '@/shared/GameIcon.vue'
+import GameCard from '@/shared/GameCard.vue'
 import { t } from '@/shared/i18n'
 import { getLocalBest, popularityRanks, trashedGames } from '@/shared/scores'
 
@@ -26,17 +26,14 @@ const cards = trashedGames(GAMES).map((game) => ({
 
     <p v-if="cards.length === 0" class="notice">{{ t('trash.empty') }}</p>
     <main v-else class="game-grid">
-      <RouterLink
+      <GameCard
         v-for="game in cards"
         :key="game.slug"
-        class="game-card"
-        :to="`/play/${game.slug}`"
-      >
-        <span v-if="game.rank !== null" class="rank">{{ game.rank }}</span>
-        <span class="thumb"><GameIcon :slug="game.slug" /></span>
-        <strong>{{ t(game.titleKey) }}</strong>
-        <small>{{ game.best === null ? '' : t('home.best', { n: game.best.toLocaleString() }) }}</small>
-      </RouterLink>
+        :slug="game.slug"
+        :title-key="game.titleKey"
+        :rank="game.rank"
+        :label="game.best === null ? '' : t('home.best', { n: game.best.toLocaleString() })"
+      />
     </main>
   </div>
 </template>
@@ -82,63 +79,4 @@ const cards = trashedGames(GAMES).map((game) => ({
   gap: 10px;
 }
 
-.game-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-  padding: 12px 6px 10px;
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 2px 8px rgb(93 64 55 / 0.08);
-  text-align: center;
-}
-
-/* 홈과 같은 모양 — 카드 크기는 그대로 두고 왼쪽 위 여백에 얹는다.
-   여기 있는 게임은 30위 밖이라 메달은 붙지 않는다 */
-.rank {
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  display: grid;
-  place-items: center;
-  min-width: 21px;
-  height: 21px;
-  padding: 0 5px;
-  border-radius: 999px;
-  background: #f3eeec;
-  color: #a1887f;
-  font-size: 12px;
-  font-weight: bold;
-  line-height: 1;
-}
-
-.thumb {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  font-size: 30px;
-  background: #fff8e1;
-  border-radius: 12px;
-  margin-bottom: 2px;
-}
-
-.game-card strong {
-  font-size: 13px;
-  line-height: 1.25;
-  word-break: keep-all;
-}
-
-.game-card small {
-  font-size: 11px;
-  line-height: 14px;
-  min-height: 14px;
-  max-width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  color: #bcaaa4;
-}
 </style>
