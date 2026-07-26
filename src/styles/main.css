@@ -16,6 +16,19 @@ body {
   background: #ffe0b2;
   color: #5d4037;
   -webkit-tap-highlight-color: transparent;
+  /* iOS에서 길게 누르면 뜨는 복사·붙여넣기 메뉴와 글자 선택을 막는다.
+     게임은 누르고 끄는 조작이 많아 그때마다 메뉴가 떠서 방해된다.
+     두 속성 모두 상속되므로 여기 한 번만 걸면 게임 화면·오버레이까지 덮인다. */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* 닉네임처럼 직접 입력하는 곳은 다시 켠다 */
+input,
+textarea {
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 .app-shell {
