@@ -3,6 +3,7 @@ import { ensureAdminChecked } from '@/shared/admin'
 import HomePage from '@/pages/HomePage.vue'
 import AdminPage from '@/pages/AdminPage.vue'
 import AdminTrashPage from '@/pages/AdminTrashPage.vue'
+import TrashPage from '@/pages/TrashPage.vue'
 import GamePlayPage from '@/pages/GamePlayPage.vue'
 import RankingHubPage from '@/pages/RankingHubPage.vue'
 import RankingPage from '@/pages/RankingPage.vue'
@@ -22,6 +23,7 @@ export const router = createRouter({
     { path: '/stats', component: StatsPage, meta: { admin: true } },
     { path: '/admin', component: AdminPage, meta: { admin: true } },
     { path: '/admin/trash', component: AdminTrashPage, meta: { admin: true } },
+    { path: '/trash', component: TrashPage },
     { path: '/notes', component: DevNotesPage },
     { path: '/privacy', component: PrivacyPage },
     { path: '/:pathMatch(.*)*', redirect: '/' },

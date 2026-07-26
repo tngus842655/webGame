@@ -8,6 +8,7 @@ import {
   getLocalBest,
   refreshPopularity,
   sortByPopularity,
+  trashedGames,
   type MyGameStat,
 } from '@/shared/scores'
 import { ensureAdminChecked, fetchGameFlags, isAdmin } from '@/shared/admin'
@@ -32,6 +33,9 @@ const cards = ref(
     stat: null as MyGameStat | null,
   })),
 )
+
+// 휴지통에 아무것도 없으면 입구를 만들지 않는다
+const trashCount = trashedGames(GAMES).length
 
 onMounted(async () => {
   // 노출 설정·인기도는 캐시에 담아두고 다음 진입부터 반영한다 (보는 도중 카드가 움직이지 않도록)
@@ -70,6 +74,10 @@ onMounted(async () => {
       </RouterLink>
     </main>
 
+    <RouterLink v-if="trashCount > 0" class="trash-entry" to="/trash">
+      <span>🗑️ {{ t('trash.title') }}</span>
+      <span class="count">{{ trashCount }} ›</span>
+    </RouterLink>
   </div>
 </template>
 
@@ -128,6 +136,22 @@ onMounted(async () => {
   font-size: 13px;
   line-height: 1.25;
   word-break: keep-all;
+}
+
+.trash-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  margin-top: 14px;
+  background: rgb(255 255 255 / 0.6);
+  border-radius: 14px;
+  font-size: 14px;
+  color: #8d6e63;
+}
+
+.trash-entry .count {
+  color: #bcaaa4;
 }
 
 /* 서버에서 순위가 도착하기 전에도 카드 높이가 같도록 한 줄을 비워둔다 */

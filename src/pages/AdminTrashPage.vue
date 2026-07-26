@@ -57,6 +57,20 @@ async function restore(row: Row) {
   }
 }
 
+// 숨김을 켜면 사용자 휴지통에서도 사라진다 = 어디에도 안 나온다
+async function toggleHidden(row: Row) {
+  saving.value = row.slug
+  error.value = ''
+  try {
+    await saveGameFlag(row.flag)
+  } catch {
+    row.flag.hidden = !row.flag.hidden
+    error.value = t('admin.saveFailed')
+  } finally {
+    saving.value = ''
+  }
+}
+
 function trashedOn(iso: string): string {
   return new Date(iso).toLocaleDateString(locale.value)
 }
@@ -91,6 +105,10 @@ function trashedOn(iso: string): string {
               </span>
               <span v-else class="over">{{ t('admin.removable') }}</span>
             </div>
+            <label class="hide">
+              <input v-model="row.flag.hidden" type="checkbox" @change="toggleHidden(row)" />
+              {{ t('admin.hidden') }}
+            </label>
           </div>
           <button type="button" class="restore" :disabled="!!saving" @click="restore(row)">
             {{ t('admin.restore') }}
@@ -203,6 +221,21 @@ function trashedOn(iso: string): string {
 .meta .over {
   color: #e65100;
   font-weight: bold;
+}
+
+.hide {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #8d6e63;
+}
+
+.hide input {
+  width: 17px;
+  height: 17px;
+  accent-color: #e65100;
 }
 
 .restore {

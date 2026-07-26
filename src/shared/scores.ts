@@ -134,15 +134,25 @@ export function popularityRanks(): Map<string, number> {
   return new Map(sorted.map(([slug], index) => [slug, index + 1]))
 }
 
+// 휴지통에 들어간 게임 — 주 목록에서는 빠지지만 홈 하단 휴지통 화면에서 계속 즐길 수 있다.
+// 숨김까지 걸린 게임은 여기서도 빠진다(= 어디에도 안 나온다).
+export function trashedGames<T extends { slug: string }>(games: readonly T[]): T[] {
+  const flags = cachedFlags()
+  return games.filter((game) => {
+    const flag = flags.get(game.slug)
+    return !!flag?.trashed && !flag.hidden
+  })
+}
+
 // 정렬: 관리자가 고정한 게임이 맨 앞(그 안에서는 sortOrder), 나머지는 인기순.
-// 감춤·휴지통 처리된 게임은 목록에서 뺀다.
+// 휴지통·숨김 처리된 게임은 주 목록에서 뺀다.
 export function sortByPopularity<T extends { slug: string }>(games: readonly T[]): T[] {
   const popularity = cachedPopularity()
   const flags = cachedFlags()
   return games
     .filter((game) => {
       const flag = flags.get(game.slug)
-      return !flag?.hidden && !flag?.trashed
+      return !flag?.trashed && !flag?.hidden
     })
     .slice()
     .sort((a, b) => {

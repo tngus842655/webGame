@@ -107,10 +107,6 @@ async function moveToTrash() {
               <input v-model="row.flag.featured" type="checkbox" @change="save(row.flag)" />
               {{ t('admin.featured') }}
             </label>
-            <label>
-              <input v-model="row.flag.hidden" type="checkbox" @change="save(row.flag)" />
-              {{ t('admin.hidden') }}
-            </label>
             <!-- 순서는 상단 고정된 것끼리만 쓰인다 — 아니면 눌러도 소용없다는 걸 보여준다 -->
             <label class="order" :class="{ off: !row.flag.featured }">
               {{ t('admin.order') }}
