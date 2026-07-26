@@ -280,7 +280,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   shell.addCleanup(detachInput)
   shell.addCleanup(() => stage.destroy())
-  return shell
+  return { destroy: () => shell.destroy(), getScore: () => todayTotal }
 }
 
 export default defineGame(createSession)

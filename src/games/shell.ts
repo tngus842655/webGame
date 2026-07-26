@@ -55,11 +55,17 @@ export function createGameShell(host: HTMLElement, onFrame: (dt: number) => void
   }
 }
 
+export interface GameSession {
+  destroy(): void
+  // 지금까지의 점수 (게임오버 시 제출하는 값과 같은 식) — 중도 이탈 기록 보존에 쓰인다
+  getScore(): number
+}
+
 // GameModule의 mount/unmount 보일러플레이트 제거용
 export function defineGame(
-  create: (host: HTMLElement, ctx: GameContext) => { destroy(): void },
+  create: (host: HTMLElement, ctx: GameContext) => GameSession,
 ): GameModule {
-  let session: { destroy(): void } | null = null
+  let session: GameSession | null = null
   return {
     mount(host, ctx) {
       session = create(host, ctx)
@@ -67,6 +73,9 @@ export function defineGame(
     unmount() {
       session?.destroy()
       session = null
+    },
+    currentScore() {
+      return session?.getScore() ?? 0
     },
   }
 }

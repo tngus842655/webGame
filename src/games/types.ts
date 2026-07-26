@@ -10,6 +10,8 @@ export interface GameModule {
   mount(host: HTMLElement, ctx: GameContext): void
   // 물리 엔진·rAF·이벤트 리스너 정리 책임은 게임 모듈에 있다
   unmount(): void
+  // 진행 중 점수 — 게임오버 전에 나가도 기록이 남도록 허브가 주기적으로 읽는다 (0 = 아직 없음)
+  currentScore(): number
 }
 
 export interface GameContext {
