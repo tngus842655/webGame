@@ -360,6 +360,22 @@ defineProps<{ slug: string }>()
       <circle cx="26.6" cy="15.2" r="1.7" fill="#FFFFFF" />
     </g>
 
+    <!-- 펭귄 미끄럼 -->
+    <g v-else-if="slug === 'iceslide'">
+      <rect x="4" y="4" width="40" height="40" rx="7" fill="#D9EEF7" />
+      <path d="M4 18 H44 M4 30 H44 M18 4 V44 M30 4 V44" stroke="#FFFFFF" stroke-width="1.6" />
+      <rect x="32" y="7" width="9" height="8" rx="2" fill="#607D8B" />
+      <rect x="7" y="32" width="9" height="8" rx="2" fill="#607D8B" />
+      <path d="M35 30 L36.4 33.4 L40 33.6 L37.2 35.9 L38.1 39.4 L35 37.4 L31.9 39.4 L32.8 35.9 L30 33.6 L33.6 33.4 Z" fill="#FFCA28" />
+      <circle cx="15" cy="16" r="8" fill="#263238" />
+      <ellipse cx="16" cy="18" rx="4.6" ry="5.4" fill="#FFFFFF" />
+      <path d="M22 19 L18 15.6 L18 22.4 Z" fill="#FB8C00" />
+      <circle cx="12.6" cy="12.6" r="1.9" fill="#FFFFFF" />
+      <circle cx="17.4" cy="12.6" r="1.9" fill="#FFFFFF" />
+      <circle cx="13" cy="12.6" r="1" fill="#0D1B22" />
+      <circle cx="17.8" cy="12.6" r="1" fill="#0D1B22" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />

@@ -143,4 +143,9 @@ export const GAMES: GameMeta[] = [
     titleKey: 'game.comet',
     loader: () => import('./comet'),
   },
+  {
+    slug: 'iceslide',
+    titleKey: 'game.iceslide',
+    loader: () => import('./iceslide'),
+  },
 ]

@@ -151,6 +151,11 @@ const ko: Record<string, Guide> = {
     how: '화면을 쓸어 선을 그으면 선에 닿은 별똥별이 함께 터집니다. 손을 뗄 때까지가 한 획입니다.',
     score: '한 획에 여러 개를 이을수록 배수가 붙습니다(5개 이상 3배). 하나씩 지우면 점수가 잘 오르지 않습니다.',
   },
+  iceslide: {
+    goal: '별을 모두 주우면 다음 판으로 갑니다. 남은 이동 횟수를 다 쓰면 끝이에요.',
+    how: '상하좌우로 쓸면 벽이나 바위에 부딪힐 때까지 미끄러집니다. 판마다 되돌리기 3회가 공짜입니다.',
+    score: '별 하나에 50점, 판을 깰 때마다 100점 이상을 더 받습니다.',
+  },
 }
 
 const en: Record<string, Guide> = {
@@ -293,6 +298,11 @@ const en: Record<string, Guide> = {
     goal: 'Chain the rising comets with a single stroke. Miss three and the run ends.',
     how: 'Swipe across the screen — every comet the line touches pops. One stroke lasts until you lift your finger.',
     score: 'More comets in one stroke means a bigger multiplier (3× from five up). Popping them one at a time barely scores.',
+  },
+  iceslide: {
+    goal: 'Collect every star to move on to the next board. Run out of moves and the game ends.',
+    how: 'Swipe in any direction and the penguin slides until a wall or rock stops it. Each board gives 3 free undos.',
+    score: '50 per star plus 100+ for each board cleared.',
   },
 }
 
@@ -437,6 +447,11 @@ const ja: Record<string, Guide> = {
     how: '画面をなぞって線を引くと、線に触れた流れ星がまとめて割れます。指を離すまでが一筆です。',
     score: '一筆で多くつなぐほど倍率が上がります（5個以上で3倍）。1個ずつ消すと点が伸びません。',
   },
+  iceslide: {
+    goal: '星を全部集めると次の面へ進みます。残り移動回数を使い切ると終了です。',
+    how: '上下左右になぞると、壁か岩にぶつかるまで滑ります。面ごとに一手戻しが3回無料です。',
+    score: '星1つ50点、面をクリアするたびに100点以上。',
+  },
 }
 
 const zhCN: Record<string, Guide> = {
@@ -579,6 +594,11 @@ const zhCN: Record<string, Guide> = {
     goal: '用一笔把升起的流星连起来击破。漏掉三颗就结束。',
     how: '在屏幕上滑动画线，线碰到的流星会一起破。抬手前都算同一笔。',
     score: '一笔连得越多倍率越高（5颗以上3倍）。一颗一颗消分数涨得很慢。',
+  },
+  iceslide: {
+    goal: '收齐所有星星即可进入下一盘。步数用完就结束。',
+    how: '上下左右滑动，企鹅会一直滑到撞上墙或石头。每盘有3次免费撤销。',
+    score: '每颗星50分，每过一盘再加100分以上。',
   },
 }
 
@@ -723,6 +743,11 @@ const es: Record<string, Guide> = {
     how: 'Desliza por la pantalla: todo cometa que toque la línea estalla. Un trazo dura hasta que levantas el dedo.',
     score: 'Más cometas en un trazo, mayor multiplicador (3× desde cinco). De uno en uno casi no puntúa.',
   },
+  iceslide: {
+    goal: 'Recoge todas las estrellas para pasar al siguiente tablero. Si se acaban los movimientos, termina.',
+    how: 'Desliza en cualquier dirección y el pingüino patina hasta que un muro o roca lo detenga. Cada tablero da 3 deshacer gratis.',
+    score: '50 por estrella y 100+ por tablero superado.',
+  },
 }
 
 const ptBR: Record<string, Guide> = {
@@ -865,6 +890,11 @@ const ptBR: Record<string, Guide> = {
     goal: 'Ligue os cometas que sobem com um único traço. Perder três encerra a partida.',
     how: 'Deslize pela tela: todo cometa que a linha tocar estoura. Um traço vale até você soltar o dedo.',
     score: 'Mais cometas num traço, maior o multiplicador (3× a partir de cinco). Um por um quase não pontua.',
+  },
+  iceslide: {
+    goal: 'Junte todas as estrelas para ir ao próximo tabuleiro. Se os movimentos acabarem, o jogo termina.',
+    how: 'Deslize em qualquer direção e o pinguim escorrega até parar numa parede ou pedra. Cada tabuleiro dá 3 desfazer grátis.',
+    score: '50 por estrela e 100+ por tabuleiro concluído.',
   },
 }
 
@@ -1009,6 +1039,11 @@ const fr: Record<string, Guide> = {
     how: 'Balaye l\'écran : chaque comète touchée par la ligne éclate. Un trait dure jusqu\'à ce que tu lèves le doigt.',
     score: 'Plus de comètes dans un trait, plus le multiplicateur monte (3× à partir de cinq). Une par une rapporte à peine.',
   },
+  iceslide: {
+    goal: 'Ramasse toutes les étoiles pour passer au plateau suivant. Plus de coups, partie terminée.',
+    how: 'Balaye dans une direction : le pingouin glisse jusqu\'à un mur ou un rocher. Chaque plateau offre 3 annulations gratuites.',
+    score: '50 par étoile et 100+ par plateau réussi.',
+  },
 }
 
 const de: Record<string, Guide> = {
@@ -1151,6 +1186,11 @@ const de: Record<string, Guide> = {
     goal: 'Verbinde die aufsteigenden Sternschnuppen mit einem Strich. Drei verpasste beenden die Runde.',
     how: 'Über den Bildschirm wischen – jede berührte Sternschnuppe platzt. Ein Strich zählt, bis du den Finger hebst.',
     score: 'Mehr Treffer pro Strich heißt höherer Multiplikator (ab fünf 3×). Einzeln abräumen bringt kaum Punkte.',
+  },
+  iceslide: {
+    goal: 'Sammle alle Sterne, um aufs nächste Feld zu kommen. Sind die Züge aufgebraucht, ist Schluss.',
+    how: 'In eine Richtung wischen – der Pinguin rutscht, bis Wand oder Fels ihn stoppt. Pro Feld gibt es 3 kostenlose Rücknahmen.',
+    score: '50 pro Stern und 100+ pro geschafftem Feld.',
   },
 }
 
@@ -1295,6 +1335,11 @@ const ru: Record<string, Guide> = {
     how: 'Проведите по экрану: каждая комета, которую задела линия, лопается. Росчерк длится, пока не отпустите палец.',
     score: 'Чем больше комет за один росчерк, тем выше множитель (с пяти — 3×). По одной очков почти не даёт.',
   },
+  iceslide: {
+    goal: 'Соберите все звёзды, чтобы перейти на следующее поле. Кончились ходы — конец.',
+    how: 'Свайп в любую сторону: пингвин скользит, пока его не остановит стена или камень. На каждом поле 3 бесплатные отмены.',
+    score: '50 за звезду и 100+ за пройденное поле.',
+  },
 }
 
 const id: Record<string, Guide> = {
@@ -1437,6 +1482,11 @@ const id: Record<string, Guide> = {
     goal: 'Rangkai komet yang melesat naik dengan satu sapuan. Tiga kali lolos berarti tamat.',
     how: 'Sapu layar — setiap komet yang tersentuh garis akan pecah. Satu sapuan berlaku sampai jari diangkat.',
     score: 'Makin banyak komet dalam satu sapuan, makin besar pengali (3× dari lima ke atas). Satu-satu hampir tak menambah skor.',
+  },
+  iceslide: {
+    goal: 'Kumpulkan semua bintang untuk lanjut ke papan berikutnya. Kalau langkah habis, permainan berakhir.',
+    how: 'Geser ke arah mana pun dan pinguin meluncur sampai dinding atau batu menghentikannya. Tiap papan memberi 3 batal gratis.',
+    score: '50 per bintang plus 100+ tiap papan selesai.',
   },
 }
 
@@ -1581,6 +1631,11 @@ const vi: Record<string, Guide> = {
     how: 'Quét trên màn hình — mọi sao băng mà đường nét chạm tới đều nổ. Một nét kéo dài tới khi bạn nhấc tay.',
     score: 'Càng nhiều sao trong một nét, hệ số càng cao (từ năm là 3×). Bấm từng cái thì điểm lên rất chậm.',
   },
+  iceslide: {
+    goal: 'Thu hết sao để sang bảng tiếp theo. Hết lượt di chuyển là kết thúc.',
+    how: 'Quét theo hướng nào cũng được, chim sẽ trượt tới khi gặp tường hay tảng đá. Mỗi bảng có 3 lần hoàn lại miễn phí.',
+    score: '50 điểm mỗi sao và hơn 100 điểm mỗi bảng hoàn thành.',
+  },
 }
 
 const th: Record<string, Guide> = {
@@ -1724,6 +1779,11 @@ const th: Record<string, Guide> = {
     how: 'ปัดบนหน้าจอ ดาวตกทุกดวงที่เส้นแตะจะแตกพร้อมกัน หนึ่งเส้นนับจนกว่าจะยกนิ้ว',
     score: 'เชื่อมได้มากในเส้นเดียวยิ่งได้ตัวคูณสูง (ห้าดวงขึ้นไป 3 เท่า) เก็บทีละดวงคะแนนขึ้นช้า',
   },
+  iceslide: {
+    goal: 'เก็บดาวให้ครบเพื่อไปกระดานถัดไป ถ้าใช้ครบทุกครั้งแล้วก็จบเกม',
+    how: 'ปัดทิศไหนก็ได้ เพนกวินจะไถลจนชนกำแพงหรือก้อนหิน แต่ละกระดานย้อนกลับได้ฟรี 3 ครั้ง',
+    score: 'ดาวละ 50 คะแนน และผ่านกระดานได้อีก 100 คะแนนขึ้นไป',
+  },
 }
 
 const tr: Record<string, Guide> = {
@@ -1866,6 +1926,11 @@ const tr: Record<string, Guide> = {
     goal: 'Yükselen kuyruklu yıldızları tek çizgide birbirine bağla. Üç tanesini kaçırırsan oyun biter.',
     how: 'Ekranda parmağını kaydır — çizginin dokunduğu her yıldız patlar. Bir çizgi, parmağını kaldırana kadar sürer.',
     score: 'Tek çizgide ne kadar çok yıldız olursa çarpan büyür (beşten sonra 3×). Tek tek patlatmak neredeyse puan getirmez.',
+  },
+  iceslide: {
+    goal: 'Bir sonraki tahtaya geçmek için bütün yıldızları topla. Hamleler biterse oyun sona erer.',
+    how: 'Herhangi bir yöne kaydır; penguen duvara ya da kayaya çarpana kadar kayar. Her tahtada 3 ücretsiz geri alma var.',
+    score: 'Yıldız başına 50, geçilen her tahta için 100+ puan.',
   },
 }
 const TABLES: Record<Locale, Record<string, Guide>> = {

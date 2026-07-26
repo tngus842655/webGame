@@ -293,6 +293,14 @@ const en = {
   'game.comet': 'Comet Chain',
   'cm.chain': 'Best chain {n}',
   'cm.ad': '▶ Watch ad to reset your misses',
+  'game.iceslide': 'Penguin Slide',
+  'ic.level': 'Board {n}',
+  'ic.moves': 'Moves {n}',
+  'ic.hint': 'Swipe to slide until something stops you',
+  'ic.undo': 'Undo ({n})',
+  'ic.undoAd': '▶ Watch ad to undo',
+  'ic.clear': 'Board clear! +{n}',
+  'ic.ad': '▶ Watch ad for 5 more moves',
 }
 
 const ko: typeof en = {
@@ -547,6 +555,14 @@ const ko: typeof en = {
   'game.comet': '별똥별 잇기',
   'cm.chain': '최다 {n}연결',
   'cm.ad': '▶ 광고 보고 놓친 개수 0으로',
+  'game.iceslide': '펭귄 미끄럼',
+  'ic.level': '{n}판',
+  'ic.moves': '남은 이동 {n}',
+  'ic.hint': '쓸면 부딪힐 때까지 미끄러집니다',
+  'ic.undo': '되돌리기 ({n})',
+  'ic.undoAd': '▶ 광고 보고 되돌리기',
+  'ic.clear': '판 완성! +{n}',
+  'ic.ad': '▶ 광고 보고 이동 5회 더',
 }
 
 // 나머지 언어: 허브·게임오버·광고·제목까지 번역, 게임 내부 텍스트는 en 폴백
@@ -771,6 +787,14 @@ const ja: CoreDict = {
   'game.comet': '流れ星つなぎ',
   'cm.chain': '最多 {n}連結',
   'cm.ad': '▶ 広告を見て見逃し数を0に',
+  'game.iceslide': 'ペンギンすべり',
+  'ic.level': '{n}面',
+  'ic.moves': '残り移動 {n}',
+  'ic.hint': 'なぞると何かにぶつかるまで滑ります',
+  'ic.undo': '一手戻す（{n}）',
+  'ic.undoAd': '▶ 広告を見て一手戻す',
+  'ic.clear': '面クリア！ +{n}',
+  'ic.ad': '▶ 広告を見て移動+5回',
 }
 
 const zhCN: CoreDict = {
@@ -992,6 +1016,14 @@ const zhCN: CoreDict = {
   'game.comet': '连接流星',
   'cm.chain': '最多连{n}颗',
   'cm.ad': '▶ 看广告把失误清零',
+  'game.iceslide': '企鹅滑冰',
+  'ic.level': '第{n}盘',
+  'ic.moves': '剩余步数 {n}',
+  'ic.hint': '滑动后会一直滑到撞上东西',
+  'ic.undo': '撤销（{n}）',
+  'ic.undoAd': '▶ 看广告撤销一步',
+  'ic.clear': '过关！ +{n}',
+  'ic.ad': '▶ 看广告再加5步',
 }
 
 const es: CoreDict = {
@@ -1213,6 +1245,14 @@ const es: CoreDict = {
   'game.comet': 'Cadena de Cometas',
   'cm.chain': 'Mejor cadena {n}',
   'cm.ad': '▶ Ver anuncio y borrar los fallos',
+  'game.iceslide': 'Pingüino Resbaladizo',
+  'ic.level': 'Tablero {n}',
+  'ic.moves': 'Movimientos {n}',
+  'ic.hint': 'Desliza y patinará hasta chocar con algo',
+  'ic.undo': 'Deshacer ({n})',
+  'ic.undoAd': '▶ Ver anuncio para deshacer',
+  'ic.clear': '¡Tablero superado! +{n}',
+  'ic.ad': '▶ Ver anuncio por 5 movimientos más',
 }
 
 const ptBR: CoreDict = {
@@ -1434,6 +1474,14 @@ const ptBR: CoreDict = {
   'game.comet': 'Corrente de Cometas',
   'cm.chain': 'Melhor corrente {n}',
   'cm.ad': '▶ Ver anúncio e zerar as perdas',
+  'game.iceslide': 'Pinguim Escorregador',
+  'ic.level': 'Tabuleiro {n}',
+  'ic.moves': 'Movimentos {n}',
+  'ic.hint': 'Deslize e ele escorrega até bater em algo',
+  'ic.undo': 'Desfazer ({n})',
+  'ic.undoAd': '▶ Ver anúncio para desfazer',
+  'ic.clear': 'Tabuleiro concluído! +{n}',
+  'ic.ad': '▶ Ver anúncio por 5 movimentos extras',
 }
 
 const fr: CoreDict = {
@@ -1655,6 +1703,14 @@ const fr: CoreDict = {
   'game.comet': 'Chaîne de Comètes',
   'cm.chain': 'Meilleure chaîne {n}',
   'cm.ad': '▶ Pub pour remettre les ratés à zéro',
+  'game.iceslide': 'Pingouin Glissant',
+  'ic.level': 'Plateau {n}',
+  'ic.moves': 'Coups {n}',
+  'ic.hint': 'Balaye : il glisse jusqu\'à heurter quelque chose',
+  'ic.undo': 'Annuler ({n})',
+  'ic.undoAd': '▶ Pub pour annuler un coup',
+  'ic.clear': 'Plateau réussi ! +{n}',
+  'ic.ad': '▶ Pub pour 5 coups de plus',
 }
 
 const de: CoreDict = {
@@ -1876,6 +1932,14 @@ const de: CoreDict = {
   'game.comet': 'Sternschnuppen-Kette',
   'cm.chain': 'Beste Kette {n}',
   'cm.ad': '▶ Werbung ansehen: Fehlschläge auf 0',
+  'game.iceslide': 'Pinguin-Rutsche',
+  'ic.level': 'Feld {n}',
+  'ic.moves': 'Züge {n}',
+  'ic.hint': 'Wischen – er rutscht, bis etwas ihn stoppt',
+  'ic.undo': 'Rückgängig ({n})',
+  'ic.undoAd': '▶ Werbung ansehen: Zug zurück',
+  'ic.clear': 'Feld geschafft! +{n}',
+  'ic.ad': '▶ Werbung ansehen: 5 Züge mehr',
 }
 
 const ru: CoreDict = {
@@ -2097,6 +2161,14 @@ const ru: CoreDict = {
   'game.comet': 'Цепочка комет',
   'cm.chain': 'Лучшая цепочка {n}',
   'cm.ad': '▶ Реклама: обнулить промахи',
+  'game.iceslide': 'Пингвин на льду',
+  'ic.level': 'Поле {n}',
+  'ic.moves': 'Ходов {n}',
+  'ic.hint': 'Свайп — он скользит, пока во что-то не упрётся',
+  'ic.undo': 'Отменить ({n})',
+  'ic.undoAd': '▶ Реклама: отменить ход',
+  'ic.clear': 'Поле пройдено! +{n}',
+  'ic.ad': '▶ Реклама: +5 ходов',
 }
 
 const id: CoreDict = {
@@ -2318,6 +2390,14 @@ const id: CoreDict = {
   'game.comet': 'Rantai Komet',
   'cm.chain': 'Rantai terbaik {n}',
   'cm.ad': '▶ Tonton iklan untuk nolkan kegagalan',
+  'game.iceslide': 'Pinguin Seluncur',
+  'ic.level': 'Papan {n}',
+  'ic.moves': 'Langkah {n}',
+  'ic.hint': 'Geser, dia meluncur sampai menabrak sesuatu',
+  'ic.undo': 'Batalkan ({n})',
+  'ic.undoAd': '▶ Tonton iklan untuk batalkan langkah',
+  'ic.clear': 'Papan selesai! +{n}',
+  'ic.ad': '▶ Tonton iklan untuk 5 langkah lagi',
 }
 
 const vi: CoreDict = {
@@ -2539,6 +2619,14 @@ const vi: CoreDict = {
   'game.comet': 'Nối Sao Băng',
   'cm.chain': 'Chuỗi cao nhất {n}',
   'cm.ad': '▶ Xem quảng cáo để xoá số lần bỏ lỡ',
+  'game.iceslide': 'Chim Cánh Cụt Trượt Băng',
+  'ic.level': 'Bảng {n}',
+  'ic.moves': 'Còn {n} lượt',
+  'ic.hint': 'Quét để trượt tới khi va vào vật gì',
+  'ic.undo': 'Hoàn lại ({n})',
+  'ic.undoAd': '▶ Xem quảng cáo để hoàn một lượt',
+  'ic.clear': 'Xong bảng! +{n}',
+  'ic.ad': '▶ Xem quảng cáo thêm 5 lượt',
 }
 
 const th: CoreDict = {
@@ -2760,6 +2848,14 @@ const th: CoreDict = {
   'game.comet': 'ลากดาวตก',
   'cm.chain': 'ต่อได้มากสุด {n}',
   'cm.ad': '▶ ดูโฆษณาเพื่อล้างจำนวนที่พลาด',
+  'game.iceslide': 'เพนกวินไถลน้ำแข็ง',
+  'ic.level': 'กระดานที่ {n}',
+  'ic.moves': 'เหลือ {n} ครั้ง',
+  'ic.hint': 'ปัดแล้วจะไถลไปจนชนอะไรเข้า',
+  'ic.undo': 'ย้อนกลับ ({n})',
+  'ic.undoAd': '▶ ดูโฆษณาเพื่อย้อนกลับ',
+  'ic.clear': 'ผ่านกระดาน! +{n}',
+  'ic.ad': '▶ ดูโฆษณาเพื่อรับอีก 5 ครั้ง',
 }
 
 const tr: CoreDict = {
@@ -2981,6 +3077,14 @@ const tr: CoreDict = {
   'game.comet': 'Kuyruklu Yıldız Zinciri',
   'cm.chain': 'En iyi zincir {n}',
   'cm.ad': '▶ Reklam izle, kaçırmaları sıfırla',
+  'game.iceslide': 'Kayan Penguen',
+  'ic.level': '{n}. tahta',
+  'ic.moves': 'Hamle {n}',
+  'ic.hint': 'Kaydır — bir şeye çarpana kadar kayar',
+  'ic.undo': 'Geri al ({n})',
+  'ic.undoAd': '▶ Reklam izle, hamleyi geri al',
+  'ic.clear': 'Tahta tamam! +{n}',
+  'ic.ad': '▶ Reklam izle, 5 hamle daha al',
 }
 
 const messages: Record<Locale, CoreDict> = {
