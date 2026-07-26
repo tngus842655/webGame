@@ -284,6 +284,9 @@ const en = {
   'fn.memorize': 'Memorize them!',
   'fn.order': 'Tap from the smallest number',
   'fn.ad': '▶ Watch ad to retry this level',
+  'game.paperboat': 'Paper Boat Lanes',
+  'pb.hint': 'Draw a lane from a boat to the dock of the same colour',
+  'pb.ad': '▶ Watch ad to clear just those two boats',
 }
 
 const ko: typeof en = {
@@ -529,6 +532,9 @@ const ko: typeof en = {
   'fn.memorize': '기억하세요!',
   'fn.order': '작은 수부터 순서대로 탭',
   'fn.ad': '▶ 광고 보고 이 단계부터 다시',
+  'game.paperboat': '종이배 뱃길',
+  'pb.hint': '배에서 같은 색 부두까지 선을 그으세요',
+  'pb.ad': '▶ 광고 보고 부딪힌 두 척만 치우기',
 }
 
 // 나머지 언어: 허브·게임오버·광고·제목까지 번역, 게임 내부 텍스트는 en 폴백
@@ -744,6 +750,9 @@ const ja: CoreDict = {
   'fn.memorize': '覚えて！',
   'fn.order': '小さい数から順にタップ',
   'fn.ad': '▶ 広告を見てこの段階から再挑戦',
+  'game.paperboat': '紙の舟の航路',
+  'pb.hint': '舟から同じ色の桟橋まで線を引きましょう',
+  'pb.ad': '▶ 広告を見てぶつかった2隻だけ片づける',
 }
 
 const zhCN: CoreDict = {
@@ -956,6 +965,9 @@ const zhCN: CoreDict = {
   'fn.memorize': '记住它们！',
   'fn.order': '从最小的数开始点',
   'fn.ad': '▶ 看广告从本关重来',
+  'game.paperboat': '纸船航道',
+  'pb.hint': '从纸船画一条线到同色码头',
+  'pb.ad': '▶ 看广告只清走撞到的两艘',
 }
 
 const es: CoreDict = {
@@ -1168,6 +1180,9 @@ const es: CoreDict = {
   'fn.memorize': '¡Memorízalos!',
   'fn.order': 'Toca desde el número más bajo',
   'fn.ad': '▶ Ver anuncio y repetir este nivel',
+  'game.paperboat': 'Rutas de Papel',
+  'pb.hint': 'Traza una ruta del barco al muelle de su color',
+  'pb.ad': '▶ Ver anuncio y retirar solo esos dos barcos',
 }
 
 const ptBR: CoreDict = {
@@ -1380,6 +1395,9 @@ const ptBR: CoreDict = {
   'fn.memorize': 'Memorize!',
   'fn.order': 'Toque a partir do menor número',
   'fn.ad': '▶ Ver anúncio e repetir este nível',
+  'game.paperboat': 'Rotas de Papel',
+  'pb.hint': 'Trace uma rota do barco até o cais da mesma cor',
+  'pb.ad': '▶ Ver anúncio e retirar só aqueles dois barcos',
 }
 
 const fr: CoreDict = {
@@ -1592,6 +1610,9 @@ const fr: CoreDict = {
   'fn.memorize': 'Mémorise !',
   'fn.order': 'Touche à partir du plus petit nombre',
   'fn.ad': '▶ Pub pour refaire ce niveau',
+  'game.paperboat': 'Voies de Papier',
+  'pb.hint': 'Trace une voie du bateau vers le quai de la même couleur',
+  'pb.ad': '▶ Pub pour retirer seulement ces deux bateaux',
 }
 
 const de: CoreDict = {
@@ -1804,6 +1825,9 @@ const de: CoreDict = {
   'fn.memorize': 'Einprägen!',
   'fn.order': 'Mit der kleinsten Zahl beginnen',
   'fn.ad': '▶ Werbung ansehen: Stufe wiederholen',
+  'game.paperboat': 'Papierboot-Routen',
+  'pb.hint': 'Zieh eine Route vom Boot zum Anleger derselben Farbe',
+  'pb.ad': '▶ Werbung ansehen: nur diese zwei Boote entfernen',
 }
 
 const ru: CoreDict = {
@@ -2016,6 +2040,9 @@ const ru: CoreDict = {
   'fn.memorize': 'Запоминайте!',
   'fn.order': 'Нажимайте от меньшего числа',
   'fn.ad': '▶ Реклама: повторить этот уровень',
+  'game.paperboat': 'Бумажные кораблики',
+  'pb.hint': 'Проведите путь от кораблика к причалу того же цвета',
+  'pb.ad': '▶ Реклама: убрать только эти два кораблика',
 }
 
 const id: CoreDict = {
@@ -2228,6 +2255,9 @@ const id: CoreDict = {
   'fn.memorize': 'Hafalkan!',
   'fn.order': 'Ketuk mulai dari angka terkecil',
   'fn.ad': '▶ Tonton iklan untuk ulangi level ini',
+  'game.paperboat': 'Jalur Perahu Kertas',
+  'pb.hint': 'Tarik jalur dari perahu ke dermaga warna sama',
+  'pb.ad': '▶ Tonton iklan untuk singkirkan dua perahu itu saja',
 }
 
 const vi: CoreDict = {
@@ -2440,6 +2470,9 @@ const vi: CoreDict = {
   'fn.memorize': 'Ghi nhớ nhé!',
   'fn.order': 'Chạm từ số nhỏ nhất',
   'fn.ad': '▶ Xem quảng cáo để chơi lại cấp này',
+  'game.paperboat': 'Luồng Thuyền Giấy',
+  'pb.hint': 'Vẽ đường từ thuyền tới bến cùng màu',
+  'pb.ad': '▶ Xem quảng cáo để dọn riêng hai chiếc vừa đụng',
 }
 
 const th: CoreDict = {
@@ -2652,6 +2685,9 @@ const th: CoreDict = {
   'fn.memorize': 'จำให้ดี!',
   'fn.order': 'แตะจากเลขน้อยไปมาก',
   'fn.ad': '▶ ดูโฆษณาเพื่อเล่นระดับนี้ใหม่',
+  'game.paperboat': 'เส้นทางเรือกระดาษ',
+  'pb.hint': 'ลากเส้นจากเรือไปยังท่าสีเดียวกัน',
+  'pb.ad': '▶ ดูโฆษณาเพื่อเก็บเฉพาะสองลำที่ชนกัน',
 }
 
 const tr: CoreDict = {
@@ -2864,6 +2900,9 @@ const tr: CoreDict = {
   'fn.memorize': 'Ezberle!',
   'fn.order': 'En küçük sayıdan başla',
   'fn.ad': '▶ Reklam izle, bu seviyeyi yeniden oyna',
+  'game.paperboat': 'Kâğıt Kayık Rotaları',
+  'pb.hint': 'Kayıktan aynı renk iskeleye bir rota çiz',
+  'pb.ad': '▶ Reklam izle, sadece çarpışan iki kayığı kaldır',
 }
 
 const messages: Record<Locale, CoreDict> = {

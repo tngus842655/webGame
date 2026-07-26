@@ -128,4 +128,9 @@ export const GAMES: GameMeta[] = [
     titleKey: 'game.flashnum',
     loader: () => import('./flashnum'),
   },
+  {
+    slug: 'paperboat',
+    titleKey: 'game.paperboat',
+    loader: () => import('./paperboat'),
+  },
 ]

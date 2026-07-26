@@ -324,6 +324,18 @@ defineProps<{ slug: string }>()
       <ellipse cx="12.5" cy="12" rx="2.4" ry="1.6" fill="#FFFFFF" opacity="0.55" transform="rotate(-30 12.5 12)" />
     </g>
 
+    <!-- 종이배 뱃길 -->
+    <g v-else-if="slug === 'paperboat'">
+      <rect x="4" y="4" width="40" height="40" rx="8" fill="#0C3D58" />
+      <path d="M15 30 Q26 30 30 21 T38 13" stroke="#EF5350" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-dasharray="4 3" opacity="0.85" />
+      <circle cx="38" cy="12" r="6" fill="#EF5350" opacity="0.22" />
+      <circle cx="38" cy="12" r="6" fill="none" stroke="#EF5350" stroke-width="2" />
+      <path d="M22 30 L7 23 L10 30 L7 37 Z" fill="#EF5350" />
+      <path d="M13 12 L26 12" stroke="#42A5F5" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="4 3" opacity="0.5" />
+      <path d="M39 36 L28 30 L31 36 L28 42 Z" fill="#42A5F5" opacity="0.9" />
+      <circle cx="10" cy="12" r="4.5" fill="none" stroke="#42A5F5" stroke-width="2" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />

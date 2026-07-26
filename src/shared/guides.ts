@@ -136,6 +136,11 @@ const ko: Record<string, Guide> = {
     how: '숫자를 외웠다가 순서대로 탭하세요. 첫 물방울을 누르는 순간 남은 숫자도 지워집니다.',
     score: '단계를 넘길 때마다 점수를 받고, 물방울이 많은 단계일수록 많이 받습니다.',
   },
+  paperboat: {
+    goal: '들어오는 종이배를 같은 색 부두로 보내세요. 배끼리 부딪히면 끝입니다.',
+    how: '배를 짚고 부두까지 손가락으로 선을 그으면 그 길로 갑니다. 다시 그으면 항로가 바뀝니다.',
+    score: '한 척에 30점, 5초 안에 이어서 보내면 콤보가 붙어 최대 110점까지 오릅니다.',
+  },
 }
 
 const en: Record<string, Guide> = {
@@ -263,6 +268,11 @@ const en: Record<string, Guide> = {
     goal: 'The numbers on the drops show for only a moment. Once they vanish, pop the drops from the smallest number up. Three mistakes end the run.',
     how: 'Memorize them, then tap in order — the first tap also wipes the remaining numbers.',
     score: 'Every level cleared pays out, and levels with more drops pay more.',
+  },
+  paperboat: {
+    goal: 'Send every paper boat to the dock of its colour. If two boats collide, the run ends.',
+    how: 'Touch a boat and draw a lane to the dock — it follows the line. Draw again to reroute it.',
+    score: '30 per boat, and docking again within 5 seconds builds a combo worth up to 110.',
   },
 }
 
@@ -392,6 +402,11 @@ const ja: Record<string, Guide> = {
     how: '数字を覚えて順番にタップします。最初の水滴を押した瞬間、残りの数字も消えます。',
     score: '段階を突破するたびに得点し、水滴が多い段階ほど高得点です。',
   },
+  paperboat: {
+    goal: '入ってくる紙の舟を同じ色の桟橋へ送りましょう。舟同士がぶつかると終了です。',
+    how: '舟を押さえて桟橋まで線を引くとその通りに進みます。もう一度引けば航路を変えられます。',
+    score: '1隻30点、5秒以内に続けて送るとコンボがつき最大110点になります。',
+  },
 }
 
 const zhCN: Record<string, Guide> = {
@@ -519,6 +534,11 @@ const zhCN: Record<string, Guide> = {
     goal: '水珠上的数字只显示一瞬间。消失后请从最小的数开始依次点破。错三次结束。',
     how: '记住数字后按顺序点击。点下第一颗水珠时，剩下的数字也会消失。',
     score: '每过一关都会得分，水珠越多的关卡分数越高。',
+  },
+  paperboat: {
+    goal: '把驶入的纸船送到同色码头。两船相撞就结束。',
+    how: '按住纸船画一条线到码头，它就会沿线行驶。再画一次可以改航道。',
+    score: '每艘30分，5秒内连续送达会累积连击，最高110分。',
   },
 }
 
@@ -648,6 +668,11 @@ const es: Record<string, Guide> = {
     how: 'Memorízalos y toca en orden: el primer toque también borra los números restantes.',
     score: 'Cada nivel superado da puntos, y los niveles con más gotas dan más.',
   },
+  paperboat: {
+    goal: 'Lleva cada barco de papel al muelle de su color. Si dos barcos chocan, termina la partida.',
+    how: 'Toca un barco y traza una ruta hasta el muelle; el barco la sigue. Vuelve a trazarla para cambiarla.',
+    score: '30 por barco, y atracar otro en menos de 5 segundos crea una racha de hasta 110.',
+  },
 }
 
 const ptBR: Record<string, Guide> = {
@@ -775,6 +800,11 @@ const ptBR: Record<string, Guide> = {
     goal: 'Os números nas gotas aparecem só por um instante. Depois que somem, estoure do menor para o maior. Três erros encerram a partida.',
     how: 'Memorize e toque em ordem — o primeiro toque também apaga os números restantes.',
     score: 'Cada nível vencido dá pontos, e níveis com mais gotas valem mais.',
+  },
+  paperboat: {
+    goal: 'Leve cada barco de papel ao cais da sua cor. Se dois barcos colidirem, a partida acaba.',
+    how: 'Toque num barco e trace uma rota até o cais; ele segue a linha. Trace de novo para mudar.',
+    score: '30 por barco, e atracar outro em até 5 segundos forma combo de até 110.',
   },
 }
 
@@ -904,6 +934,11 @@ const fr: Record<string, Guide> = {
     how: 'Mémorise puis touche dans l\'ordre : la première touche effface aussi les nombres restants.',
     score: 'Chaque niveau réussi rapporte, et plus il y a de gouttes plus ça rapporte.',
   },
+  paperboat: {
+    goal: 'Amène chaque bateau en papier au quai de sa couleur. Si deux bateaux se heurtent, la partie s\'arrête.',
+    how: 'Touche un bateau et trace une voie jusqu\'au quai : il la suit. Retrace pour changer d\'itinéraire.',
+    score: '30 par bateau, et accoster de nouveau en moins de 5 secondes monte un combo jusqu\'à 110.',
+  },
 }
 
 const de: Record<string, Guide> = {
@@ -1031,6 +1066,11 @@ const de: Record<string, Guide> = {
     goal: 'Die Zahlen auf den Tropfen sind nur kurz zu sehen. Sind sie weg, platze sie von der kleinsten Zahl aufwärts. Drei Fehler beenden die Runde.',
     how: 'Merken und dann der Reihe nach tippen – der erste Tipp löscht auch die übrigen Zahlen.',
     score: 'Jede geschaffte Stufe bringt Punkte, Stufen mit mehr Tropfen mehr.',
+  },
+  paperboat: {
+    goal: 'Bring jedes Papierboot zum Anleger seiner Farbe. Stoßen zwei Boote zusammen, ist die Runde vorbei.',
+    how: 'Boot antippen und eine Route zum Anleger ziehen – es folgt der Linie. Neu ziehen ändert die Route.',
+    score: '30 pro Boot; ein weiteres innerhalb von 5 Sekunden baut eine Serie bis 110 auf.',
   },
 }
 
@@ -1160,6 +1200,11 @@ const ru: Record<string, Guide> = {
     how: 'Запомните и нажимайте по порядку — первое нажатие тоже стирает остальные числа.',
     score: 'За каждый пройденный уровень дают очки, и чем больше капель, тем больше.',
   },
+  paperboat: {
+    goal: 'Отправляйте бумажные кораблики к причалу своего цвета. Если два столкнутся — конец.',
+    how: 'Коснитесь кораблика и проведите путь к причалу — он пойдёт по линии. Проведите снова, чтобы изменить.',
+    score: '30 за кораблик, а новая стыковка в течение 5 секунд наращивает серию до 110.',
+  },
 }
 
 const id: Record<string, Guide> = {
@@ -1287,6 +1332,11 @@ const id: Record<string, Guide> = {
     goal: 'Angka di tetesan hanya tampak sekejap. Setelah hilang, pecahkan dari angka terkecil. Tiga kesalahan berarti tamat.',
     how: 'Hafalkan lalu ketuk berurutan — ketukan pertama juga menghapus angka sisanya.',
     score: 'Setiap level yang lewat memberi poin, dan level dengan lebih banyak tetesan bernilai lebih besar.',
+  },
+  paperboat: {
+    goal: 'Antar setiap perahu kertas ke dermaga sewarna. Kalau dua perahu bertabrakan, permainan berakhir.',
+    how: 'Sentuh perahu dan tarik jalur ke dermaga — perahu mengikuti garisnya. Tarik lagi untuk mengubah jalur.',
+    score: '30 per perahu, dan berlabuh lagi dalam 5 detik membangun kombo hingga 110.',
   },
 }
 
@@ -1416,6 +1466,11 @@ const vi: Record<string, Guide> = {
     how: 'Ghi nhớ rồi chạm theo thứ tự — cú chạm đầu tiên cũng xoá các số còn lại.',
     score: 'Mỗi cấp vượt qua đều được điểm, cấp càng nhiều giọt càng nhiều điểm.',
   },
+  paperboat: {
+    goal: 'Đưa từng chiếc thuyền giấy về bến đúng màu. Hai thuyền đụng nhau là kết thúc.',
+    how: 'Chạm vào thuyền rồi vẽ đường tới bến, thuyền sẽ đi theo. Vẽ lại để đổi đường.',
+    score: '30 điểm mỗi thuyền, cập bến tiếp trong 5 giây sẽ tạo combo tới 110 điểm.',
+  },
 }
 
 const th: Record<string, Guide> = {
@@ -1544,6 +1599,11 @@ const th: Record<string, Guide> = {
     how: 'จำให้ได้แล้วแตะตามลำดับ การแตะครั้งแรกจะลบตัวเลขที่เหลือด้วย',
     score: 'ผ่านแต่ละระดับได้คะแนน ระดับที่มีหยดน้ำมากได้คะแนนมากกว่า',
   },
+  paperboat: {
+    goal: 'ส่งเรือกระดาษทุกลำไปยังท่าสีเดียวกัน ถ้าเรือชนกันเป็นอันจบ',
+    how: 'แตะเรือแล้วลากเส้นไปยังท่า เรือจะแล่นตามเส้น ลากใหม่เพื่อเปลี่ยนเส้นทาง',
+    score: 'ลำละ 30 คะแนน ส่งถึงท่าอีกครั้งภายใน 5 วินาทีจะต่อคอมโบได้สูงสุด 110',
+  },
 }
 
 const tr: Record<string, Guide> = {
@@ -1671,6 +1731,11 @@ const tr: Record<string, Guide> = {
     goal: 'Damlaların üstündeki sayılar yalnızca bir an görünür. Kaybolduktan sonra en küçük sayıdan başlayarak patlat. Üç hata oyunu bitirir.',
     how: 'Ezberle ve sırayla dokun — ilk dokunuş kalan sayıları da siler.',
     score: 'Geçilen her seviye puan verir, damla sayısı arttıkça puan da artar.',
+  },
+  paperboat: {
+    goal: 'Her kâğıt kayığı kendi renginin iskelesine gönder. İki kayık çarpışırsa oyun biter.',
+    how: 'Kayığa dokun ve iskeleye bir rota çiz; kayık çizgiyi izler. Yeniden çizersen rota değişir.',
+    score: 'Kayık başına 30 puan; 5 saniye içinde bir kayık daha yanaşırsa seri 110 puana kadar çıkar.',
   },
 }
 const TABLES: Record<Locale, Record<string, Guide>> = {
