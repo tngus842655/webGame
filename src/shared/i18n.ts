@@ -317,6 +317,15 @@ const en = {
   'rg.c24l': 'Take him in',
   'rg.c24r': 'Send him back',
   'game.focus': 'Focus Tree',
+  'fc.pick': 'How long will you focus?',
+  'fc.min': '{n} min',
+  'fc.today': 'Today: {n} min focused',
+  'fc.stay': 'Leave the app and the tree withers',
+  'fc.giveup': 'Give up',
+  'fc.done': 'Your tree is fully grown! 🌸',
+  'fc.withered': 'The tree withered…',
+  'fc.new': 'Plant a new tree',
+  'fc.ad': '▶ Watch ad to revive the tree',
   'game.wordle': 'Hangul Wordle',
 }
 
@@ -599,6 +608,15 @@ const ko: typeof en = {
   'rg.c24l': '받아준다',
   'rg.c24r': '돌려보낸다',
   'game.focus': '집중 나무',
+  'fc.pick': '얼마나 집중해 볼까요?',
+  'fc.min': '{n}분',
+  'fc.today': '오늘 집중 {n}분',
+  'fc.stay': '화면을 벗어나면 나무가 시들어요',
+  'fc.giveup': '포기',
+  'fc.done': '나무가 다 자랐어요! 🌸',
+  'fc.withered': '나무가 시들었어요…',
+  'fc.new': '새 나무 심기',
+  'fc.ad': '▶ 광고 보고 나무 살리기',
   'game.wordle': '한글 워들',
 }
 

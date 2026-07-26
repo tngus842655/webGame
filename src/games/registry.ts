@@ -123,4 +123,9 @@ export const GAMES: GameMeta[] = [
     titleKey: 'game.reigns',
     loader: () => import('./reigns'),
   },
+  {
+    slug: 'focus',
+    titleKey: 'game.focus',
+    loader: () => import('./focus'),
+  },
 ]

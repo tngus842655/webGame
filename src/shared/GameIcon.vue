@@ -300,6 +300,19 @@ defineProps<{ slug: string }>()
       <path d="M17 6 L21 9 L24 5 L27 9 L31 6 L30 11 H18 Z" fill="#FFB300" />
     </g>
 
+    <!-- 집중 나무 -->
+    <g v-else-if="slug === 'focus'">
+      <rect x="4" y="4" width="40" height="40" rx="7" fill="#C4E6FA" />
+      <rect x="4" y="36" width="40" height="8" rx="3" fill="#8BC34A" />
+      <path d="M24 38 Q22 28 24 20" stroke="#6D4C41" stroke-width="4.5" fill="none" stroke-linecap="round" />
+      <circle cx="24" cy="15" r="8.5" fill="#66BB6A" />
+      <circle cx="16.5" cy="19" r="6" fill="#43A047" />
+      <circle cx="31.5" cy="19" r="6" fill="#43A047" />
+      <circle cx="20" cy="11" r="2" fill="#F48FB1" />
+      <circle cx="28.5" cy="13.5" r="2" fill="#F48FB1" />
+      <circle cx="38" cy="10" r="4.6" fill="#FFEE58" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />
