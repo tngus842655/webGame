@@ -185,6 +185,9 @@ const en = {
   'pp.level': 'Level {n}',
   'pp.ad': '▶ Watch ad for +30s',
   'game.defense': 'Tower Defense',
+  'df.wave': 'Wave {n}',
+  'df.summon': 'Summon {n}G',
+  'df.ad': '▶ Watch ad to revive (5 lives)',
   'game.jump': 'Jump Challenge',
 }
 
@@ -335,6 +338,9 @@ const ko: typeof en = {
   'pp.level': '레벨 {n}',
   'pp.ad': '▶ 광고 보고 30초 연장',
   'game.defense': '타워 디펜스',
+  'df.wave': '웨이브 {n}',
+  'df.summon': '소환 {n}G',
+  'df.ad': '▶ 광고 보고 부활 (생명 5)',
   'game.jump': '점프 챌린지',
 }
 

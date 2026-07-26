@@ -191,6 +191,19 @@ defineProps<{ slug: string }>()
       <circle cx="34" cy="44" r="2.2" fill="#FFFFFF" />
     </g>
 
+    <!-- 타워 디펜스 -->
+    <g v-else-if="slug === 'defense'">
+      <rect x="4" y="4" width="40" height="40" rx="7" fill="#9CCC65" />
+      <path d="M4 14 H30 Q36 14 36 20 V28 Q36 34 30 34 H4" stroke="#BCAAA4" stroke-width="9" fill="none" stroke-linecap="round" />
+      <circle cx="12" cy="14" r="5.5" fill="#EF5350" />
+      <circle cx="10.2" cy="12.8" r="1.5" fill="#FFFFFF" />
+      <circle cx="13.8" cy="12.8" r="1.5" fill="#FFFFFF" />
+      <rect x="14" y="38" width="20" height="4" rx="2" fill="#5D4037" />
+      <rect x="17" y="24" width="14" height="16" rx="2.5" fill="#6D4C41" />
+      <path d="M16 20 h4 v3 h4 v-3 h4 v3 h4 v-3 v10 h-16 Z" fill="#5D4037" />
+      <circle cx="24" cy="32" r="4" fill="#1E88E5" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />
