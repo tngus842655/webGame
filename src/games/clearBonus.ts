@@ -2,7 +2,7 @@ import { t } from '@/shared/i18n'
 import type { GameShell } from './shell'
 import type { GameContext } from './types'
 
-// 클리어 보상 — 한 판이 길어 게임오버가 잘 나지 않는 게임(스도쿠·마작·네모로직·디펜스·머지)에서
+// 클리어 보상 — 한 판이 길어 게임오버가 잘 나지 않는 게임(스도쿠·네모로직·디펜스·머지 가든)에서
 // 성공 쪽에 붙이는 리워드 광고 지점. 방금 얻은 점수만큼 한 번 더 받는다(=2배).
 export interface ClearBonus {
   // true = 광고 시청 완료 → 호출한 쪽에서 points를 한 번 더 더한다

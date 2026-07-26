@@ -3,7 +3,7 @@ import { t, type TranslationKey } from '@/shared/i18n'
 // 게임 공통 게임오버 오버레이 (점수·최고 기록·광고 이어하기·다시하기)
 // 문구는 show() 시점에 t()로 채워 언어 변경이 즉시 반영된다.
 export interface GameOverOverlayOptions {
-  // 광고 보상이 없는 게임(예: 미니 골프)은 생략
+  // 광고 보상 지점이 없는 게임은 생략한다
   adLabelKey?: TranslationKey
   onRetry(): void
   onContinue?(): void
