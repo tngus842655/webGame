@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { GAMES } from '@/games/registry'
-import AccountPrompt from '@/shared/AccountPrompt.vue'
-import { linkedProvider } from '@/shared/auth'
 import GameIcon from '@/shared/GameIcon.vue'
 import { t } from '@/shared/i18n'
 import {
@@ -14,9 +11,6 @@ import {
   type MyGameStat,
 } from '@/shared/scores'
 
-const ASKED_KEY = 'webgame:accountAsked'
-const router = useRouter()
-const askAccount = ref(false)
 
 // 기록이 없어도 빈 문자열을 반환해 한 줄을 차지한다 (CSS에서 높이 확보)
 function scoreLabel(card: { best: number | null; stat: MyGameStat | null }): string {
@@ -27,12 +21,6 @@ function scoreLabel(card: { best: number | null; stat: MyGameStat | null }): str
     })
   }
   return card.best === null ? '' : t('home.best', { n: card.best.toLocaleString() })
-}
-
-function answerAccount(existing: boolean) {
-  localStorage.setItem(ASKED_KEY, 'done')
-  askAccount.value = false
-  if (existing) void router.push('/settings')
 }
 
 // 카드 순서는 캐시된 인기순으로 처음부터 확정하고, 서버 응답으로는 내 기록만 채운다
@@ -51,13 +39,6 @@ onMounted(async () => {
   ])
   const statBySlug = new Map(myStats.map((stat) => [stat.game_slug, stat]))
   cards.value = cards.value.map((card) => ({ ...card, stat: statBySlug.get(card.slug) ?? null }))
-
-  // 기존 회원 안내는 '기록이 하나도 없는' 첫 실행에서만 의미가 있다.
-  // 세션 조회가 끝난 이 시점이라야 연동 여부(linkedProvider)도 확정된다
-  if (localStorage.getItem(ASKED_KEY)) return
-  const hasRecord = myStats.length > 0 || cards.value.some((card) => card.best !== null)
-  if (hasRecord || linkedProvider.value) localStorage.setItem(ASKED_KEY, 'done')
-  else askAccount.value = true
 })
 </script>
 
@@ -85,7 +66,6 @@ onMounted(async () => {
       </RouterLink>
     </main>
 
-    <AccountPrompt v-if="askAccount" @answer="answerAccount" />
   </div>
 </template>
 
