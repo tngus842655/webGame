@@ -113,4 +113,9 @@ export const GAMES: GameMeta[] = [
     titleKey: 'game.store',
     loader: () => import('./store'),
   },
+  {
+    slug: 'tuber',
+    titleKey: 'game.tuber',
+    loader: () => import('./tuber'),
+  },
 ]

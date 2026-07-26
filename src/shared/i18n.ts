@@ -215,6 +215,28 @@ const en = {
   'st.stock': 'Stock {n}',
   'st.order': 'Order {n}',
   'st.ad': '▶ Watch ad to reopen (restore reputation)',
+  'game.tuber': 'Creator Sim',
+  'tb.subs': 'Subscribers',
+  'tb.trend': 'Trending now: {name}',
+  'tb.pick': 'Pick your next video topic',
+  'tb.hot': '🔥 Trending +100%',
+  'tb.t1': 'Gaming',
+  'tb.t2': 'Mukbang',
+  'tb.t3': 'Vlog',
+  'tb.t4': 'Music',
+  'tb.t5': 'Workout',
+  'tb.t6': 'Cooking',
+  'tb.t7': 'Travel',
+  'tb.t8': 'Unboxing',
+  'tb.s1': 'Filming',
+  'tb.s2': 'Editing',
+  'tb.s3': 'Thumbnail',
+  'tb.tap': 'Tap to stop at the green center!',
+  'tb.views': 'Views {n}',
+  'tb.ad': '▶ Watch ad for +45s',
+  'game.reigns': 'Kingdom Cards',
+  'game.focus': 'Focus Tree',
+  'game.wordle': 'Hangul Wordle',
 }
 
 const ko: typeof en = {
@@ -394,6 +416,28 @@ const ko: typeof en = {
   'st.stock': '창고 {n}',
   'st.order': '발주 {n}',
   'st.ad': '▶ 광고 보고 재개장 (평판 회복)',
+  'game.tuber': '유튜버 시뮬',
+  'tb.subs': '구독자',
+  'tb.trend': '지금 인기: {name}',
+  'tb.pick': '다음 영상 주제를 고르세요',
+  'tb.hot': '🔥 트렌드 +100%',
+  'tb.t1': '게임',
+  'tb.t2': '먹방',
+  'tb.t3': '브이로그',
+  'tb.t4': '음악',
+  'tb.t5': '운동',
+  'tb.t6': '요리',
+  'tb.t7': '여행',
+  'tb.t8': '언박싱',
+  'tb.s1': '촬영',
+  'tb.s2': '편집',
+  'tb.s3': '썸네일',
+  'tb.tap': '초록 중앙에 맞춰 탭!',
+  'tb.views': '조회수 {n}',
+  'tb.ad': '▶ 광고 보고 45초 연장',
+  'game.reigns': '국가 운영',
+  'game.focus': '집중 나무',
+  'game.wordle': '한글 워들',
 }
 
 // 나머지 언어: 허브·게임오버·광고·제목까지 번역, 게임 내부 텍스트는 en 폴백
@@ -477,6 +521,10 @@ const ja: CoreDict = {
   'game.orbit': 'オービットシューター',
   'game.estate': '不動産タイクーン',
   'game.store': 'コンビニ経営',
+  'game.tuber': 'クリエイターシミュ',
+  'game.reigns': '王国カード',
+  'game.focus': '集中の木',
+  'game.wordle': 'ハングルワードル',
 }
 
 const zhCN: CoreDict = {
@@ -557,6 +605,10 @@ const zhCN: CoreDict = {
   'game.orbit': '轨道射击',
   'game.estate': '地产大亨',
   'game.store': '便利店经营',
+  'game.tuber': '博主模拟器',
+  'game.reigns': '王国卡牌',
+  'game.focus': '专注之树',
+  'game.wordle': '韩文猜词',
 }
 
 const es: CoreDict = {
@@ -637,6 +689,10 @@ const es: CoreDict = {
   'game.orbit': 'Disparo Orbital',
   'game.estate': 'Magnate Inmobiliario',
   'game.store': 'Minimercado',
+  'game.tuber': 'Sim de Creador',
+  'game.reigns': 'Cartas del Reino',
+  'game.focus': 'Árbol de Enfoque',
+  'game.wordle': 'Wordle Hangul',
 }
 
 const ptBR: CoreDict = {
@@ -717,6 +773,10 @@ const ptBR: CoreDict = {
   'game.orbit': 'Tiro Orbital',
   'game.estate': 'Magnata Imobiliário',
   'game.store': 'Minimercado',
+  'game.tuber': 'Sim de Criador',
+  'game.reigns': 'Cartas do Reino',
+  'game.focus': 'Árvore do Foco',
+  'game.wordle': 'Wordle Hangul',
 }
 
 const fr: CoreDict = {
@@ -797,6 +857,10 @@ const fr: CoreDict = {
   'game.orbit': 'Tir Orbital',
   'game.estate': 'Magnat Immobilier',
   'game.store': 'Supérette',
+  'game.tuber': 'Simu Créateur',
+  'game.reigns': 'Cartes du Royaume',
+  'game.focus': 'Arbre de Focus',
+  'game.wordle': 'Wordle Hangeul',
 }
 
 const de: CoreDict = {
@@ -877,6 +941,10 @@ const de: CoreDict = {
   'game.orbit': 'Orbit-Schütze',
   'game.estate': 'Immobilien-Tycoon',
   'game.store': 'Minimarkt',
+  'game.tuber': 'Creator-Sim',
+  'game.reigns': 'Königreich-Karten',
+  'game.focus': 'Fokus-Baum',
+  'game.wordle': 'Hangul-Wordle',
 }
 
 const ru: CoreDict = {
@@ -957,6 +1025,10 @@ const ru: CoreDict = {
   'game.orbit': 'Орбитальный тир',
   'game.estate': 'Магнат недвижимости',
   'game.store': 'Мини-маркет',
+  'game.tuber': 'Симулятор блогера',
+  'game.reigns': 'Карты королевства',
+  'game.focus': 'Дерево фокуса',
+  'game.wordle': 'Хангыль-вордл',
 }
 
 const id: CoreDict = {
@@ -1037,6 +1109,10 @@ const id: CoreDict = {
   'game.orbit': 'Tembak Orbit',
   'game.estate': 'Taipan Properti',
   'game.store': 'Minimarket',
+  'game.tuber': 'Simulasi Kreator',
+  'game.reigns': 'Kartu Kerajaan',
+  'game.focus': 'Pohon Fokus',
+  'game.wordle': 'Wordle Hangul',
 }
 
 const vi: CoreDict = {
@@ -1117,6 +1193,10 @@ const vi: CoreDict = {
   'game.orbit': 'Bắn Quỹ Đạo',
   'game.estate': 'Trùm Bất Động Sản',
   'game.store': 'Cửa Hàng Tiện Lợi',
+  'game.tuber': 'Mô Phỏng Vlogger',
+  'game.reigns': 'Bài Vương Quốc',
+  'game.focus': 'Cây Tập Trung',
+  'game.wordle': 'Wordle Hangul',
 }
 
 const th: CoreDict = {
@@ -1197,6 +1277,10 @@ const th: CoreDict = {
   'game.orbit': 'ยิงวงโคจร',
   'game.estate': 'เศรษฐีอสังหาฯ',
   'game.store': 'ร้านสะดวกซื้อ',
+  'game.tuber': 'จำลองครีเอเตอร์',
+  'game.reigns': 'ไพ่ราชอาณาจักร',
+  'game.focus': 'ต้นไม้สมาธิ',
+  'game.wordle': 'เวิร์ดเดิลฮันกึล',
 }
 
 const tr: CoreDict = {
@@ -1277,6 +1361,10 @@ const tr: CoreDict = {
   'game.orbit': 'Yörünge Atışı',
   'game.estate': 'Emlak Kralı',
   'game.store': 'Market İşletme',
+  'game.tuber': 'İçerik Üretici Sim',
+  'game.reigns': 'Krallık Kartları',
+  'game.focus': 'Odak Ağacı',
+  'game.wordle': 'Hangıl Wordle',
 }
 
 const messages: Record<Locale, CoreDict> = {

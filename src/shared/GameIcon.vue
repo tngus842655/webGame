@@ -279,6 +279,17 @@ defineProps<{ slug: string }>()
       <rect x="30.5" y="35" width="3" height="7" fill="#3E2723" />
     </g>
 
+    <!-- 유튜버 시뮬 -->
+    <g v-else-if="slug === 'tuber'">
+      <rect x="4" y="4" width="40" height="40" rx="7" fill="#FCE4EC" />
+      <rect x="8" y="12" width="32" height="22" rx="5" fill="#D32F2F" />
+      <path d="M21 18 L29 23 L21 28 Z" fill="#FFFFFF" />
+      <path d="M14 38 h20" stroke="#B71C1C" stroke-width="2.6" stroke-linecap="round" />
+      <path d="M18 41.5 h12" stroke="#EF9A9A" stroke-width="2.4" stroke-linecap="round" />
+      <circle cx="39" cy="10" r="5.5" fill="#FF6F00" />
+      <path d="M39 7.4 v3.2 l2 1.6" stroke="#FFF3E0" stroke-width="1.6" fill="none" stroke-linecap="round" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />
