@@ -3,7 +3,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { GAMES } from '@/games/registry'
 import GameIcon from '@/shared/GameIcon.vue'
 import { t } from '@/shared/i18n'
-import { fetchGameStats, type GameStat } from '@/shared/playSessions'
+import { fetchGameStats, fetchTotalPlayers, type GameStat } from '@/shared/playSessions'
 
 const PERIODS = [1, 7, 30] as const
 
@@ -21,14 +21,16 @@ const rows = computed(() => {
   })).sort((a, b) => (b.stat?.total_seconds ?? 0) - (a.stat?.total_seconds ?? 0))
 })
 
+// 이용자 수는 게임별 값으로 만들 수 없다 (같은 사람이 여러 게임을 하면 겹친다) — 따로 받는다
+const players = ref(0)
+
 const totals = computed(() => {
   return stats.value.reduce(
     (acc, s) => ({
       plays: acc.plays + s.plays,
       seconds: acc.seconds + s.total_seconds,
-      players: Math.max(acc.players, s.players),
     }),
-    { plays: 0, seconds: 0, players: 0 },
+    { plays: 0, seconds: 0 },
   )
 })
 
@@ -38,7 +40,12 @@ async function load() {
   loading.value = true
   failed.value = false
   try {
-    stats.value = await fetchGameStats(days.value)
+    const [rows, total] = await Promise.all([
+      fetchGameStats(days.value),
+      fetchTotalPlayers(days.value),
+    ])
+    stats.value = rows
+    players.value = total
   } catch {
     failed.value = true
   } finally {
@@ -80,6 +87,8 @@ function duration(sec: number): string {
       </button>
     </div>
 
+    <p class="hint">{{ t('stats.hint') }}</p>
+
     <section class="summary">
       <div class="summary-item">
         <strong>{{ totals.plays.toLocaleString() }}</strong>
@@ -90,7 +99,7 @@ function duration(sec: number): string {
         <small>{{ t('stats.playtime') }}</small>
       </div>
       <div class="summary-item">
-        <strong>{{ totals.players.toLocaleString() }}</strong>
+        <strong>{{ players.toLocaleString() }}</strong>
         <small>{{ t('stats.players') }}</small>
       </div>
     </section>
@@ -164,6 +173,14 @@ function duration(sec: number): string {
   background: #8d6e63;
   color: #fff;
   font-weight: bold;
+}
+
+.hint {
+  margin-bottom: 14px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #bcaaa4;
+  word-break: keep-all;
 }
 
 .summary {
