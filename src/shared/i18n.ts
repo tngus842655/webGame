@@ -287,6 +287,9 @@ const en = {
   'game.paperboat': 'Paper Boat Lanes',
   'pb.hint': 'Draw a lane from a boat to the dock of the same colour',
   'pb.ad': '▶ Watch ad to clear just those two boats',
+  'game.samepic': 'Spot the Match',
+  'sp.hint': 'One picture appears on both discs',
+  'sp.ad': '▶ Watch ad for +10s (keep half the combo)',
 }
 
 const ko: typeof en = {
@@ -535,6 +538,9 @@ const ko: typeof en = {
   'game.paperboat': '종이배 뱃길',
   'pb.hint': '배에서 같은 색 부두까지 선을 그으세요',
   'pb.ad': '▶ 광고 보고 부딪힌 두 척만 치우기',
+  'game.samepic': '같은 그림 찾기',
+  'sp.hint': '두 원판에 함께 있는 그림은 하나입니다',
+  'sp.ad': '▶ 광고 보고 +10초 (콤보 절반 유지)',
 }
 
 // 나머지 언어: 허브·게임오버·광고·제목까지 번역, 게임 내부 텍스트는 en 폴백
@@ -753,6 +759,9 @@ const ja: CoreDict = {
   'game.paperboat': '紙の舟の航路',
   'pb.hint': '舟から同じ色の桟橋まで線を引きましょう',
   'pb.ad': '▶ 広告を見てぶつかった2隻だけ片づける',
+  'game.samepic': '同じ絵さがし',
+  'sp.hint': '2つの円盤に共通する絵は一つだけ',
+  'sp.ad': '▶ 広告を見て+10秒（コンボ半分維持）',
 }
 
 const zhCN: CoreDict = {
@@ -968,6 +977,9 @@ const zhCN: CoreDict = {
   'game.paperboat': '纸船航道',
   'pb.hint': '从纸船画一条线到同色码头',
   'pb.ad': '▶ 看广告只清走撞到的两艘',
+  'game.samepic': '找相同图案',
+  'sp.hint': '两个圆盘上只有一个图案相同',
+  'sp.ad': '▶ 看广告 +10秒（保留一半连击）',
 }
 
 const es: CoreDict = {
@@ -1183,6 +1195,9 @@ const es: CoreDict = {
   'game.paperboat': 'Rutas de Papel',
   'pb.hint': 'Traza una ruta del barco al muelle de su color',
   'pb.ad': '▶ Ver anuncio y retirar solo esos dos barcos',
+  'game.samepic': 'Halla la Pareja',
+  'sp.hint': 'Solo un dibujo está en los dos discos',
+  'sp.ad': '▶ Ver anuncio: +10 s (media racha)',
 }
 
 const ptBR: CoreDict = {
@@ -1398,6 +1413,9 @@ const ptBR: CoreDict = {
   'game.paperboat': 'Rotas de Papel',
   'pb.hint': 'Trace uma rota do barco até o cais da mesma cor',
   'pb.ad': '▶ Ver anúncio e retirar só aqueles dois barcos',
+  'game.samepic': 'Ache o Igual',
+  'sp.hint': 'Só um desenho aparece nos dois discos',
+  'sp.ad': '▶ Ver anúncio: +10s (metade do combo)',
 }
 
 const fr: CoreDict = {
@@ -1613,6 +1631,9 @@ const fr: CoreDict = {
   'game.paperboat': 'Voies de Papier',
   'pb.hint': 'Trace une voie du bateau vers le quai de la même couleur',
   'pb.ad': '▶ Pub pour retirer seulement ces deux bateaux',
+  'game.samepic': 'Trouve la Paire',
+  'sp.hint': 'Un seul dessin est sur les deux disques',
+  'sp.ad': '▶ Pub : +10 s (moitié du combo)',
 }
 
 const de: CoreDict = {
@@ -1828,6 +1849,9 @@ const de: CoreDict = {
   'game.paperboat': 'Papierboot-Routen',
   'pb.hint': 'Zieh eine Route vom Boot zum Anleger derselben Farbe',
   'pb.ad': '▶ Werbung ansehen: nur diese zwei Boote entfernen',
+  'game.samepic': 'Finde das Gleiche',
+  'sp.hint': 'Nur ein Bild ist auf beiden Scheiben',
+  'sp.ad': '▶ Werbung: +10 s (halbe Serie bleibt)',
 }
 
 const ru: CoreDict = {
@@ -2043,6 +2067,9 @@ const ru: CoreDict = {
   'game.paperboat': 'Бумажные кораблики',
   'pb.hint': 'Проведите путь от кораблика к причалу того же цвета',
   'pb.ad': '▶ Реклама: убрать только эти два кораблика',
+  'game.samepic': 'Найди одинаковое',
+  'sp.hint': 'Только одна картинка есть на обоих кругах',
+  'sp.ad': '▶ Реклама: +10 с (половина серии)',
 }
 
 const id: CoreDict = {
@@ -2258,6 +2285,9 @@ const id: CoreDict = {
   'game.paperboat': 'Jalur Perahu Kertas',
   'pb.hint': 'Tarik jalur dari perahu ke dermaga warna sama',
   'pb.ad': '▶ Tonton iklan untuk singkirkan dua perahu itu saja',
+  'game.samepic': 'Cari yang Sama',
+  'sp.hint': 'Hanya satu gambar ada di kedua piringan',
+  'sp.ad': '▶ Tonton iklan: +10 detik (kombo separuh)',
 }
 
 const vi: CoreDict = {
@@ -2473,6 +2503,9 @@ const vi: CoreDict = {
   'game.paperboat': 'Luồng Thuyền Giấy',
   'pb.hint': 'Vẽ đường từ thuyền tới bến cùng màu',
   'pb.ad': '▶ Xem quảng cáo để dọn riêng hai chiếc vừa đụng',
+  'game.samepic': 'Tìm Hình Giống Nhau',
+  'sp.hint': 'Chỉ một hình có ở cả hai đĩa',
+  'sp.ad': '▶ Xem quảng cáo: +10 giây (giữ nửa combo)',
 }
 
 const th: CoreDict = {
@@ -2688,6 +2721,9 @@ const th: CoreDict = {
   'game.paperboat': 'เส้นทางเรือกระดาษ',
   'pb.hint': 'ลากเส้นจากเรือไปยังท่าสีเดียวกัน',
   'pb.ad': '▶ ดูโฆษณาเพื่อเก็บเฉพาะสองลำที่ชนกัน',
+  'game.samepic': 'หาภาพที่เหมือนกัน',
+  'sp.hint': 'มีเพียงภาพเดียวที่อยู่ทั้งสองวง',
+  'sp.ad': '▶ ดูโฆษณา: +10 วินาที (เก็บคอมโบครึ่งหนึ่ง)',
 }
 
 const tr: CoreDict = {
@@ -2903,6 +2939,9 @@ const tr: CoreDict = {
   'game.paperboat': 'Kâğıt Kayık Rotaları',
   'pb.hint': 'Kayıktan aynı renk iskeleye bir rota çiz',
   'pb.ad': '▶ Reklam izle, sadece çarpışan iki kayığı kaldır',
+  'game.samepic': 'Aynısını Bul',
+  'sp.hint': 'İki diskte ortak olan tek bir resim var',
+  'sp.ad': '▶ Reklam izle: +10 sn (serinin yarısı kalır)',
 }
 
 const messages: Record<Locale, CoreDict> = {

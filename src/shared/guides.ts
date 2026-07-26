@@ -141,6 +141,11 @@ const ko: Record<string, Guide> = {
     how: '배를 짚고 부두까지 손가락으로 선을 그으면 그 길로 갑니다. 다시 그으면 항로가 바뀝니다.',
     score: '한 척에 30점, 5초 안에 이어서 보내면 콤보가 붙어 최대 110점까지 오릅니다.',
   },
+  samepic: {
+    goal: '위아래 원판에 공통으로 들어 있는 그림 하나를 찾아 탭하세요. 시간 게이지가 다하면 끝입니다.',
+    how: '어느 쪽 원판이든 그 그림을 탭하면 됩니다. 틀리면 2초를 잃습니다.',
+    score: '한 번에 30점, 연속으로 맞힐수록 최대 80점까지 오르고 맞힐 때마다 시간이 조금 회복됩니다.',
+  },
 }
 
 const en: Record<string, Guide> = {
@@ -273,6 +278,11 @@ const en: Record<string, Guide> = {
     goal: 'Send every paper boat to the dock of its colour. If two boats collide, the run ends.',
     how: 'Touch a boat and draw a lane to the dock — it follows the line. Draw again to reroute it.',
     score: '30 per boat, and docking again within 5 seconds builds a combo worth up to 110.',
+  },
+  samepic: {
+    goal: 'Find the one picture that appears on both discs and tap it. When the time gauge empties, the run ends.',
+    how: 'Tap that picture on either disc. A wrong tap costs 2 seconds.',
+    score: '30 per find, up to 80 on a streak, and every find gives a little time back.',
   },
 }
 
@@ -407,6 +417,11 @@ const ja: Record<string, Guide> = {
     how: '舟を押さえて桟橋まで線を引くとその通りに進みます。もう一度引けば航路を変えられます。',
     score: '1隻30点、5秒以内に続けて送るとコンボがつき最大110点になります。',
   },
+  samepic: {
+    goal: '上下の円盤に共通して入っている絵を一つ見つけてタップしましょう。時間ゲージが尽きると終了です。',
+    how: 'どちらの円盤でもその絵をタップすればOK。間違えると2秒失います。',
+    score: '1回30点、連続で当てるほど最大80点まで上がり、当てるたびに時間が少し戻ります。',
+  },
 }
 
 const zhCN: Record<string, Guide> = {
@@ -539,6 +554,11 @@ const zhCN: Record<string, Guide> = {
     goal: '把驶入的纸船送到同色码头。两船相撞就结束。',
     how: '按住纸船画一条线到码头，它就会沿线行驶。再画一次可以改航道。',
     score: '每艘30分，5秒内连续送达会累积连击，最高110分。',
+  },
+  samepic: {
+    goal: '找出上下圆盘共有的那一个图案并点它。时间条用完就结束。',
+    how: '在任意一个圆盘上点那个图案即可。点错会失去2秒。',
+    score: '每次30分，连对最高可到80分，每次答对还会回一点时间。',
   },
 }
 
@@ -673,6 +693,11 @@ const es: Record<string, Guide> = {
     how: 'Toca un barco y traza una ruta hasta el muelle; el barco la sigue. Vuelve a trazarla para cambiarla.',
     score: '30 por barco, y atracar otro en menos de 5 segundos crea una racha de hasta 110.',
   },
+  samepic: {
+    goal: 'Encuentra el único dibujo que está en los dos discos y tócalo. Cuando la barra de tiempo se agota, termina.',
+    how: 'Tócalo en cualquiera de los dos discos. Un fallo cuesta 2 segundos.',
+    score: '30 por acierto, hasta 80 en racha, y cada acierto devuelve algo de tiempo.',
+  },
 }
 
 const ptBR: Record<string, Guide> = {
@@ -805,6 +830,11 @@ const ptBR: Record<string, Guide> = {
     goal: 'Leve cada barco de papel ao cais da sua cor. Se dois barcos colidirem, a partida acaba.',
     how: 'Toque num barco e trace uma rota até o cais; ele segue a linha. Trace de novo para mudar.',
     score: '30 por barco, e atracar outro em até 5 segundos forma combo de até 110.',
+  },
+  samepic: {
+    goal: 'Ache o único desenho que está nos dois discos e toque nele. Quando a barra de tempo zera, a partida acaba.',
+    how: 'Toque nele em qualquer um dos discos. Errar custa 2 segundos.',
+    score: '30 por acerto, até 80 em sequência, e cada acerto devolve um pouco de tempo.',
   },
 }
 
@@ -939,6 +969,11 @@ const fr: Record<string, Guide> = {
     how: 'Touche un bateau et trace une voie jusqu\'au quai : il la suit. Retrace pour changer d\'itinéraire.',
     score: '30 par bateau, et accoster de nouveau en moins de 5 secondes monte un combo jusqu\'à 110.',
   },
+  samepic: {
+    goal: 'Trouve le seul dessin présent sur les deux disques et touche-le. Quand la jauge de temps est vide, c\'est fini.',
+    how: 'Touche-le sur l\'un ou l\'autre disque. Une erreur coûte 2 secondes.',
+    score: '30 par trouvaille, jusqu\'à 80 en série, et chaque trouvaille rend un peu de temps.',
+  },
 }
 
 const de: Record<string, Guide> = {
@@ -1071,6 +1106,11 @@ const de: Record<string, Guide> = {
     goal: 'Bring jedes Papierboot zum Anleger seiner Farbe. Stoßen zwei Boote zusammen, ist die Runde vorbei.',
     how: 'Boot antippen und eine Route zum Anleger ziehen – es folgt der Linie. Neu ziehen ändert die Route.',
     score: '30 pro Boot; ein weiteres innerhalb von 5 Sekunden baut eine Serie bis 110 auf.',
+  },
+  samepic: {
+    goal: 'Finde das eine Bild, das auf beiden Scheiben vorkommt, und tippe es an. Ist die Zeitleiste leer, ist Schluss.',
+    how: 'Tippe es auf einer der beiden Scheiben an. Ein Fehler kostet 2 Sekunden.',
+    score: '30 pro Treffer, in Serie bis 80, und jeder Treffer gibt etwas Zeit zurück.',
   },
 }
 
@@ -1205,6 +1245,11 @@ const ru: Record<string, Guide> = {
     how: 'Коснитесь кораблика и проведите путь к причалу — он пойдёт по линии. Проведите снова, чтобы изменить.',
     score: '30 за кораблик, а новая стыковка в течение 5 секунд наращивает серию до 110.',
   },
+  samepic: {
+    goal: 'Найдите единственную картинку, которая есть на обоих кругах, и нажмите её. Когда шкала времени опустеет — конец.',
+    how: 'Нажмите её на любом из кругов. Ошибка стоит 2 секунды.',
+    score: '30 за находку, до 80 в серии, и каждая находка немного возвращает время.',
+  },
 }
 
 const id: Record<string, Guide> = {
@@ -1337,6 +1382,11 @@ const id: Record<string, Guide> = {
     goal: 'Antar setiap perahu kertas ke dermaga sewarna. Kalau dua perahu bertabrakan, permainan berakhir.',
     how: 'Sentuh perahu dan tarik jalur ke dermaga — perahu mengikuti garisnya. Tarik lagi untuk mengubah jalur.',
     score: '30 per perahu, dan berlabuh lagi dalam 5 detik membangun kombo hingga 110.',
+  },
+  samepic: {
+    goal: 'Temukan satu gambar yang ada di kedua piringan lalu ketuk. Kalau bar waktu habis, permainan berakhir.',
+    how: 'Ketuk gambar itu di piringan mana saja. Salah ketuk memotong 2 detik.',
+    score: '30 per temuan, sampai 80 saat beruntun, dan tiap temuan mengembalikan sedikit waktu.',
   },
 }
 
@@ -1471,6 +1521,11 @@ const vi: Record<string, Guide> = {
     how: 'Chạm vào thuyền rồi vẽ đường tới bến, thuyền sẽ đi theo. Vẽ lại để đổi đường.',
     score: '30 điểm mỗi thuyền, cập bến tiếp trong 5 giây sẽ tạo combo tới 110 điểm.',
   },
+  samepic: {
+    goal: 'Tìm một hình có ở cả hai đĩa rồi chạm vào nó. Khi thanh thời gian hết là kết thúc.',
+    how: 'Chạm hình đó ở đĩa nào cũng được. Chạm sai mất 2 giây.',
+    score: '30 điểm mỗi lần, tối đa 80 khi liên tiếp, và mỗi lần đúng hồi lại chút thời gian.',
+  },
 }
 
 const th: Record<string, Guide> = {
@@ -1604,6 +1659,11 @@ const th: Record<string, Guide> = {
     how: 'แตะเรือแล้วลากเส้นไปยังท่า เรือจะแล่นตามเส้น ลากใหม่เพื่อเปลี่ยนเส้นทาง',
     score: 'ลำละ 30 คะแนน ส่งถึงท่าอีกครั้งภายใน 5 วินาทีจะต่อคอมโบได้สูงสุด 110',
   },
+  samepic: {
+    goal: 'หาภาพเดียวที่อยู่ทั้งวงบนและวงล่างแล้วแตะ เมื่อหลอดเวลาหมดก็จบเกม',
+    how: 'แตะภาพนั้นที่วงไหนก็ได้ แตะผิดเสียเวลา 2 วินาที',
+    score: 'ครั้งละ 30 คะแนน ต่อเนื่องได้ถึง 80 และทุกครั้งที่ถูกจะได้เวลาคืนเล็กน้อย',
+  },
 }
 
 const tr: Record<string, Guide> = {
@@ -1736,6 +1796,11 @@ const tr: Record<string, Guide> = {
     goal: 'Her kâğıt kayığı kendi renginin iskelesine gönder. İki kayık çarpışırsa oyun biter.',
     how: 'Kayığa dokun ve iskeleye bir rota çiz; kayık çizgiyi izler. Yeniden çizersen rota değişir.',
     score: 'Kayık başına 30 puan; 5 saniye içinde bir kayık daha yanaşırsa seri 110 puana kadar çıkar.',
+  },
+  samepic: {
+    goal: 'İki diskte birlikte bulunan tek resmi bul ve dokun. Zaman göstergesi biterse oyun sona erer.',
+    how: 'O resme iki diskten birinde dokun. Yanlış dokunuş 2 saniye götürür.',
+    score: 'Her bulguda 30 puan, seride 80\'e kadar; her doğru bulgu biraz zaman geri verir.',
   },
 }
 const TABLES: Record<Locale, Record<string, Guide>> = {

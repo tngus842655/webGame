@@ -336,6 +336,16 @@ defineProps<{ slug: string }>()
       <circle cx="10" cy="12" r="4.5" fill="none" stroke="#42A5F5" stroke-width="2" />
     </g>
 
+    <!-- 같은 그림 찾기 -->
+    <g v-else-if="slug === 'samepic'">
+      <circle cx="24" cy="14" r="11.5" fill="#FFF8E1" stroke="#3E2723" stroke-opacity="0.3" stroke-width="1.4" />
+      <circle cx="24" cy="35" r="11.5" fill="#FFF8E1" stroke="#3E2723" stroke-opacity="0.3" stroke-width="1.4" />
+      <path d="M20 9.5 L21.2 12.4 L24.3 12.6 L21.9 14.6 L22.7 17.6 L20 15.9 L17.3 17.6 L18.1 14.6 L15.7 12.6 L18.8 12.4 Z" fill="#FFCA28" />
+      <circle cx="28.5" cy="17" r="3.4" fill="#42A5F5" />
+      <path d="M29 30.4 L30.2 33.3 L33.3 33.5 L30.9 35.5 L31.7 38.5 L29 36.8 L26.3 38.5 L27.1 35.5 L24.7 33.5 L27.8 33.3 Z" fill="#FFCA28" />
+      <path d="M19.5 31.5 L22.5 36.5 L16.5 36.5 Z" fill="#66BB6A" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />
