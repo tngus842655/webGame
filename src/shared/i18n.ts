@@ -353,6 +353,16 @@ const en = {
   'dk.focus': 'Focus',
   'dk.nova': 'Nova',
   'game.autochess': 'Auto Battler',
+  'ac.round': 'Round {n}',
+  'ac.fight': 'Start battle',
+  'ac.shop': 'Shop (tap to buy)',
+  'ac.win': 'Victory! +{n}',
+  'ac.lose': 'Defeat… ❤ -{n}',
+  'ac.ad': '▶ Watch ad to revive (5 HP)',
+  'ac.s1': 'Warrior',
+  'ac.s2': 'Archer',
+  'ac.s3': 'Guard',
+  'ac.s4': 'Mage',
   'game.roulette': 'Daily Roulette',
 }
 
@@ -671,6 +681,16 @@ const ko: typeof en = {
   'dk.focus': '집중',
   'dk.nova': '작렬',
   'game.autochess': '오토 배틀',
+  'ac.round': '라운드 {n}',
+  'ac.fight': '전투 시작',
+  'ac.shop': '상점 (탭해서 구매)',
+  'ac.win': '승리! +{n}',
+  'ac.lose': '패배… ❤ -{n}',
+  'ac.ad': '▶ 광고 보고 부활 (체력 5)',
+  'ac.s1': '전사',
+  'ac.s2': '궁수',
+  'ac.s3': '방패병',
+  'ac.s4': '마법사',
   'game.roulette': '룰렛 데일리',
 }
 

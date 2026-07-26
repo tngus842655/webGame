@@ -355,6 +355,19 @@ defineProps<{ slug: string }>()
       <text x="12" y="13.2" font-size="8" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
     </g>
 
+    <!-- 오토 배틀 -->
+    <g v-else-if="slug === 'autochess'">
+      <rect x="4" y="4" width="40" height="40" rx="7" fill="#37474F" />
+      <circle cx="14" cy="18" r="7" fill="#E57373" />
+      <circle cx="14" cy="34" r="7" fill="#64B5F6" />
+      <circle cx="34" cy="18" r="7" fill="#BA68C8" />
+      <circle cx="34" cy="34" r="7" fill="#81C784" />
+      <path d="M22 22 L26 30 M26 22 L22 30" stroke="#FFD54F" stroke-width="2.6" stroke-linecap="round" />
+      <path d="M11 8.5 L14 5.5 L17 8.5" stroke="#FFD54F" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+      <circle cx="14" cy="16" r="2" fill="#FFFFFF" opacity="0.65" />
+      <circle cx="34" cy="16" r="2" fill="#FFFFFF" opacity="0.65" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />
