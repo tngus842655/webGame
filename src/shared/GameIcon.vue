@@ -313,6 +313,17 @@ defineProps<{ slug: string }>()
       <text x="39" y="26" font-size="8" font-weight="bold" fill="#3E2723" text-anchor="middle">31</text>
     </g>
 
+    <!-- 찰나의 숫자 -->
+    <g v-else-if="slug === 'flashnum'">
+      <rect x="4" y="4" width="40" height="40" rx="8" fill="#0C3B4C" />
+      <circle cx="15" cy="15" r="8" fill="#4FC3F7" />
+      <text x="15" y="18.6" font-size="10" font-weight="bold" fill="#06323F" text-anchor="middle">1</text>
+      <circle cx="33" cy="20" r="8" fill="#FFFFFF" opacity="0.14" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.4" />
+      <circle cx="17" cy="33" r="8" fill="#FFFFFF" opacity="0.14" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.4" />
+      <circle cx="34" cy="35" r="6.5" fill="#FFFFFF" opacity="0.14" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.4" />
+      <ellipse cx="12.5" cy="12" rx="2.4" ry="1.6" fill="#FFFFFF" opacity="0.55" transform="rotate(-30 12.5 12)" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />

@@ -279,6 +279,11 @@ const en = {
   'nm.round': 'Board {n}',
   'nm.clear': 'Board complete! +{n}',
   'nm.ad': '▶ Watch ad to empty the blocking slot',
+  'game.flashnum': 'Flash Numbers',
+  'fn.level': 'Level {n}',
+  'fn.memorize': 'Memorize them!',
+  'fn.order': 'Tap from the smallest number',
+  'fn.ad': '▶ Watch ad to retry this level',
 }
 
 const ko: typeof en = {
@@ -519,6 +524,11 @@ const ko: typeof en = {
   'nm.round': '{n}판',
   'nm.clear': '한 판 완성! +{n}',
   'nm.ad': '▶ 광고 보고 막힌 칸 비우기',
+  'game.flashnum': '찰나의 숫자',
+  'fn.level': '{n}단계',
+  'fn.memorize': '기억하세요!',
+  'fn.order': '작은 수부터 순서대로 탭',
+  'fn.ad': '▶ 광고 보고 이 단계부터 다시',
 }
 
 // 나머지 언어: 허브·게임오버·광고·제목까지 번역, 게임 내부 텍스트는 en 폴백
@@ -729,6 +739,11 @@ const ja: CoreDict = {
   'nm.round': '{n}面',
   'nm.clear': '1面クリア！ +{n}',
   'nm.ad': '▶ 広告を見て詰まった枠を空ける',
+  'game.flashnum': '一瞬の数字',
+  'fn.level': '{n}段階',
+  'fn.memorize': '覚えて！',
+  'fn.order': '小さい数から順にタップ',
+  'fn.ad': '▶ 広告を見てこの段階から再挑戦',
 }
 
 const zhCN: CoreDict = {
@@ -936,6 +951,11 @@ const zhCN: CoreDict = {
   'nm.round': '第{n}盘',
   'nm.clear': '一盘完成！ +{n}',
   'nm.ad': '▶ 看广告清空堵住的格子',
+  'game.flashnum': '瞬间记数',
+  'fn.level': '第{n}关',
+  'fn.memorize': '记住它们！',
+  'fn.order': '从最小的数开始点',
+  'fn.ad': '▶ 看广告从本关重来',
 }
 
 const es: CoreDict = {
@@ -1143,6 +1163,11 @@ const es: CoreDict = {
   'nm.round': 'Tablero {n}',
   'nm.clear': '¡Tablero completo! +{n}',
   'nm.ad': '▶ Ver anuncio y vaciar la casilla que bloquea',
+  'game.flashnum': 'Números Fugaces',
+  'fn.level': 'Nivel {n}',
+  'fn.memorize': '¡Memorízalos!',
+  'fn.order': 'Toca desde el número más bajo',
+  'fn.ad': '▶ Ver anuncio y repetir este nivel',
 }
 
 const ptBR: CoreDict = {
@@ -1350,6 +1375,11 @@ const ptBR: CoreDict = {
   'nm.round': 'Tabuleiro {n}',
   'nm.clear': 'Tabuleiro completo! +{n}',
   'nm.ad': '▶ Ver anúncio e esvaziar a casa que travou',
+  'game.flashnum': 'Números Relâmpago',
+  'fn.level': 'Nível {n}',
+  'fn.memorize': 'Memorize!',
+  'fn.order': 'Toque a partir do menor número',
+  'fn.ad': '▶ Ver anúncio e repetir este nível',
 }
 
 const fr: CoreDict = {
@@ -1557,6 +1587,11 @@ const fr: CoreDict = {
   'nm.round': 'Plateau {n}',
   'nm.clear': 'Plateau complet ! +{n}',
   'nm.ad': '▶ Pub pour vider la case qui bloque',
+  'game.flashnum': 'Nombres Éclair',
+  'fn.level': 'Niveau {n}',
+  'fn.memorize': 'Mémorise !',
+  'fn.order': 'Touche à partir du plus petit nombre',
+  'fn.ad': '▶ Pub pour refaire ce niveau',
 }
 
 const de: CoreDict = {
@@ -1764,6 +1799,11 @@ const de: CoreDict = {
   'nm.round': 'Feld {n}',
   'nm.clear': 'Feld voll! +{n}',
   'nm.ad': '▶ Werbung ansehen: blockierendes Fach leeren',
+  'game.flashnum': 'Blitzzahlen',
+  'fn.level': 'Stufe {n}',
+  'fn.memorize': 'Einprägen!',
+  'fn.order': 'Mit der kleinsten Zahl beginnen',
+  'fn.ad': '▶ Werbung ansehen: Stufe wiederholen',
 }
 
 const ru: CoreDict = {
@@ -1971,6 +2011,11 @@ const ru: CoreDict = {
   'nm.round': 'Поле {n}',
   'nm.clear': 'Поле собрано! +{n}',
   'nm.ad': '▶ Реклама: освободить мешающую ячейку',
+  'game.flashnum': 'Числа на миг',
+  'fn.level': 'Уровень {n}',
+  'fn.memorize': 'Запоминайте!',
+  'fn.order': 'Нажимайте от меньшего числа',
+  'fn.ad': '▶ Реклама: повторить этот уровень',
 }
 
 const id: CoreDict = {
@@ -2178,6 +2223,11 @@ const id: CoreDict = {
   'nm.round': 'Papan {n}',
   'nm.clear': 'Papan penuh! +{n}',
   'nm.ad': '▶ Tonton iklan untuk kosongkan kotak penghalang',
+  'game.flashnum': 'Angka Sekejap',
+  'fn.level': 'Level {n}',
+  'fn.memorize': 'Hafalkan!',
+  'fn.order': 'Ketuk mulai dari angka terkecil',
+  'fn.ad': '▶ Tonton iklan untuk ulangi level ini',
 }
 
 const vi: CoreDict = {
@@ -2385,6 +2435,11 @@ const vi: CoreDict = {
   'nm.round': 'Bảng {n}',
   'nm.clear': 'Hoàn thành bảng! +{n}',
   'nm.ad': '▶ Xem quảng cáo để trống ô đang chặn',
+  'game.flashnum': 'Số Trong Khoảnh Khắc',
+  'fn.level': 'Cấp {n}',
+  'fn.memorize': 'Ghi nhớ nhé!',
+  'fn.order': 'Chạm từ số nhỏ nhất',
+  'fn.ad': '▶ Xem quảng cáo để chơi lại cấp này',
 }
 
 const th: CoreDict = {
@@ -2592,6 +2647,11 @@ const th: CoreDict = {
   'nm.round': 'กระดานที่ {n}',
   'nm.clear': 'เต็มกระดาน! +{n}',
   'nm.ad': '▶ ดูโฆษณาเพื่อเคลียร์ช่องที่ขวางอยู่',
+  'game.flashnum': 'ตัวเลขพริบตา',
+  'fn.level': 'ระดับ {n}',
+  'fn.memorize': 'จำให้ดี!',
+  'fn.order': 'แตะจากเลขน้อยไปมาก',
+  'fn.ad': '▶ ดูโฆษณาเพื่อเล่นระดับนี้ใหม่',
 }
 
 const tr: CoreDict = {
@@ -2799,6 +2859,11 @@ const tr: CoreDict = {
   'nm.round': '{n}. tahta',
   'nm.clear': 'Tahta tamam! +{n}',
   'nm.ad': '▶ Reklam izle, tıkayan kutuyu boşalt',
+  'game.flashnum': 'Bir Anlık Sayılar',
+  'fn.level': '{n}. seviye',
+  'fn.memorize': 'Ezberle!',
+  'fn.order': 'En küçük sayıdan başla',
+  'fn.ad': '▶ Reklam izle, bu seviyeyi yeniden oyna',
 }
 
 const messages: Record<Locale, CoreDict> = {

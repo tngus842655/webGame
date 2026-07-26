@@ -123,4 +123,9 @@ export const GAMES: GameMeta[] = [
     titleKey: 'game.numorder',
     loader: () => import('./numorder'),
   },
+  {
+    slug: 'flashnum',
+    titleKey: 'game.flashnum',
+    loader: () => import('./flashnum'),
+  },
 ]

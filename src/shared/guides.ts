@@ -131,6 +131,11 @@ const ko: Record<string, Guide> = {
     how: '테두리가 살아 있는 칸을 탭하면 손에 든 카드가 들어갑니다.',
     score: '뒤로 갈수록 한 칸에 주는 점수가 커지고, 16칸을 다 채우면 300점을 더 받고 새 판이 시작됩니다.',
   },
+  flashnum: {
+    goal: '물방울에 적힌 숫자가 잠깐만 보입니다. 사라진 뒤 작은 수부터 순서대로 터뜨리세요. 세 번 틀리면 끝입니다.',
+    how: '숫자를 외웠다가 순서대로 탭하세요. 첫 물방울을 누르는 순간 남은 숫자도 지워집니다.',
+    score: '단계를 넘길 때마다 점수를 받고, 물방울이 많은 단계일수록 많이 받습니다.',
+  },
 }
 
 const en: Record<string, Guide> = {
@@ -253,6 +258,11 @@ const en: Record<string, Guide> = {
     goal: 'Slot each card so the column grows from top to bottom. When no slot fits the card, the run ends.',
     how: 'Tap one of the outlined slots to drop the card you are holding.',
     score: 'Later slots pay more, and filling all 16 adds 300 and starts a fresh board.',
+  },
+  flashnum: {
+    goal: 'The numbers on the drops show for only a moment. Once they vanish, pop the drops from the smallest number up. Three mistakes end the run.',
+    how: 'Memorize them, then tap in order — the first tap also wipes the remaining numbers.',
+    score: 'Every level cleared pays out, and levels with more drops pay more.',
   },
 }
 
@@ -377,6 +387,11 @@ const ja: Record<string, Guide> = {
     how: '枠線が光っているマスをタップすると手持ちのカードが入ります。',
     score: '後半の枠ほど点数が高く、16枠すべて埋めると300点を追加して新しい盤が始まります。',
   },
+  flashnum: {
+    goal: '水滴の数字は一瞬しか見えません。消えたあと小さい数から順に割りましょう。3回間違えると終了です。',
+    how: '数字を覚えて順番にタップします。最初の水滴を押した瞬間、残りの数字も消えます。',
+    score: '段階を突破するたびに得点し、水滴が多い段階ほど高得点です。',
+  },
 }
 
 const zhCN: Record<string, Guide> = {
@@ -499,6 +514,11 @@ const zhCN: Record<string, Guide> = {
     goal: '把卡片放进空格，让数字从上到下越来越大。没有格子可放时结束。',
     how: '点击带亮边框的格子，手上的卡片就会放进去。',
     score: '越靠后的格子分数越高，填满16格再加300分并开始新的一盘。',
+  },
+  flashnum: {
+    goal: '水珠上的数字只显示一瞬间。消失后请从最小的数开始依次点破。错三次结束。',
+    how: '记住数字后按顺序点击。点下第一颗水珠时，剩下的数字也会消失。',
+    score: '每过一关都会得分，水珠越多的关卡分数越高。',
   },
 }
 
@@ -623,6 +643,11 @@ const es: Record<string, Guide> = {
     how: 'Toca una de las casillas resaltadas para soltar la carta que tienes.',
     score: 'Las casillas más avanzadas pagan más, y llenar las 16 suma 300 y abre un tablero nuevo.',
   },
+  flashnum: {
+    goal: 'Los números de las gotas solo se ven un instante. Cuando desaparezcan, reviéntalas del número más bajo al más alto. Tres fallos y termina.',
+    how: 'Memorízalos y toca en orden: el primer toque también borra los números restantes.',
+    score: 'Cada nivel superado da puntos, y los niveles con más gotas dan más.',
+  },
 }
 
 const ptBR: Record<string, Guide> = {
@@ -745,6 +770,11 @@ const ptBR: Record<string, Guide> = {
     goal: 'Encaixe cada carta para a coluna crescer de cima para baixo. Quando nenhuma casa serve, a partida acaba.',
     how: 'Toque numa das casas destacadas para soltar a carta que está na mão.',
     score: 'Casas mais avançadas valem mais, e preencher todas as 16 soma 300 e abre um tabuleiro novo.',
+  },
+  flashnum: {
+    goal: 'Os números nas gotas aparecem só por um instante. Depois que somem, estoure do menor para o maior. Três erros encerram a partida.',
+    how: 'Memorize e toque em ordem — o primeiro toque também apaga os números restantes.',
+    score: 'Cada nível vencido dá pontos, e níveis com mais gotas valem mais.',
   },
 }
 
@@ -869,6 +899,11 @@ const fr: Record<string, Guide> = {
     how: 'Touche une des cases entourées pour y déposer la carte en main.',
     score: 'Les cases tardives rapportent plus, et remplir les 16 ajoute 300 points et lance un nouveau plateau.',
   },
+  flashnum: {
+    goal: 'Les nombres sur les gouttes ne s\'affichent qu\'un instant. Une fois disparus, éclate-les du plus petit au plus grand. Trois erreurs et c\'est fini.',
+    how: 'Mémorise puis touche dans l\'ordre : la première touche effface aussi les nombres restants.',
+    score: 'Chaque niveau réussi rapporte, et plus il y a de gouttes plus ça rapporte.',
+  },
 }
 
 const de: Record<string, Guide> = {
@@ -991,6 +1026,11 @@ const de: Record<string, Guide> = {
     goal: 'Setze jede Karte so, dass die Spalte von oben nach unten wächst. Passt keine Lücke mehr, ist die Runde vorbei.',
     how: 'Tippe auf ein umrandetes Fach, um die Karte in der Hand abzulegen.',
     score: 'Späte Fächer bringen mehr, und alle 16 gefüllt gibt 300 extra und ein neues Feld.',
+  },
+  flashnum: {
+    goal: 'Die Zahlen auf den Tropfen sind nur kurz zu sehen. Sind sie weg, platze sie von der kleinsten Zahl aufwärts. Drei Fehler beenden die Runde.',
+    how: 'Merken und dann der Reihe nach tippen – der erste Tipp löscht auch die übrigen Zahlen.',
+    score: 'Jede geschaffte Stufe bringt Punkte, Stufen mit mehr Tropfen mehr.',
   },
 }
 
@@ -1115,6 +1155,11 @@ const ru: Record<string, Guide> = {
     how: 'Нажмите на подсвеченную ячейку, чтобы положить карту из руки.',
     score: 'Чем дальше ячейка, тем больше очков; все 16 заполнены — плюс 300 и новое поле.',
   },
+  flashnum: {
+    goal: 'Числа на капли показывают лишь на мгновение. Когда они исчезнут, лопайте капли от меньшего числа к большему. Три ошибки — конец.',
+    how: 'Запомните и нажимайте по порядку — первое нажатие тоже стирает остальные числа.',
+    score: 'За каждый пройденный уровень дают очки, и чем больше капель, тем больше.',
+  },
 }
 
 const id: Record<string, Guide> = {
@@ -1237,6 +1282,11 @@ const id: Record<string, Guide> = {
     goal: 'Sisipkan tiap kartu agar angkanya membesar dari atas ke bawah. Kalau tak ada kotak yang cocok, permainan berakhir.',
     how: 'Ketuk salah satu kotak bergaris untuk menaruh kartu di tangan.',
     score: 'Kotak yang lebih belakang bernilai lebih besar, dan mengisi 16 kotak menambah 300 lalu membuka papan baru.',
+  },
+  flashnum: {
+    goal: 'Angka di tetesan hanya tampak sekejap. Setelah hilang, pecahkan dari angka terkecil. Tiga kesalahan berarti tamat.',
+    how: 'Hafalkan lalu ketuk berurutan — ketukan pertama juga menghapus angka sisanya.',
+    score: 'Setiap level yang lewat memberi poin, dan level dengan lebih banyak tetesan bernilai lebih besar.',
   },
 }
 
@@ -1361,6 +1411,11 @@ const vi: Record<string, Guide> = {
     how: 'Chạm vào ô đang được viền sáng để đặt thẻ đang giữ.',
     score: 'Ô càng về sau càng nhiều điểm, đầy cả 16 ô được thêm 300 và mở bảng mới.',
   },
+  flashnum: {
+    goal: 'Số trên các giọt nước chỉ hiện trong khoảnh khắc. Khi chúng biến mất, hãy bấm nổ từ số nhỏ nhất. Sai ba lần là kết thúc.',
+    how: 'Ghi nhớ rồi chạm theo thứ tự — cú chạm đầu tiên cũng xoá các số còn lại.',
+    score: 'Mỗi cấp vượt qua đều được điểm, cấp càng nhiều giọt càng nhiều điểm.',
+  },
 }
 
 const th: Record<string, Guide> = {
@@ -1484,6 +1539,11 @@ const th: Record<string, Guide> = {
     how: 'แตะช่องที่มีขอบเรืองแสงเพื่อวางการ์ดที่ถืออยู่',
     score: 'ช่องท้าย ๆ ได้คะแนนมากขึ้น เต็มทั้ง 16 ช่องได้เพิ่ม 300 แล้วเริ่มกระดานใหม่',
   },
+  flashnum: {
+    goal: 'ตัวเลขบนหยดน้ำจะโชว์เพียงเสี้ยววินาที เมื่อหายไปให้แตะไล่จากเลขน้อยไปมาก ผิดสามครั้งจบเกม',
+    how: 'จำให้ได้แล้วแตะตามลำดับ การแตะครั้งแรกจะลบตัวเลขที่เหลือด้วย',
+    score: 'ผ่านแต่ละระดับได้คะแนน ระดับที่มีหยดน้ำมากได้คะแนนมากกว่า',
+  },
 }
 
 const tr: Record<string, Guide> = {
@@ -1606,6 +1666,11 @@ const tr: Record<string, Guide> = {
     goal: 'Kartları, sayılar yukarıdan aşağıya büyüyecek şekilde boş kutulara yerleştir. Uyan kutu kalmazsa oyun biter.',
     how: 'Elindeki kartı bırakmak için çerçevesi parlayan kutulardan birine dokun.',
     score: 'Sondaki kutular daha çok puan verir; 16 kutunun tamamı dolarsa 300 puan eklenir ve yeni tahta açılır.',
+  },
+  flashnum: {
+    goal: 'Damlaların üstündeki sayılar yalnızca bir an görünür. Kaybolduktan sonra en küçük sayıdan başlayarak patlat. Üç hata oyunu bitirir.',
+    how: 'Ezberle ve sırayla dokun — ilk dokunuş kalan sayıları da siler.',
+    score: 'Geçilen her seviye puan verir, damla sayısı arttıkça puan da artar.',
   },
 }
 const TABLES: Record<Locale, Record<string, Guide>> = {
