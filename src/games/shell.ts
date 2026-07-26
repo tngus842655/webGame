@@ -10,12 +10,25 @@ export interface GameShell {
   destroy(): void
 }
 
+// 실행 중인 셸 (한 번에 한 게임) — 가이드 팝업처럼 화면을 덮을 때 잠시 멈추기 위해 모아둔다.
+// 게임 코드는 rAF 루프를 직접 다루지 않으므로 여기서만 관리하면 된다
+const running = new Set<{ pause(): void; resume(): void }>()
+
+export function pauseRunningGame() {
+  for (const shell of running) shell.pause()
+}
+
+export function resumeRunningGame() {
+  for (const shell of running) shell.resume()
+}
+
 export function createGameShell(host: HTMLElement, onFrame: (dt: number) => void): GameShell {
   const wrapper = document.createElement('div')
   wrapper.style.cssText = 'position:absolute;inset:0;overflow:hidden;'
   host.appendChild(wrapper)
 
   let destroyed = false
+  let paused = false
   const cleanups: Array<() => void> = []
 
   let rafId = 0
@@ -26,33 +39,47 @@ export function createGameShell(host: HTMLElement, onFrame: (dt: number) => void
     last = now
     onFrame(dt)
   }
+  // 멈췄다 돌아올 때 그동안의 시간이 한 프레임에 몰리지 않도록 기준을 다시 잡는다
+  const startLoop = () => {
+    last = performance.now()
+    rafId = requestAnimationFrame(frame)
+  }
   const onVisibility = () => {
     if (destroyed) return
-    if (document.hidden) {
-      cancelAnimationFrame(rafId)
-    } else {
-      last = performance.now()
-      rafId = requestAnimationFrame(frame)
-    }
+    if (document.hidden) cancelAnimationFrame(rafId)
+    else if (!paused) startLoop()
   }
   document.addEventListener('visibilitychange', onVisibility)
-  rafId = requestAnimationFrame(frame)
+  startLoop()
 
-  return {
+  const shell = {
     wrapper,
     isDestroyed: () => destroyed,
-    addCleanup(fn) {
+    addCleanup(fn: () => void) {
       cleanups.push(fn)
+    },
+    pause() {
+      if (destroyed || paused) return
+      paused = true
+      cancelAnimationFrame(rafId)
+    },
+    resume() {
+      if (destroyed || !paused) return
+      paused = false
+      if (!document.hidden) startLoop()
     },
     destroy() {
       if (destroyed) return
       destroyed = true
+      running.delete(shell)
       cancelAnimationFrame(rafId)
       document.removeEventListener('visibilitychange', onVisibility)
       for (const fn of cleanups.reverse()) fn()
       wrapper.remove()
     },
   }
+  running.add(shell)
+  return shell
 }
 
 export interface GameSession {

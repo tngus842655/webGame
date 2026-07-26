@@ -1,0 +1,96 @@
+<script setup lang="ts">
+// 게임 설명 팝업 — 플레이 화면의 ? 버튼으로 연다.
+// 게임 화면 위에 뜨므로 바깥을 눌러도 닫히지 않는다 (오터치로 사라지면 성가시다)
+import { guideFor } from './guides'
+import { t } from './i18n'
+
+const props = defineProps<{ slug: string; title: string }>()
+defineEmits<{ close: [] }>()
+
+const guide = guideFor(props.slug)
+</script>
+
+<template>
+  <div class="guide-backdrop">
+    <div class="guide-card" role="dialog" aria-modal="true">
+      <h2>{{ title }}</h2>
+
+      <dl v-if="guide">
+        <div class="row">
+          <dt><span aria-hidden="true">🎯</span> {{ t('guide.goal') }}</dt>
+          <dd>{{ guide.goal }}</dd>
+        </div>
+        <div class="row">
+          <dt><span aria-hidden="true">👆</span> {{ t('guide.how') }}</dt>
+          <dd>{{ guide.how }}</dd>
+        </div>
+        <div class="row">
+          <dt><span aria-hidden="true">⭐</span> {{ t('guide.score') }}</dt>
+          <dd>{{ guide.score }}</dd>
+        </div>
+      </dl>
+
+      <button type="button" class="close" @click="$emit('close')">{{ t('guide.close') }}</button>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.guide-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgb(38 26 22 / 0.66);
+}
+
+.guide-card {
+  width: 100%;
+  max-width: 360px;
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 22px 20px 18px;
+  border-radius: 22px;
+  background: #fffdf7;
+  color: #4e342e;
+  box-shadow: 0 18px 40px rgb(0 0 0 / 0.28);
+}
+
+.guide-card h2 {
+  margin-bottom: 16px;
+  font-size: 21px;
+  text-align: center;
+}
+
+.row + .row {
+  margin-top: 14px;
+}
+
+dt {
+  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: bold;
+  color: #a1887f;
+}
+
+dd {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.close {
+  width: 100%;
+  margin-top: 22px;
+  padding: 13px;
+  border: none;
+  border-radius: 16px;
+  background: #43a047;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+</style>
