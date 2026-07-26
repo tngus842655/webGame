@@ -108,4 +108,54 @@ export const GAMES: GameMeta[] = [
     titleKey: 'game.autochess',
     loader: () => import('./autochess'),
   },
+  {
+    slug: 'stack',
+    titleKey: 'game.stack',
+    loader: () => import('./stack'),
+  },
+  {
+    slug: 'sortgate',
+    titleKey: 'game.sortgate',
+    loader: () => import('./sortgate'),
+  },
+  {
+    slug: 'numorder',
+    titleKey: 'game.numorder',
+    loader: () => import('./numorder'),
+  },
+  {
+    slug: 'flashnum',
+    titleKey: 'game.flashnum',
+    loader: () => import('./flashnum'),
+  },
+  {
+    slug: 'paperboat',
+    titleKey: 'game.paperboat',
+    loader: () => import('./paperboat'),
+  },
+  {
+    slug: 'samepic',
+    titleKey: 'game.samepic',
+    loader: () => import('./samepic'),
+  },
+  {
+    slug: 'comet',
+    titleKey: 'game.comet',
+    loader: () => import('./comet'),
+  },
+  {
+    slug: 'iceslide',
+    titleKey: 'game.iceslide',
+    loader: () => import('./iceslide'),
+  },
+  {
+    slug: 'marblejar',
+    titleKey: 'game.marblejar',
+    loader: () => import('./marblejar'),
+  },
+  {
+    slug: 'bamboo',
+    titleKey: 'game.bamboo',
+    loader: () => import('./bamboo'),
+  },
 ]

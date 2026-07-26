@@ -116,6 +116,56 @@ const ko: Record<string, Guide> = {
     how: '상점에서 유닛을 사고, 같은 유닛을 겹쳐 끌면 한 단계 강해집니다.',
     score: '라운드를 오래 버틸수록 점수가 쌓입니다.',
   },
+  stack: {
+    goal: '좌우로 왕복하는 블록을 탑 꼭대기에 얹으세요. 삐져나온 만큼 폭이 깎이고, 얹을 폭이 남지 않으면 끝입니다.',
+    how: '화면 아무 곳이나 탭하면 그 자리에 놓입니다.',
+    score: '한 층에 10점. 정확히 맞추면 폭이 조금 돌아오고 연속으로 맞출수록 점수가 커집니다.',
+  },
+  sortgate: {
+    goal: '위쪽 두 상자의 기준을 보고 도형을 맞는 쪽으로 미세요. 기준은 몇 개마다 통째로 바뀌고, 바뀔 때 상자가 번쩍입니다. 세 번 틀리면 끝입니다.',
+    how: '좌우로 밀거나 화면의 좌우 절반을 탭하세요.',
+    score: '한 개에 20점, 연속으로 맞히면 최대 50점까지 오릅니다.',
+  },
+  numorder: {
+    goal: '카드를 위에서 아래로 커지도록 빈 칸에 끼워 넣으세요. 넣을 수 있는 칸이 없으면 끝입니다.',
+    how: '테두리가 살아 있는 칸을 탭하면 손에 든 카드가 들어갑니다.',
+    score: '뒤로 갈수록 한 칸에 주는 점수가 커지고, 16칸을 다 채우면 300점을 더 받고 새 판이 시작됩니다.',
+  },
+  flashnum: {
+    goal: '물방울에 적힌 숫자가 잠깐만 보입니다. 사라진 뒤 작은 수부터 순서대로 터뜨리세요. 세 번 틀리면 끝입니다.',
+    how: '숫자를 외웠다가 순서대로 탭하세요. 첫 물방울을 누르는 순간 남은 숫자도 지워집니다.',
+    score: '단계를 넘길 때마다 점수를 받고, 물방울이 많은 단계일수록 많이 받습니다.',
+  },
+  paperboat: {
+    goal: '들어오는 종이배를 같은 색 부두로 보내세요. 배끼리 부딪히면 끝입니다.',
+    how: '배를 짚고 부두까지 손가락으로 선을 그으면 그 길로 갑니다. 다시 그으면 항로가 바뀝니다.',
+    score: '한 척에 30점, 5초 안에 이어서 보내면 콤보가 붙어 최대 110점까지 오릅니다.',
+  },
+  samepic: {
+    goal: '위아래 원판에 공통으로 들어 있는 그림 하나를 찾아 탭하세요. 시간 게이지가 다하면 끝입니다.',
+    how: '어느 쪽 원판이든 그 그림을 탭하면 됩니다. 틀리면 2초를 잃습니다.',
+    score: '한 번에 30점, 연속으로 맞힐수록 최대 80점까지 오르고 맞힐 때마다 시간이 조금 회복됩니다.',
+  },
+  comet: {
+    goal: '솟아오르는 별똥별을 한 획으로 이어 터뜨리세요. 세 개를 놓치면 끝입니다.',
+    how: '화면을 쓸어 선을 그으면 선에 닿은 별똥별이 함께 터집니다. 손을 뗄 때까지가 한 획입니다.',
+    score: '한 획에 여러 개를 이을수록 배수가 붙습니다(5개 이상 3배). 하나씩 지우면 점수가 잘 오르지 않습니다.',
+  },
+  iceslide: {
+    goal: '별을 모두 주우면 다음 판으로 갑니다. 남은 이동 횟수를 다 쓰면 끝이에요.',
+    how: '상하좌우로 쓸면 벽이나 바위에 부딪힐 때까지 미끄러집니다. 판마다 되돌리기 3회가 공짜입니다.',
+    score: '별 하나에 50점, 판을 깰 때마다 100점 이상을 더 받습니다.',
+  },
+  marblejar: {
+    goal: '통 하나가 같은 색으로 가득 차면 비워지고 점수가 됩니다. 통에는 정해진 색이 없어요. 네 통이 다 차면 끝입니다.',
+    how: '구슬을 넣을 통을 탭하세요. 색이 섞인 통은 다시 비워지지 않으니 흐리게 표시됩니다.',
+    score: '구슬 하나에 5점, 통을 비울 때마다 120점. 비운 횟수가 쌓이면 나오는 색이 한 종씩 늘어납니다.',
+  },
+  bamboo: {
+    goal: '가지를 피해 대나무를 오르세요. 가지에 부딪히거나 시간 막대가 다하면 끝입니다.',
+    how: '화면 좌우 절반 중 가지가 없는 쪽을 탭하면 한 마디 오릅니다.',
+    score: '한 마디에 10점. 오를 때마다 시간이 조금 채워지므로 쉬면 그만큼 줄어듭니다.',
+  },
 }
 
 const en: Record<string, Guide> = {
@@ -223,6 +273,56 @@ const en: Record<string, Guide> = {
     goal: 'Buy units, place them, and win the auto battles. Losing costs health.',
     how: 'Buy from the shop and drag matching units together to upgrade them.',
     score: 'Score builds the longer you survive.',
+  },
+  stack: {
+    goal: 'Land the sliding block on top of your tower. Whatever hangs over is shaved off, and once there is nothing left to land on, the run ends.',
+    how: 'Tap anywhere to drop the block where it is.',
+    score: '10 per floor. A dead-centre landing wins back a little width and pays more the longer your streak holds.',
+  },
+  sortgate: {
+    goal: 'Read the two boxes up top and push each shape into the one it belongs to. The rule swaps every few shapes and the boxes flash when it does. Three mistakes end the run.',
+    how: 'Swipe left or right, or tap the left or right half of the screen.',
+    score: '20 per shape, rising to 50 as your streak grows.',
+  },
+  numorder: {
+    goal: 'Slot each card so the column grows from top to bottom. When no slot fits the card, the run ends.',
+    how: 'Tap one of the outlined slots to drop the card you are holding.',
+    score: 'Later slots pay more, and filling all 16 adds 300 and starts a fresh board.',
+  },
+  flashnum: {
+    goal: 'The numbers on the drops show for only a moment. Once they vanish, pop the drops from the smallest number up. Three mistakes end the run.',
+    how: 'Memorize them, then tap in order — the first tap also wipes the remaining numbers.',
+    score: 'Every level cleared pays out, and levels with more drops pay more.',
+  },
+  paperboat: {
+    goal: 'Send every paper boat to the dock of its colour. If two boats collide, the run ends.',
+    how: 'Touch a boat and draw a lane to the dock — it follows the line. Draw again to reroute it.',
+    score: '30 per boat, and docking again within 5 seconds builds a combo worth up to 110.',
+  },
+  samepic: {
+    goal: 'Find the one picture that appears on both discs and tap it. When the time gauge empties, the run ends.',
+    how: 'Tap that picture on either disc. A wrong tap costs 2 seconds.',
+    score: '30 per find, up to 80 on a streak, and every find gives a little time back.',
+  },
+  comet: {
+    goal: 'Chain the rising comets with a single stroke. Miss three and the run ends.',
+    how: 'Swipe across the screen — every comet the line touches pops. One stroke lasts until you lift your finger.',
+    score: 'More comets in one stroke means a bigger multiplier (3× from five up). Popping them one at a time barely scores.',
+  },
+  iceslide: {
+    goal: 'Collect every star to move on to the next board. Run out of moves and the game ends.',
+    how: 'Swipe in any direction and the penguin slides until a wall or rock stops it. Each board gives 3 free undos.',
+    score: '50 per star plus 100+ for each board cleared.',
+  },
+  marblejar: {
+    goal: 'A jar filled with a single colour empties out and scores. No jar has a fixed colour. When all four are full, the run ends.',
+    how: 'Tap the jar you want the marble to go in. A jar with mixed colours can never empty, so it is dimmed.',
+    score: '5 per marble and 120 per jar emptied. Every few jars emptied adds another colour to the mix.',
+  },
+  bamboo: {
+    goal: 'Climb the bamboo while dodging branches. Hit one, or let the time bar empty, and the run ends.',
+    how: 'Tap the left or right half — whichever side has no branch — to climb one joint.',
+    score: '10 per joint. Each climb tops the time bar up a little, so pausing drains it.',
   },
 }
 
@@ -332,6 +432,56 @@ const ja: Record<string, Guide> = {
     how: 'ショップで購入し、同じユニットどうしをドラッグして強化します。',
     score: '長く生き残るほど点数が伸びます。',
   },
+  stack: {
+    goal: '左右に往復するブロックを塔の上に乗せましょう。はみ出した分だけ幅が削られ、乗せる幅がなくなると終了です。',
+    how: '画面のどこでもタップするとその位置に置かれます。',
+    score: '1階ごとに10点。ぴったり乗せると幅が少し戻り、連続で決めるほど点数が伸びます。',
+  },
+  sortgate: {
+    goal: '上の二つの箱の基準を見て、図形を正しい側へ押し出しましょう。基準は数個ごとに丸ごと入れ替わり、その時は箱が光ります。3回間違えると終了です。',
+    how: '左右にスワイプするか、画面の左右半分をタップします。',
+    score: '1個20点、連続で正解すると最大50点まで上がります。',
+  },
+  numorder: {
+    goal: 'カードを上から下へ大きくなるように空き枠へ入れましょう。入る枠がなくなると終了です。',
+    how: '枠線が光っているマスをタップすると手持ちのカードが入ります。',
+    score: '後半の枠ほど点数が高く、16枠すべて埋めると300点を追加して新しい盤が始まります。',
+  },
+  flashnum: {
+    goal: '水滴の数字は一瞬しか見えません。消えたあと小さい数から順に割りましょう。3回間違えると終了です。',
+    how: '数字を覚えて順番にタップします。最初の水滴を押した瞬間、残りの数字も消えます。',
+    score: '段階を突破するたびに得点し、水滴が多い段階ほど高得点です。',
+  },
+  paperboat: {
+    goal: '入ってくる紙の舟を同じ色の桟橋へ送りましょう。舟同士がぶつかると終了です。',
+    how: '舟を押さえて桟橋まで線を引くとその通りに進みます。もう一度引けば航路を変えられます。',
+    score: '1隻30点、5秒以内に続けて送るとコンボがつき最大110点になります。',
+  },
+  samepic: {
+    goal: '上下の円盤に共通して入っている絵を一つ見つけてタップしましょう。時間ゲージが尽きると終了です。',
+    how: 'どちらの円盤でもその絵をタップすればOK。間違えると2秒失います。',
+    score: '1回30点、連続で当てるほど最大80点まで上がり、当てるたびに時間が少し戻ります。',
+  },
+  comet: {
+    goal: '打ち上がる流れ星を一筆でつないで割りましょう。3個逃すと終了です。',
+    how: '画面をなぞって線を引くと、線に触れた流れ星がまとめて割れます。指を離すまでが一筆です。',
+    score: '一筆で多くつなぐほど倍率が上がります（5個以上で3倍）。1個ずつ消すと点が伸びません。',
+  },
+  iceslide: {
+    goal: '星を全部集めると次の面へ進みます。残り移動回数を使い切ると終了です。',
+    how: '上下左右になぞると、壁か岩にぶつかるまで滑ります。面ごとに一手戻しが3回無料です。',
+    score: '星1つ50点、面をクリアするたびに100点以上。',
+  },
+  marblejar: {
+    goal: '筒が同じ色でいっぱいになると空になって得点です。筒に決まった色はありません。4本すべて埋まると終了です。',
+    how: '玉を入れる筒をタップします。色が混ざった筒は二度と空にならないので薄く表示されます。',
+    score: '玉1つ5点、筒を空けるごとに120点。空けた回数が増えると出る色が1種ずつ増えます。',
+  },
+  bamboo: {
+    goal: '枝を避けて竹をのぼりましょう。枝にぶつかるか時間ゲージが尽きると終了です。',
+    how: '画面の左右半分のうち枝がない側をタップすると1節のぼります。',
+    score: '1節10点。のぼるたびに時間が少し足されるので、休むと減っていきます。',
+  },
 }
 
 const zhCN: Record<string, Guide> = {
@@ -439,6 +589,56 @@ const zhCN: Record<string, Guide> = {
     goal: '购买单位并布阵，赢下自动战斗。战败会扣生命。',
     how: '在商店购买，把相同单位拖到一起升级。',
     score: '活得越久分数越高。',
+  },
+  stack: {
+    goal: '把左右移动的方块叠到塔顶。超出的部分会被削掉，没有落脚的宽度就结束。',
+    how: '点击屏幕任意位置即可放下方块。',
+    score: '每层10分。正中叠放能收回一点宽度，连续命中得分更高。',
+  },
+  sortgate: {
+    goal: '看清上方两个箱子的标准，把图形推向正确的一侧。标准每隔几个就会整体更换，更换时箱子会闪烁。错三次结束。',
+    how: '左右滑动，或点击屏幕左右半边。',
+    score: '每个20分，连对越多最高可达50分。',
+  },
+  numorder: {
+    goal: '把卡片放进空格，让数字从上到下越来越大。没有格子可放时结束。',
+    how: '点击带亮边框的格子，手上的卡片就会放进去。',
+    score: '越靠后的格子分数越高，填满16格再加300分并开始新的一盘。',
+  },
+  flashnum: {
+    goal: '水珠上的数字只显示一瞬间。消失后请从最小的数开始依次点破。错三次结束。',
+    how: '记住数字后按顺序点击。点下第一颗水珠时，剩下的数字也会消失。',
+    score: '每过一关都会得分，水珠越多的关卡分数越高。',
+  },
+  paperboat: {
+    goal: '把驶入的纸船送到同色码头。两船相撞就结束。',
+    how: '按住纸船画一条线到码头，它就会沿线行驶。再画一次可以改航道。',
+    score: '每艘30分，5秒内连续送达会累积连击，最高110分。',
+  },
+  samepic: {
+    goal: '找出上下圆盘共有的那一个图案并点它。时间条用完就结束。',
+    how: '在任意一个圆盘上点那个图案即可。点错会失去2秒。',
+    score: '每次30分，连对最高可到80分，每次答对还会回一点时间。',
+  },
+  comet: {
+    goal: '用一笔把升起的流星连起来击破。漏掉三颗就结束。',
+    how: '在屏幕上滑动画线，线碰到的流星会一起破。抬手前都算同一笔。',
+    score: '一笔连得越多倍率越高（5颗以上3倍）。一颗一颗消分数涨得很慢。',
+  },
+  iceslide: {
+    goal: '收齐所有星星即可进入下一盘。步数用完就结束。',
+    how: '上下左右滑动，企鹅会一直滑到撞上墙或石头。每盘有3次免费撤销。',
+    score: '每颗星50分，每过一盘再加100分以上。',
+  },
+  marblejar: {
+    goal: '筒里装满同一种颜色就会清空并得分。筒本身没有固定颜色。四个筒都满了就结束。',
+    how: '点击想放入的筒。混色的筒再也无法清空，所以会变暗。',
+    score: '每颗弹珠5分，清空一个筒120分。清空次数累积后出现的颜色会多一种。',
+  },
+  bamboo: {
+    goal: '避开竹枝往上爬。撞到枝条或时间条耗尽就结束。',
+    how: '点击屏幕左右半边中没有竹枝的一侧，就往上爬一节。',
+    score: '每节10分。每爬一节会补一点时间，所以停下来就会减少。',
   },
 }
 
@@ -548,6 +748,56 @@ const es: Record<string, Guide> = {
     how: 'Compra en la tienda y arrastra unidades iguales para mejorarlas.',
     score: 'Cuanto más sobrevivas, más puntos.',
   },
+  stack: {
+    goal: 'Coloca el bloque que se desliza sobre la torre. Lo que sobresale se recorta y, cuando no queda ancho, termina la partida.',
+    how: 'Toca en cualquier parte para soltar el bloque donde está.',
+    score: '10 por piso. Un centrado perfecto recupera algo de ancho y paga más en racha.',
+  },
+  sortgate: {
+    goal: 'Mira el criterio de las dos cajas y empuja cada figura al lado correcto. El criterio cambia por completo cada pocas figuras y las cajas destellan al cambiar. Tres fallos y termina.',
+    how: 'Desliza a izquierda o derecha, o toca la mitad izquierda o derecha de la pantalla.',
+    score: '20 por figura, hasta 50 según crece tu racha.',
+  },
+  numorder: {
+    goal: 'Coloca cada carta para que la columna crezca de arriba abajo. Si ninguna casilla sirve, termina la partida.',
+    how: 'Toca una de las casillas resaltadas para soltar la carta que tienes.',
+    score: 'Las casillas más avanzadas pagan más, y llenar las 16 suma 300 y abre un tablero nuevo.',
+  },
+  flashnum: {
+    goal: 'Los números de las gotas solo se ven un instante. Cuando desaparezcan, reviéntalas del número más bajo al más alto. Tres fallos y termina.',
+    how: 'Memorízalos y toca en orden: el primer toque también borra los números restantes.',
+    score: 'Cada nivel superado da puntos, y los niveles con más gotas dan más.',
+  },
+  paperboat: {
+    goal: 'Lleva cada barco de papel al muelle de su color. Si dos barcos chocan, termina la partida.',
+    how: 'Toca un barco y traza una ruta hasta el muelle; el barco la sigue. Vuelve a trazarla para cambiarla.',
+    score: '30 por barco, y atracar otro en menos de 5 segundos crea una racha de hasta 110.',
+  },
+  samepic: {
+    goal: 'Encuentra el único dibujo que está en los dos discos y tócalo. Cuando la barra de tiempo se agota, termina.',
+    how: 'Tócalo en cualquiera de los dos discos. Un fallo cuesta 2 segundos.',
+    score: '30 por acierto, hasta 80 en racha, y cada acierto devuelve algo de tiempo.',
+  },
+  comet: {
+    goal: 'Enlaza los cometas que suben con un solo trazo. Con tres fallos termina la partida.',
+    how: 'Desliza por la pantalla: todo cometa que toque la línea estalla. Un trazo dura hasta que levantas el dedo.',
+    score: 'Más cometas en un trazo, mayor multiplicador (3× desde cinco). De uno en uno casi no puntúa.',
+  },
+  iceslide: {
+    goal: 'Recoge todas las estrellas para pasar al siguiente tablero. Si se acaban los movimientos, termina.',
+    how: 'Desliza en cualquier dirección y el pingüino patina hasta que un muro o roca lo detenga. Cada tablero da 3 deshacer gratis.',
+    score: '50 por estrella y 100+ por tablero superado.',
+  },
+  marblejar: {
+    goal: 'Un tarro lleno de un solo color se vacía y puntúa. Ningún tarro tiene color fijo. Cuando los cuatro se llenan, termina.',
+    how: 'Toca el tarro donde quieres la canica. Un tarro con colores mezclados ya no puede vaciarse y se atenúa.',
+    score: '5 por canica y 120 por tarro vaciado. Cada pocos vaciados entra un color más en juego.',
+  },
+  bamboo: {
+    goal: 'Trepa el bambú esquivando las ramas. Si chocas o se agota la barra de tiempo, termina.',
+    how: 'Toca la mitad izquierda o derecha, la que no tenga rama, para subir un nudo.',
+    score: '10 por nudo. Cada subida rellena un poco el tiempo, así que pararse lo consume.',
+  },
 }
 
 const ptBR: Record<string, Guide> = {
@@ -655,6 +905,56 @@ const ptBR: Record<string, Guide> = {
     goal: 'Compre unidades, posicione-as e vença as batalhas automáticas. Perder custa vida.',
     how: 'Compre na loja e arraste unidades iguais para melhorá-las.',
     score: 'Quanto mais sobreviver, mais pontos.',
+  },
+  stack: {
+    goal: 'Encaixe o bloco deslizante no topo da torre. O que sobra é cortado e, quando não resta largura, a partida acaba.',
+    how: 'Toque em qualquer lugar para soltar o bloco onde ele está.',
+    score: '10 por andar. Acertar no centro devolve um pouco de largura e vale mais em sequência.',
+  },
+  sortgate: {
+    goal: 'Olhe o critério das duas caixas e empurre cada figura para o lado certo. O critério muda por completo a cada poucas figuras e as caixas piscam quando isso acontece. Três erros encerram a partida.',
+    how: 'Deslize para a esquerda ou direita, ou toque na metade esquerda ou direita da tela.',
+    score: '20 por figura, chegando a 50 conforme a sequência cresce.',
+  },
+  numorder: {
+    goal: 'Encaixe cada carta para a coluna crescer de cima para baixo. Quando nenhuma casa serve, a partida acaba.',
+    how: 'Toque numa das casas destacadas para soltar a carta que está na mão.',
+    score: 'Casas mais avançadas valem mais, e preencher todas as 16 soma 300 e abre um tabuleiro novo.',
+  },
+  flashnum: {
+    goal: 'Os números nas gotas aparecem só por um instante. Depois que somem, estoure do menor para o maior. Três erros encerram a partida.',
+    how: 'Memorize e toque em ordem — o primeiro toque também apaga os números restantes.',
+    score: 'Cada nível vencido dá pontos, e níveis com mais gotas valem mais.',
+  },
+  paperboat: {
+    goal: 'Leve cada barco de papel ao cais da sua cor. Se dois barcos colidirem, a partida acaba.',
+    how: 'Toque num barco e trace uma rota até o cais; ele segue a linha. Trace de novo para mudar.',
+    score: '30 por barco, e atracar outro em até 5 segundos forma combo de até 110.',
+  },
+  samepic: {
+    goal: 'Ache o único desenho que está nos dois discos e toque nele. Quando a barra de tempo zera, a partida acaba.',
+    how: 'Toque nele em qualquer um dos discos. Errar custa 2 segundos.',
+    score: '30 por acerto, até 80 em sequência, e cada acerto devolve um pouco de tempo.',
+  },
+  comet: {
+    goal: 'Ligue os cometas que sobem com um único traço. Perder três encerra a partida.',
+    how: 'Deslize pela tela: todo cometa que a linha tocar estoura. Um traço vale até você soltar o dedo.',
+    score: 'Mais cometas num traço, maior o multiplicador (3× a partir de cinco). Um por um quase não pontua.',
+  },
+  iceslide: {
+    goal: 'Junte todas as estrelas para ir ao próximo tabuleiro. Se os movimentos acabarem, o jogo termina.',
+    how: 'Deslize em qualquer direção e o pinguim escorrega até parar numa parede ou pedra. Cada tabuleiro dá 3 desfazer grátis.',
+    score: '50 por estrela e 100+ por tabuleiro concluído.',
+  },
+  marblejar: {
+    goal: 'Um pote cheio de uma só cor se esvazia e pontua. Nenhum pote tem cor fixa. Quando os quatro enchem, a partida acaba.',
+    how: 'Toque no pote onde quer a bolinha. Um pote com cores misturadas nunca mais esvazia, por isso fica apagado.',
+    score: '5 por bolinha e 120 por pote esvaziado. A cada poucos potes entra mais uma cor no jogo.',
+  },
+  bamboo: {
+    goal: 'Suba o bambu desviando dos galhos. Se bater num galho ou a barra de tempo zerar, a partida acaba.',
+    how: 'Toque na metade esquerda ou direita — a que não tem galho — para subir um nó.',
+    score: '10 por nó. Cada subida repõe um pouco de tempo, então parar consome.',
   },
 }
 
@@ -764,6 +1064,56 @@ const fr: Record<string, Guide> = {
     how: 'Achète en boutique et fais glisser deux unités identiques pour les améliorer.',
     score: 'Plus tu survis, plus tu marques.',
   },
+  stack: {
+    goal: 'Pose le bloc qui glisse au sommet de la tour. Ce qui dépasse est rogné, et quand il ne reste plus de largeur, la partie s\'arrête.',
+    how: 'Touche n\'importe où pour lâcher le bloc à sa position.',
+    score: '10 par étage. Un centrage parfait récupère un peu de largeur et rapporte plus en série.',
+  },
+  sortgate: {
+    goal: 'Lis le critère des deux boîtes et pousse chaque forme du bon côté. Le critère change entièrement toutes les quelques formes, et les boîtes clignotent à ce moment-là. Trois erreurs et c\'est fini.',
+    how: 'Balaye à gauche ou à droite, ou touche la moitié gauche ou droite de l\'écran.',
+    score: '20 par forme, jusqu\'à 50 selon ta série.',
+  },
+  numorder: {
+    goal: 'Place chaque carte pour que la colonne grandisse de haut en bas. Si aucune case ne convient, la partie s\'arrête.',
+    how: 'Touche une des cases entourées pour y déposer la carte en main.',
+    score: 'Les cases tardives rapportent plus, et remplir les 16 ajoute 300 points et lance un nouveau plateau.',
+  },
+  flashnum: {
+    goal: 'Les nombres sur les gouttes ne s\'affichent qu\'un instant. Une fois disparus, éclate-les du plus petit au plus grand. Trois erreurs et c\'est fini.',
+    how: 'Mémorise puis touche dans l\'ordre : la première touche effface aussi les nombres restants.',
+    score: 'Chaque niveau réussi rapporte, et plus il y a de gouttes plus ça rapporte.',
+  },
+  paperboat: {
+    goal: 'Amène chaque bateau en papier au quai de sa couleur. Si deux bateaux se heurtent, la partie s\'arrête.',
+    how: 'Touche un bateau et trace une voie jusqu\'au quai : il la suit. Retrace pour changer d\'itinéraire.',
+    score: '30 par bateau, et accoster de nouveau en moins de 5 secondes monte un combo jusqu\'à 110.',
+  },
+  samepic: {
+    goal: 'Trouve le seul dessin présent sur les deux disques et touche-le. Quand la jauge de temps est vide, c\'est fini.',
+    how: 'Touche-le sur l\'un ou l\'autre disque. Une erreur coûte 2 secondes.',
+    score: '30 par trouvaille, jusqu\'à 80 en série, et chaque trouvaille rend un peu de temps.',
+  },
+  comet: {
+    goal: 'Relie les comètes qui montent d\'un seul trait. Trois ratés et la partie s\'arrête.',
+    how: 'Balaye l\'écran : chaque comète touchée par la ligne éclate. Un trait dure jusqu\'à ce que tu lèves le doigt.',
+    score: 'Plus de comètes dans un trait, plus le multiplicateur monte (3× à partir de cinq). Une par une rapporte à peine.',
+  },
+  iceslide: {
+    goal: 'Ramasse toutes les étoiles pour passer au plateau suivant. Plus de coups, partie terminée.',
+    how: 'Balaye dans une direction : le pingouin glisse jusqu\'à un mur ou un rocher. Chaque plateau offre 3 annulations gratuites.',
+    score: '50 par étoile et 100+ par plateau réussi.',
+  },
+  marblejar: {
+    goal: 'Un bocal rempli d\'une seule couleur se vide et rapporte des points. Aucun bocal n\'a de couleur fixe. Quand les quatre sont pleins, c\'est fini.',
+    how: 'Touche le bocal où mettre la bille. Un bocal aux couleurs mélangées ne se vide plus, il est donc grisé.',
+    score: '5 par bille et 120 par bocal vidé. Tous les quelques bocaux vidés, une couleur de plus entre en jeu.',
+  },
+  bamboo: {
+    goal: 'Grimpe le bambou en évitant les branches. Une collision ou la jauge de temps vide et c\'est fini.',
+    how: 'Touche la moitié gauche ou droite — celle sans branche — pour monter d\'un nœud.',
+    score: '10 par nœud. Chaque montée remplit un peu la jauge, donc s\'arrêter la vide.',
+  },
 }
 
 const de: Record<string, Guide> = {
@@ -871,6 +1221,56 @@ const de: Record<string, Guide> = {
     goal: 'Kauf Einheiten, stell sie auf und gewinn die automatischen Kämpfe. Verlieren kostet Gesundheit.',
     how: 'Im Laden kaufen und gleiche Einheiten aufeinanderziehen zum Aufwerten.',
     score: 'Je länger du überlebst, desto mehr Punkte.',
+  },
+  stack: {
+    goal: 'Setze den pendelnden Block oben auf den Turm. Was übersteht, wird abgeschnitten – bleibt keine Breite übrig, ist Schluss.',
+    how: 'Tippe irgendwo, um den Block dort abzusetzen.',
+    score: '10 pro Etage. Ein perfekt zentrierter Block gibt etwas Breite zurück und bringt in Serie mehr.',
+  },
+  sortgate: {
+    goal: 'Lies das Kriterium der beiden Kisten und schiebe jede Form auf die richtige Seite. Alle paar Formen wird das Kriterium komplett getauscht – dann blinken die Kisten. Drei Fehler beenden die Runde.',
+    how: 'Nach links oder rechts wischen oder die linke bzw. rechte Bildschirmhälfte antippen.',
+    score: '20 pro Form, mit wachsender Serie bis zu 50.',
+  },
+  numorder: {
+    goal: 'Setze jede Karte so, dass die Spalte von oben nach unten wächst. Passt keine Lücke mehr, ist die Runde vorbei.',
+    how: 'Tippe auf ein umrandetes Fach, um die Karte in der Hand abzulegen.',
+    score: 'Späte Fächer bringen mehr, und alle 16 gefüllt gibt 300 extra und ein neues Feld.',
+  },
+  flashnum: {
+    goal: 'Die Zahlen auf den Tropfen sind nur kurz zu sehen. Sind sie weg, platze sie von der kleinsten Zahl aufwärts. Drei Fehler beenden die Runde.',
+    how: 'Merken und dann der Reihe nach tippen – der erste Tipp löscht auch die übrigen Zahlen.',
+    score: 'Jede geschaffte Stufe bringt Punkte, Stufen mit mehr Tropfen mehr.',
+  },
+  paperboat: {
+    goal: 'Bring jedes Papierboot zum Anleger seiner Farbe. Stoßen zwei Boote zusammen, ist die Runde vorbei.',
+    how: 'Boot antippen und eine Route zum Anleger ziehen – es folgt der Linie. Neu ziehen ändert die Route.',
+    score: '30 pro Boot; ein weiteres innerhalb von 5 Sekunden baut eine Serie bis 110 auf.',
+  },
+  samepic: {
+    goal: 'Finde das eine Bild, das auf beiden Scheiben vorkommt, und tippe es an. Ist die Zeitleiste leer, ist Schluss.',
+    how: 'Tippe es auf einer der beiden Scheiben an. Ein Fehler kostet 2 Sekunden.',
+    score: '30 pro Treffer, in Serie bis 80, und jeder Treffer gibt etwas Zeit zurück.',
+  },
+  comet: {
+    goal: 'Verbinde die aufsteigenden Sternschnuppen mit einem Strich. Drei verpasste beenden die Runde.',
+    how: 'Über den Bildschirm wischen – jede berührte Sternschnuppe platzt. Ein Strich zählt, bis du den Finger hebst.',
+    score: 'Mehr Treffer pro Strich heißt höherer Multiplikator (ab fünf 3×). Einzeln abräumen bringt kaum Punkte.',
+  },
+  iceslide: {
+    goal: 'Sammle alle Sterne, um aufs nächste Feld zu kommen. Sind die Züge aufgebraucht, ist Schluss.',
+    how: 'In eine Richtung wischen – der Pinguin rutscht, bis Wand oder Fels ihn stoppt. Pro Feld gibt es 3 kostenlose Rücknahmen.',
+    score: '50 pro Stern und 100+ pro geschafftem Feld.',
+  },
+  marblejar: {
+    goal: 'Ein Glas voll einer einzigen Farbe leert sich und bringt Punkte. Kein Glas hat eine feste Farbe. Sind alle vier voll, ist Schluss.',
+    how: 'Tippe das Glas an, in das die Murmel soll. Ein gemischtes Glas leert sich nie wieder und wird abgedunkelt.',
+    score: '5 pro Murmel und 120 pro geleertem Glas. Nach ein paar Leerungen kommt eine Farbe dazu.',
+  },
+  bamboo: {
+    goal: 'Klettere den Bambus hoch und weiche Ästen aus. Ein Treffer oder eine leere Zeitleiste beendet die Runde.',
+    how: 'Tippe die linke oder rechte Hälfte an – die ohne Ast – um einen Knoten höher zu steigen.',
+    score: '10 pro Knoten. Jeder Aufstieg füllt die Zeitleiste ein wenig, Pausen leeren sie.',
   },
 }
 
@@ -980,6 +1380,56 @@ const ru: Record<string, Guide> = {
     how: 'Покупайте в магазине и перетаскивайте одинаковых бойцов друг на друга для улучшения.',
     score: 'Чем дольше выживаете, тем больше очков.',
   },
+  stack: {
+    goal: 'Ставьте скользящий блок на вершину башни. Выступающая часть срезается, а когда ставить уже некуда — конец.',
+    how: 'Нажмите в любом месте, чтобы опустить блок там, где он есть.',
+    score: '10 за этаж. Точное попадание в центр возвращает немного ширины и даёт больше в серии.',
+  },
+  sortgate: {
+    goal: 'Смотрите на признак в двух ящиках и отправляйте фигуру в нужную сторону. Каждые несколько фигур признак полностью меняется — при этом ящики вспыхивают. Три ошибки — конец.',
+    how: 'Свайп влево или вправо либо нажатие на левую или правую половину экрана.',
+    score: '20 за фигуру, до 50 по мере роста серии.',
+  },
+  numorder: {
+    goal: 'Ставьте карты так, чтобы числа росли сверху вниз. Если подходящей ячейки нет — конец.',
+    how: 'Нажмите на подсвеченную ячейку, чтобы положить карту из руки.',
+    score: 'Чем дальше ячейка, тем больше очков; все 16 заполнены — плюс 300 и новое поле.',
+  },
+  flashnum: {
+    goal: 'Числа на капли показывают лишь на мгновение. Когда они исчезнут, лопайте капли от меньшего числа к большему. Три ошибки — конец.',
+    how: 'Запомните и нажимайте по порядку — первое нажатие тоже стирает остальные числа.',
+    score: 'За каждый пройденный уровень дают очки, и чем больше капель, тем больше.',
+  },
+  paperboat: {
+    goal: 'Отправляйте бумажные кораблики к причалу своего цвета. Если два столкнутся — конец.',
+    how: 'Коснитесь кораблика и проведите путь к причалу — он пойдёт по линии. Проведите снова, чтобы изменить.',
+    score: '30 за кораблик, а новая стыковка в течение 5 секунд наращивает серию до 110.',
+  },
+  samepic: {
+    goal: 'Найдите единственную картинку, которая есть на обоих кругах, и нажмите её. Когда шкала времени опустеет — конец.',
+    how: 'Нажмите её на любом из кругов. Ошибка стоит 2 секунды.',
+    score: '30 за находку, до 80 в серии, и каждая находка немного возвращает время.',
+  },
+  comet: {
+    goal: 'Соединяйте взлетающие кометы одним росчерком. Три промаха — конец.',
+    how: 'Проведите по экрану: каждая комета, которую задела линия, лопается. Росчерк длится, пока не отпустите палец.',
+    score: 'Чем больше комет за один росчерк, тем выше множитель (с пяти — 3×). По одной очков почти не даёт.',
+  },
+  iceslide: {
+    goal: 'Соберите все звёзды, чтобы перейти на следующее поле. Кончились ходы — конец.',
+    how: 'Свайп в любую сторону: пингвин скользит, пока его не остановит стена или камень. На каждом поле 3 бесплатные отмены.',
+    score: '50 за звезду и 100+ за пройденное поле.',
+  },
+  marblejar: {
+    goal: 'Банка, заполненная одним цветом, опустошается и даёт очки. Цвет банки не задан заранее. Когда все четыре полны — конец.',
+    how: 'Нажмите на банку, куда положить шарик. Банка со смешанными цветами уже никогда не опустеет — она затемнена.',
+    score: '5 за шарик и 120 за опустошённую банку. Через несколько опустошений в игру входит ещё один цвет.',
+  },
+  bamboo: {
+    goal: 'Поднимайтесь по бамбуку, уклоняясь от ветвей. Удар о ветку или пустая шкала времени — конец.',
+    how: 'Нажимайте на ту половину экрана, где нет ветки, — так подниметесь на одно колено.',
+    score: '10 за колено. Каждый подъём немного пополняет время, поэтому пауза его тратит.',
+  },
 }
 
 const id: Record<string, Guide> = {
@@ -1087,6 +1537,56 @@ const id: Record<string, Guide> = {
     goal: 'Beli unit, tempatkan, dan menangkan pertarungan otomatis. Kalah mengurangi nyawa.',
     how: 'Beli di toko dan seret unit yang sama untuk meningkatkannya.',
     score: 'Semakin lama bertahan, semakin tinggi nilainya.',
+  },
+  stack: {
+    goal: 'Tumpuk balok yang bergerak ke puncak menara. Bagian yang menjorok terpotong, dan kalau lebarnya habis permainan berakhir.',
+    how: 'Ketuk di mana saja untuk menjatuhkan balok di posisinya.',
+    score: '10 per lantai. Pas di tengah mengembalikan sedikit lebar dan makin besar saat beruntun.',
+  },
+  sortgate: {
+    goal: 'Baca kriteria pada dua kotak di atas dan dorong tiap bentuk ke sisi yang benar. Kriterianya berganti total setiap beberapa bentuk, dan kotaknya berkedip saat itu terjadi. Tiga kesalahan berarti tamat.',
+    how: 'Geser ke kiri atau kanan, atau ketuk separuh kiri atau kanan layar.',
+    score: '20 per bentuk, naik sampai 50 seiring rentetan.',
+  },
+  numorder: {
+    goal: 'Sisipkan tiap kartu agar angkanya membesar dari atas ke bawah. Kalau tak ada kotak yang cocok, permainan berakhir.',
+    how: 'Ketuk salah satu kotak bergaris untuk menaruh kartu di tangan.',
+    score: 'Kotak yang lebih belakang bernilai lebih besar, dan mengisi 16 kotak menambah 300 lalu membuka papan baru.',
+  },
+  flashnum: {
+    goal: 'Angka di tetesan hanya tampak sekejap. Setelah hilang, pecahkan dari angka terkecil. Tiga kesalahan berarti tamat.',
+    how: 'Hafalkan lalu ketuk berurutan — ketukan pertama juga menghapus angka sisanya.',
+    score: 'Setiap level yang lewat memberi poin, dan level dengan lebih banyak tetesan bernilai lebih besar.',
+  },
+  paperboat: {
+    goal: 'Antar setiap perahu kertas ke dermaga sewarna. Kalau dua perahu bertabrakan, permainan berakhir.',
+    how: 'Sentuh perahu dan tarik jalur ke dermaga — perahu mengikuti garisnya. Tarik lagi untuk mengubah jalur.',
+    score: '30 per perahu, dan berlabuh lagi dalam 5 detik membangun kombo hingga 110.',
+  },
+  samepic: {
+    goal: 'Temukan satu gambar yang ada di kedua piringan lalu ketuk. Kalau bar waktu habis, permainan berakhir.',
+    how: 'Ketuk gambar itu di piringan mana saja. Salah ketuk memotong 2 detik.',
+    score: '30 per temuan, sampai 80 saat beruntun, dan tiap temuan mengembalikan sedikit waktu.',
+  },
+  comet: {
+    goal: 'Rangkai komet yang melesat naik dengan satu sapuan. Tiga kali lolos berarti tamat.',
+    how: 'Sapu layar — setiap komet yang tersentuh garis akan pecah. Satu sapuan berlaku sampai jari diangkat.',
+    score: 'Makin banyak komet dalam satu sapuan, makin besar pengali (3× dari lima ke atas). Satu-satu hampir tak menambah skor.',
+  },
+  iceslide: {
+    goal: 'Kumpulkan semua bintang untuk lanjut ke papan berikutnya. Kalau langkah habis, permainan berakhir.',
+    how: 'Geser ke arah mana pun dan pinguin meluncur sampai dinding atau batu menghentikannya. Tiap papan memberi 3 batal gratis.',
+    score: '50 per bintang plus 100+ tiap papan selesai.',
+  },
+  marblejar: {
+    goal: 'Tabung yang penuh satu warna akan dikosongkan dan memberi poin. Tabung tidak punya warna tetap. Kalau keempatnya penuh, permainan berakhir.',
+    how: 'Ketuk tabung tujuan kelereng. Tabung yang warnanya tercampur tak bisa dikosongkan lagi, jadi ditampilkan pudar.',
+    score: '5 per kelereng dan 120 per tabung yang dikosongkan. Tiap beberapa kali, satu warna baru masuk.',
+  },
+  bamboo: {
+    goal: 'Panjat bambu sambil menghindari dahan. Kena dahan atau bar waktu habis berarti tamat.',
+    how: 'Ketuk separuh kiri atau kanan — yang tidak ada dahannya — untuk naik satu ruas.',
+    score: '10 per ruas. Setiap panjatan mengisi sedikit waktu, jadi berhenti berarti menyusut.',
   },
 }
 
@@ -1196,6 +1696,56 @@ const vi: Record<string, Guide> = {
     how: 'Mua ở cửa hàng và kéo các quân giống nhau vào nhau để nâng cấp.',
     score: 'Sống sót càng lâu điểm càng cao.',
   },
+  stack: {
+    goal: 'Đặt khối đang trượt lên đỉnh tháp. Phần nhô ra bị cắt mất, và khi không còn chỗ đặt thì kết thúc.',
+    how: 'Chạm bất kỳ đâu để thả khối tại vị trí đó.',
+    score: '10 điểm mỗi tầng. Đặt trúng giữa sẽ hồi lại chút chiều rộng và càng liên tiếp càng nhiều điểm.',
+  },
+  sortgate: {
+    goal: 'Xem tiêu chí trên hai chiếc hộp và đẩy mỗi hình sang bên đúng. Cứ vài hình tiêu chí lại đổi hoàn toàn, khi đó hộp sẽ nháy sáng. Sai ba lần là kết thúc.',
+    how: 'Quét sang trái hoặc phải, hoặc chạm vào nửa trái/phải màn hình.',
+    score: '20 điểm mỗi hình, tăng tới 50 khi chuỗi đúng dài hơn.',
+  },
+  numorder: {
+    goal: 'Đặt từng thẻ sao cho số lớn dần từ trên xuống dưới. Khi không còn ô nào vừa thì kết thúc.',
+    how: 'Chạm vào ô đang được viền sáng để đặt thẻ đang giữ.',
+    score: 'Ô càng về sau càng nhiều điểm, đầy cả 16 ô được thêm 300 và mở bảng mới.',
+  },
+  flashnum: {
+    goal: 'Số trên các giọt nước chỉ hiện trong khoảnh khắc. Khi chúng biến mất, hãy bấm nổ từ số nhỏ nhất. Sai ba lần là kết thúc.',
+    how: 'Ghi nhớ rồi chạm theo thứ tự — cú chạm đầu tiên cũng xoá các số còn lại.',
+    score: 'Mỗi cấp vượt qua đều được điểm, cấp càng nhiều giọt càng nhiều điểm.',
+  },
+  paperboat: {
+    goal: 'Đưa từng chiếc thuyền giấy về bến đúng màu. Hai thuyền đụng nhau là kết thúc.',
+    how: 'Chạm vào thuyền rồi vẽ đường tới bến, thuyền sẽ đi theo. Vẽ lại để đổi đường.',
+    score: '30 điểm mỗi thuyền, cập bến tiếp trong 5 giây sẽ tạo combo tới 110 điểm.',
+  },
+  samepic: {
+    goal: 'Tìm một hình có ở cả hai đĩa rồi chạm vào nó. Khi thanh thời gian hết là kết thúc.',
+    how: 'Chạm hình đó ở đĩa nào cũng được. Chạm sai mất 2 giây.',
+    score: '30 điểm mỗi lần, tối đa 80 khi liên tiếp, và mỗi lần đúng hồi lại chút thời gian.',
+  },
+  comet: {
+    goal: 'Nối các sao băng đang bay lên bằng một nét. Bỏ lỡ ba lần là kết thúc.',
+    how: 'Quét trên màn hình — mọi sao băng mà đường nét chạm tới đều nổ. Một nét kéo dài tới khi bạn nhấc tay.',
+    score: 'Càng nhiều sao trong một nét, hệ số càng cao (từ năm là 3×). Bấm từng cái thì điểm lên rất chậm.',
+  },
+  iceslide: {
+    goal: 'Thu hết sao để sang bảng tiếp theo. Hết lượt di chuyển là kết thúc.',
+    how: 'Quét theo hướng nào cũng được, chim sẽ trượt tới khi gặp tường hay tảng đá. Mỗi bảng có 3 lần hoàn lại miễn phí.',
+    score: '50 điểm mỗi sao và hơn 100 điểm mỗi bảng hoàn thành.',
+  },
+  marblejar: {
+    goal: 'Ống chứa toàn một màu sẽ được dốc ra và tính điểm. Ống không có màu cố định. Khi cả bốn ống đầy là kết thúc.',
+    how: 'Chạm vào ống muốn đặt viên bi. Ống đã lẫn màu thì không bao giờ dốc được nữa nên bị làm mờ.',
+    score: '5 điểm mỗi viên và 120 điểm mỗi ống dốc được. Cứ vài lần dốc lại thêm một màu mới.',
+  },
+  bamboo: {
+    goal: 'Leo lên cây tre và tránh các cành. Đụng cành hoặc hết thanh thời gian là kết thúc.',
+    how: 'Chạm nửa trái hoặc nửa phải màn hình — bên không có cành — để leo lên một đốt.',
+    score: '10 điểm mỗi đốt. Mỗi lần leo được hồi chút thời gian, nên dừng lại là bị trừ.',
+  },
 }
 
 const th: Record<string, Guide> = {
@@ -1304,6 +1854,56 @@ const th: Record<string, Guide> = {
     how: 'ซื้อจากร้านค้าและลากหน่วยแบบเดียวกันมารวมเพื่ออัปเกรด',
     score: 'อยู่รอดยิ่งนานยิ่งได้คะแนนสูง',
   },
+  stack: {
+    goal: 'วางบล็อกที่เลื่อนไปมาลงบนยอดหอคอย ส่วนที่ล้นจะถูกเฉือนออก และเมื่อไม่มีที่ให้วางก็จบเกม',
+    how: 'แตะที่ใดก็ได้เพื่อวางบล็อกตรงตำแหน่งนั้น',
+    score: 'ชั้นละ 10 คะแนน วางตรงกลางพอดีจะได้ความกว้างคืนเล็กน้อยและยิ่งต่อเนื่องยิ่งได้มาก',
+  },
+  sortgate: {
+    goal: 'ดูเกณฑ์บนกล่องสองใบด้านบนแล้วดันรูปทรงไปฝั่งที่ถูก เกณฑ์จะเปลี่ยนทั้งชุดทุก ๆ ไม่กี่รูป และกล่องจะกะพริบตอนเปลี่ยน ผิดสามครั้งจบเกม',
+    how: 'ปัดซ้ายหรือขวา หรือแตะครึ่งซ้าย/ขวาของหน้าจอ',
+    score: 'รูปละ 20 คะแนน ต่อเนื่องได้สูงสุด 50 คะแนน',
+  },
+  numorder: {
+    goal: 'ใส่การ์ดให้ตัวเลขเพิ่มขึ้นจากบนลงล่าง ถ้าไม่มีช่องที่ใส่ได้ก็จบเกม',
+    how: 'แตะช่องที่มีขอบเรืองแสงเพื่อวางการ์ดที่ถืออยู่',
+    score: 'ช่องท้าย ๆ ได้คะแนนมากขึ้น เต็มทั้ง 16 ช่องได้เพิ่ม 300 แล้วเริ่มกระดานใหม่',
+  },
+  flashnum: {
+    goal: 'ตัวเลขบนหยดน้ำจะโชว์เพียงเสี้ยววินาที เมื่อหายไปให้แตะไล่จากเลขน้อยไปมาก ผิดสามครั้งจบเกม',
+    how: 'จำให้ได้แล้วแตะตามลำดับ การแตะครั้งแรกจะลบตัวเลขที่เหลือด้วย',
+    score: 'ผ่านแต่ละระดับได้คะแนน ระดับที่มีหยดน้ำมากได้คะแนนมากกว่า',
+  },
+  paperboat: {
+    goal: 'ส่งเรือกระดาษทุกลำไปยังท่าสีเดียวกัน ถ้าเรือชนกันเป็นอันจบ',
+    how: 'แตะเรือแล้วลากเส้นไปยังท่า เรือจะแล่นตามเส้น ลากใหม่เพื่อเปลี่ยนเส้นทาง',
+    score: 'ลำละ 30 คะแนน ส่งถึงท่าอีกครั้งภายใน 5 วินาทีจะต่อคอมโบได้สูงสุด 110',
+  },
+  samepic: {
+    goal: 'หาภาพเดียวที่อยู่ทั้งวงบนและวงล่างแล้วแตะ เมื่อหลอดเวลาหมดก็จบเกม',
+    how: 'แตะภาพนั้นที่วงไหนก็ได้ แตะผิดเสียเวลา 2 วินาที',
+    score: 'ครั้งละ 30 คะแนน ต่อเนื่องได้ถึง 80 และทุกครั้งที่ถูกจะได้เวลาคืนเล็กน้อย',
+  },
+  comet: {
+    goal: 'ลากเส้นเดียวเชื่อมดาวตกที่พุ่งขึ้นมาให้แตก พลาดสามดวงจบเกม',
+    how: 'ปัดบนหน้าจอ ดาวตกทุกดวงที่เส้นแตะจะแตกพร้อมกัน หนึ่งเส้นนับจนกว่าจะยกนิ้ว',
+    score: 'เชื่อมได้มากในเส้นเดียวยิ่งได้ตัวคูณสูง (ห้าดวงขึ้นไป 3 เท่า) เก็บทีละดวงคะแนนขึ้นช้า',
+  },
+  iceslide: {
+    goal: 'เก็บดาวให้ครบเพื่อไปกระดานถัดไป ถ้าใช้ครบทุกครั้งแล้วก็จบเกม',
+    how: 'ปัดทิศไหนก็ได้ เพนกวินจะไถลจนชนกำแพงหรือก้อนหิน แต่ละกระดานย้อนกลับได้ฟรี 3 ครั้ง',
+    score: 'ดาวละ 50 คะแนน และผ่านกระดานได้อีก 100 คะแนนขึ้นไป',
+  },
+  marblejar: {
+    goal: 'กระบอกที่เต็มด้วยสีเดียวจะถูกเทออกและได้คะแนน กระบอกไม่มีสีประจำ ถ้าเต็มทั้งสี่ใบก็จบเกม',
+    how: 'แตะกระบอกที่ต้องการใส่ลูกแก้ว กระบอกที่สีปนกันจะเทออกไม่ได้อีกจึงแสดงแบบจาง',
+    score: 'ลูกละ 5 คะแนน เทกระบอกได้ 120 คะแนน เทไปหลายครั้งจะมีสีใหม่เพิ่มเข้ามา',
+  },
+  bamboo: {
+    goal: 'ปีนต้นไผ่ขึ้นไปโดยเลี่ยงกิ่ง ถ้าชนกิ่งหรือหลอดเวลาหมดก็จบเกม',
+    how: 'แตะครึ่งซ้ายหรือขวาที่ไม่มีกิ่งเพื่อปีนขึ้นหนึ่งปล้อง',
+    score: 'ปล้องละ 10 คะแนน ทุกครั้งที่ปีนจะเติมเวลาเล็กน้อย ดังนั้นหยุดพักคือเวลาลด',
+  },
 }
 
 const tr: Record<string, Guide> = {
@@ -1411,6 +2011,56 @@ const tr: Record<string, Guide> = {
     goal: 'Birim satın al, yerleştir ve otomatik savaşları kazan. Kaybetmek can götürür.',
     how: 'Dükkândan satın al ve aynı birimleri üst üste sürükleyip yükselt.',
     score: 'Ne kadar uzun hayatta kalırsan o kadar çok puan.',
+  },
+  stack: {
+    goal: 'Sağa sola giden bloğu kulenin tepesine oturt. Taşan kısım kesilir; oturacak genişlik kalmazsa oyun biter.',
+    how: 'Bloğu bulunduğu yere bırakmak için ekranın herhangi bir yerine dokun.',
+    score: 'Her kat 10 puan. Tam ortaya oturtmak biraz genişlik geri verir ve seri uzadıkça puan artar.',
+  },
+  sortgate: {
+    goal: 'Üstteki iki kutunun ölçütüne bak ve her şekli doğru tarafa it. Ölçüt her birkaç şekilde tamamen değişir, değişirken kutular parlar. Üç hata oyunu bitirir.',
+    how: 'Sola ya da sağa kaydır, veya ekranın sol/sağ yarısına dokun.',
+    score: 'Şekil başına 20 puan, seri uzadıkça 50 puana kadar çıkar.',
+  },
+  numorder: {
+    goal: 'Kartları, sayılar yukarıdan aşağıya büyüyecek şekilde boş kutulara yerleştir. Uyan kutu kalmazsa oyun biter.',
+    how: 'Elindeki kartı bırakmak için çerçevesi parlayan kutulardan birine dokun.',
+    score: 'Sondaki kutular daha çok puan verir; 16 kutunun tamamı dolarsa 300 puan eklenir ve yeni tahta açılır.',
+  },
+  flashnum: {
+    goal: 'Damlaların üstündeki sayılar yalnızca bir an görünür. Kaybolduktan sonra en küçük sayıdan başlayarak patlat. Üç hata oyunu bitirir.',
+    how: 'Ezberle ve sırayla dokun — ilk dokunuş kalan sayıları da siler.',
+    score: 'Geçilen her seviye puan verir, damla sayısı arttıkça puan da artar.',
+  },
+  paperboat: {
+    goal: 'Her kâğıt kayığı kendi renginin iskelesine gönder. İki kayık çarpışırsa oyun biter.',
+    how: 'Kayığa dokun ve iskeleye bir rota çiz; kayık çizgiyi izler. Yeniden çizersen rota değişir.',
+    score: 'Kayık başına 30 puan; 5 saniye içinde bir kayık daha yanaşırsa seri 110 puana kadar çıkar.',
+  },
+  samepic: {
+    goal: 'İki diskte birlikte bulunan tek resmi bul ve dokun. Zaman göstergesi biterse oyun sona erer.',
+    how: 'O resme iki diskten birinde dokun. Yanlış dokunuş 2 saniye götürür.',
+    score: 'Her bulguda 30 puan, seride 80\'e kadar; her doğru bulgu biraz zaman geri verir.',
+  },
+  comet: {
+    goal: 'Yükselen kuyruklu yıldızları tek çizgide birbirine bağla. Üç tanesini kaçırırsan oyun biter.',
+    how: 'Ekranda parmağını kaydır — çizginin dokunduğu her yıldız patlar. Bir çizgi, parmağını kaldırana kadar sürer.',
+    score: 'Tek çizgide ne kadar çok yıldız olursa çarpan büyür (beşten sonra 3×). Tek tek patlatmak neredeyse puan getirmez.',
+  },
+  iceslide: {
+    goal: 'Bir sonraki tahtaya geçmek için bütün yıldızları topla. Hamleler biterse oyun sona erer.',
+    how: 'Herhangi bir yöne kaydır; penguen duvara ya da kayaya çarpana kadar kayar. Her tahtada 3 ücretsiz geri alma var.',
+    score: 'Yıldız başına 50, geçilen her tahta için 100+ puan.',
+  },
+  marblejar: {
+    goal: 'Tek renkle dolan kavanoz boşalır ve puan verir. Hiçbir kavanozun sabit rengi yok. Dördü de dolarsa oyun biter.',
+    how: 'Misketi koymak istediğin kavanoza dokun. Renkleri karışan kavanoz bir daha boşalmaz, bu yüzden soluk görünür.',
+    score: 'Misket başına 5, boşalan kavanoz başına 120 puan. Birkaç boşaltmada bir yeni renk oyuna girer.',
+  },
+  bamboo: {
+    goal: 'Dallardan kaçarak bambuya tırman. Bir dala çarparsan ya da süre biterse oyun sona erer.',
+    how: 'Bir boğum yükselmek için ekranın dalsız olan yarısına dokun.',
+    score: 'Boğum başına 10 puan. Her tırmanış süreyi biraz doldurur, durmak ise tüketir.',
   },
 }
 const TABLES: Record<Locale, Record<string, Guide>> = {

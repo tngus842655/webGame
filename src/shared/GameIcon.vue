@@ -275,6 +275,139 @@ defineProps<{ slug: string }>()
     </g>
 
 
+    <!-- 탑 쌓기 -->
+    <g v-else-if="slug === 'stack'">
+      <rect x="7" y="35" width="34" height="8" rx="2" fill="#42A5F5" />
+      <rect x="7" y="35" width="34" height="2.6" rx="1.3" fill="#90CAF9" />
+      <rect x="10" y="26" width="28" height="8" rx="2" fill="#26C6DA" />
+      <rect x="10" y="26" width="28" height="2.6" rx="1.3" fill="#80DEEA" />
+      <rect x="15" y="17" width="20" height="8" rx="2" fill="#66BB6A" />
+      <rect x="15" y="17" width="20" height="2.6" rx="1.3" fill="#A5D6A7" />
+      <rect x="24" y="6" width="16" height="8" rx="2" fill="#FFCA28" />
+      <rect x="24" y="6" width="16" height="2.6" rx="1.3" fill="#FFE082" />
+      <path d="M20 10 L9 10" stroke="#FFCA28" stroke-width="2" stroke-linecap="round" />
+      <path d="M12 7 L9 10 L12 13" stroke="#FFCA28" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+
+    <!-- 분류 반장 -->
+    <g v-else-if="slug === 'sortgate'">
+      <rect x="3" y="27" width="18" height="16" rx="3.5" fill="#37474F" />
+      <rect x="27" y="27" width="18" height="16" rx="3.5" fill="#37474F" />
+      <circle cx="12" cy="35" r="5" fill="#EF5350" />
+      <path d="M36 30.5 L40.5 38.5 L31.5 38.5 Z" fill="#42A5F5" />
+      <rect x="18" y="6" width="12" height="12" rx="3" fill="#FFCA28" />
+      <path d="M15 12 L8.5 12 M33 12 L39.5 12" stroke="#B0BEC5" stroke-width="2" stroke-linecap="round" />
+      <path d="M11 9.5 L8.5 12 L11 14.5" stroke="#B0BEC5" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M37 9.5 L39.5 12 L37 14.5" stroke="#B0BEC5" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+
+    <!-- 숫자 줄 세우기 -->
+    <g v-else-if="slug === 'numorder'">
+      <rect x="6" y="4" width="24" height="9" rx="2.5" fill="#37507A" />
+      <text x="18" y="11.4" font-size="7" font-weight="bold" fill="#FFFFFF" text-anchor="middle">14</text>
+      <rect x="6" y="16" width="24" height="9" rx="2.5" fill="#66BB6A" opacity="0.28" stroke="#66BB6A" stroke-width="1.6" />
+      <rect x="6" y="28" width="24" height="9" rx="2.5" fill="#37507A" />
+      <text x="18" y="35.4" font-size="7" font-weight="bold" fill="#FFFFFF" text-anchor="middle">52</text>
+      <rect x="6" y="39" width="24" height="6" rx="2" fill="#FFFFFF" opacity="0.08" />
+      <rect x="33" y="15" width="12" height="16" rx="3" fill="#FFF8E1" />
+      <text x="39" y="26" font-size="8" font-weight="bold" fill="#3E2723" text-anchor="middle">31</text>
+    </g>
+
+    <!-- 찰나의 숫자 -->
+    <g v-else-if="slug === 'flashnum'">
+      <rect x="4" y="4" width="40" height="40" rx="8" fill="#0C3B4C" />
+      <circle cx="15" cy="15" r="8" fill="#4FC3F7" />
+      <text x="15" y="18.6" font-size="10" font-weight="bold" fill="#06323F" text-anchor="middle">1</text>
+      <circle cx="33" cy="20" r="8" fill="#FFFFFF" opacity="0.14" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.4" />
+      <circle cx="17" cy="33" r="8" fill="#FFFFFF" opacity="0.14" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.4" />
+      <circle cx="34" cy="35" r="6.5" fill="#FFFFFF" opacity="0.14" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.4" />
+      <ellipse cx="12.5" cy="12" rx="2.4" ry="1.6" fill="#FFFFFF" opacity="0.55" transform="rotate(-30 12.5 12)" />
+    </g>
+
+    <!-- 종이배 뱃길 -->
+    <g v-else-if="slug === 'paperboat'">
+      <rect x="4" y="4" width="40" height="40" rx="8" fill="#0C3D58" />
+      <path d="M15 30 Q26 30 30 21 T38 13" stroke="#EF5350" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-dasharray="4 3" opacity="0.85" />
+      <circle cx="38" cy="12" r="6" fill="#EF5350" opacity="0.22" />
+      <circle cx="38" cy="12" r="6" fill="none" stroke="#EF5350" stroke-width="2" />
+      <path d="M22 30 L7 23 L10 30 L7 37 Z" fill="#EF5350" />
+      <path d="M13 12 L26 12" stroke="#42A5F5" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="4 3" opacity="0.5" />
+      <path d="M39 36 L28 30 L31 36 L28 42 Z" fill="#42A5F5" opacity="0.9" />
+      <circle cx="10" cy="12" r="4.5" fill="none" stroke="#42A5F5" stroke-width="2" />
+    </g>
+
+    <!-- 같은 그림 찾기 -->
+    <g v-else-if="slug === 'samepic'">
+      <circle cx="24" cy="14" r="11.5" fill="#FFF8E1" stroke="#3E2723" stroke-opacity="0.3" stroke-width="1.4" />
+      <circle cx="24" cy="35" r="11.5" fill="#FFF8E1" stroke="#3E2723" stroke-opacity="0.3" stroke-width="1.4" />
+      <path d="M20 9.5 L21.2 12.4 L24.3 12.6 L21.9 14.6 L22.7 17.6 L20 15.9 L17.3 17.6 L18.1 14.6 L15.7 12.6 L18.8 12.4 Z" fill="#FFCA28" />
+      <circle cx="28.5" cy="17" r="3.4" fill="#42A5F5" />
+      <path d="M29 30.4 L30.2 33.3 L33.3 33.5 L30.9 35.5 L31.7 38.5 L29 36.8 L26.3 38.5 L27.1 35.5 L24.7 33.5 L27.8 33.3 Z" fill="#FFCA28" />
+      <path d="M19.5 31.5 L22.5 36.5 L16.5 36.5 Z" fill="#66BB6A" />
+    </g>
+
+    <!-- 별똥별 잇기 -->
+    <g v-else-if="slug === 'comet'">
+      <rect x="4" y="4" width="40" height="40" rx="8" fill="#0A1230" />
+      <circle cx="12" cy="10" r="1.1" fill="#FFFFFF" opacity="0.5" />
+      <circle cx="37" cy="9" r="1.4" fill="#FFFFFF" opacity="0.4" />
+      <circle cx="30" cy="38" r="1.1" fill="#FFFFFF" opacity="0.35" />
+      <path d="M7 33 Q22 12 41 22" stroke="#B2EBF2" stroke-width="2.6" fill="none" stroke-linecap="round" />
+      <path d="M8 38 L13 30" stroke="#FFB74D" stroke-width="3" stroke-linecap="round" opacity="0.75" />
+      <circle cx="14" cy="28.5" r="4.2" fill="#FFE082" />
+      <path d="M22 26 L27 18" stroke="#FFB74D" stroke-width="3" stroke-linecap="round" opacity="0.75" />
+      <circle cx="28" cy="16.5" r="4.6" fill="#FFE082" />
+      <circle cx="26.6" cy="15.2" r="1.7" fill="#FFFFFF" />
+    </g>
+
+    <!-- 펭귄 미끄럼 -->
+    <g v-else-if="slug === 'iceslide'">
+      <rect x="4" y="4" width="40" height="40" rx="7" fill="#D9EEF7" />
+      <path d="M4 18 H44 M4 30 H44 M18 4 V44 M30 4 V44" stroke="#FFFFFF" stroke-width="1.6" />
+      <rect x="32" y="7" width="9" height="8" rx="2" fill="#607D8B" />
+      <rect x="7" y="32" width="9" height="8" rx="2" fill="#607D8B" />
+      <path d="M35 30 L36.4 33.4 L40 33.6 L37.2 35.9 L38.1 39.4 L35 37.4 L31.9 39.4 L32.8 35.9 L30 33.6 L33.6 33.4 Z" fill="#FFCA28" />
+      <circle cx="15" cy="16" r="8" fill="#263238" />
+      <ellipse cx="16" cy="18" rx="4.6" ry="5.4" fill="#FFFFFF" />
+      <path d="M22 19 L18 15.6 L18 22.4 Z" fill="#FB8C00" />
+      <circle cx="12.6" cy="12.6" r="1.9" fill="#FFFFFF" />
+      <circle cx="17.4" cy="12.6" r="1.9" fill="#FFFFFF" />
+      <circle cx="13" cy="12.6" r="1" fill="#0D1B22" />
+      <circle cx="17.8" cy="12.6" r="1" fill="#0D1B22" />
+    </g>
+
+    <!-- 구슬 정리함 -->
+    <g v-else-if="slug === 'marblejar'">
+      <rect x="4" y="18" width="9" height="26" rx="3" fill="#FFFFFF" opacity="0.12" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.4" />
+      <rect x="15.5" y="18" width="9" height="26" rx="3" fill="#FFFFFF" opacity="0.12" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.4" />
+      <rect x="27" y="18" width="9" height="26" rx="3" fill="#FFFFFF" opacity="0.12" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.4" />
+      <rect x="38.5" y="18" width="9" height="26" rx="3" fill="#FFFFFF" opacity="0.12" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.4" />
+      <circle cx="8.5" cy="40" r="3.6" fill="#EF5350" />
+      <circle cx="8.5" cy="32.5" r="3.6" fill="#EF5350" />
+      <circle cx="20" cy="40" r="3.6" fill="#42A5F5" />
+      <circle cx="31.5" cy="40" r="3.6" fill="#66BB6A" />
+      <circle cx="31.5" cy="32.5" r="3.6" fill="#FFCA28" />
+      <circle cx="24" cy="8" r="6.5" fill="#AB47BC" />
+      <ellipse cx="21.8" cy="5.8" rx="2" ry="1.3" fill="#FFFFFF" opacity="0.5" transform="rotate(-30 21.8 5.8)" />
+    </g>
+
+    <!-- 대나무 타기 -->
+    <g v-else-if="slug === 'bamboo'">
+      <rect x="4" y="4" width="40" height="40" rx="8" fill="#16351F" />
+      <rect x="19" y="4" width="14" height="40" fill="#7CB342" />
+      <rect x="20.5" y="4" width="3.5" height="40" fill="#FFFFFF" opacity="0.18" />
+      <rect x="19" y="15" width="14" height="2.6" fill="#558B2F" />
+      <rect x="19" y="30" width="14" height="2.6" fill="#558B2F" />
+      <path d="M33 12 Q39 9 43 12" stroke="#33691E" stroke-width="2.6" fill="none" stroke-linecap="round" />
+      <ellipse cx="41" cy="10" rx="2.4" ry="4.6" fill="#558B2F" transform="rotate(38 41 10)" />
+      <circle cx="10" cy="26" r="3" fill="#2E2E2E" />
+      <circle cx="18" cy="26" r="3" fill="#2E2E2E" />
+      <circle cx="14" cy="30" r="7.5" fill="#F5F5F5" />
+      <ellipse cx="11.4" cy="29" rx="2" ry="2.5" fill="#2E2E2E" />
+      <ellipse cx="16.6" cy="29" rx="2" ry="2.5" fill="#2E2E2E" />
+      <circle cx="14" cy="33.4" r="1.4" fill="#2E2E2E" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />
