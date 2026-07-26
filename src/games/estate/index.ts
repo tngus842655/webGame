@@ -214,7 +214,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   shell.addCleanup(detachInput)
   shell.addCleanup(() => stage.destroy())
-  return { destroy: () => shell.destroy(), getScore: () => totalAssets(state) }
+  // 시간제한 자산형 — 고점에서 이탈하면 이득이 되므로 시간을 다 썼을 때만 기록한다
+  return shell
 }
 
 export default defineGame(createSession)

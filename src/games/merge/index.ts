@@ -8,48 +8,65 @@ import { CanvasStage } from '../stage'
 import { drawPlant } from './plantArt'
 import {
   COLS,
-  GEN_COOLDOWN,
   LAYOUT,
+  MAX_LEVEL,
   ROWS,
   cellPos,
   clearLowestItems,
   createState,
   dropItem,
   generate,
+  hasEmptyCell,
   indexAt,
-  updateEffects,
+  reviveWithTime,
+  stageGoal,
+  stageSeconds,
+  update,
 } from './state'
+
+const REVIVE_SECONDS = 60
 
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
-    updateEffects(state, dt)
+    const events = update(state, dt)
+    if (events.timeUp) void gameOver()
+    if (events.nextStage) playMerge(4)
+    genShake = Math.max(0, genShake - dt)
+    for (let i = popups.length - 1; i >= 0; i--) {
+      popups[i].age += dt
+      if (popups[i].age > 1.1) popups.splice(i, 1)
+    }
     draw()
   })
   const stage = new CanvasStage(shell.wrapper, LAYOUT.width, LAYOUT.height)
   const state = createState()
-  let adClearUsed = false
+  const popups: Array<{ x: number; y: number; text: string; age: number }> = []
+  let adReviveUsed = false
   let drag: { from: number; x: number; y: number } | null = null
+  let genShake = 0 // 자리가 없을 때 생성 버튼 흔들림
 
   const overlay = createGameOverOverlay(shell.wrapper, {
     adLabelKey: 'merge.ad',
     onRetry() {
       if (state.phase !== 'over') return
-      adClearUsed = false
+      adReviveUsed = false
       Object.assign(state, createState())
+      popups.length = 0
       overlay.hide()
     },
     onContinue() {
-      void clearWithAd()
+      void reviveWithAd()
     },
   })
 
-  async function clearWithAd() {
-    if (state.phase !== 'over' || adClearUsed) return
-    const rewarded = await ctx.showRewardAd('merge_clear')
+  // 광고 보상: 시간을 되살리고 자리도 비워 같은 스테이지를 이어간다 (판당 1회)
+  async function reviveWithAd() {
+    if (state.phase !== 'over' || adReviveUsed) return
+    const rewarded = await ctx.showRewardAd('merge-revive')
     if (shell.isDestroyed() || !rewarded || state.phase !== 'over') return
-    adClearUsed = true
+    adReviveUsed = true
     clearLowestItems(state)
-    state.phase = 'playing'
+    reviveWithTime(state, REVIVE_SECONDS)
     overlay.hide()
   }
 
@@ -59,7 +76,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const prevBest = await ctx.getBestScore()
     await ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
-    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adClearUsed)
+    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adReviveUsed)
   }
 
   const genButton = LAYOUT.genButton
@@ -76,7 +93,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         const result = generate(state)
         if (result.ok) {
           playDrop()
-          if (result.gameOver) void gameOver()
+          // 상위 식물이 터지면 확실히 느끼도록 강조
+          if (result.level >= 8) {
+            playMerge(result.level)
+            vibrate([15, 30, 15])
+          }
+        } else {
+          // 자리가 없어 생성이 막힌 경우 — 왜 안 되는지 바로 알 수 있게 반응을 준다
+          genShake = 0.35
+          vibrate(40)
         }
         return
       }
@@ -97,10 +122,16 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       const to = indexAt(p.x, p.y)
       if (to < 0) return
       const result = dropItem(state, current.from, to)
-      if (result.merged) {
-        playMerge(result.newLevel)
-        vibrate(12)
-        if (result.gameOver) void gameOver()
+      if (!result.merged) return
+      playMerge(result.newLevel)
+      vibrate(12)
+      if (result.harvested) {
+        const col = to % COLS
+        const row = Math.floor(to / COLS)
+        const [px, py] = cellPos(col, row)
+        const cellSize = LAYOUT.cell - LAYOUT.gap * 2
+        popups.push({ x: px + cellSize / 2, y: py, text: '🏆', age: 0 })
+        vibrate([25, 40, 25])
       }
     },
   })
@@ -114,27 +145,68 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.fillStyle = sky
     c.fillRect(0, 0, LAYOUT.width, LAYOUT.height)
 
-    // HUD: 점수 + 최고 발견 아이템
-    c.textAlign = 'center'
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.75
-    c.beginPath()
-    c.roundRect(200, 30, 240, 88, 24)
-    c.fill()
-    c.restore()
-    c.fillStyle = '#5D4037'
-    c.font = 'bold 50px sans-serif'
-    c.fillText(state.score.toLocaleString(), 320, 92)
+    const card = (x: number, y: number, w: number, h: number) => {
+      c.save()
+      c.fillStyle = '#FFFFFF'
+      c.globalAlpha = 0.75
+      c.beginPath()
+      c.roundRect(x, y, w, h, 20)
+      c.fill()
+      c.restore()
+    }
 
+    // HUD: 스테이지 · 점수 · 황금 화분 진행
+    c.textAlign = 'center'
+    card(30, 24, 150, 80)
+    c.fillStyle = '#A1887F'
+    c.font = '18px sans-serif'
+    c.fillText(t('merge.stageLabel'), 105, 50)
+    c.fillStyle = '#5D4037'
+    c.font = 'bold 34px sans-serif'
+    c.fillText(String(state.stage), 105, 88)
+
+    card(196, 24, 244, 80)
+    c.fillStyle = '#5D4037'
+    c.font = 'bold 42px sans-serif'
+    c.fillText(state.score.toLocaleString(), 318, 80)
+
+    const goal = stageGoal(state.stage)
+    card(456, 24, 234, 80)
+    drawPlant(c, 496, 66, 26, MAX_LEVEL)
+    c.fillStyle = '#5D4037'
+    c.font = 'bold 34px sans-serif'
+    c.fillText(`${state.goldMade} / ${goal}`, 600, 78)
+
+    // 남은 시간 바
+    const total = stageSeconds(state.stage)
+    const ratio = Math.max(0, Math.min(1, state.timeLeft / total))
+    const barX = 45
+    const barW = 630
+    const barY = 122
+    const barH = 30
     c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.75
+    c.fillStyle = 'rgb(93 64 55 / 0.15)'
     c.beginPath()
-    c.roundRect(470, 30, 110, 88, 24)
+    c.roundRect(barX, barY, barW, barH, 15)
     c.fill()
     c.restore()
-    drawPlant(c, 525, 78, 34, state.discovered)
+    const urgent = state.timeLeft <= 30 && state.phase === 'playing'
+    if (ratio > 0) {
+      c.fillStyle = ratio > 0.5 ? '#66BB6A' : ratio > 0.25 ? '#FFA726' : '#EF5350'
+      c.save()
+      if (urgent) c.globalAlpha = 0.6 + 0.4 * Math.abs(Math.sin(state.hintTime * 6))
+      c.beginPath()
+      c.roundRect(barX, barY, Math.max(barH, barW * ratio), barH, 15)
+      c.fill()
+      c.restore()
+    }
+    const mm = Math.floor(state.timeLeft / 60)
+    const ss = String(Math.floor(state.timeLeft % 60)).padStart(2, '0')
+    c.fillStyle = '#FFFFFF'
+    c.font = 'bold 21px sans-serif'
+    c.textBaseline = 'middle'
+    c.fillText(`${mm}:${ss}`, barX + barW / 2, barY + barH / 2 + 1)
+    c.textBaseline = 'alphabetic'
 
     // 보드
     const boardW = COLS * LAYOUT.cell
@@ -165,83 +237,94 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       }
     }
 
-    // 드래그 중 아이템
+    // 드래그 중인 아이템 + 놓을 자리 표시
     if (drag) {
       const item = state.grid[drag.from]
       if (item) {
         const to = indexAt(drag.x, drag.y)
         if (to >= 0 && to !== drag.from) {
           const target = state.grid[to]
-          if (target === null || target.level === item.level) {
-            const [px, py] = cellPos(to % COLS, Math.floor(to / COLS))
-            c.save()
-            c.strokeStyle = target && target.level === item.level ? '#43A047' : '#BCAAA4'
-            c.lineWidth = 5
-            c.setLineDash(target ? [] : [10, 8])
-            c.beginPath()
-            c.roundRect(px, py, cellSize, cellSize, 14)
-            c.stroke()
-            c.restore()
-          }
+          const mergeable = target !== null && target.level === item.level && item.level < MAX_LEVEL
+          const [tx, ty] = cellPos(to % COLS, Math.floor(to / COLS))
+          c.save()
+          c.strokeStyle = mergeable || target === null ? '#43A047' : '#BCAAA4'
+          c.lineWidth = 5
+          c.setLineDash(mergeable || target === null ? [] : [10, 8])
+          c.beginPath()
+          c.roundRect(tx, ty, cellSize, cellSize, 14)
+          c.stroke()
+          c.restore()
         }
         drawPlant(c, drag.x, drag.y - 70, cellSize * 0.46, item.level)
       }
     }
 
-    // 생성 버튼
-    const ready = state.genCooldown <= 0
+    // 수확 연출
+    for (const popup of popups) {
+      c.save()
+      c.globalAlpha = 1 - popup.age / 1.1
+      c.font = 'bold 58px sans-serif'
+      c.textAlign = 'center'
+      c.fillText(popup.text, popup.x, popup.y - popup.age * 70)
+      c.restore()
+    }
+
+    // 자리가 없으면 무엇을 해야 하는지 알린다
+    const roomLeft = hasEmptyCell(state)
+    if (!roomLeft && state.phase === 'playing') {
+      c.textAlign = 'center'
+      c.fillStyle = '#8D6E63'
+      c.font = 'bold 26px sans-serif'
+      c.fillText(t('merge.full'), 360, 176)
+    }
+
+    // 생성 버튼 (쿨다운 없음 — 자리가 없을 때만 비활성)
     const gb = LAYOUT.genButton
     c.save()
-    c.fillStyle = ready ? '#2E7D32' : '#9E9E9E'
+    if (genShake > 0) c.translate(Math.sin(state.hintTime * 60) * 8 * (genShake / 0.35), 0)
+    c.fillStyle = roomLeft ? '#2E7D32' : '#9E9E9E'
     c.beginPath()
     c.roundRect(gb.x, gb.y + 6, gb.w, gb.h, 24)
     c.fill()
-    c.fillStyle = ready ? '#43A047' : '#BDBDBD'
+    c.fillStyle = roomLeft ? '#43A047' : '#BDBDBD'
     c.beginPath()
     c.roundRect(gb.x, gb.y, gb.w, gb.h, 24)
     c.fill()
-    if (!ready) {
-      c.save()
-      c.beginPath()
-      c.roundRect(gb.x, gb.y, gb.w, gb.h, 24)
-      c.clip()
-      c.fillStyle = 'rgb(255 255 255 / 0.3)'
-      c.fillRect(gb.x, gb.y, gb.w * (1 - state.genCooldown / GEN_COOLDOWN), gb.h)
-      c.restore()
-    }
-    c.restore()
     drawPlant(c, gb.x + 62, gb.y + gb.h / 2 + 4, 30, 1)
     c.textAlign = 'center'
     c.fillStyle = '#FFFFFF'
     c.font = 'bold 34px sans-serif'
     c.fillText(t('merge.gen'), gb.x + gb.w / 2 + 30, gb.y + gb.h / 2 + 12)
+    c.restore()
 
-    // 텍스트 없는 조작 안내: 생성 버튼 → 보드로 끌어가는 표식
-    if (!state.movedOnce && state.phase === 'playing' && !drag) {
-      const k = (state.hintTime % 2.4) / 2.4
-      const ease = k < 0.75 ? k / 0.75 : 1
-      const fade = k < 0.75 ? 1 : 1 - (k - 0.75) / 0.25
-      const sx = gb.x + gb.w / 2
-      const sy = gb.y - 30
-      const ex = LAYOUT.boardX + LAYOUT.cell * 2.5
-      const ey = LAYOUT.boardY + LAYOUT.cell * 5.5
-      const hx = sx + (ex - sx) * ease
-      const hy = sy + (ey - sy) * ease
+    // 텍스트 없는 조작 안내: 생성 버튼을 누르라는 표식
+    if (!state.hintDone && state.phase === 'playing' && !drag) {
+      const k = (state.hintTime % 1.6) / 1.6
       c.save()
-      c.globalAlpha = 0.45 * fade
-      c.strokeStyle = '#8D6E63'
-      c.lineWidth = 3
-      c.setLineDash([8, 10])
+      c.globalAlpha = 0.5 * (1 - k)
+      c.strokeStyle = '#2E7D32'
+      c.lineWidth = 5
       c.beginPath()
-      c.moveTo(sx, sy)
-      c.lineTo(hx, hy)
+      c.roundRect(gb.x - k * 24, gb.y - k * 20, gb.w + k * 48, gb.h + k * 40, 24 + k * 20)
       c.stroke()
-      c.setLineDash([])
-      c.globalAlpha = 0.7 * fade
-      c.fillStyle = '#8D6E63'
-      c.beginPath()
-      c.arc(hx, hy, 16, 0, Math.PI * 2)
-      c.fill()
+      c.restore()
+    }
+
+    // 스테이지 완료 연출
+    if (state.phase === 'stageClear') {
+      c.save()
+      c.fillStyle = 'rgb(62 39 35 / 0.55)'
+      c.fillRect(0, 0, LAYOUT.width, LAYOUT.height)
+      c.textAlign = 'center'
+      c.fillStyle = '#FFFFFF'
+      c.font = 'bold 48px sans-serif'
+      c.fillText(t('merge.clear', { n: state.stage }), 360, 560)
+      c.fillStyle = '#FFD54F'
+      c.font = 'bold 62px sans-serif'
+      c.fillText(`+${state.lastBonus.toLocaleString()}`, 360, 650)
+      c.fillStyle = 'rgb(255 255 255 / 0.85)'
+      c.font = '28px sans-serif'
+      c.fillText(t('merge.nextStage', { n: state.stage + 1, g: stageGoal(state.stage + 1) }), 360, 720)
       c.restore()
     }
   }

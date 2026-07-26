@@ -261,7 +261,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   shell.addCleanup(detachInput)
   shell.addCleanup(() => stage.destroy())
-  return { destroy: () => shell.destroy(), getScore: () => state.score }
+  // 시간제한 게임 — 제한 시간을 다 쓴 결과만 기록한다
+  return shell
 }
 
 export default defineGame(createSession)
