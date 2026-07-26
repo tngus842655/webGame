@@ -344,6 +344,17 @@ defineProps<{ slug: string }>()
       <circle cx="10.5" cy="12.5" r="1.6" fill="#616161" />
     </g>
 
+    <!-- 카드 배틀 -->
+    <g v-else-if="slug === 'deck'">
+      <rect x="4" y="4" width="40" height="40" rx="7" fill="#2A2138" />
+      <rect x="7" y="14" width="16" height="24" rx="3" fill="#ECEFF1" transform="rotate(-10 15 26)" />
+      <rect x="15" y="12" width="16" height="24" rx="3" fill="#FFFFFF" stroke="#C62828" stroke-width="1.6" />
+      <path d="M23 17 L25.5 22 L23 27 L20.5 22 Z" fill="#C62828" />
+      <rect x="26" y="15" width="16" height="24" rx="3" fill="#FFFFFF" stroke="#1565C0" stroke-width="1.6" transform="rotate(10 34 27)" />
+      <circle cx="12" cy="10" r="4.6" fill="#FF8F00" />
+      <text x="12" y="13.2" font-size="8" font-weight="bold" fill="#FFFFFF" text-anchor="middle">1</text>
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />
