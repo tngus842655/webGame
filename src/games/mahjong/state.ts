@@ -146,7 +146,9 @@ export interface MahjongState {
 }
 
 export function loadStage(state: MahjongState, stage: number) {
-  const positions = LAYOUTS[(stage - 1) % LAYOUTS.length]
+  // 예전엔 % 로 돌려써서 스테이지 4가 다시 36타일로 쉬워졌다. 가장 어려운 배치까지
+  // 올라간 뒤 유지한다 (레이아웃이 3종뿐이라 그 이상 조일 레버가 없다)
+  const positions = LAYOUTS[Math.min(stage - 1, LAYOUTS.length - 1)]
   const pairKinds = shuffle([...KINDS]).slice(0, positions.length / 2)
   const kinds = dealTiles(positions, pairKinds)
   state.stage = stage
