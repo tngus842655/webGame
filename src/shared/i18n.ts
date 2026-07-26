@@ -63,6 +63,7 @@ const en = {
   'trash.empty': 'Nothing here yet.',
   'stats.title': 'Statistics',
   'notes.title': 'Dev notes',
+  'notes.empty': 'Nothing here yet. Updates will show up as they land.',
   // 운영자 전용 화면 — 다른 언어는 en 폴백으로 둔다
   'admin.title': 'Admin',
   'admin.hint':
@@ -293,6 +294,7 @@ const ko: typeof en = {
   'trash.empty': '아직 비어 있어요.',
   'stats.title': '통계',
   'notes.title': '개발자 노트',
+  'notes.empty': '아직 남긴 기록이 없어요. 새 소식이 생기면 여기에 올라옵니다.',
   'admin.title': '관리자',
   'admin.hint':
     '신규를 체크한 게임은 홈 맨 위 신규 칸에 올라갑니다(최대 3개). 순서는 체크한 차례대로 매겨지고, 중간 것을 해제하면 뒤가 당겨집니다. 나머지는 인기순으로, 1~3위가 인기 칸에 서고 그 아래가 마지막 칸입니다. 오른쪽 순위가 주황색이면 30위 밖으로 밀린 게임입니다. 바뀐 내용은 홈에 다시 들어갈 때 반영됩니다.',

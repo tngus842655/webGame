@@ -14,7 +14,8 @@ const notes = computed(() => [...DEV_NOTES].sort((a, b) => b.date.localeCompare(
       <h1>{{ t('notes.title') }}</h1>
     </header>
 
-    <ol class="timeline">
+    <p v-if="notes.length === 0" class="empty">{{ t('notes.empty') }}</p>
+    <ol v-else class="timeline">
       <li v-for="(note, i) in notes" :key="i" class="entry">
         <div class="marker" />
         <article class="card">
@@ -50,6 +51,15 @@ const notes = computed(() => [...DEV_NOTES].sort((a, b) => b.date.localeCompare(
 
 .notes-header h1 {
   font-size: 20px;
+}
+
+.empty {
+  padding: 60px 0;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #a1887f;
+  word-break: keep-all;
 }
 
 .timeline {

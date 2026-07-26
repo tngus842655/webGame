@@ -1,7 +1,12 @@
 import { TIERS } from './suika/config'
 
-// 과일 벡터 아트 — 이미지 에셋 없이 티어마다 고유한 형태·무늬를 그린다.
-// 공통: 입체 그라데이션 → 티어별 무늬 → 하이라이트 → 얼굴
+// 과일 벡터 아트 — 이미지 에셋 없이 티어마다 고유한 모습을 그린다.
+//
+// 하단 진화 도표는 반지름 22px로 그리는데, 그 크기에서는 씨앗·잔점 같은 잔무늬가
+// 전부 사라져 색만 남는다. 그래서 무늬보다 먼저 **실루엣과 꼭지**로 차이를 낸다.
+// (딸기는 뾰족한 원뿔, 사과는 꼭지 홈, 배는 조롱박 — 색을 지워도 구분된다.)
+//
+// 그리는 순서: 꼭지·잎(뒤) → 본체 → 무늬·광택(본체로 클리핑) → 꽃받침(앞) → 얼굴
 
 export function drawFruit(
   c: CanvasRenderingContext2D,
@@ -16,40 +21,94 @@ export function drawFruit(
   c.translate(x, y)
   c.rotate(angle)
 
-  drawStemAndLeaf(c, tier, radius)
-  drawBody(c, t.color, t.dark, radius)
+  drawTop(c, tier, radius)
+  fillBody(c, tier, t.color, t.dark, radius)
 
   c.save()
-  c.beginPath()
-  c.arc(0, 0, radius, 0, Math.PI * 2)
+  bodyPath(c, tier, radius)
   c.clip()
   drawPattern(c, tier, radius, t.dark)
+  drawGloss(c, radius)
   c.restore()
 
-  drawGloss(c, radius)
+  drawCalyx(c, tier, radius)
   drawFace(c, t.faceColor, radius)
 
   c.restore()
 }
 
-// 왼쪽 위 광원 기준 구체 음영
-function drawBody(c: CanvasRenderingContext2D, color: string, dark: string, r: number) {
+// ── 실루엣 ────────────────────────────────────────────────
+// 물리 몸체는 전부 원이라 크게 벗어나지 않는 선에서만 변형한다.
+
+function bodyPath(c: CanvasRenderingContext2D, tier: number, r: number) {
+  switch (tier) {
+    case 1:
+      strawberryPath(c, r)
+      break
+    case 4:
+      applePath(c, r)
+      break
+    case 5:
+      pearPath(c, r)
+      break
+    default:
+      c.beginPath()
+      c.arc(0, 0, r, 0, Math.PI * 2)
+  }
+}
+
+// 어깨가 넓고 아래로 갈수록 좁아지는 원뿔
+function strawberryPath(c: CanvasRenderingContext2D, r: number) {
+  c.beginPath()
+  c.moveTo(-r * 0.97, -r * 0.22)
+  c.bezierCurveTo(-r * 0.97, -r * 1.02, r * 0.97, -r * 1.02, r * 0.97, -r * 0.22)
+  c.bezierCurveTo(r * 0.88, r * 0.5, r * 0.34, r, 0, r)
+  c.bezierCurveTo(-r * 0.34, r, -r * 0.88, r * 0.5, -r * 0.97, -r * 0.22)
+  c.closePath()
+}
+
+// 꼭지 자리가 움푹 들어간 원
+function applePath(c: CanvasRenderingContext2D, r: number) {
+  c.beginPath()
+  c.moveTo(0, -r * 0.76)
+  c.bezierCurveTo(r * 0.46, -r * 1.06, r, -r * 0.68, r, 0)
+  c.bezierCurveTo(r, r * 0.74, r * 0.5, r, 0, r)
+  c.bezierCurveTo(-r * 0.5, r, -r, r * 0.74, -r, 0)
+  c.bezierCurveTo(-r, -r * 0.68, -r * 0.46, -r * 1.06, 0, -r * 0.76)
+  c.closePath()
+}
+
+// 위가 좁고 아래가 불룩한 조롱박
+function pearPath(c: CanvasRenderingContext2D, r: number) {
+  c.beginPath()
+  c.moveTo(0, -r)
+  c.bezierCurveTo(r * 0.4, -r * 0.94, r * 0.48, -r * 0.36, r * 0.42, -r * 0.06)
+  c.bezierCurveTo(r * 1.0, r * 0.3, r * 0.84, r, 0, r)
+  c.bezierCurveTo(-r * 0.84, r, -r * 1.0, r * 0.3, -r * 0.42, -r * 0.06)
+  c.bezierCurveTo(-r * 0.48, -r * 0.36, -r * 0.4, -r * 0.94, 0, -r)
+  c.closePath()
+}
+
+// 왼쪽 위 광원 기준 입체 음영
+function fillBody(
+  c: CanvasRenderingContext2D,
+  tier: number,
+  color: string,
+  dark: string,
+  r: number,
+) {
   const grad = c.createRadialGradient(-r * 0.35, -r * 0.4, r * 0.1, 0, 0, r * 1.08)
   grad.addColorStop(0, mix(color, '#FFFFFF', 0.34))
   grad.addColorStop(0.5, color)
   // 가장자리는 완전한 dark가 아니라 살짝 섞어 채도를 유지 (무늬 대비 확보)
   grad.addColorStop(1, mix(color, dark, 0.78))
   c.fillStyle = grad
-  c.beginPath()
-  c.arc(0, 0, r, 0, Math.PI * 2)
+  bodyPath(c, tier, r)
   c.fill()
 }
 
 function drawGloss(c: CanvasRenderingContext2D, r: number) {
   c.save()
-  c.beginPath()
-  c.arc(0, 0, r, 0, Math.PI * 2)
-  c.clip()
   // 큰 하이라이트
   c.globalAlpha = 0.32
   c.fillStyle = '#FFFFFF'
@@ -69,11 +128,28 @@ function drawGloss(c: CanvasRenderingContext2D, r: number) {
   c.restore()
 }
 
-function drawStemAndLeaf(c: CanvasRenderingContext2D, tier: number, r: number) {
-  // 꼭지가 있는 과일만 (체리·사과·배·복숭아·수박)
-  if (![0, 4, 5, 6, 9].includes(tier)) return
-  // 짧게 — 쌓였을 때 옆 과일을 파고들지 않도록
-  const len = r * (tier === 0 ? 0.3 : 0.16)
+// ── 꼭지·잎 (본체 뒤) ─────────────────────────────────────
+// 작게 그려도 남는 부분이라 티어마다 길이와 모양을 다르게 준다.
+
+function drawTop(c: CanvasRenderingContext2D, tier: number, r: number) {
+  if (tier === 7) {
+    pineappleCrown(c, r)
+    return
+  }
+  // 딸기는 꽃받침이 본체 앞에 오므로 여기서는 그리지 않는다
+  const STEM: Record<number, { len: number; leaf: boolean }> = {
+    0: { len: 0.42, leaf: true }, // 체리 — 길게 늘어뜨려 사과와 구분
+    2: { len: 0.14, leaf: false }, // 포도
+    4: { len: 0.2, leaf: true }, // 사과
+    5: { len: 0.16, leaf: true }, // 배
+    6: { len: 0.12, leaf: true }, // 복숭아
+    8: { len: 0.13, leaf: false }, // 멜론
+    9: { len: 0.14, leaf: true }, // 수박
+  }
+  const spec = STEM[tier]
+  if (!spec) return
+
+  const len = r * spec.len
   c.save()
   c.strokeStyle = '#6D4C2F'
   c.lineWidth = Math.max(r * 0.08, 2)
@@ -82,22 +158,76 @@ function drawStemAndLeaf(c: CanvasRenderingContext2D, tier: number, r: number) {
   c.moveTo(0, -r * 0.9)
   c.quadraticCurveTo(r * 0.08, -r - len * 0.7, r * 0.18, -r - len)
   c.stroke()
-  // 잎
-  c.fillStyle = '#4CAF50'
-  c.beginPath()
-  c.ellipse(r * 0.36, -r - len * 0.85, r * 0.2, r * 0.1, -0.5, 0, Math.PI * 2)
-  c.fill()
+  if (spec.leaf) {
+    c.fillStyle = '#4CAF50'
+    c.beginPath()
+    c.ellipse(r * 0.36, -r - len * 0.85, r * 0.2, r * 0.1, -0.5, 0, Math.PI * 2)
+    c.fill()
+  }
   c.restore()
 }
 
-// 티어별 고유 무늬 (원 내부로 클리핑된 상태에서 호출)
+// 파인애플 — 위로 뻗은 잎 다발
+function pineappleCrown(c: CanvasRenderingContext2D, r: number) {
+  c.save()
+  c.fillStyle = '#5A9E3D'
+  for (const [tilt, len] of [
+    [-0.55, 0.34],
+    [-0.24, 0.46],
+    [0, 0.52],
+    [0.24, 0.46],
+    [0.55, 0.34],
+  ] as Array<[number, number]>) {
+    c.save()
+    c.rotate(tilt)
+    c.beginPath()
+    c.moveTo(-r * 0.11, -r * 0.9)
+    c.quadraticCurveTo(0, -r * (1 + len), r * 0.11, -r * 0.9)
+    c.closePath()
+    c.fill()
+    c.restore()
+  }
+  c.restore()
+}
+
+// 딸기 꽃받침 — 본체 위에 얹힌 별 모양. 클리핑 안에서 그리면 표면에 박힌
+// 초록 조각처럼 보여서 본체를 다 그린 뒤 위에 올린다.
+function drawCalyx(c: CanvasRenderingContext2D, tier: number, r: number) {
+  if (tier !== 1) return
+  c.save()
+  c.translate(0, -r * 0.72)
+  c.fillStyle = '#43A047'
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2
+    c.save()
+    c.rotate(a)
+    c.beginPath()
+    c.moveTo(-r * 0.1, 0)
+    c.quadraticCurveTo(0, -r * 0.52, r * 0.1, 0)
+    c.closePath()
+    c.fill()
+    c.restore()
+  }
+  // 가운데 짧은 꼭지
+  c.strokeStyle = '#2E7D32'
+  c.lineWidth = Math.max(r * 0.07, 1.8)
+  c.lineCap = 'round'
+  c.beginPath()
+  c.moveTo(0, 0)
+  c.lineTo(0, -r * 0.34)
+  c.stroke()
+  c.restore()
+}
+
+// ── 표면 무늬 (본체로 클리핑된 상태에서 호출) ──────────────
+
 function drawPattern(c: CanvasRenderingContext2D, tier: number, r: number, dark: string) {
   switch (tier) {
     case 0: // 체리 — 중앙 세로 홈
       creaseLine(c, r, dark, 0.28)
       break
-    case 1: // 딸기 — 씨앗 + 위쪽 꼭지잎
-      strawberry(c, r)
+    case 1: // 딸기 — 씨앗
+      strawberrySeeds(c, r)
       break
     case 2: // 포도 — 알갱이 뭉치
       grape(c, r, dark)
@@ -105,13 +235,13 @@ function drawPattern(c: CanvasRenderingContext2D, tier: number, r: number, dark:
     case 3: // 오렌지 — 껍질 질감 + 배꼽
       orange(c, r, dark)
       break
-    case 4: // 사과 — 세로 홈 + 얼룩
-      creaseLine(c, r, dark, 0.2)
+    case 4: // 사과 — 세로 홈
+      creaseLine(c, r, dark, 0.22)
       break
     case 5: // 배 — 잔점 무늬
       speckles(c, r, dark, 26, 0.4)
       break
-    case 6: // 복숭아 — 붉은 볼터치 + 홈
+    case 6: // 복숭아 — 붉은 볼터치 + 깊은 홈
       peach(c, r, dark)
       break
     case 7: // 파인애플 — 격자 무늬
@@ -138,9 +268,8 @@ function creaseLine(c: CanvasRenderingContext2D, r: number, dark: string, alpha:
   c.restore()
 }
 
-function strawberry(c: CanvasRenderingContext2D, r: number) {
+function strawberrySeeds(c: CanvasRenderingContext2D, r: number) {
   c.save()
-  // 씨앗
   c.fillStyle = '#FFE082'
   const seeds: Array<[number, number]> = [
     [-0.5, -0.1], [-0.2, 0.22], [0.12, -0.02], [0.42, 0.2],
@@ -153,17 +282,6 @@ function strawberry(c: CanvasRenderingContext2D, r: number) {
     c.rotate(sx + sy)
     c.beginPath()
     c.ellipse(0, 0, r * 0.075, r * 0.045, 0, 0, Math.PI * 2)
-    c.fill()
-    c.restore()
-  }
-  // 꼭지 잎
-  c.fillStyle = '#43A047'
-  for (let i = 0; i < 5; i++) {
-    const a = -Math.PI / 2 + (i - 2) * 0.42
-    c.save()
-    c.rotate(a)
-    c.beginPath()
-    c.ellipse(0, -r * 0.82, r * 0.13, r * 0.3, 0, 0, Math.PI * 2)
     c.fill()
     c.restore()
   }
@@ -189,7 +307,7 @@ function grape(c: CanvasRenderingContext2D, r: number, dark: string) {
     c.arc(gx * r, gy * r, gr * r, 0, Math.PI * 2)
     c.fill()
 
-    c.globalAlpha = 0.5
+    c.globalAlpha = 0.6
     c.strokeStyle = dark
     c.lineWidth = Math.max(r * 0.05, 1.3)
     c.stroke()
@@ -201,12 +319,18 @@ function grape(c: CanvasRenderingContext2D, r: number, dark: string) {
 function orange(c: CanvasRenderingContext2D, r: number, dark: string) {
   speckles(c, r, dark, 30, 0.16)
   c.save()
-  // 배꼽
-  c.globalAlpha = 0.35
-  c.fillStyle = dark
-  c.beginPath()
-  c.arc(0, -r * 0.78, r * 0.11, 0, Math.PI * 2)
-  c.fill()
+  // 배꼽 — 작게 그려도 남도록 별 모양 자국
+  c.globalAlpha = 0.4
+  c.strokeStyle = dark
+  c.lineWidth = Math.max(r * 0.045, 1.2)
+  c.lineCap = 'round'
+  for (let i = 0; i < 5; i++) {
+    const a = (i / 5) * Math.PI * 2
+    c.beginPath()
+    c.moveTo(0, -r * 0.78)
+    c.lineTo(Math.sin(a) * r * 0.18, -r * 0.78 + Math.cos(a) * r * 0.18)
+    c.stroke()
+  }
   c.restore()
 }
 
@@ -235,14 +359,14 @@ function peach(c: CanvasRenderingContext2D, r: number, dark: string) {
   c.save()
   // 붉은 그라데이션 블러시
   const grad = c.createRadialGradient(r * 0.35, r * 0.1, r * 0.05, r * 0.3, 0, r * 1.1)
-  grad.addColorStop(0, 'rgb(244 67 54 / 0.4)')
+  grad.addColorStop(0, 'rgb(244 67 54 / 0.45)')
   grad.addColorStop(1, 'rgb(244 67 54 / 0)')
   c.fillStyle = grad
   c.beginPath()
   c.arc(0, 0, r, 0, Math.PI * 2)
   c.fill()
   c.restore()
-  creaseLine(c, r, dark, 0.3)
+  creaseLine(c, r, dark, 0.4)
 }
 
 function pineapple(c: CanvasRenderingContext2D, r: number, dark: string) {
