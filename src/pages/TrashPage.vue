@@ -4,9 +4,15 @@
 import { GAMES } from '@/games/registry'
 import GameIcon from '@/shared/GameIcon.vue'
 import { t } from '@/shared/i18n'
-import { getLocalBest, trashedGames } from '@/shared/scores'
+import { getLocalBest, popularityRanks, trashedGames } from '@/shared/scores'
 
-const cards = trashedGames(GAMES).map((game) => ({ ...game, best: getLocalBest(game.slug) }))
+// 순위는 홈과 같은 기준으로 매긴다 — 그래서 홈에서 비어 보이는 번호가 여기에 있다
+const ranks = popularityRanks()
+const cards = trashedGames(GAMES).map((game) => ({
+  ...game,
+  rank: ranks.get(game.slug) ?? null,
+  best: getLocalBest(game.slug),
+}))
 </script>
 
 <template>
@@ -26,6 +32,7 @@ const cards = trashedGames(GAMES).map((game) => ({ ...game, best: getLocalBest(g
         class="game-card"
         :to="`/play/${game.slug}`"
       >
+        <span v-if="game.rank !== null" class="rank">{{ game.rank }}</span>
         <span class="thumb"><GameIcon :slug="game.slug" /></span>
         <strong>{{ t(game.titleKey) }}</strong>
         <small>{{ game.best === null ? '' : t('home.best', { n: game.best.toLocaleString() }) }}</small>
@@ -76,6 +83,7 @@ const cards = trashedGames(GAMES).map((game) => ({ ...game, best: getLocalBest(g
 }
 
 .game-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -85,6 +93,16 @@ const cards = trashedGames(GAMES).map((game) => ({ ...game, best: getLocalBest(g
   border-radius: 14px;
   box-shadow: 0 2px 8px rgb(93 64 55 / 0.08);
   text-align: center;
+}
+
+/* 홈과 같은 자리 — 카드 크기는 그대로 두고 왼쪽 위 여백에 얹는다 */
+.rank {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  font-size: 11px;
+  font-weight: bold;
+  color: #d7ccc8;
 }
 
 .thumb {
