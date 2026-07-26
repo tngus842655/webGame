@@ -5,7 +5,12 @@ import { t } from './i18n'
 
 export interface AdProvider {
   isReady(): boolean
-  // true = 끝까지 시청 완료(보상 지급)
+  // 반환값 = 보상을 지급할지.
+  //   광고를 끝까지 봤다            → true
+  //   광고를 띄울 수 없었다(재고 없음·빈도 상한·에러) → true
+  //   사용자가 광고를 중간에 닫았다 → false
+  // 두 번째가 중요하다. 버튼을 눌렀는데 매체 사정으로 광고가 안 나온 것은
+  // 사용자 잘못이 아니므로 기회를 뺏지 않는다.
   show(placement: string): Promise<boolean>
 }
 
@@ -20,7 +25,8 @@ class StubAdProvider implements AdProvider {
   }
 
   show(_placement: string): Promise<boolean> {
-    if (this.showing) return Promise.resolve(false)
+    // 겹쳐 부르면 띄울 수 없는 상황이라 보상은 준다 (실제 매체와 같은 규칙)
+    if (this.showing) return Promise.resolve(true)
     this.showing = true
     return new Promise((resolve) => {
       const el = document.createElement('div')
@@ -65,19 +71,35 @@ class StubAdProvider implements AdProvider {
   }
 }
 
+// 광고 매체가 없는 빌드. isReady()가 false라 버튼 자체가 노출되지 않지만,
+// 혹시 호출되면 매체 사정으로 못 본 것이므로 보상은 준다.
 class NoAdProvider implements AdProvider {
   isReady() {
     return false
   }
 
   show(_placement: string): Promise<boolean> {
-    return Promise.resolve(false)
+    return Promise.resolve(true)
   }
 }
 
 // H5 Games Ads (AdSense Ad Placement API) — 웹과 안드로이드 패키징(TWA) 양쪽에서 같은 코드로 돈다.
 // adBreak/adConfig는 adsbygoogle 큐에 객체를 넣는 방식이라 스크립트 로드 전에 호출해도 쌓였다가 처리된다.
-type AdBreakStatus = 'viewed' | 'dismissed' | 'notReady' | 'timeout' | 'error' | string
+type AdBreakStatus =
+  | 'viewed'
+  | 'dismissed'
+  | 'notReady'
+  | 'timeout'
+  | 'error'
+  | 'noAdPreloaded'
+  | 'frequencyCapped'
+  | 'ignored'
+  | 'other'
+  | string
+
+// 사용자가 스스로 광고를 닫은 경우에만 보상을 막는다. 나머지(재고 없음·상한·에러)는
+// 매체 사정이라 보상을 준다.
+const DENIES_REWARD: ReadonlySet<AdBreakStatus> = new Set(['dismissed'])
 
 class H5GamesAdProvider implements AdProvider {
   private queue: unknown[]
@@ -102,29 +124,32 @@ class H5GamesAdProvider implements AdProvider {
     return !this.showing
   }
 
-  // 재고가 없거나 빈도 상한에 걸리면 광고 없이 breakStatus만 돌아온다 → false(보상 없음)
   show(placement: string): Promise<boolean> {
-    if (this.showing) return Promise.resolve(false)
+    // 이미 광고가 떠 있는데 또 부르면 매체가 거절한다 — 사용자에게 기회를 돌려준다
+    if (this.showing) return Promise.resolve(true)
     this.showing = true
     return new Promise((resolve) => {
-      let viewed = false
-      const done = () => {
+      let dismissed = false
+      let settled = false
+      const finish = (reward: boolean) => {
+        if (settled) return
+        settled = true
         this.showing = false
-        resolve(viewed)
+        resolve(reward)
       }
       this.queue.push({
         type: 'reward',
         name: placement,
         beforeReward: (showAdFn: () => void) => showAdFn(),
         adViewed: () => {
-          viewed = true
+          dismissed = false
         },
         adDismissed: () => {
-          viewed = false
+          dismissed = true
         },
         adBreakDone: (info: { breakStatus: AdBreakStatus }) => {
-          if (info.breakStatus !== 'viewed') viewed = false
-          done()
+          // 재고가 없거나 상한에 걸리면 광고 없이 breakStatus만 돌아온다 → 보상 지급
+          finish(!dismissed && !DENIES_REWARD.has(info.breakStatus))
         },
       })
     })
