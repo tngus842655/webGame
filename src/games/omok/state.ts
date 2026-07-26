@@ -17,11 +17,11 @@ export function stageSeconds(stage: number): number {
 
 // 단 클리어 기본 점수 (단이 오를수록 크게)
 export function stagePoints(stage: number): number {
-  return 200 + (stage - 1) * 100
+  return 450 + (stage - 1) * 220
 }
 
 // 제한 시간이 있는 단은 남긴 시간을 점수로 바꿔준다
-export const TIME_BONUS_PER_SEC = 4
+export const TIME_BONUS_PER_SEC = 9
 
 export interface OmokState {
   phase: Phase

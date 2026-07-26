@@ -98,7 +98,8 @@ export function ensureNotes(state: RhythmState) {
   while (state.bar < SONG_BARS && state.genTime < state.time + APPROACH + 4) generateBar(state)
 }
 
-const JUDGE_SCORE: Record<Judge, number> = { perfect: 100, great: 60, good: 30, miss: 0 }
+// 노트가 워낙 많아 다른 게임의 25배로 쌓였다 — 판정당 점수를 낮춰 분당 점수를 맞춘다
+const JUDGE_SCORE: Record<Judge, number> = { perfect: 4, great: 2, good: 1, miss: 0 }
 const JUDGE_HEALTH: Record<Judge, number> = { perfect: 2, great: 1, good: 0, miss: -12 }
 
 function applyJudge(state: RhythmState, note: Note, judge: Judge) {

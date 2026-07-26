@@ -230,7 +230,7 @@ export function submitGuess(state: WordleState): SubmitResult {
   }
 
   if (result.every((s) => s === 'g')) {
-    const points = (state.maxRows + 1 - state.rows.length) * 100
+    const points = (state.maxRows + 1 - state.rows.length) * 220
     if (state.daily) {
       // 스트릭은 출석 표시일 뿐 점수에는 넣지 않는다 (순위표는 이번 판 실력만 반영)
       state.streak = recordDailyClear().streak

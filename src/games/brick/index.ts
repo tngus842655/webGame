@@ -121,10 +121,11 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (brick.hp > 0) return
     state.bricks.splice(index, 1)
     state.run.gold += brick.maxHp
-    state.score += brick.maxHp
+    // 점수만 다른 게임과 자릿수를 맞춘다 (골드는 강화 경제라 그대로)
+    state.score += Math.ceil(brick.maxHp / 7)
     const r = brickRect(brick.col, brick.row)
     state.flashes.push({ x: r.x, y: r.y, w: r.w, h: r.h, age: 0 })
-    state.popups.push({ x: r.x + r.w / 2, y: r.y + r.h / 2, text: `+${brick.maxHp}`, age: 0 })
+    state.popups.push({ x: r.x + r.w / 2, y: r.y + r.h / 2, text: `+${Math.ceil(brick.maxHp / 7)}`, age: 0 })
     playMerge(2)
     vibrate(10)
   }

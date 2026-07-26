@@ -269,7 +269,7 @@ export function update(state: DefenseState, dt: number): TickEvents {
       b.target.hp -= b.damage
       if (b.target.hp <= 0) {
         state.gold += b.target.gold
-        state.score = Math.min(1_000_000, state.score + 5 + state.wave)
+        state.score = Math.min(1_000_000, state.score + 2 + Math.floor(state.wave / 2))
         state.enemies.splice(state.enemies.indexOf(b.target), 1)
         events.kills += 1
       }
@@ -282,7 +282,7 @@ export function update(state: DefenseState, dt: number): TickEvents {
 
   // 웨이브 클리어
   if (state.waveBreak <= 0 && state.spawnLeft === 0 && state.enemies.length === 0) {
-    state.score = Math.min(1_000_000, state.score + state.wave * 50)
+    state.score = Math.min(1_000_000, state.score + state.wave * 20)
     state.wave += 1
     state.waveBreak = 2.5
     events.waveCleared = true

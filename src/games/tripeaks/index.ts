@@ -101,17 +101,17 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     })
     state.waste.push({ rank: card.rank, suit: card.suit })
     state.streak += 1
-    addScore(50 * state.streak)
+    addScore(20 * state.streak)
     playMerge(Math.min(state.streak, 8))
     if (card.row === 0) {
       // 봉우리 하나 완전 제거
-      addScore(500)
+      addScore(200)
       vibrate(30)
     }
     flipUncovered(state.table)
     if (state.table.every((other) => other.removed)) {
       // 보드 클리어 → 잠시 후 다음 스테이지
-      addScore(1000 + state.stock.length * 100)
+      addScore(400 + state.stock.length * 40)
       state.clearTimer = 0.9
     } else if (state.stock.length === 0 && !hasMoves(state.table, wasteTop().rank)) {
       void gameOver()

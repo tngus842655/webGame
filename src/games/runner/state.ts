@@ -43,8 +43,9 @@ export function speedAt(time: number): number {
   return Math.min(1300, 420 + time * 10)
 }
 
+// 거리가 빠르게 쌓여 다른 게임의 6배였다 — 환산 비율을 낮춘다
 export function scoreOf(state: RunnerState): number {
-  return Math.floor(state.distance / 10) + state.coinScore
+  return Math.floor(state.distance / 60) + state.coinScore
 }
 
 export function createState(): RunnerState {
@@ -127,7 +128,7 @@ export function update(state: RunnerState, dt: number): UpdateResult {
       coin.y < state.playerY + 10
     if (hit) {
       coinsTaken += 1
-      state.coinScore += 15
+      state.coinScore += 3
       return false
     }
     return true
