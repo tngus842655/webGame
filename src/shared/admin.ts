@@ -30,27 +30,46 @@ export async function ensureAdminChecked(): Promise<boolean> {
   return refreshAdmin()
 }
 
+// 인기 상위 몇 개를 남길지 — 이 밖으로 밀린 게임이 휴지통 후보다
+export const TOP_KEEP = 30
+
+// 휴지통 보관 기간. 이 기간이 지나면 코드에서 제거해도 되는 것으로 본다.
+// 자동으로 지우지는 않는다 — 실제 삭제는 레지스트리와 폴더를 지우는 커밋이라 사람이 한다.
+export const RETENTION_DAYS = 30
+
+// 보관 기간이 며칠 남았는지 (0이면 지금 제거해도 된다)
+export function daysLeft(trashedAt: string): number {
+  const elapsed = (Date.now() - new Date(trashedAt).getTime()) / 86_400_000
+  return Math.max(0, Math.ceil(RETENTION_DAYS - elapsed))
+}
+
 export interface GameFlag {
   slug: string
   featured: boolean
   hidden: boolean
   sortOrder: number
+  // 휴지통에 넣은 시각 (null이면 정상)
+  trashedAt: string | null
 }
 
 export async function fetchGameFlags(): Promise<GameFlag[]> {
   const { data, error } = await supabase
     .from('game_flags')
-    .select('slug, featured, hidden, sort_order')
+    .select('slug, featured, hidden, sort_order, trashed_at')
   if (error) throw error
   const flags = (data ?? []).map((row) => ({
     slug: row.slug as string,
     featured: row.featured as boolean,
     hidden: row.hidden as boolean,
     sortOrder: Number(row.sort_order),
+    trashedAt: (row.trashed_at as string | null) ?? null,
   }))
   // 홈 정렬이 서버 응답을 기다리지 않도록 캐시해 둔다
   cacheGameFlags(
-    flags.map((f) => [f.slug, { featured: f.featured, hidden: f.hidden, sortOrder: f.sortOrder }]),
+    flags.map((f) => [
+      f.slug,
+      { featured: f.featured, hidden: f.hidden, sortOrder: f.sortOrder, trashed: !!f.trashedAt },
+    ]),
   )
   return flags
 }
@@ -62,6 +81,7 @@ export async function saveGameFlag(flag: GameFlag): Promise<void> {
     featured: flag.featured,
     hidden: flag.hidden,
     sort_order: flag.sortOrder,
+    trashed_at: flag.trashedAt,
     updated_at: new Date().toISOString(),
   })
   if (error) throw error

@@ -110,6 +110,7 @@ interface CachedFlag {
   featured: boolean
   hidden: boolean
   sortOrder: number
+  trashed: boolean
 }
 
 // 관리자가 정한 노출 설정 — 첫 화면을 서버 응답까지 기다리지 않게 캐시해 둔다
@@ -126,13 +127,23 @@ export function cacheGameFlags(rows: Array<[string, CachedFlag]>): void {
   localStorage.setItem(FLAGS_KEY, JSON.stringify(rows))
 }
 
+// 인기 순위 (1위부터). 관리자 화면에서 '상위 30위 밖' 후보를 가려내는 데 쓴다.
+// 기록이 없는 게임은 순위가 없어 지도에 들어가지 않는다.
+export function popularityRanks(): Map<string, number> {
+  const sorted = [...cachedPopularity().entries()].sort((a, b) => b[1] - a[1])
+  return new Map(sorted.map(([slug], index) => [slug, index + 1]))
+}
+
 // 정렬: 관리자가 고정한 게임이 맨 앞(그 안에서는 sortOrder), 나머지는 인기순.
-// 감춤 처리된 게임은 목록에서 뺀다.
+// 감춤·휴지통 처리된 게임은 목록에서 뺀다.
 export function sortByPopularity<T extends { slug: string }>(games: readonly T[]): T[] {
   const popularity = cachedPopularity()
   const flags = cachedFlags()
   return games
-    .filter((game) => !flags.get(game.slug)?.hidden)
+    .filter((game) => {
+      const flag = flags.get(game.slug)
+      return !flag?.hidden && !flag?.trashed
+    })
     .slice()
     .sort((a, b) => {
       const fa = flags.get(a.slug)

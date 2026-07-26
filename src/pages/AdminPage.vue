@@ -1,30 +1,44 @@
 <script setup lang="ts">
 // 운영자 전용 화면 — 홈 목록에 게임을 어떻게 내보낼지 정한다.
 // 신규 게임은 기록이 없어 인기순 정렬에서 맨 뒤로 밀리므로 '상단 고정'으로 끌어올린다.
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { GAMES } from '@/games/registry'
 import GameIcon from '@/shared/GameIcon.vue'
 import { t, type TranslationKey } from '@/shared/i18n'
-import { fetchGameFlags, saveGameFlag, type GameFlag } from '@/shared/admin'
+import { fetchGameFlags, saveGameFlag, TOP_KEEP, type GameFlag } from '@/shared/admin'
+import { popularityRanks } from '@/shared/scores'
 
-const rows = ref<Array<{ slug: string; titleKey: TranslationKey; flag: GameFlag }>>([])
+interface Row {
+  slug: string
+  titleKey: TranslationKey
+  rank: number | null
+  flag: GameFlag
+}
+
+const all = ref<Row[]>([])
 const loading = ref(true)
 const failed = ref(false)
 const saving = ref('')
 const error = ref('')
 
+const rows = computed(() => all.value.filter((row) => !row.flag.trashedAt))
+const trashedCount = computed(() => all.value.length - rows.value.length)
+
 onMounted(async () => {
   try {
     const bySlug = new Map((await fetchGameFlags()).map((flag) => [flag.slug, flag]))
+    const ranks = popularityRanks()
     // 등록 순서 그대로 — 숨긴 게임도 여기서는 보여야 다시 켤 수 있다
-    rows.value = GAMES.map((game) => ({
+    all.value = GAMES.map((game) => ({
       slug: game.slug,
       titleKey: game.titleKey,
+      rank: ranks.get(game.slug) ?? null,
       flag: bySlug.get(game.slug) ?? {
         slug: game.slug,
         featured: false,
         hidden: false,
         sortOrder: 0,
+        trashedAt: null,
       },
     }))
   } catch {
@@ -45,6 +59,13 @@ async function save(flag: GameFlag) {
     saving.value = ''
   }
 }
+
+async function moveToTrash(row: Row) {
+  if (!confirm(t('admin.trashConfirm', { name: t(row.titleKey) }))) return
+  const next = { ...row.flag, trashedAt: new Date().toISOString() }
+  await save(next)
+  if (!error.value) row.flag = next
+}
 </script>
 
 <template>
@@ -55,6 +76,11 @@ async function save(flag: GameFlag) {
       <RouterLink class="stats-link" to="/stats">{{ t('stats.title') }}</RouterLink>
     </header>
 
+    <RouterLink class="menu-link" to="/admin/trash">
+      <span>🗑️ {{ t('admin.trash') }}</span>
+      <span class="count">{{ trashedCount > 0 ? trashedCount : '' }} ›</span>
+    </RouterLink>
+
     <p class="hint">{{ t('admin.hint') }}</p>
     <p v-if="error" class="error">{{ error }}</p>
 
@@ -64,7 +90,13 @@ async function save(flag: GameFlag) {
       <li v-for="row in rows" :key="row.slug" class="row" :class="{ busy: saving === row.slug }">
         <span class="thumb"><GameIcon :slug="row.slug" /></span>
         <div class="info">
-          <strong>{{ t(row.titleKey) }}</strong>
+          <div class="title-line">
+            <strong>{{ t(row.titleKey) }}</strong>
+            <span v-if="row.rank === null" class="rank">{{ t('admin.unranked') }}</span>
+            <span v-else class="rank" :class="{ out: row.rank > TOP_KEEP }">
+              {{ t('admin.rank', { n: row.rank }) }}
+            </span>
+          </div>
           <div class="controls">
             <label>
               <input v-model="row.flag.featured" type="checkbox" @change="save(row.flag)" />
@@ -84,6 +116,9 @@ async function save(flag: GameFlag) {
                 @change="save(row.flag)"
               />
             </label>
+            <button type="button" class="trash-btn" @click="moveToTrash(row)">
+              {{ t('admin.toTrash') }}
+            </button>
           </div>
         </div>
       </li>
@@ -117,6 +152,23 @@ async function save(flag: GameFlag) {
   font-size: 13px;
   color: #8d6e63;
   text-decoration: underline;
+}
+
+.menu-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  background: #fff;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.count {
+  color: #bcaaa4;
+  font-weight: normal;
 }
 
 .hint {
@@ -170,8 +222,27 @@ async function save(flag: GameFlag) {
   min-width: 0;
 }
 
-.info strong {
+.title-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.title-line strong {
   font-size: 14px;
+}
+
+.rank {
+  flex: none;
+  font-size: 11px;
+  color: #bcaaa4;
+}
+
+/* 30위 밖 = 휴지통 후보 */
+.rank.out {
+  color: #e65100;
+  font-weight: bold;
 }
 
 .controls {
@@ -201,5 +272,17 @@ async function save(flag: GameFlag) {
   border: 1px solid #d7ccc8;
   border-radius: 7px;
   font: inherit;
+}
+
+.trash-btn {
+  margin-left: auto;
+  padding: 4px 10px;
+  border: 1px solid #ffccbc;
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+  font-size: 12px;
+  color: #e65100;
+  cursor: pointer;
 }
 </style>
