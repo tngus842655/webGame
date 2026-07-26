@@ -10,6 +10,7 @@ import {
   sortByPopularity,
   type MyGameStat,
 } from '@/shared/scores'
+import { ensureAdminChecked, fetchGameFlags, isAdmin } from '@/shared/admin'
 
 
 // 기록이 없어도 빈 문자열을 반환해 한 줄을 차지한다 (CSS에서 높이 확보)
@@ -33,6 +34,9 @@ const cards = ref(
 )
 
 onMounted(async () => {
+  // 노출 설정·인기도는 캐시에 담아두고 다음 진입부터 반영한다 (보는 도중 카드가 움직이지 않도록)
+  void fetchGameFlags().catch(() => {})
+  void ensureAdminChecked()
   const [, myStats] = await Promise.all([
     refreshPopularity(),
     fetchMyStats().catch(() => [] as MyGameStat[]),
@@ -48,7 +52,7 @@ onMounted(async () => {
       <h1>{{ t('app.title') }}</h1>
       <nav class="header-links">
         <RouterLink to="/ranking" :aria-label="t('home.ranking')">🏆</RouterLink>
-        <RouterLink to="/stats" :aria-label="t('stats.title')">📊</RouterLink>
+        <RouterLink v-if="isAdmin" to="/admin" :aria-label="t('admin.title')">🛠️</RouterLink>
         <RouterLink to="/settings" :aria-label="t('settings.title')">⚙️</RouterLink>
       </nav>
     </header>

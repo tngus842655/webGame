@@ -84,6 +84,8 @@ src/
 | `profiles` | auth.users 1:1. `nickname`, `nickname_set`(직접 설정 여부 — 소셜 닉네임 자동 적용 판단) |
 | `scores` | append-only 플레이 기록. 유저별 최고점은 `get_leaderboard`가 집계 |
 | `play_sessions` | 게임별 플레이 시간. 인기 순위(`get_game_popularity`)·통계의 근거 |
+| `admin_emails` | 관리자 이메일 목록. RLS를 켜고 정책을 두지 않아 클라이언트에서 읽지도 쓰지도 못한다 |
+| `game_flags` | 게임별 노출 설정(`featured`/`hidden`/`sort_order`). 조회 공개, 쓰기는 관리자만 |
 
 ### 인증 흐름 (구현 완료)
 
@@ -132,6 +134,24 @@ src/
 
 `AppLayout.vue`가 `webgame:onboarded` 플래그로 게이트한다. 플래그가 없어도 세션이
 살아 있으면(소셜 로그인 복귀·저장소만 지워진 재방문) 다시 묻지 않는다.
+
+### 관리자
+
+관리자 여부는 **이메일**로 정한다. `admin_emails`에 이메일을 넣는 일은 Supabase
+대시보드에서 직접 한다 — 앱에서 관리자를 추가하는 화면은 만들지 않는다.
+익명 계정에는 이메일이 없으므로 관리자는 반드시 구글/카카오로 로그인해야 한다.
+
+- `is_admin()` — `security definer`. `auth.jwt() ->> 'email'`을 `admin_emails`와 대조한다.
+- **화면을 숨기는 것은 안내일 뿐**이다. 실제 차단은 두 군데서 한다:
+  `game_flags` 쓰기는 RLS 정책이, `get_game_stats()`는 함수 첫 줄의 관리자 검사가 막는다.
+- 관리자 화면(`/admin`)에서 하는 일:
+  - **상단 고정**(`featured`) — 신규 게임은 기록이 없어 인기순 정렬 맨 뒤로 밀린다.
+    고정한 게임끼리는 `sort_order`(작을수록 앞) 순서로 맨 앞에 붙는다.
+  - **숨김**(`hidden`) — 문제가 생긴 게임을 배포 없이 목록에서 뺀다.
+- 통계(`/stats`)는 관리자만 볼 수 있다. 홈의 📊 링크는 🛠️ 관리자 링크로 바뀌었고
+  관리자에게만 보인다. `get_game_popularity()`는 홈 정렬에 필요하므로 공개로 남긴다.
+- 노출 설정은 인기도와 같이 localStorage에 캐시해 첫 렌더부터 쓴다 — 보는 도중
+  카드가 움직이지 않도록 새로 받은 값은 **다음 진입부터** 반영한다.
 
 ### RLS·치팅 대비
 

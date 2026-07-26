@@ -57,6 +57,14 @@ const en = {
   'common.back': '← Home',
   'stats.title': 'Statistics',
   'notes.title': 'Dev notes',
+  // 운영자 전용 화면 — 다른 언어는 en 폴백으로 둔다
+  'admin.title': 'Admin',
+  'admin.hint':
+    'Pinned games sit at the top of the home list regardless of popularity. Hidden games disappear from the list. Changes show up the next time the home screen opens.',
+  'admin.featured': 'Pin to top',
+  'admin.hidden': 'Hide',
+  'admin.order': 'Order',
+  'admin.saveFailed': 'Could not save.',
   'stats.days': '{n}d',
   'stats.plays': 'Plays',
   'stats.playtime': 'Play time',
@@ -257,6 +265,13 @@ const ko: typeof en = {
   'common.back': '← 홈',
   'stats.title': '통계',
   'notes.title': '개발자 노트',
+  'admin.title': '관리자',
+  'admin.hint':
+    '상단 고정한 게임은 인기 순위와 상관없이 홈 맨 앞에 나옵니다. 숨긴 게임은 목록에서 빠집니다. 바뀐 내용은 홈에 다시 들어갈 때 반영됩니다.',
+  'admin.featured': '상단 고정',
+  'admin.hidden': '숨김',
+  'admin.order': '순서',
+  'admin.saveFailed': '저장하지 못했어요.',
   'stats.days': '{n}일',
   'stats.plays': '플레이 횟수',
   'stats.playtime': '플레이 시간',

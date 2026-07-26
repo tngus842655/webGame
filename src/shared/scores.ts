@@ -104,9 +104,43 @@ function cachedPopularity(): Map<string, number> {
 }
 
 // 동률(기록이 아직 없는 신규 게임 포함)은 레지스트리 순서 유지 — sort는 안정 정렬
+const FLAGS_KEY = 'webgame:gameFlags'
+
+interface CachedFlag {
+  featured: boolean
+  hidden: boolean
+  sortOrder: number
+}
+
+// 관리자가 정한 노출 설정 — 첫 화면을 서버 응답까지 기다리지 않게 캐시해 둔다
+function cachedFlags(): Map<string, CachedFlag> {
+  try {
+    const raw = JSON.parse(localStorage.getItem(FLAGS_KEY) ?? '[]')
+    return new Map(Array.isArray(raw) ? (raw as Array<[string, CachedFlag]>) : [])
+  } catch {
+    return new Map()
+  }
+}
+
+export function cacheGameFlags(rows: Array<[string, CachedFlag]>): void {
+  localStorage.setItem(FLAGS_KEY, JSON.stringify(rows))
+}
+
+// 정렬: 관리자가 고정한 게임이 맨 앞(그 안에서는 sortOrder), 나머지는 인기순.
+// 감춤 처리된 게임은 목록에서 뺀다.
 export function sortByPopularity<T extends { slug: string }>(games: readonly T[]): T[] {
   const popularity = cachedPopularity()
-  return [...games].sort((a, b) => (popularity.get(b.slug) ?? 0) - (popularity.get(a.slug) ?? 0))
+  const flags = cachedFlags()
+  return games
+    .filter((game) => !flags.get(game.slug)?.hidden)
+    .slice()
+    .sort((a, b) => {
+      const fa = flags.get(a.slug)
+      const fb = flags.get(b.slug)
+      if (!!fa?.featured !== !!fb?.featured) return fa?.featured ? -1 : 1
+      if (fa?.featured && fb?.featured) return (fa.sortOrder ?? 0) - (fb.sortOrder ?? 0)
+      return (popularity.get(b.slug) ?? 0) - (popularity.get(a.slug) ?? 0)
+    })
 }
 
 export async function refreshPopularity(): Promise<void> {
