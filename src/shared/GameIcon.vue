@@ -346,6 +346,20 @@ defineProps<{ slug: string }>()
       <path d="M19.5 31.5 L22.5 36.5 L16.5 36.5 Z" fill="#66BB6A" />
     </g>
 
+    <!-- 별똥별 잇기 -->
+    <g v-else-if="slug === 'comet'">
+      <rect x="4" y="4" width="40" height="40" rx="8" fill="#0A1230" />
+      <circle cx="12" cy="10" r="1.1" fill="#FFFFFF" opacity="0.5" />
+      <circle cx="37" cy="9" r="1.4" fill="#FFFFFF" opacity="0.4" />
+      <circle cx="30" cy="38" r="1.1" fill="#FFFFFF" opacity="0.35" />
+      <path d="M7 33 Q22 12 41 22" stroke="#B2EBF2" stroke-width="2.6" fill="none" stroke-linecap="round" />
+      <path d="M8 38 L13 30" stroke="#FFB74D" stroke-width="3" stroke-linecap="round" opacity="0.75" />
+      <circle cx="14" cy="28.5" r="4.2" fill="#FFE082" />
+      <path d="M22 26 L27 18" stroke="#FFB74D" stroke-width="3" stroke-linecap="round" opacity="0.75" />
+      <circle cx="28" cy="16.5" r="4.6" fill="#FFE082" />
+      <circle cx="26.6" cy="15.2" r="1.7" fill="#FFFFFF" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />

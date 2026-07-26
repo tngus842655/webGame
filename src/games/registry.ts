@@ -138,4 +138,9 @@ export const GAMES: GameMeta[] = [
     titleKey: 'game.samepic',
     loader: () => import('./samepic'),
   },
+  {
+    slug: 'comet',
+    titleKey: 'game.comet',
+    loader: () => import('./comet'),
+  },
 ]

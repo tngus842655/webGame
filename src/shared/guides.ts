@@ -146,6 +146,11 @@ const ko: Record<string, Guide> = {
     how: '어느 쪽 원판이든 그 그림을 탭하면 됩니다. 틀리면 2초를 잃습니다.',
     score: '한 번에 30점, 연속으로 맞힐수록 최대 80점까지 오르고 맞힐 때마다 시간이 조금 회복됩니다.',
   },
+  comet: {
+    goal: '솟아오르는 별똥별을 한 획으로 이어 터뜨리세요. 세 개를 놓치면 끝입니다.',
+    how: '화면을 쓸어 선을 그으면 선에 닿은 별똥별이 함께 터집니다. 손을 뗄 때까지가 한 획입니다.',
+    score: '한 획에 여러 개를 이을수록 배수가 붙습니다(5개 이상 3배). 하나씩 지우면 점수가 잘 오르지 않습니다.',
+  },
 }
 
 const en: Record<string, Guide> = {
@@ -283,6 +288,11 @@ const en: Record<string, Guide> = {
     goal: 'Find the one picture that appears on both discs and tap it. When the time gauge empties, the run ends.',
     how: 'Tap that picture on either disc. A wrong tap costs 2 seconds.',
     score: '30 per find, up to 80 on a streak, and every find gives a little time back.',
+  },
+  comet: {
+    goal: 'Chain the rising comets with a single stroke. Miss three and the run ends.',
+    how: 'Swipe across the screen — every comet the line touches pops. One stroke lasts until you lift your finger.',
+    score: 'More comets in one stroke means a bigger multiplier (3× from five up). Popping them one at a time barely scores.',
   },
 }
 
@@ -422,6 +432,11 @@ const ja: Record<string, Guide> = {
     how: 'どちらの円盤でもその絵をタップすればOK。間違えると2秒失います。',
     score: '1回30点、連続で当てるほど最大80点まで上がり、当てるたびに時間が少し戻ります。',
   },
+  comet: {
+    goal: '打ち上がる流れ星を一筆でつないで割りましょう。3個逃すと終了です。',
+    how: '画面をなぞって線を引くと、線に触れた流れ星がまとめて割れます。指を離すまでが一筆です。',
+    score: '一筆で多くつなぐほど倍率が上がります（5個以上で3倍）。1個ずつ消すと点が伸びません。',
+  },
 }
 
 const zhCN: Record<string, Guide> = {
@@ -559,6 +574,11 @@ const zhCN: Record<string, Guide> = {
     goal: '找出上下圆盘共有的那一个图案并点它。时间条用完就结束。',
     how: '在任意一个圆盘上点那个图案即可。点错会失去2秒。',
     score: '每次30分，连对最高可到80分，每次答对还会回一点时间。',
+  },
+  comet: {
+    goal: '用一笔把升起的流星连起来击破。漏掉三颗就结束。',
+    how: '在屏幕上滑动画线，线碰到的流星会一起破。抬手前都算同一笔。',
+    score: '一笔连得越多倍率越高（5颗以上3倍）。一颗一颗消分数涨得很慢。',
   },
 }
 
@@ -698,6 +718,11 @@ const es: Record<string, Guide> = {
     how: 'Tócalo en cualquiera de los dos discos. Un fallo cuesta 2 segundos.',
     score: '30 por acierto, hasta 80 en racha, y cada acierto devuelve algo de tiempo.',
   },
+  comet: {
+    goal: 'Enlaza los cometas que suben con un solo trazo. Con tres fallos termina la partida.',
+    how: 'Desliza por la pantalla: todo cometa que toque la línea estalla. Un trazo dura hasta que levantas el dedo.',
+    score: 'Más cometas en un trazo, mayor multiplicador (3× desde cinco). De uno en uno casi no puntúa.',
+  },
 }
 
 const ptBR: Record<string, Guide> = {
@@ -835,6 +860,11 @@ const ptBR: Record<string, Guide> = {
     goal: 'Ache o único desenho que está nos dois discos e toque nele. Quando a barra de tempo zera, a partida acaba.',
     how: 'Toque nele em qualquer um dos discos. Errar custa 2 segundos.',
     score: '30 por acerto, até 80 em sequência, e cada acerto devolve um pouco de tempo.',
+  },
+  comet: {
+    goal: 'Ligue os cometas que sobem com um único traço. Perder três encerra a partida.',
+    how: 'Deslize pela tela: todo cometa que a linha tocar estoura. Um traço vale até você soltar o dedo.',
+    score: 'Mais cometas num traço, maior o multiplicador (3× a partir de cinco). Um por um quase não pontua.',
   },
 }
 
@@ -974,6 +1004,11 @@ const fr: Record<string, Guide> = {
     how: 'Touche-le sur l\'un ou l\'autre disque. Une erreur coûte 2 secondes.',
     score: '30 par trouvaille, jusqu\'à 80 en série, et chaque trouvaille rend un peu de temps.',
   },
+  comet: {
+    goal: 'Relie les comètes qui montent d\'un seul trait. Trois ratés et la partie s\'arrête.',
+    how: 'Balaye l\'écran : chaque comète touchée par la ligne éclate. Un trait dure jusqu\'à ce que tu lèves le doigt.',
+    score: 'Plus de comètes dans un trait, plus le multiplicateur monte (3× à partir de cinq). Une par une rapporte à peine.',
+  },
 }
 
 const de: Record<string, Guide> = {
@@ -1111,6 +1146,11 @@ const de: Record<string, Guide> = {
     goal: 'Finde das eine Bild, das auf beiden Scheiben vorkommt, und tippe es an. Ist die Zeitleiste leer, ist Schluss.',
     how: 'Tippe es auf einer der beiden Scheiben an. Ein Fehler kostet 2 Sekunden.',
     score: '30 pro Treffer, in Serie bis 80, und jeder Treffer gibt etwas Zeit zurück.',
+  },
+  comet: {
+    goal: 'Verbinde die aufsteigenden Sternschnuppen mit einem Strich. Drei verpasste beenden die Runde.',
+    how: 'Über den Bildschirm wischen – jede berührte Sternschnuppe platzt. Ein Strich zählt, bis du den Finger hebst.',
+    score: 'Mehr Treffer pro Strich heißt höherer Multiplikator (ab fünf 3×). Einzeln abräumen bringt kaum Punkte.',
   },
 }
 
@@ -1250,6 +1290,11 @@ const ru: Record<string, Guide> = {
     how: 'Нажмите её на любом из кругов. Ошибка стоит 2 секунды.',
     score: '30 за находку, до 80 в серии, и каждая находка немного возвращает время.',
   },
+  comet: {
+    goal: 'Соединяйте взлетающие кометы одним росчерком. Три промаха — конец.',
+    how: 'Проведите по экрану: каждая комета, которую задела линия, лопается. Росчерк длится, пока не отпустите палец.',
+    score: 'Чем больше комет за один росчерк, тем выше множитель (с пяти — 3×). По одной очков почти не даёт.',
+  },
 }
 
 const id: Record<string, Guide> = {
@@ -1387,6 +1432,11 @@ const id: Record<string, Guide> = {
     goal: 'Temukan satu gambar yang ada di kedua piringan lalu ketuk. Kalau bar waktu habis, permainan berakhir.',
     how: 'Ketuk gambar itu di piringan mana saja. Salah ketuk memotong 2 detik.',
     score: '30 per temuan, sampai 80 saat beruntun, dan tiap temuan mengembalikan sedikit waktu.',
+  },
+  comet: {
+    goal: 'Rangkai komet yang melesat naik dengan satu sapuan. Tiga kali lolos berarti tamat.',
+    how: 'Sapu layar — setiap komet yang tersentuh garis akan pecah. Satu sapuan berlaku sampai jari diangkat.',
+    score: 'Makin banyak komet dalam satu sapuan, makin besar pengali (3× dari lima ke atas). Satu-satu hampir tak menambah skor.',
   },
 }
 
@@ -1526,6 +1576,11 @@ const vi: Record<string, Guide> = {
     how: 'Chạm hình đó ở đĩa nào cũng được. Chạm sai mất 2 giây.',
     score: '30 điểm mỗi lần, tối đa 80 khi liên tiếp, và mỗi lần đúng hồi lại chút thời gian.',
   },
+  comet: {
+    goal: 'Nối các sao băng đang bay lên bằng một nét. Bỏ lỡ ba lần là kết thúc.',
+    how: 'Quét trên màn hình — mọi sao băng mà đường nét chạm tới đều nổ. Một nét kéo dài tới khi bạn nhấc tay.',
+    score: 'Càng nhiều sao trong một nét, hệ số càng cao (từ năm là 3×). Bấm từng cái thì điểm lên rất chậm.',
+  },
 }
 
 const th: Record<string, Guide> = {
@@ -1664,6 +1719,11 @@ const th: Record<string, Guide> = {
     how: 'แตะภาพนั้นที่วงไหนก็ได้ แตะผิดเสียเวลา 2 วินาที',
     score: 'ครั้งละ 30 คะแนน ต่อเนื่องได้ถึง 80 และทุกครั้งที่ถูกจะได้เวลาคืนเล็กน้อย',
   },
+  comet: {
+    goal: 'ลากเส้นเดียวเชื่อมดาวตกที่พุ่งขึ้นมาให้แตก พลาดสามดวงจบเกม',
+    how: 'ปัดบนหน้าจอ ดาวตกทุกดวงที่เส้นแตะจะแตกพร้อมกัน หนึ่งเส้นนับจนกว่าจะยกนิ้ว',
+    score: 'เชื่อมได้มากในเส้นเดียวยิ่งได้ตัวคูณสูง (ห้าดวงขึ้นไป 3 เท่า) เก็บทีละดวงคะแนนขึ้นช้า',
+  },
 }
 
 const tr: Record<string, Guide> = {
@@ -1801,6 +1861,11 @@ const tr: Record<string, Guide> = {
     goal: 'İki diskte birlikte bulunan tek resmi bul ve dokun. Zaman göstergesi biterse oyun sona erer.',
     how: 'O resme iki diskten birinde dokun. Yanlış dokunuş 2 saniye götürür.',
     score: 'Her bulguda 30 puan, seride 80\'e kadar; her doğru bulgu biraz zaman geri verir.',
+  },
+  comet: {
+    goal: 'Yükselen kuyruklu yıldızları tek çizgide birbirine bağla. Üç tanesini kaçırırsan oyun biter.',
+    how: 'Ekranda parmağını kaydır — çizginin dokunduğu her yıldız patlar. Bir çizgi, parmağını kaldırana kadar sürer.',
+    score: 'Tek çizgide ne kadar çok yıldız olursa çarpan büyür (beşten sonra 3×). Tek tek patlatmak neredeyse puan getirmez.',
   },
 }
 const TABLES: Record<Locale, Record<string, Guide>> = {

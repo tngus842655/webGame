@@ -290,6 +290,9 @@ const en = {
   'game.samepic': 'Spot the Match',
   'sp.hint': 'One picture appears on both discs',
   'sp.ad': '▶ Watch ad for +10s (keep half the combo)',
+  'game.comet': 'Comet Chain',
+  'cm.chain': 'Best chain {n}',
+  'cm.ad': '▶ Watch ad to reset your misses',
 }
 
 const ko: typeof en = {
@@ -541,6 +544,9 @@ const ko: typeof en = {
   'game.samepic': '같은 그림 찾기',
   'sp.hint': '두 원판에 함께 있는 그림은 하나입니다',
   'sp.ad': '▶ 광고 보고 +10초 (콤보 절반 유지)',
+  'game.comet': '별똥별 잇기',
+  'cm.chain': '최다 {n}연결',
+  'cm.ad': '▶ 광고 보고 놓친 개수 0으로',
 }
 
 // 나머지 언어: 허브·게임오버·광고·제목까지 번역, 게임 내부 텍스트는 en 폴백
@@ -762,6 +768,9 @@ const ja: CoreDict = {
   'game.samepic': '同じ絵さがし',
   'sp.hint': '2つの円盤に共通する絵は一つだけ',
   'sp.ad': '▶ 広告を見て+10秒（コンボ半分維持）',
+  'game.comet': '流れ星つなぎ',
+  'cm.chain': '最多 {n}連結',
+  'cm.ad': '▶ 広告を見て見逃し数を0に',
 }
 
 const zhCN: CoreDict = {
@@ -980,6 +989,9 @@ const zhCN: CoreDict = {
   'game.samepic': '找相同图案',
   'sp.hint': '两个圆盘上只有一个图案相同',
   'sp.ad': '▶ 看广告 +10秒（保留一半连击）',
+  'game.comet': '连接流星',
+  'cm.chain': '最多连{n}颗',
+  'cm.ad': '▶ 看广告把失误清零',
 }
 
 const es: CoreDict = {
@@ -1198,6 +1210,9 @@ const es: CoreDict = {
   'game.samepic': 'Halla la Pareja',
   'sp.hint': 'Solo un dibujo está en los dos discos',
   'sp.ad': '▶ Ver anuncio: +10 s (media racha)',
+  'game.comet': 'Cadena de Cometas',
+  'cm.chain': 'Mejor cadena {n}',
+  'cm.ad': '▶ Ver anuncio y borrar los fallos',
 }
 
 const ptBR: CoreDict = {
@@ -1416,6 +1431,9 @@ const ptBR: CoreDict = {
   'game.samepic': 'Ache o Igual',
   'sp.hint': 'Só um desenho aparece nos dois discos',
   'sp.ad': '▶ Ver anúncio: +10s (metade do combo)',
+  'game.comet': 'Corrente de Cometas',
+  'cm.chain': 'Melhor corrente {n}',
+  'cm.ad': '▶ Ver anúncio e zerar as perdas',
 }
 
 const fr: CoreDict = {
@@ -1634,6 +1652,9 @@ const fr: CoreDict = {
   'game.samepic': 'Trouve la Paire',
   'sp.hint': 'Un seul dessin est sur les deux disques',
   'sp.ad': '▶ Pub : +10 s (moitié du combo)',
+  'game.comet': 'Chaîne de Comètes',
+  'cm.chain': 'Meilleure chaîne {n}',
+  'cm.ad': '▶ Pub pour remettre les ratés à zéro',
 }
 
 const de: CoreDict = {
@@ -1852,6 +1873,9 @@ const de: CoreDict = {
   'game.samepic': 'Finde das Gleiche',
   'sp.hint': 'Nur ein Bild ist auf beiden Scheiben',
   'sp.ad': '▶ Werbung: +10 s (halbe Serie bleibt)',
+  'game.comet': 'Sternschnuppen-Kette',
+  'cm.chain': 'Beste Kette {n}',
+  'cm.ad': '▶ Werbung ansehen: Fehlschläge auf 0',
 }
 
 const ru: CoreDict = {
@@ -2070,6 +2094,9 @@ const ru: CoreDict = {
   'game.samepic': 'Найди одинаковое',
   'sp.hint': 'Только одна картинка есть на обоих кругах',
   'sp.ad': '▶ Реклама: +10 с (половина серии)',
+  'game.comet': 'Цепочка комет',
+  'cm.chain': 'Лучшая цепочка {n}',
+  'cm.ad': '▶ Реклама: обнулить промахи',
 }
 
 const id: CoreDict = {
@@ -2288,6 +2315,9 @@ const id: CoreDict = {
   'game.samepic': 'Cari yang Sama',
   'sp.hint': 'Hanya satu gambar ada di kedua piringan',
   'sp.ad': '▶ Tonton iklan: +10 detik (kombo separuh)',
+  'game.comet': 'Rantai Komet',
+  'cm.chain': 'Rantai terbaik {n}',
+  'cm.ad': '▶ Tonton iklan untuk nolkan kegagalan',
 }
 
 const vi: CoreDict = {
@@ -2506,6 +2536,9 @@ const vi: CoreDict = {
   'game.samepic': 'Tìm Hình Giống Nhau',
   'sp.hint': 'Chỉ một hình có ở cả hai đĩa',
   'sp.ad': '▶ Xem quảng cáo: +10 giây (giữ nửa combo)',
+  'game.comet': 'Nối Sao Băng',
+  'cm.chain': 'Chuỗi cao nhất {n}',
+  'cm.ad': '▶ Xem quảng cáo để xoá số lần bỏ lỡ',
 }
 
 const th: CoreDict = {
@@ -2724,6 +2757,9 @@ const th: CoreDict = {
   'game.samepic': 'หาภาพที่เหมือนกัน',
   'sp.hint': 'มีเพียงภาพเดียวที่อยู่ทั้งสองวง',
   'sp.ad': '▶ ดูโฆษณา: +10 วินาที (เก็บคอมโบครึ่งหนึ่ง)',
+  'game.comet': 'ลากดาวตก',
+  'cm.chain': 'ต่อได้มากสุด {n}',
+  'cm.ad': '▶ ดูโฆษณาเพื่อล้างจำนวนที่พลาด',
 }
 
 const tr: CoreDict = {
@@ -2942,6 +2978,9 @@ const tr: CoreDict = {
   'game.samepic': 'Aynısını Bul',
   'sp.hint': 'İki diskte ortak olan tek bir resim var',
   'sp.ad': '▶ Reklam izle: +10 sn (serinin yarısı kalır)',
+  'game.comet': 'Kuyruklu Yıldız Zinciri',
+  'cm.chain': 'En iyi zincir {n}',
+  'cm.ad': '▶ Reklam izle, kaçırmaları sıfırla',
 }
 
 const messages: Record<Locale, CoreDict> = {
