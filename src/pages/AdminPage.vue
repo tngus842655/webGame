@@ -106,13 +106,15 @@ async function moveToTrash(row: Row) {
               <input v-model="row.flag.hidden" type="checkbox" @change="save(row.flag)" />
               {{ t('admin.hidden') }}
             </label>
-            <label class="order">
+            <!-- 순서는 상단 고정된 것끼리만 쓰인다 — 아니면 눌러도 소용없다는 걸 보여준다 -->
+            <label class="order" :class="{ off: !row.flag.featured }">
               {{ t('admin.order') }}
               <input
                 v-model.number="row.flag.sortOrder"
                 type="number"
                 min="0"
                 max="99"
+                :disabled="!row.flag.featured"
                 @change="save(row.flag)"
               />
             </label>
@@ -272,6 +274,14 @@ async function moveToTrash(row: Row) {
   border: 1px solid #d7ccc8;
   border-radius: 7px;
   font: inherit;
+}
+
+.order.off {
+  opacity: 0.4;
+}
+
+.order input:disabled {
+  background: #f5f5f5;
 }
 
 .trash-btn {

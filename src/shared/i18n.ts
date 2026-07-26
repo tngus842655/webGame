@@ -60,8 +60,8 @@ const en = {
   // 운영자 전용 화면 — 다른 언어는 en 폴백으로 둔다
   'admin.title': 'Admin',
   'admin.hint':
-    'Pinned games sit at the top of the home list regardless of popularity. Hidden games disappear from the list. An orange rank on the right means the game dropped out of the top 30. Changes show up the next time the home screen opens.',
-  'admin.featured': 'Pin to top',
+    'Games checked as Top sit at the front of the home list regardless of popularity. Order is their place within that front row (lower comes first); everything unchecked stays in popularity order. Hidden games disappear from the list. An orange rank on the right means the game dropped out of the top 30. Changes show up the next time the home screen opens.',
+  'admin.featured': 'Top',
   'admin.hidden': 'Hide',
   'admin.order': 'Order',
   'admin.saveFailed': 'Could not save.',
@@ -280,8 +280,8 @@ const ko: typeof en = {
   'notes.title': '개발자 노트',
   'admin.title': '관리자',
   'admin.hint':
-    '상단 고정한 게임은 인기 순위와 상관없이 홈 맨 앞에 나옵니다. 숨긴 게임은 목록에서 빠집니다. 오른쪽 순위가 주황색이면 30위 밖으로 밀린 게임입니다. 바뀐 내용은 홈에 다시 들어갈 때 반영됩니다.',
-  'admin.featured': '상단 고정',
+    '상단을 체크한 게임은 인기 순위와 상관없이 홈 맨 앞에 나옵니다. 순서는 그 앞줄 안에서의 자리이고(작을수록 앞), 체크하지 않은 게임은 그대로 인기순입니다. 숨긴 게임은 목록에서 빠집니다. 오른쪽 순위가 주황색이면 30위 밖으로 밀린 게임입니다. 바뀐 내용은 홈에 다시 들어갈 때 반영됩니다.',
+  'admin.featured': '상단',
   'admin.hidden': '숨김',
   'admin.order': '순서',
   'admin.saveFailed': '저장하지 못했어요.',
