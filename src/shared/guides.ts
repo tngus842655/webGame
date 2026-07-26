@@ -41,11 +41,6 @@ const ko: Record<string, Guide> = {
     how: '좌우로 끌어서 움직입니다.',
     score: '버틴 시간이 곧 점수입니다.',
   },
-  golf: {
-    goal: '9홀을 도는 동안 공을 홀컵에 넣으세요.',
-    how: '공에서 반대 방향으로 당겼다 놓으면 그 힘으로 굴러갑니다.',
-    score: '적은 타수로 넣을수록 높은 점수를 받습니다.',
-  },
   survivor: {
     goal: '몰려드는 적 사이에서 살아남으세요. 체력이 다하면 끝입니다.',
     how: '끌어서 이동만 하면 공격은 자동입니다. 레벨업 때 강화를 하나 고르세요.',
@@ -131,11 +126,6 @@ const ko: Record<string, Guide> = {
     how: '안건 카드에서 두 선택지 중 하나를 고르세요. 어떤 지표가 움직이는지 아이콘으로 귀띔해 줍니다.',
     score: '버틴 재위 년수가 점수입니다.',
   },
-  focus: {
-    goal: '정한 시간 동안 화면을 지키면 나무가 다 자랍니다. 앱을 벗어나면 시들어요.',
-    how: '집중할 시간을 고르고 기다리기만 하면 됩니다.',
-    score: '오늘 집중한 시간(분)이 그대로 점수입니다.',
-  },
   wordle: {
     goal: '숨은 두 글자 단어를 여섯 번 안에 맞히세요.',
     how: '자음·모음을 눌러 여섯 칸을 채우고 입력하세요. 초록은 자리까지 정답, 노랑은 자리만 틀린 것입니다.',
@@ -193,11 +183,6 @@ const en: Record<string, Guide> = {
     goal: 'Survive as long as you can under the falling objects.',
     how: 'Drag left and right to move.',
     score: 'Time survived is your score.',
-  },
-  golf: {
-    goal: 'Sink the ball across nine holes.',
-    how: 'Pull back from the ball and release to shoot.',
-    score: 'Fewer strokes score higher.',
   },
   survivor: {
     goal: 'Stay alive in the swarm. When your health runs out, the run ends.',
@@ -283,11 +268,6 @@ const en: Record<string, Guide> = {
     goal: 'If people, treasury, army or diplomacy hits zero or overflows, you lose the throne.',
     how: 'Choose one of two answers on each card. Icons hint at which stats move.',
     score: 'Years you stayed on the throne.',
-  },
-  focus: {
-    goal: 'Keep the screen for the time you set and the tree grows. Leave the app and it withers.',
-    how: 'Pick a duration and simply wait.',
-    score: 'Minutes you focused today.',
   },
   wordle: {
     goal: 'Guess the hidden two-syllable word within six tries.',

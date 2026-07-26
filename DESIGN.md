@@ -43,7 +43,7 @@ src/
 │  ├─ types.ts              # GameMeta / GameModule / GameContext
 │  ├─ registry.ts           # 게임 목록 (여기 한 줄 추가로 게임 등록)
 │  ├─ shell.ts              # 공통 골격: rAF 루프, 백그라운드 일시정지, 정리
-│  ├─ stage.ts / overlay.ts / pointer.ts   # 캔버스 스테이지·게임오버 UI·입력 공통
+│  ├─ stage.ts / overlay.ts / clearBonus.ts / pointer.ts   # 스테이지·게임오버·클리어 보너스·입력
 │  └─ <slug>/               # 게임 모듈 (index.ts 진입점, state/renderer/config…)
 ├─ shared/
 │  ├─ supabase.ts           # 클라이언트 싱글턴
@@ -51,7 +51,7 @@ src/
 │  ├─ profile.ts            # 닉네임 조회·수정, 소셜 닉네임 자동 적용
 │  ├─ scores.ts             # 점수 제출·랭킹·인기도 조회 (+localStorage 병행)
 │  ├─ playSessions.ts       # 플레이 시간 기록 (인기 순위·통계 근거)
-│  ├─ ads.ts                # 리워드 광고 추상화 (운영은 NoAdProvider)
+│  ├─ ads.ts                # 리워드 광고 추상화 (H5 Games Ads / 개발용 스텁 / 미노출)
 │  └─ i18n.ts / sound.ts / GameIcon.vue / AccountPrompt.vue / devNotes.ts
 └─ styles/
 ```
@@ -92,6 +92,16 @@ src/
 - 필요한 외부 설정: 구글/카카오 콘솔 + Supabase(Manual Linking ON,
   Kakao는 Allow users without an email ON) — 상세는 마이그레이션 파일 주석 참고
 
+### 리워드 광고
+
+- `ads.ts`가 매체를 감싼다. 운영은 `VITE_ADSENSE_CLIENT`가 있으면 H5 Games Ads
+  (AdSense Ad Placement API), 없으면 `NoAdProvider` = 광고 버튼 미노출. 개발은 스텁.
+- 노출 지점은 두 가지. **실패 쪽**은 게임오버 오버레이의 이어하기(대부분의 게임),
+  **성공 쪽**은 `clearBonus.ts`의 점수 2배(스도쿠·마작·네모로직·디펜스·머지 가든).
+  한 판이 10분 넘게 가는 게임은 실패가 잘 나지 않아 성공 쪽이 유일한 접점이다.
+- `gameContext.ts`가 게임 화면 방문당 노출 횟수를 5회로 제한한다. 한 판이 짧은
+  게임(회피·러너·궤도·리듬·주식)에서 이어하기 광고가 몇 분 만에 반복되는 걸 막는다.
+
 ### RLS·치팅 대비
 
 - `scores` insert는 본인만(`auth.uid() = user_id`), update/delete 금지
@@ -100,6 +110,7 @@ src/
 
 ## 6. 확장 지점 (미구현)
 
-- **리워드 광고**: `ads.ts`의 `AdProvider` 구현 교체로 도입 (게임 쪽 코드는 준비됨)
 - **재화·상점**: 광고와 세트로 도입 시점에 설계
-- **PWA/앱화**: 정적 SPA라 언제든 추가 가능
+- **PWA/앱화**: 정적 SPA라 언제든 추가 가능. 안드로이드는 PWABuilder(TWA)로 포장한다 —
+  TWA는 크롬이 사이트를 그대로 띄우는 구조라 네이티브 SDK(AdMob)를 부를 수 없어서
+  광고는 웹·앱 공통으로 도는 H5 Games Ads를 쓴다.

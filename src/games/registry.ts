@@ -34,11 +34,6 @@ export const GAMES: GameMeta[] = [
     loader: () => import('./dodge'),
   },
   {
-    slug: 'golf',
-    titleKey: 'game.golf',
-    loader: () => import('./golf'),
-  },
-  {
     slug: 'survivor',
     titleKey: 'game.survivor',
     loader: () => import('./survivor'),
@@ -122,11 +117,6 @@ export const GAMES: GameMeta[] = [
     slug: 'reigns',
     titleKey: 'game.reigns',
     loader: () => import('./reigns'),
-  },
-  {
-    slug: 'focus',
-    titleKey: 'game.focus',
-    loader: () => import('./focus'),
   },
   {
     slug: 'wordle',

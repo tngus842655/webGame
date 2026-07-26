@@ -1,6 +1,7 @@
 import { t } from '@/shared/i18n'
 import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
+import { createClearBonus } from '../clearBonus'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
@@ -42,6 +43,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const state = createState()
   const popups: Array<{ x: number; y: number; text: string; age: number }> = []
   let adReviveUsed = false
+  const bonus = createClearBonus(shell, ctx, 'merge-clear')
   let drag: { from: number; x: number; y: number } | null = null
   let genShake = 0 // 자리가 없을 때 생성 버튼 흔들림
 
@@ -68,6 +70,12 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     clearLowestItems(state)
     reviveWithTime(state, REVIVE_SECONDS)
     overlay.hide()
+  }
+
+  // 스테이지 클리어로 받은 남은 시간 보너스를 한 번 더 준다
+  async function offerStageBonus(points: number) {
+    if (!(await bonus.offer(points)) || shell.isDestroyed()) return
+    state.score = Math.min(1_000_000, state.score + points)
   }
 
   async function gameOver() {
@@ -133,6 +141,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         popups.push({ x: px + cellSize / 2, y: py, text: '🏆', age: 0 })
         vibrate([25, 40, 25])
       }
+      if (result.stageClear) void offerStageBonus(state.lastBonus)
     },
   })
 

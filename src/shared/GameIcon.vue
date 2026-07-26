@@ -73,17 +73,6 @@ defineProps<{ slug: string }>()
       <circle cx="26.5" cy="39" r="1.6" fill="#0D2C45" />
     </g>
 
-    <!-- 미니 골프 -->
-    <g v-else-if="slug === 'golf'">
-      <rect x="3" y="14" width="42" height="30" rx="6" fill="#6FBF63" />
-      <rect x="3" y="22" width="42" height="6" fill="#7FCC72" />
-      <rect x="3" y="36" width="42" height="6" fill="#7FCC72" />
-      <ellipse cx="31" cy="29" rx="7" ry="5" fill="#2E2E2E" />
-      <path d="M31 27 L31 6" stroke="#ECEFF1" stroke-width="2.6" stroke-linecap="round" />
-      <path d="M31 6 Q39 8 44 11 Q37 13 31 15 Z" fill="#E53935" />
-      <circle cx="13" cy="34" r="5.5" fill="#FFFFFF" />
-      <circle cx="11.2" cy="32.2" r="1.8" fill="#F0F4F6" />
-    </g>
 
     <!-- 서바이버 -->
     <g v-else-if="slug === 'survivor'">
@@ -300,18 +289,6 @@ defineProps<{ slug: string }>()
       <path d="M17 6 L21 9 L24 5 L27 9 L31 6 L30 11 H18 Z" fill="#FFB300" />
     </g>
 
-    <!-- 집중 나무 -->
-    <g v-else-if="slug === 'focus'">
-      <rect x="4" y="4" width="40" height="40" rx="7" fill="#C4E6FA" />
-      <rect x="4" y="36" width="40" height="8" rx="3" fill="#8BC34A" />
-      <path d="M24 38 Q22 28 24 20" stroke="#6D4C41" stroke-width="4.5" fill="none" stroke-linecap="round" />
-      <circle cx="24" cy="15" r="8.5" fill="#66BB6A" />
-      <circle cx="16.5" cy="19" r="6" fill="#43A047" />
-      <circle cx="31.5" cy="19" r="6" fill="#43A047" />
-      <circle cx="20" cy="11" r="2" fill="#F48FB1" />
-      <circle cx="28.5" cy="13.5" r="2" fill="#F48FB1" />
-      <circle cx="38" cy="10" r="4.6" fill="#FFEE58" />
-    </g>
 
     <!-- 한글 워들 -->
     <g v-else-if="slug === 'wordle'">

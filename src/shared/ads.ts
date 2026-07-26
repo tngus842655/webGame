@@ -1,7 +1,7 @@
 import { t } from './i18n'
 
-// 리워드 광고 추상화. 실제 SDK(AdSense 등) 연동 시 Provider 구현만 교체한다.
-// 운영 빌드에서는 SDK가 없으므로 NoAdProvider → 광고 버튼이 아예 노출되지 않는다.
+// 리워드 광고 추상화. 게임은 이 인터페이스만 알면 되고, 실제 매체는 Provider 구현으로 갈아끼운다.
+// 운영 빌드는 VITE_ADSENSE_CLIENT가 있으면 H5 Games Ads, 없으면 NoAdProvider(=광고 버튼 미노출).
 
 export interface AdProvider {
   isReady(): boolean
@@ -75,4 +75,66 @@ class NoAdProvider implements AdProvider {
   }
 }
 
-export const adProvider: AdProvider = import.meta.env.DEV ? new StubAdProvider() : new NoAdProvider()
+// H5 Games Ads (AdSense Ad Placement API) — 웹과 안드로이드 패키징(TWA) 양쪽에서 같은 코드로 돈다.
+// adBreak/adConfig는 adsbygoogle 큐에 객체를 넣는 방식이라 스크립트 로드 전에 호출해도 쌓였다가 처리된다.
+type AdBreakStatus = 'viewed' | 'dismissed' | 'notReady' | 'timeout' | 'error' | string
+
+class H5GamesAdProvider implements AdProvider {
+  private queue: unknown[]
+  private showing = false
+
+  constructor(client: string) {
+    const script = document.createElement('script')
+    script.async = true
+    script.crossOrigin = 'anonymous'
+    script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`
+    // 미리 받아두지 않으면 버튼을 누른 뒤 광고가 뜰 때까지 몇 초씩 빈다
+    script.dataset.adFrequencyHint = '60s'
+    document.head.appendChild(script)
+
+    const w = window as Window & { adsbygoogle?: unknown[] }
+    w.adsbygoogle = w.adsbygoogle ?? []
+    this.queue = w.adsbygoogle
+    this.queue.push({ preloadAdBreaks: 'on', sound: 'on' })
+  }
+
+  isReady() {
+    return !this.showing
+  }
+
+  // 재고가 없거나 빈도 상한에 걸리면 광고 없이 breakStatus만 돌아온다 → false(보상 없음)
+  show(placement: string): Promise<boolean> {
+    if (this.showing) return Promise.resolve(false)
+    this.showing = true
+    return new Promise((resolve) => {
+      let viewed = false
+      const done = () => {
+        this.showing = false
+        resolve(viewed)
+      }
+      this.queue.push({
+        type: 'reward',
+        name: placement,
+        beforeReward: (showAdFn: () => void) => showAdFn(),
+        adViewed: () => {
+          viewed = true
+        },
+        adDismissed: () => {
+          viewed = false
+        },
+        adBreakDone: (info: { breakStatus: AdBreakStatus }) => {
+          if (info.breakStatus !== 'viewed') viewed = false
+          done()
+        },
+      })
+    })
+  }
+}
+
+function createProvider(): AdProvider {
+  if (import.meta.env.DEV) return new StubAdProvider()
+  const client = import.meta.env.VITE_ADSENSE_CLIENT as string | undefined
+  return client ? new H5GamesAdProvider(client) : new NoAdProvider()
+}
+
+export const adProvider: AdProvider = createProvider()

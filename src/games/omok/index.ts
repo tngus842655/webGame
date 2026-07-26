@@ -42,21 +42,38 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
   let undoUsed = false // 판당 1회 광고 무르기
+  let adContinueUsed = false
 
   const overlay = createGameOverOverlay(shell.wrapper, {
+    adLabelKey: 'om.ad',
     onRetry() {
       if (state.phase !== 'over') return
       Object.assign(state, createState())
       undoUsed = false
+      adContinueUsed = false
       overlay.hide()
     },
+    onContinue() {
+      void continueWithAd()
+    },
   })
+
+  // 광고 보상: 패배한 수를 물러 연승을 이어간다 (판당 1회)
+  async function continueWithAd() {
+    if (state.phase !== 'over' || adContinueUsed) return
+    const rewarded = await ctx.showRewardAd('omok-continue')
+    if (shell.isDestroyed() || !rewarded || state.phase !== 'over') return
+    adContinueUsed = true
+    state.phase = 'playing'
+    undo(state)
+    overlay.hide()
+  }
 
   async function gameOver() {
     const prevBest = await ctx.getBestScore()
     await ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
-    overlay.show(state.score, prevBest, false)
+    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adContinueUsed)
   }
 
   // 광고 보상: 마지막 한 수 무르기

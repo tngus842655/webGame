@@ -1,6 +1,7 @@
 import { t } from '@/shared/i18n'
 import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
+import { createClearBonus } from '../clearBonus'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
@@ -46,6 +47,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   let pops: { x: number; y: number; age: number }[] = []
   let popups: { x: number; y: number; text: string; age: number }[] = []
   let adContinueUsed = false
+  const bonus = createClearBonus(shell, ctx, 'mahjong-clear')
 
   const overlay = createGameOverOverlay(shell.wrapper, {
     adLabelKey: 'mj.ad',
@@ -79,6 +81,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       state.noMovesTimer = 1.6
     }
     overlay.hide()
+  }
+
+  // 보너스를 묻는 동안 셸이 멈추므로 다음 스테이지로 넘어가지 않는다
+  async function onStageClear() {
+    let points = 1000
+    if (await bonus.offer(points)) points *= 2
+    if (shell.isDestroyed()) return
+    state.score = Math.min(1_000_000, state.score + points)
+    popups.push({ x: 360, y: 620, text: `+${points}`, age: 0 })
   }
 
   async function gameOver() {
@@ -156,9 +167,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     if (!state.tiles.some((tile) => !tile.removed)) {
       // 스테이지 클리어: 보너스 후 다음 스테이지 (점수 누적)
-      state.score = Math.min(1_000_000, state.score + 1000)
-      popups.push({ x: 360, y: 620, text: '+1000', age: 0 })
       state.clearTimer = 1
+      void onStageClear()
     } else if (!hasMoves(state.tiles)) {
       state.phase = 'noMoves'
       state.noMovesTimer = 1.6
