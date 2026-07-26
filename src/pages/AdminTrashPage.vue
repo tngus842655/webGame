@@ -6,10 +6,12 @@ import { GAMES } from '@/games/registry'
 import GameIcon from '@/shared/GameIcon.vue'
 import { t, locale, type TranslationKey } from '@/shared/i18n'
 import { daysLeft, fetchGameFlags, RETENTION_DAYS, saveGameFlag, type GameFlag } from '@/shared/admin'
+import { popularityRanks } from '@/shared/scores'
 
 interface Row {
   slug: string
   titleKey: TranslationKey
+  rank: number | null
   flag: GameFlag
   trashedAt: string
 }
@@ -25,6 +27,8 @@ const removable = computed(() => rows.value.filter((row) => daysLeft(row.trashed
 onMounted(async () => {
   try {
     const titleBySlug = new Map(GAMES.map((game) => [game.slug, game.titleKey]))
+    // 휴지통 게임도 사용자가 계속 즐길 수 있어 순위가 움직인다 — 되돌릴지 판단하는 재료다
+    const ranks = popularityRanks()
     const flags = await fetchGameFlags()
     rows.value = flags
       .filter((flag): flag is GameFlag & { trashedAt: string } => !!flag.trashedAt)
@@ -33,6 +37,7 @@ onMounted(async () => {
       .map((flag) => ({
         slug: flag.slug,
         titleKey: titleBySlug.get(flag.slug)!,
+        rank: ranks.get(flag.slug) ?? null,
         flag,
         trashedAt: flag.trashedAt,
       }))
@@ -97,7 +102,12 @@ function trashedOn(iso: string): string {
         <li v-for="row in rows" :key="row.slug" class="row" :class="{ busy: saving === row.slug }">
           <span class="thumb"><GameIcon :slug="row.slug" /></span>
           <div class="info">
-            <strong>{{ t(row.titleKey) }}</strong>
+            <div class="title-line">
+              <strong>{{ t(row.titleKey) }}</strong>
+              <span class="rank">
+                {{ row.rank === null ? t('admin.unranked') : t('admin.rank', { n: row.rank }) }}
+              </span>
+            </div>
             <div class="meta">
               <span>{{ t('admin.trashedOn', { date: trashedOn(row.trashedAt) }) }}</span>
               <span v-if="daysLeft(row.trashedAt) > 0">
@@ -204,9 +214,22 @@ function trashedOn(iso: string): string {
   min-width: 0;
 }
 
+.title-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .info strong {
   font-size: 14px;
   color: #8d6e63;
+}
+
+.rank {
+  flex: none;
+  font-size: 11px;
+  color: #bcaaa4;
 }
 
 .meta {
