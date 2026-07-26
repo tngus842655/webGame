@@ -236,14 +236,16 @@ function onLangChange() {
 
     <section class="section">
       <h2>{{ t('settings.sound') }}</h2>
-      <label class="toggle-row">
-        <input v-model="sound" type="checkbox" @change="onSoundChange" />
-        {{ t('settings.soundOn') }}
-      </label>
-      <label class="toggle-row">
-        <input v-model="music" type="checkbox" @change="onMusicChange" />
-        {{ t('settings.musicOn') }}
-      </label>
+      <div class="toggles">
+        <label class="toggle-row">
+          <input v-model="sound" type="checkbox" @change="onSoundChange" />
+          {{ t('settings.soundOn') }}
+        </label>
+        <label class="toggle-row">
+          <input v-model="music" type="checkbox" @change="onMusicChange" />
+          {{ t('settings.musicOn') }}
+        </label>
+      </div>
     </section>
 
     <section class="section">
@@ -442,6 +444,13 @@ function onLangChange() {
 .nickname-row button:disabled {
   background: #d7ccc8;
   cursor: default;
+}
+
+/* 두 항목이 짧아 한 줄에 나란히 놓는다 — 글자가 길어지는 언어에서는 아래로 접힌다 */
+.toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
 }
 
 .toggle-row {
