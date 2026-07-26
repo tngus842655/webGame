@@ -164,7 +164,7 @@ export function battleTick(state: ACState, dt: number): BattleEvents {
   events.ended = true
   state.won = !foesAlive && mineAlive
   if (state.won) {
-    state.score = Math.min(1_000_000, state.score + state.round * 100)
+    state.score = Math.min(1_000_000, state.score + state.round * 30)
     state.lostLives = 0
   } else {
     state.lostLives = Math.max(1, state.foes.filter((u) => u.hp > 0).length)

@@ -1,15 +1,35 @@
-// 오목 (AI전) — 15×15 대국. 이길수록 AI가 강해지는 연승 사다리.
-// AI는 공격·수비 패턴 점수 휴리스틱으로 한 수를 고른다 (연승이 낮을수록 무작위성 추가).
+// 오목 (AI전) — 15×15 대국. 1단부터 10단까지 올라가는 단 사다리.
+// AI는 공격·수비 패턴 점수로 한 수를 고른다. 낮은 단은 일부러 실수하고,
+// 6단부터는 내 응수까지 읽는 2수 탐색을 하며 단이 오를수록 더 넓게 본다.
 
 export type Phase = 'playing' | 'aiThinking' | 'won' | 'lost' | 'over'
 export type Stone = 0 | 1 | 2 // 0 빈칸, 1 플레이어(흑), 2 AI(백)
 
 export const SIZE = 15
+export const MAX_STAGE = 10
+export const TIMED_FROM = 6 // 이 단부터 판마다 제한 시간이 붙는다
+
+// 6단 140초 → 10단 60초. 한 판이 대략 45수(내 차례 22수)라
+// 10단은 한 수에 3초 남짓밖에 못 쓴다. 시계는 내 차례에만 간다.
+export function stageSeconds(stage: number): number {
+  return 140 - (stage - TIMED_FROM) * 20
+}
+
+// 단 클리어 기본 점수 (단이 오를수록 크게)
+export function stagePoints(stage: number): number {
+  return 450 + (stage - 1) * 220
+}
+
+// 제한 시간이 있는 단은 남긴 시간을 점수로 바꿔준다
+export const TIME_BONUS_PER_SEC = 9
 
 export interface OmokState {
   phase: Phase
   board: Stone[] // SIZE*SIZE
-  wins: number // 연승 = 점수 근거
+  stage: number // 1~10
+  cleared: boolean // 10단까지 통과
+  timeLeft: number // 제한 시간이 있는 단에서만 > 0
+  lastBonus: number // 방금 판에서 받은 시간 보너스 (연출용)
   score: number
   lastMove: number // 마지막 착수 위치 (-1 없음)
   winLine: number[] // 승리한 5목 위치 (연출용)
@@ -23,7 +43,10 @@ export function createState(): OmokState {
   return {
     phase: 'playing',
     board: new Array<Stone>(SIZE * SIZE).fill(0),
-    wins: 0,
+    stage: 1,
+    cleared: false,
+    timeLeft: 0,
+    lastBonus: 0,
     score: 0,
     lastMove: -1,
     winLine: [],
@@ -34,13 +57,23 @@ export function createState(): OmokState {
   }
 }
 
-export function resetBoard(state: OmokState) {
+// 다음 단으로 (또는 같은 단을 다시) 시작
+export function startStage(state: OmokState, stage: number) {
   state.board.fill(0)
+  state.stage = stage
   state.lastMove = -1
   state.winLine = []
   state.moveCount = 0
   state.history = []
+  state.timeLeft = stage >= TIMED_FROM ? stageSeconds(stage) : 0
   state.phase = 'playing'
+}
+
+// 제한 시간 소진 여부. true면 시간 초과(패배)
+export function tickClock(state: OmokState, dt: number): boolean {
+  if (state.timeLeft <= 0) return false
+  state.timeLeft = Math.max(0, state.timeLeft - dt)
+  return state.timeLeft === 0
 }
 
 const DIRS: Array<[number, number]> = [
@@ -102,7 +135,35 @@ function cellScore(board: Stone[], index: number, stone: Stone): number {
   return total
 }
 
-// AI 착수: 공격 + 수비 점수 최대 칸. 연승이 낮으면 상위 후보 중 무작위
+// 돌 근처 2칸 이내 빈칸 (탐색 후보)
+function nearCells(board: Stone[]): number[] {
+  const near = new Set<number>()
+  for (let i = 0; i < board.length; i++) {
+    if (board[i] === 0) continue
+    const x = i % SIZE
+    const y = Math.floor(i / SIZE)
+    for (let dy = -2; dy <= 2; dy++) {
+      for (let dx = -2; dx <= 2; dx++) {
+        const nx = x + dx
+        const ny = y + dy
+        if (nx < 0 || ny < 0 || nx >= SIZE || ny >= SIZE) continue
+        const j = ny * SIZE + nx
+        if (board[j] === 0) near.add(j)
+      }
+    }
+  }
+  return [...near]
+}
+
+// 한 수 평가: 내 공격 + 상대 수비
+function moveValue(board: Stone[], index: number, stone: Stone): number {
+  const foe: Stone = stone === 1 ? 2 : 1
+  return cellScore(board, index, stone) + cellScore(board, index, foe) * 0.85
+}
+
+// AI 착수. 낮은 단일수록 상위 후보 중에서 흔들려 일부러 실수한다.
+// 5단부터는 항상 최선수를 둔다 — 그 위는 AI를 더 강하게 만드는 대신 제한 시간으로 조인다.
+// (2수 탐색도 붙여봤지만 서로 완벽히 막기만 해 무승부 100%가 나와 걷어냈다)
 export function aiMove(state: OmokState): number {
   const board = state.board
   // 첫 수: 플레이어 근처
@@ -121,35 +182,21 @@ export function aiMove(state: OmokState): number {
     return candidates[Math.floor(Math.random() * candidates.length)]
   }
 
-  // 돌 근처 2칸 이내 빈칸만 후보로
-  const near = new Set<number>()
-  for (let i = 0; i < board.length; i++) {
-    if (board[i] === 0) continue
-    const x = i % SIZE
-    const y = Math.floor(i / SIZE)
-    for (let dy = -2; dy <= 2; dy++) {
-      for (let dx = -2; dx <= 2; dx++) {
-        const nx = x + dx
-        const ny = y + dy
-        if (nx < 0 || ny < 0 || nx >= SIZE || ny >= SIZE) continue
-        const j = ny * SIZE + nx
-        if (board[j] === 0) near.add(j)
-      }
-    }
-  }
+  const scored = nearCells(board)
+    .map((index) => ({ index, score: moveValue(board, index, 2) }))
+    .sort((a, b) => b.score - a.score)
+  // 판이 꽉 차면 후보가 없다 — 호출부에서 무승부 처리하지만 여기서도 방어한다
+  if (scored.length === 0) return board.findIndex((cell) => cell === 0)
 
-  const scored: Array<{ index: number; score: number }> = []
-  for (const index of near) {
-    const attack = cellScore(board, index, 2)
-    const defense = cellScore(board, index, 1)
-    scored.push({ index, score: attack + defense * 0.85 })
-  }
-  scored.sort((a, b) => b.score - a.score)
-  // 연승 0~2는 상위 후보 중 무작위로 실수한다 (사다리 난이도)
-  const sloppiness = Math.max(0, 3 - state.wins)
+  const sloppiness = Math.max(0, 5 - state.stage)
   const pickRange = 1 + (sloppiness > 0 && Math.random() < sloppiness * 0.25 ? sloppiness : 0)
   const pick = scored[Math.floor(Math.random() * Math.min(pickRange, scored.length))]
   return pick.index
+}
+
+// 빈칸이 남았는가 (다 차면 아무도 둘 수 없다 — 예전엔 여기서 AI가 크래시했다)
+export function boardFull(state: OmokState): boolean {
+  return state.moveCount >= SIZE * SIZE
 }
 
 export type MoveResult = 'placed' | 'win' | 'invalid'
@@ -163,11 +210,18 @@ export function playerMove(state: OmokState, index: number): MoveResult {
   const line = findWin(state.board, index, 1)
   if (line) {
     state.winLine = line
-    state.wins += 1
-    state.score = Math.min(1_000_000, state.score + 100 * state.wins)
+    state.lastBonus = Math.round(state.timeLeft) * TIME_BONUS_PER_SEC
+    state.score = Math.min(1_000_000, state.score + stagePoints(state.stage) + state.lastBonus)
+    if (state.stage >= MAX_STAGE) state.cleared = true
     state.phase = 'won'
     state.resultTimer = 2
     return 'win'
+  }
+  if (boardFull(state)) {
+    // 무승부 — 단 통과 실패로 본다
+    state.phase = 'lost'
+    state.resultTimer = 2
+    return 'placed'
   }
   state.phase = 'aiThinking'
   state.thinkTimer = 0.5 + Math.random() * 0.5
@@ -175,6 +229,11 @@ export function playerMove(state: OmokState, index: number): MoveResult {
 }
 
 export function applyAiMove(state: OmokState): MoveResult {
+  if (boardFull(state)) {
+    state.phase = 'lost'
+    state.resultTimer = 2
+    return 'placed'
+  }
   const index = aiMove(state)
   state.board[index] = 2
   state.lastMove = index
@@ -183,6 +242,12 @@ export function applyAiMove(state: OmokState): MoveResult {
   const line = findWin(state.board, index, 2)
   if (line) {
     state.winLine = line
+    state.phase = 'lost'
+    state.resultTimer = 2
+    return 'win'
+  }
+  // 판이 다 차면 무승부 — 단 통과 실패로 본다
+  if (boardFull(state)) {
     state.phase = 'lost'
     state.resultTimer = 2
     return 'win'

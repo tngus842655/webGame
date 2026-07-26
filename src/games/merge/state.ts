@@ -12,8 +12,10 @@ export const MAX_LEVEL = 12
 const SPAWN_PERCENT = [38, 22, 12, 8, 6, 4.5, 3.5, 2.5, 1.8, 1.2, 0.5] as const
 
 // 점수는 다른 게임과 자릿수를 맞춘다: 화분 하나 = 100점, 남은 시간 1초 = 5점
-const HARVEST_POINTS = 100
-export const TIME_BONUS = 5
+const HARVEST_POINTS = 470
+export const TIME_BONUS = 23
+
+export const MAX_STAGE = 10
 
 // 스테이지 목표: n단계 = 황금 화분 n개
 export function stageGoal(stage: number): number {
@@ -44,6 +46,7 @@ export function cellPos(col: number, row: number): [number, number] {
 }
 
 export type Phase = 'playing' | 'stageClear' | 'over'
+// cleared = 10단계까지 통과해 끝냈다 (실패로 끝난 판과 구분)
 
 export interface Item {
   level: number // 1부터, ITEMS 인덱스는 level-1
@@ -60,6 +63,7 @@ export interface MergeState {
   hintTime: number // 조작 힌트 애니메이션용
   hintDone: boolean // 첫 조작(생성·이동)을 했는지 — 조작 힌트 종료 조건
   discovered: number // 이번 판에서 만든 최고 단계
+  cleared: boolean // 10단계까지 통과
   clearTimer: number // 스테이지 완료 연출
   lastBonus: number // 방금 받은 보너스 점수 (연출용)
 }
@@ -75,6 +79,7 @@ export function createState(): MergeState {
     hintTime: 0,
     hintDone: false,
     discovered: 1,
+    cleared: false,
     clearTimer: 0,
     lastBonus: 0,
   }
@@ -171,6 +176,7 @@ export function dropItem(state: MergeState, from: number, to: number): DropResul
       // 남은 시간을 점수로 환산하고 다음 스테이지 준비
       state.lastBonus = Math.round(state.timeLeft) * TIME_BONUS
       state.score = Math.min(1_000_000, state.score + state.lastBonus)
+      if (state.stage >= MAX_STAGE) state.cleared = true
       state.phase = 'stageClear'
       state.clearTimer = 2.2
       result.stageClear = true
@@ -217,6 +223,12 @@ export function update(state: MergeState, dt: number): TickEvents {
   } else if (state.phase === 'stageClear') {
     state.clearTimer -= dt
     if (state.clearTimer <= 0) {
+      if (state.cleared) {
+        // 10단계 통과 — 판이 끝난다
+        state.phase = 'over'
+        events.timeUp = true
+        return events
+      }
       state.stage += 1
       state.goldMade = 0
       state.timeLeft = stageSeconds(state.stage)

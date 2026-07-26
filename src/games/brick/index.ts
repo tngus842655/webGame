@@ -10,7 +10,6 @@ import {
   advanceWave,
   clearDangerRows,
   createState,
-  persistSave,
   tryPurchase,
   updateEffects,
 } from './state'
@@ -31,7 +30,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     onRetry() {
       if (state.phase !== 'over') return
       adContinueUsed = false
-      // 골드·강화 레벨은 저장되어 유지된다 (RPG 루프)
       Object.assign(state, createState())
       overlay.hide()
     },
@@ -53,7 +51,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   async function gameOver() {
     playGameOver()
     vibrate(120)
-    persistSave(state.save)
     const prevBest = await ctx.getBestScore()
     await ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
@@ -111,7 +108,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       if (!aimingActive) return
       aimingActive = false
       if (state.phase !== 'aiming' || !state.aim) return
-      state.toLaunch = state.save.ballLevel
+      state.toLaunch = state.run.ballLevel
       state.launchTimer = 0
       state.phase = 'flying'
       playDrop()
@@ -120,14 +117,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   const damageBrick = (index: number) => {
     const brick = state.bricks[index]
-    brick.hp -= state.save.attackLevel
+    brick.hp -= state.run.attackLevel
     if (brick.hp > 0) return
     state.bricks.splice(index, 1)
-    state.save.gold += brick.maxHp
-    state.score += brick.maxHp
+    state.run.gold += brick.maxHp
+    // 점수만 다른 게임과 자릿수를 맞춘다 (골드는 강화 경제라 그대로)
+    state.score += Math.ceil(brick.maxHp / 7)
     const r = brickRect(brick.col, brick.row)
     state.flashes.push({ x: r.x, y: r.y, w: r.w, h: r.h, age: 0 })
-    state.popups.push({ x: r.x + r.w / 2, y: r.y + r.h / 2, text: `+${brick.maxHp}`, age: 0 })
+    state.popups.push({ x: r.x + r.w / 2, y: r.y + r.h / 2, text: `+${Math.ceil(brick.maxHp / 7)}`, age: 0 })
     playMerge(2)
     vibrate(10)
   }
@@ -212,7 +210,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         )
       }
       state.firstLandedX = null
-      persistSave(state.save)
       if (advanceWave(state)) {
         void gameOver()
       } else {
@@ -222,7 +219,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   }
 
   shell.addCleanup(detachInput)
-  shell.addCleanup(() => persistSave(state.save))
   shell.addCleanup(() => renderer.destroy())
   return { destroy: () => shell.destroy(), getScore: () => state.score }
 }

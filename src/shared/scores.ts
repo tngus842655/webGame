@@ -104,9 +104,76 @@ function cachedPopularity(): Map<string, number> {
 }
 
 // 동률(기록이 아직 없는 신규 게임 포함)은 레지스트리 순서 유지 — sort는 안정 정렬
+const FLAGS_KEY = 'webgame:gameFlags'
+
+interface CachedFlag {
+  featured: boolean
+  hidden: boolean
+  sortOrder: number
+  trashed: boolean
+}
+
+// 관리자가 정한 노출 설정 — 첫 화면을 서버 응답까지 기다리지 않게 캐시해 둔다
+function cachedFlags(): Map<string, CachedFlag> {
+  try {
+    const raw = JSON.parse(localStorage.getItem(FLAGS_KEY) ?? '[]')
+    return new Map(Array.isArray(raw) ? (raw as Array<[string, CachedFlag]>) : [])
+  } catch {
+    return new Map()
+  }
+}
+
+export function cacheGameFlags(rows: Array<[string, CachedFlag]>): void {
+  localStorage.setItem(FLAGS_KEY, JSON.stringify(rows))
+}
+
+// 인기 순위 (1위부터). 기록이 없는 게임은 순위가 없어 지도에 들어가지 않는다.
+// 반드시 현재 등록된 게임만 넘길 것 — 인기도 캐시에는 이미 지운 게임의 기록도 섞여
+// 있는데(play_sessions는 남는다), 그것까지 세면 화면에 없는 번호가 중간에 빈다.
+export function popularityRanks(games: readonly { slug: string }[]): Map<string, number> {
+  const popularity = cachedPopularity()
+  const ranked = games
+    .map((game) => ({ slug: game.slug, score: popularity.get(game.slug) }))
+    .filter((entry) => entry.score !== undefined)
+    .sort((a, b) => b.score! - a.score!)
+  return new Map(ranked.map((entry, index) => [entry.slug, index + 1]))
+}
+
+// 홈 화면이 '신규' 칸을 가르는 데 쓴다 (관리자가 상단에 올린 게임)
+export function featuredSlugs(): Set<string> {
+  const slugs = new Set<string>()
+  for (const [slug, flag] of cachedFlags()) if (flag.featured) slugs.add(slug)
+  return slugs
+}
+
+// 휴지통에 들어간 게임 — 주 목록에서는 빠지지만 홈 하단 휴지통 화면에서 계속 즐길 수 있다.
+// 숨김까지 걸린 게임은 여기서도 빠진다(= 어디에도 안 나온다).
+export function trashedGames<T extends { slug: string }>(games: readonly T[]): T[] {
+  const flags = cachedFlags()
+  return games.filter((game) => {
+    const flag = flags.get(game.slug)
+    return !!flag?.trashed && !flag.hidden
+  })
+}
+
+// 정렬: 관리자가 고정한 게임이 맨 앞(그 안에서는 sortOrder), 나머지는 인기순.
+// 휴지통·숨김 처리된 게임은 주 목록에서 뺀다.
 export function sortByPopularity<T extends { slug: string }>(games: readonly T[]): T[] {
   const popularity = cachedPopularity()
-  return [...games].sort((a, b) => (popularity.get(b.slug) ?? 0) - (popularity.get(a.slug) ?? 0))
+  const flags = cachedFlags()
+  return games
+    .filter((game) => {
+      const flag = flags.get(game.slug)
+      return !flag?.trashed && !flag?.hidden
+    })
+    .slice()
+    .sort((a, b) => {
+      const fa = flags.get(a.slug)
+      const fb = flags.get(b.slug)
+      if (!!fa?.featured !== !!fb?.featured) return fa?.featured ? -1 : 1
+      if (fa?.featured && fb?.featured) return (fa.sortOrder ?? 0) - (fb.sortOrder ?? 0)
+      return (popularity.get(b.slug) ?? 0) - (popularity.get(a.slug) ?? 0)
+    })
 }
 
 export async function refreshPopularity(): Promise<void> {

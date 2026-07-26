@@ -35,8 +35,10 @@ export function sizeForLevel(level: number): number {
   return 7
 }
 
-export function timeForSize(size: number): number {
-  return 40 + (size - 4) * 15
+// 크기는 7×7에서 멈추므로, 그 뒤로는 제한 시간을 줄여 계속 조인다
+export function timeForLevel(size: number, level: number): number {
+  const base = 40 + (size - 4) * 15
+  return Math.max(35, base - Math.max(0, level - 8) * 3)
 }
 
 export function clearPoints(state: PipesState): number {
@@ -157,7 +159,7 @@ export function loadLevel(state: PipesState, level: number) {
   state.source = source
   state.wet = wet
   state.wetCount = wet.filter(Boolean).length
-  state.timeLeft = timeForSize(size)
+  state.timeLeft = timeForLevel(size, level)
   state.clearTimer = 0
 }
 

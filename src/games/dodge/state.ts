@@ -28,10 +28,13 @@ export interface DodgeState {
   rocks: Rock[]
   spawnTimer: number
   invuln: number // 남은 무적 시간(광고 부활 직후)
+  grazes: number // 스치듯 피한 횟수
 }
 
+export const GRAZE_POINTS = 5
+
 export function scoreOf(state: DodgeState): number {
-  return Math.floor(state.time * 10)
+  return Math.floor(state.time * 10) + state.grazes * GRAZE_POINTS
 }
 
 export function createState(): DodgeState {
@@ -42,16 +45,28 @@ export function createState(): DodgeState {
     rocks: [],
     spawnTimer: 1,
     invuln: 0,
+    grazes: 0,
   }
 }
 
-export function update(state: DodgeState, dt: number): boolean {
+// 스침 판정 여유 — 이 안쪽으로 지나가면 보너스
+const GRAZE_MARGIN = 46
+
+export interface TickResult {
+  died: boolean
+  grazed: boolean
+}
+
+export function update(state: DodgeState, dt: number): TickResult {
+  const result: TickResult = { died: false, grazed: false }
   state.time += dt
   state.invuln = Math.max(0, state.invuln - dt)
 
   state.spawnTimer -= dt
   if (state.spawnTimer <= 0) {
-    state.spawnTimer = Math.max(0.16, 0.55 - state.time * 0.01)
+    // 예전엔 0.55초 간격으로 시작해 첫 초부터 최고 밀도에 가까웠다. 실력 차이가 드러날
+    // 여유를 주려고 느슨하게 시작해서 2분에 걸쳐 조여든다.
+    state.spawnTimer = Math.max(0.22, 1.1 - state.time * 0.0073)
     const kind = KINDS[Math.floor(Math.random() * KINDS.length)]
     // 운석은 작고 빠르게, 통나무는 크고 느리게
     const fast = kind === 'meteor'
@@ -68,8 +83,17 @@ export function update(state: DodgeState, dt: number): boolean {
   }
 
   for (const rock of state.rocks) {
+    const wasAbove = rock.y <= PLAYER_Y
     rock.y += rock.vy * dt
     rock.x += rock.vx * dt
+    // 플레이어 높이를 막 지나간 순간에만 스침을 센다 (한 낙하물당 최대 1회)
+    if (wasAbove && rock.y > PLAYER_Y && state.invuln <= 0) {
+      const dx = Math.abs(rock.x - state.playerX)
+      if (dx < rock.r + PLAYER_R + GRAZE_MARGIN) {
+        state.grazes += 1
+        result.grazed = true
+      }
+    }
   }
   state.rocks = state.rocks.filter((rock) => rock.y < 1320)
 
@@ -80,9 +104,10 @@ export function update(state: DodgeState, dt: number): boolean {
       const hit = rock.r + PLAYER_R - 6
       if (dx * dx + dy * dy < hit * hit) {
         state.phase = 'over'
-        return true
+        result.died = true
+        return result
       }
     }
   }
-  return false
+  return result
 }

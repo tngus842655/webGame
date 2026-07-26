@@ -29,7 +29,7 @@ defineProps<{ slug: string }>()
       <rect x="26" y="26" width="17" height="6" rx="3" fill="#CE94E6" />
     </g>
 
-    <!-- 벽돌깨기 RPG -->
+    <!-- 벽돌깨기 -->
     <g v-else-if="slug === 'brick'">
       <rect x="4" y="6" width="18" height="10" rx="2.5" fill="#EF5350" />
       <rect x="26" y="6" width="18" height="10" rx="2.5" fill="#FFB300" />
@@ -73,17 +73,6 @@ defineProps<{ slug: string }>()
       <circle cx="26.5" cy="39" r="1.6" fill="#0D2C45" />
     </g>
 
-    <!-- 미니 골프 -->
-    <g v-else-if="slug === 'golf'">
-      <rect x="3" y="14" width="42" height="30" rx="6" fill="#6FBF63" />
-      <rect x="3" y="22" width="42" height="6" fill="#7FCC72" />
-      <rect x="3" y="36" width="42" height="6" fill="#7FCC72" />
-      <ellipse cx="31" cy="29" rx="7" ry="5" fill="#2E2E2E" />
-      <path d="M31 27 L31 6" stroke="#ECEFF1" stroke-width="2.6" stroke-linecap="round" />
-      <path d="M31 6 Q39 8 44 11 Q37 13 31 15 Z" fill="#E53935" />
-      <circle cx="13" cy="34" r="5.5" fill="#FFFFFF" />
-      <circle cx="11.2" cy="32.2" r="1.8" fill="#F0F4F6" />
-    </g>
 
     <!-- 서바이버 -->
     <g v-else-if="slug === 'survivor'">
@@ -99,13 +88,6 @@ defineProps<{ slug: string }>()
       <path d="M28 27 L28 33" stroke="#8D6E63" stroke-width="3.4" stroke-linecap="round" />
     </g>
 
-    <!-- 모의 주식 -->
-    <g v-else-if="slug === 'stock'">
-      <rect x="3" y="6" width="42" height="36" rx="6" fill="#FFFFFF" stroke="#CFD8DC" stroke-width="2" />
-      <path d="M8 34 L18 24 L25 29 L40 12" stroke="#E5393C" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-      <path d="M8 34 L18 24 L25 29 L40 12 L40 37 L8 37 Z" fill="#E5393C" opacity="0.14" />
-      <path d="M33 12 h7 v7" stroke="#E5393C" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-    </g>
 
     <!-- 머지 가든 -->
     <g v-else-if="slug === 'merge'">
@@ -140,20 +122,6 @@ defineProps<{ slug: string }>()
       <circle cx="22.6" cy="39.6" r="1.5" fill="#FFE082" />
     </g>
 
-    <!-- 마작 솔리테어 -->
-    <g v-else-if="slug === 'mahjong'">
-      <rect x="7" y="16" width="18" height="24" rx="3.5" fill="#C8E6C9" />
-      <rect x="7" y="16" width="18" height="20" rx="3.5" fill="#F5F5F0" />
-      <circle cx="16" cy="26" r="5.5" fill="#43A047" />
-      <circle cx="16" cy="26" r="2.4" fill="#F5F5F0" />
-      <rect x="24" y="8" width="18" height="24" rx="3.5" fill="#FFCCBC" />
-      <rect x="24" y="8" width="18" height="20" rx="3.5" fill="#FFFFFF" />
-      <circle cx="30" cy="14" r="2.6" fill="#E5393C" />
-      <circle cx="36" cy="14" r="2.6" fill="#1565C0" />
-      <circle cx="30" cy="21" r="2.6" fill="#1565C0" />
-      <circle cx="36" cy="21" r="2.6" fill="#E5393C" />
-      <rect x="16" y="30" width="18" height="14" rx="3.5" fill="#D7CCC8" opacity="0.55" />
-    </g>
 
     <!-- 네모로직 -->
     <g v-else-if="slug === 'nonogram'">
@@ -246,72 +214,10 @@ defineProps<{ slug: string }>()
       <circle cx="36" cy="38" r="3" fill="none" stroke="#E1BEE7" stroke-width="1.4" />
     </g>
 
-    <!-- 부동산 타이쿤 -->
-    <g v-else-if="slug === 'estate'">
-      <rect x="4" y="4" width="40" height="40" rx="7" fill="#455A64" />
-      <rect x="8" y="20" width="11" height="20" rx="2" fill="#90A4AE" />
-      <rect x="10.5" y="23" width="2.6" height="2.6" fill="#ECEFF1" />
-      <rect x="14.5" y="23" width="2.6" height="2.6" fill="#ECEFF1" />
-      <rect x="10.5" y="28" width="2.6" height="2.6" fill="#ECEFF1" />
-      <rect x="14.5" y="28" width="2.6" height="2.6" fill="#ECEFF1" />
-      <rect x="21" y="12" width="13" height="28" rx="2" fill="#CFD8DC" />
-      <rect x="24" y="16" width="3" height="3" fill="#546E7A" />
-      <rect x="29" y="16" width="3" height="3" fill="#546E7A" />
-      <rect x="24" y="22" width="3" height="3" fill="#546E7A" />
-      <rect x="29" y="22" width="3" height="3" fill="#546E7A" />
-      <rect x="24" y="28" width="3" height="3" fill="#546E7A" />
-      <rect x="29" y="28" width="3" height="3" fill="#546E7A" />
-      <rect x="36" y="26" width="8" height="14" rx="2" fill="#78909C" />
-      <path d="M8 14 L15 7 L22 14" stroke="#E5393C" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-      <circle cx="38" cy="12" r="6" fill="#FFB300" />
-      <text x="38" y="15.4" font-size="9" font-weight="bold" fill="#7A4F01" text-anchor="middle">$</text>
-    </g>
 
-    <!-- 편의점 운영 -->
-    <g v-else-if="slug === 'store'">
-      <rect x="5" y="14" width="38" height="28" rx="4" fill="#ECEFF1" />
-      <path d="M4 14 L8 6 H40 L44 14 Z" fill="#43A047" />
-      <path d="M4 14 h8 v-2 h8 v2 h8 v-2 h8 v2 h8" stroke="#2E7D32" stroke-width="1.4" fill="none" />
-      <rect x="10" y="20" width="12" height="9" rx="2" fill="#FFCC80" />
-      <rect x="26" y="20" width="12" height="9" rx="2" fill="#80DEEA" />
-      <rect x="10" y="32" width="12" height="9" rx="2" fill="#EF9A9A" />
-      <rect x="26" y="31" width="12" height="11" rx="2" fill="#6D4C41" />
-      <rect x="30.5" y="35" width="3" height="7" fill="#3E2723" />
-    </g>
 
-    <!-- 유튜버 시뮬 -->
-    <g v-else-if="slug === 'tuber'">
-      <rect x="4" y="4" width="40" height="40" rx="7" fill="#FCE4EC" />
-      <rect x="8" y="12" width="32" height="22" rx="5" fill="#D32F2F" />
-      <path d="M21 18 L29 23 L21 28 Z" fill="#FFFFFF" />
-      <path d="M14 38 h20" stroke="#B71C1C" stroke-width="2.6" stroke-linecap="round" />
-      <path d="M18 41.5 h12" stroke="#EF9A9A" stroke-width="2.4" stroke-linecap="round" />
-      <circle cx="39" cy="10" r="5.5" fill="#FF6F00" />
-      <path d="M39 7.4 v3.2 l2 1.6" stroke="#FFF3E0" stroke-width="1.6" fill="none" stroke-linecap="round" />
-    </g>
 
-    <!-- 국가 운영 -->
-    <g v-else-if="slug === 'reigns'">
-      <rect x="4" y="4" width="40" height="40" rx="7" fill="#5D4037" />
-      <rect x="15" y="14" width="24" height="28" rx="3.5" fill="#BCAAA4" transform="rotate(8 27 28)" />
-      <rect x="9" y="12" width="24" height="28" rx="3.5" fill="#EFEBE9" />
-      <circle cx="21" cy="22" r="4.5" fill="#8D6E63" />
-      <path d="M14 32 h14 M14 36 h10" stroke="#A1887F" stroke-width="2" stroke-linecap="round" />
-      <path d="M17 6 L21 9 L24 5 L27 9 L31 6 L30 11 H18 Z" fill="#FFB300" />
-    </g>
 
-    <!-- 집중 나무 -->
-    <g v-else-if="slug === 'focus'">
-      <rect x="4" y="4" width="40" height="40" rx="7" fill="#C4E6FA" />
-      <rect x="4" y="36" width="40" height="8" rx="3" fill="#8BC34A" />
-      <path d="M24 38 Q22 28 24 20" stroke="#6D4C41" stroke-width="4.5" fill="none" stroke-linecap="round" />
-      <circle cx="24" cy="15" r="8.5" fill="#66BB6A" />
-      <circle cx="16.5" cy="19" r="6" fill="#43A047" />
-      <circle cx="31.5" cy="19" r="6" fill="#43A047" />
-      <circle cx="20" cy="11" r="2" fill="#F48FB1" />
-      <circle cx="28.5" cy="13.5" r="2" fill="#F48FB1" />
-      <circle cx="38" cy="10" r="4.6" fill="#FFEE58" />
-    </g>
 
     <!-- 한글 워들 -->
     <g v-else-if="slug === 'wordle'">
@@ -368,23 +274,6 @@ defineProps<{ slug: string }>()
       <circle cx="34" cy="16" r="2" fill="#FFFFFF" opacity="0.65" />
     </g>
 
-    <!-- 룰렛 데일리 -->
-    <g v-else-if="slug === 'roulette'">
-      <rect x="4" y="4" width="40" height="40" rx="7" fill="#6A1B9A" />
-      <g>
-        <path d="M24 26 L24 8 A18 18 0 0 1 36.7 13.3 Z" fill="#EF5350" />
-        <path d="M24 26 L36.7 13.3 A18 18 0 0 1 42 26 Z" fill="#42A5F5" />
-        <path d="M24 26 L42 26 A18 18 0 0 1 36.7 38.7 Z" fill="#FFB300" />
-        <path d="M24 26 L36.7 38.7 A18 18 0 0 1 24 44 Z" fill="#66BB6A" />
-        <path d="M24 26 L24 44 A18 18 0 0 1 11.3 38.7 Z" fill="#AB47BC" />
-        <path d="M24 26 L11.3 38.7 A18 18 0 0 1 6 26 Z" fill="#26C6DA" />
-        <path d="M24 26 L6 26 A18 18 0 0 1 11.3 13.3 Z" fill="#FF7043" />
-        <path d="M24 26 L11.3 13.3 A18 18 0 0 1 24 8 Z" fill="#9CCC65" />
-      </g>
-      <circle cx="24" cy="26" r="18" fill="none" stroke="#FFD54F" stroke-width="2.4" />
-      <circle cx="24" cy="26" r="5" fill="#4A148C" stroke="#FFD54F" stroke-width="1.6" />
-      <path d="M20 6 L24 12 L28 6 Z" fill="#FFD54F" />
-    </g>
 
     <!-- 등록되지 않은 게임 -->
     <g v-else>

@@ -101,6 +101,13 @@ export interface GameStat {
   best_score: number
 }
 
+// 구간 전체의 이용자 수 — 게임별 인원은 서로 겹쳐서 더하거나 최댓값을 쓸 수 없다
+export async function fetchTotalPlayers(days: number): Promise<number> {
+  const { data, error } = await supabase.rpc('get_total_players', { p_days: days })
+  if (error) throw error
+  return Number(data ?? 0)
+}
+
 export async function fetchGameStats(days: number): Promise<GameStat[]> {
   const { data, error } = await supabase.rpc('get_game_stats', { p_days: days })
   if (error) throw error

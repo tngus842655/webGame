@@ -34,19 +34,9 @@ export const GAMES: GameMeta[] = [
     loader: () => import('./dodge'),
   },
   {
-    slug: 'golf',
-    titleKey: 'game.golf',
-    loader: () => import('./golf'),
-  },
-  {
     slug: 'survivor',
     titleKey: 'game.survivor',
     loader: () => import('./survivor'),
-  },
-  {
-    slug: 'stock',
-    titleKey: 'game.stock',
-    loader: () => import('./stock'),
   },
   {
     slug: 'merge',
@@ -62,11 +52,6 @@ export const GAMES: GameMeta[] = [
     slug: 'tripeaks',
     titleKey: 'game.tripeaks',
     loader: () => import('./tripeaks'),
-  },
-  {
-    slug: 'mahjong',
-    titleKey: 'game.mahjong',
-    loader: () => import('./mahjong'),
   },
   {
     slug: 'nonogram',
@@ -104,31 +89,6 @@ export const GAMES: GameMeta[] = [
     loader: () => import('./orbit'),
   },
   {
-    slug: 'estate',
-    titleKey: 'game.estate',
-    loader: () => import('./estate'),
-  },
-  {
-    slug: 'store',
-    titleKey: 'game.store',
-    loader: () => import('./store'),
-  },
-  {
-    slug: 'tuber',
-    titleKey: 'game.tuber',
-    loader: () => import('./tuber'),
-  },
-  {
-    slug: 'reigns',
-    titleKey: 'game.reigns',
-    loader: () => import('./reigns'),
-  },
-  {
-    slug: 'focus',
-    titleKey: 'game.focus',
-    loader: () => import('./focus'),
-  },
-  {
     slug: 'wordle',
     titleKey: 'game.wordle',
     loader: () => import('./wordle'),
@@ -147,10 +107,5 @@ export const GAMES: GameMeta[] = [
     slug: 'autochess',
     titleKey: 'game.autochess',
     loader: () => import('./autochess'),
-  },
-  {
-    slug: 'roulette',
-    titleKey: 'game.roulette',
-    loader: () => import('./roulette'),
   },
 ]

@@ -248,7 +248,10 @@ export function loadDaily(state: SudokuState) {
 }
 
 export function loadPractice(state: SudokuState, level: number) {
-  const { puzzle, solution } = generatePuzzle(Math.floor(Math.random() * 0x7fffffff))
+  // 연습 퍼즐이 매번 같은 난이도라 몇 판을 풀든 똑같았다. 레벨마다 빈칸을 늘린다
+  // (생성기가 유일해를 확인하므로 지나치게 파낼 걱정은 없다)
+  const holes = 46 + Math.min(12, level)
+  const { puzzle, solution } = generatePuzzle(Math.floor(Math.random() * 0x7fffffff), holes)
   state.daily = false
   state.level = level
   applyPuzzle(state, puzzle, solution)
@@ -295,6 +298,6 @@ export function placeDigit(state: SudokuState, digit: number): PlaceResult {
 
 // 퍼즐 클리어 점수: 기본 + 남은 생명 + 시간 보너스
 export function clearPoints(state: SudokuState): number {
-  const timeBonus = Math.max(0, 900 - Math.floor(state.elapsed) * 2)
-  return 1000 + state.lives * 200 + timeBonus
+  const timeBonus = Math.max(0, 2300 - Math.floor(state.elapsed) * 5)
+  return 2600 + state.lives * 520 + timeBonus
 }

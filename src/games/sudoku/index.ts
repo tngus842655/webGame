@@ -1,6 +1,7 @@
 import { t } from '@/shared/i18n'
 import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
+import { createClearBonus } from '../clearBonus'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
@@ -74,6 +75,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   let popup: { text: string; age: number } | null = null
   let lostHeart: { index: number; age: number } | null = null
   let adContinueUsed = false
+  const bonus = createClearBonus(shell, ctx, 'sudoku-clear')
 
   const overlay = createGameOverOverlay(shell.wrapper, {
     adLabelKey: 'sd.ad',
@@ -101,33 +103,34 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   async function gameOver() {
     playGameOver()
+    vibrate(120)
     const prevBest = await ctx.getBestScore()
     await ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
     overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adContinueUsed)
   }
 
-  const onPuzzleClear = () => {
+  const onPuzzleClear = async () => {
     let points = clearPoints(state)
-    if (state.daily) {
-      // 오늘 첫 데일리 클리어면 스트릭을 쌓고 보너스를 준다
-      const { streak, first } = recordDailyClear()
-      state.streak = streak
-      if (first) points += streak * 150
-    }
-    state.score = Math.min(1_000_000, state.score + points)
-    popup = { text: `+${points}`, age: 0 }
+    // 스트릭은 출석 표시일 뿐 점수에는 넣지 않는다 —
+    // 지난 날들의 기록이 오늘 점수에 얹히면 순위표가 실력을 재지 못한다
+    if (state.daily) state.streak = recordDailyClear().streak
     playMerge(6)
     vibrate(30)
     state.phase = 'clearing'
     state.clearTimer = 1.6
+    // 보너스를 묻는 동안 셸이 멈추므로 다음 퍼즐로 넘어가지 않는다
+    if (await bonus.offer(points)) points *= 2
+    if (shell.isDestroyed()) return
+    state.score = Math.min(1_000_000, state.score + points)
+    popup = { text: `+${points}`, age: 0 }
   }
 
   const tryPlace = (digit: number) => {
     const result = placeDigit(state, digit)
     if (result === 'placed') {
       playMerge(3)
-      if (state.remaining === 0) onPuzzleClear()
+      if (state.remaining === 0) void onPuzzleClear()
     } else if (result === 'miss') {
       vibrate(60)
       state.shakeTime = 0.35

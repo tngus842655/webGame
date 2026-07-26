@@ -10,6 +10,9 @@ import { SuikaWorld } from './world'
 
 const STEP_MS = 1000 / 60
 
+// 부활 시 걷어낼 과일의 상한 티어 (0=체리 … 3=오렌지)
+const REVIVE_MAX_TIER = 3
+
 function createSession(host: HTMLElement, ctx: GameContext) {
   let acc = 0
   const shell = createGameShell(host, (dt) => {
@@ -71,13 +74,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     },
   })
 
-  // 광고 보상: 통을 비우고 점수를 유지한 채 이어하기 (판당 1회)
+  // 광고 보상: 작은 과일(체리~오렌지)만 걷어내 자리를 만들고 이어하기 (판당 1회).
+  // 키워둔 큰 과일은 남으므로 하던 판을 그대로 잇는다.
   async function continueWithAd() {
     if (state.phase !== 'over' || adContinueUsed) return
     const rewarded = await ctx.showRewardAd('suika_continue')
     if (shell.isDestroyed() || !rewarded || state.phase !== 'over') return
     adContinueUsed = true
-    world.reset()
+    // 작은 과일이 하나도 없으면(큰 것만 남아 넘친 경우) 한 단계 위까지 걷어낸다
+    if (world.clearSmallFruits(REVIVE_MAX_TIER) === 0) world.clearSmallFruits(REVIVE_MAX_TIER + 2)
     state.phase = 'playing'
     state.dangerTime = 0
     state.cooldown = 0

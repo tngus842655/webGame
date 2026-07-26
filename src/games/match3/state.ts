@@ -224,7 +224,9 @@ export function addScore(state: M3State, gained: number) {
     state.level += 1
     state.moves += LEVEL_MOVES
     state.goalBase = state.goal
-    state.goal += 1000 + state.level * 500
+    // 이동 보상은 레벨당 +10회로 고정인데 목표는 레벨당 +500씩 더 올라서
+    // 레벨 2를 넘기는 게 사실상 불가능했다. 이동 보상에 맞춰 완만하게 올린다.
+    state.goal += 700 + state.level * 100
     state.levelFx = 0
   }
 }

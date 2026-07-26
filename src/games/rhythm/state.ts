@@ -9,6 +9,7 @@ export interface Note {
   time: number // 판정선 도달 시각(초)
   hit: boolean
   judged: Judge | null
+  window: number // 이 노트의 GOOD 판정 폭 (BPM이 오르면 좁아진다)
 }
 
 export interface RhythmState {
@@ -28,14 +29,20 @@ export interface RhythmState {
 
 export const LANES = 4
 export const APPROACH = 1.5 // 노트가 화면에 보이는 시간(초)
+// 곡의 길이. 끝이 없으면 정확한 사람은 영영 죽지 않아 세션이 늘어지고 점수도 상한까지 부푼다.
+// 리듬 게임은 원래 곡이 끝나면 판이 끝난다 — 난이도가 다 오르는 지점(약 2분 반)에 맞췄다.
+export const SONG_BARS = 100
 
-// 판정 창 (초)
-const W_PERFECT = 0.045
-const W_GREAT = 0.09
-const W_GOOD = 0.15
-export const HIT_WINDOW = W_GOOD
+// 판정 창 (초). 기준 BPM에서 GOOD ±150ms, GREAT ±90ms, PERFECT ±45ms.
+// BPM에 반비례해 좁아진다 — 고정폭이면 190BPM(8비트 간격 158ms)에서 앞뒤 노트의
+// 판정 창이 겹쳐서 아무 데나 쳐도 맞았고, 정확한 사람은 영영 죽지 않았다.
+export const HIT_WINDOW = 0.15
+const BASE_BPM = 105
+const windowFor = (bpm: number) => HIT_WINDOW * Math.min(1, BASE_BPM / bpm)
 
-const bpmAt = (bar: number) => Math.min(150, 105 + bar * 2)
+// 예전엔 45초면 BPM·밀도가 전부 상한에 닿아 같은 패턴이 무한 반복됐다.
+// 계수를 낮추고 천장을 올려 2분 부근까지 계속 조여든다.
+const bpmAt = (bar: number) => Math.min(190, 105 + bar * 1.2)
 
 // 마디 하나를 생성 — 8비트 슬롯, 진행할수록 약박 채움과 동시 노트가 늘어난다
 function generateBar(state: RhythmState) {
@@ -49,17 +56,18 @@ function generateBar(state: RhythmState) {
   for (let s = 0; s < slots; s++) {
     // 강박은 거의 항상, 약박은 확률적으로
     const strong = s % sub === 0
-    const chance = strong ? 0.9 : Math.min(0.5, 0.12 + bar * 0.015)
+    const chance = strong ? 0.9 : Math.min(0.85, 0.12 + bar * 0.01)
     if (Math.random() > chance) continue
     let lane = Math.floor(Math.random() * LANES)
     if (lane === lastLane) lane = (lane + 1 + Math.floor(Math.random() * (LANES - 1))) % LANES
     lastLane = lane
     const time = start + (s * beat * 4) / slots
-    state.notes.push({ lane, time, hit: false, judged: null })
+    const window = windowFor(bpm)
+    state.notes.push({ lane, time, hit: false, judged: null, window })
     // 후반부엔 가끔 동시 노트
-    if (strong && bar >= 8 && Math.random() < 0.18) {
+    if (strong && bar >= 8 && Math.random() < Math.min(0.45, 0.06 + bar * 0.008)) {
       const other = (lane + 1 + Math.floor(Math.random() * (LANES - 1))) % LANES
-      state.notes.push({ lane: other, time, hit: false, judged: null })
+      state.notes.push({ lane: other, time, hit: false, judged: null, window })
     }
   }
   state.notes.sort((a, b) => a.time - b.time)
@@ -87,10 +95,11 @@ export function createState(): RhythmState {
 }
 
 export function ensureNotes(state: RhythmState) {
-  while (state.genTime < state.time + APPROACH + 4) generateBar(state)
+  while (state.bar < SONG_BARS && state.genTime < state.time + APPROACH + 4) generateBar(state)
 }
 
-const JUDGE_SCORE: Record<Judge, number> = { perfect: 100, great: 60, good: 30, miss: 0 }
+// 노트가 워낙 많아 다른 게임의 25배로 쌓였다 — 판정당 점수를 낮춰 분당 점수를 맞춘다
+const JUDGE_SCORE: Record<Judge, number> = { perfect: 4, great: 2, good: 1, miss: 0 }
 const JUDGE_HEALTH: Record<Judge, number> = { perfect: 2, great: 1, good: 0, miss: -12 }
 
 function applyJudge(state: RhythmState, note: Note, judge: Judge) {
@@ -130,10 +139,15 @@ export function update(state: RhythmState, dt: number): Judge[] {
       state.nextIndex += 1
       continue
     }
-    if (note.time + HIT_WINDOW >= state.time) break
+    if (note.time + note.window >= state.time) break
     applyJudge(state, note, 'miss')
     results.push('miss')
     state.nextIndex += 1
+  }
+  // 마지막 노트까지 지나가면 곡이 끝난다
+  if (state.phase === 'playing' && state.bar >= SONG_BARS && state.nextIndex >= state.notes.length) {
+    state.phase = 'over'
+    state.overTimer = 0.8
   }
   return results
 }
@@ -148,13 +162,15 @@ export function tapLane(state: RhythmState, lane: number): Judge | null {
     if (note.time - state.time > HIT_WINDOW) break
     if (note.hit || note.lane !== lane) continue
     const diff = Math.abs(note.time - state.time)
+    if (diff > note.window) continue
     if (diff < bestDiff) {
       bestDiff = diff
       best = note
     }
   }
   if (!best) return null
-  const judge: Judge = bestDiff <= W_PERFECT ? 'perfect' : bestDiff <= W_GREAT ? 'great' : 'good'
+  const judge: Judge =
+    bestDiff <= best.window * 0.3 ? 'perfect' : bestDiff <= best.window * 0.6 ? 'great' : 'good'
   applyJudge(state, best, judge)
   return judge
 }

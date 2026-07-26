@@ -230,11 +230,10 @@ export function submitGuess(state: WordleState): SubmitResult {
   }
 
   if (result.every((s) => s === 'g')) {
-    let points = (state.maxRows + 1 - state.rows.length) * 100
+    const points = (state.maxRows + 1 - state.rows.length) * 220
     if (state.daily) {
-      const { streak, first } = recordDailyClear()
-      state.streak = streak
-      if (first) points += streak * 150
+      // 스트릭은 출석 표시일 뿐 점수에는 넣지 않는다 (순위표는 이번 판 실력만 반영)
+      state.streak = recordDailyClear().streak
       state.dailyShare = state.results.map((row) => row.map((s) => EMOJI[s]).join('')).join('\n')
     }
     state.score = Math.min(1_000_000, state.score + points)

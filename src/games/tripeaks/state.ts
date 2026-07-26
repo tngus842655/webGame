@@ -36,8 +36,14 @@ export function cardY(row: number): number {
   return TABLE_TOP + row * ROW_GAP
 }
 
-// 52장 셔플 → 테이블 28장 + 웨이스트 1장 + 스톡 23장
-function createDeal(): { table: TableCard[]; waste: PlayingCard[]; stock: PlayingCard[] } {
+// 스테이지가 올라도 배치·스톡이 똑같아 진행감이 없었다. 뒤집을 수 있는 카드를
+// 줄여 조금씩 조인다 (스톡을 다 쓰고 낼 카드가 없으면 판이 끝난다).
+export function stockFor(stage: number): number {
+  return Math.max(15, 23 - (stage - 1))
+}
+
+// 52장 셔플 → 테이블 28장 + 웨이스트 1장 + 스톡(스테이지에 따라 23~15장)
+function createDeal(stage: number): { table: TableCard[]; waste: PlayingCard[]; stock: PlayingCard[] } {
   const deck: PlayingCard[] = []
   for (let suit = 0; suit < 4; suit++) {
     for (let rank = 0; rank < 13; rank++) deck.push({ rank, suit })
@@ -55,7 +61,7 @@ function createDeal(): { table: TableCard[]; waste: PlayingCard[]; stock: Playin
     faceUp: row === 3,
     removed: false,
   }))
-  return { table, waste: [deck[28]], stock: deck.slice(29) }
+  return { table, waste: [deck[28]], stock: deck.slice(29, 29 + stockFor(stage)) }
 }
 
 // 아랫행에서 반 칸 걸쳐 덮는 카드가 모두 제거됐는지
@@ -107,13 +113,13 @@ export function createState(): TripeaksState {
     moveCount: 0,
     clearTimer: 0,
     playTime: 0,
-    ...createDeal(),
+    ...createDeal(1),
   }
 }
 
 // 다음 스테이지: 점수는 유지한 채 새 딜
 export function loadStage(state: TripeaksState) {
-  const deal = createDeal()
+  const deal = createDeal(state.stage)
   state.table = deal.table
   state.waste = deal.waste
   state.stock = deal.stock

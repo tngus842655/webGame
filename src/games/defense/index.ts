@@ -1,6 +1,7 @@
 import { t } from '@/shared/i18n'
 import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
+import { createClearBonus } from '../clearBonus'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
@@ -31,7 +32,12 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       vibrate(60)
       leakFlash = 0.4
     }
-    if (events.waveCleared) playMerge(4)
+    if (events.waveCleared) {
+      playMerge(4)
+      // 웨이브마다 물으면 성가시므로 보스 웨이브(5의 배수)를 넘겼을 때만
+      const cleared = state.wave - 1
+      if (cleared % 5 === 0) void offerWaveBonus(cleared)
+    }
     if (events.died) void gameOver()
     draw()
   })
@@ -41,6 +47,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   let leakFlash = 0
   let btnShake = 0
   let adContinueUsed = false
+  const bonus = createClearBonus(shell, ctx, 'defense-wave')
 
   const overlay = createGameOverOverlay(shell.wrapper, {
     adLabelKey: 'df.ad',
@@ -71,8 +78,16 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     overlay.hide()
   }
 
+  // 웨이브 클리어 점수(wave * 50)를 한 번 더 준다
+  async function offerWaveBonus(wave: number) {
+    const points = wave * 50
+    if (!(await bonus.offer(points)) || shell.isDestroyed()) return
+    state.score = Math.min(1_000_000, state.score + points)
+  }
+
   async function gameOver() {
     playGameOver()
+    vibrate(120)
     const prevBest = await ctx.getBestScore()
     await ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return

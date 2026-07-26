@@ -7,6 +7,9 @@ export interface GameShell {
   isDestroyed(): boolean
   // destroy 시 등록 역순으로 실행된다
   addCleanup(fn: () => void): void
+  // 화면을 덮는 팝업 동안 루프를 멈춘다 (제한 시간·적 이동이 뒤에서 계속되면 안 되므로)
+  pause(): void
+  resume(): void
   destroy(): void
 }
 
@@ -28,7 +31,8 @@ export function createGameShell(host: HTMLElement, onFrame: (dt: number) => void
   host.appendChild(wrapper)
 
   let destroyed = false
-  let paused = false
+  // 가이드 팝업과 클리어 보너스가 겹칠 수 있어 중첩을 센다 (하나가 닫혀도 나머지가 남아 있으면 계속 멈춤)
+  let pauseDepth = 0
   const cleanups: Array<() => void> = []
 
   let rafId = 0
@@ -47,7 +51,7 @@ export function createGameShell(host: HTMLElement, onFrame: (dt: number) => void
   const onVisibility = () => {
     if (destroyed) return
     if (document.hidden) cancelAnimationFrame(rafId)
-    else if (!paused) startLoop()
+    else if (pauseDepth === 0) startLoop()
   }
   document.addEventListener('visibilitychange', onVisibility)
   startLoop()
@@ -59,14 +63,14 @@ export function createGameShell(host: HTMLElement, onFrame: (dt: number) => void
       cleanups.push(fn)
     },
     pause() {
-      if (destroyed || paused) return
-      paused = true
-      cancelAnimationFrame(rafId)
+      if (destroyed) return
+      pauseDepth += 1
+      if (pauseDepth === 1) cancelAnimationFrame(rafId)
     },
     resume() {
-      if (destroyed || !paused) return
-      paused = false
-      if (!document.hidden) startLoop()
+      if (destroyed || pauseDepth === 0) return
+      pauseDepth -= 1
+      if (pauseDepth === 0 && !document.hidden) startLoop()
     },
     destroy() {
       if (destroyed) return

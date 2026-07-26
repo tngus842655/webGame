@@ -1,6 +1,7 @@
 import { t } from '@/shared/i18n'
 import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
+import { createClearBonus } from '../clearBonus'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
@@ -42,6 +43,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const state = createState()
   const popups: Array<{ x: number; y: number; text: string; age: number }> = []
   let adReviveUsed = false
+  const bonus = createClearBonus(shell, ctx, 'merge-clear')
   let drag: { from: number; x: number; y: number } | null = null
   let genShake = 0 // 자리가 없을 때 생성 버튼 흔들림
 
@@ -61,7 +63,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   // 광고 보상: 시간을 되살리고 자리도 비워 같은 스테이지를 이어간다 (판당 1회)
   async function reviveWithAd() {
-    if (state.phase !== 'over' || adReviveUsed) return
+    if (state.phase !== 'over' || state.cleared || adReviveUsed) return
     const rewarded = await ctx.showRewardAd('merge-revive')
     if (shell.isDestroyed() || !rewarded || state.phase !== 'over') return
     adReviveUsed = true
@@ -70,13 +72,19 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     overlay.hide()
   }
 
+  // 스테이지 클리어로 받은 남은 시간 보너스를 한 번 더 준다
+  async function offerStageBonus(points: number) {
+    if (!(await bonus.offer(points)) || shell.isDestroyed()) return
+    state.score = Math.min(1_000_000, state.score + points)
+  }
+
   async function gameOver() {
     playGameOver()
     vibrate(120)
     const prevBest = await ctx.getBestScore()
     await ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
-    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adReviveUsed)
+    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adReviveUsed && !state.cleared)
   }
 
   const genButton = LAYOUT.genButton
@@ -133,6 +141,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         popups.push({ x: px + cellSize / 2, y: py, text: '🏆', age: 0 })
         vibrate([25, 40, 25])
       }
+      if (result.stageClear) void offerStageBonus(state.lastBonus)
     },
   })
 
@@ -318,13 +327,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.textAlign = 'center'
       c.fillStyle = '#FFFFFF'
       c.font = 'bold 48px sans-serif'
-      c.fillText(t('merge.clear', { n: state.stage }), 360, 560)
+      c.fillText(state.cleared ? t('merge.cleared') : t('merge.clear', { n: state.stage }), 360, 560)
       c.fillStyle = '#FFD54F'
       c.font = 'bold 62px sans-serif'
       c.fillText(`+${state.lastBonus.toLocaleString()}`, 360, 650)
-      c.fillStyle = 'rgb(255 255 255 / 0.85)'
-      c.font = '28px sans-serif'
-      c.fillText(t('merge.nextStage', { n: state.stage + 1, g: stageGoal(state.stage + 1) }), 360, 720)
+      if (!state.cleared) {
+        c.fillStyle = 'rgb(255 255 255 / 0.85)'
+        c.font = '28px sans-serif'
+        c.fillText(t('merge.nextStage', { n: state.stage + 1, g: stageGoal(state.stage + 1) }), 360, 720)
+      }
       c.restore()
     }
   }

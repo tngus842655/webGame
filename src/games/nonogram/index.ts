@@ -1,6 +1,7 @@
 import { t } from '@/shared/i18n'
 import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
+import { createClearBonus } from '../clearBonus'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
@@ -75,6 +76,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   let popup: { text: string; age: number } | null = null
   let lostHeart: { index: number; age: number } | null = null
   let adContinueUsed = false
+  const bonus = createClearBonus(shell, ctx, 'nonogram-clear')
 
   const overlay = createGameOverOverlay(shell.wrapper, {
     adLabelKey: 'no.ad',
@@ -102,6 +104,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   async function gameOver() {
     playGameOver()
+    vibrate(120)
     const prevBest = await ctx.getBestScore()
     await ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
@@ -120,7 +123,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const result = applyFill(state, row, col)
     if (result === 'filled') {
       playMerge(3)
-      if (state.remaining === 0) onPuzzleClear()
+      if (state.remaining === 0) void onPuzzleClear()
     } else if (result === 'miss') {
       drag = null // 오답이면 드래그 종료
       vibrate(60)
@@ -134,14 +137,17 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     }
   }
 
-  const onPuzzleClear = () => {
-    const points = puzzlePoints(state.size) + state.lives * 100
-    state.score = Math.min(1_000_000, state.score + points)
-    popup = { text: `+${points}`, age: 0 }
+  const onPuzzleClear = async () => {
+    let points = puzzlePoints(state.size) + state.lives * 100
     playMerge(6)
     vibrate(30)
     state.phase = 'clearing'
     state.clearTimer = 1.4
+    // 보너스를 묻는 동안 셸이 멈추므로 다음 퍼즐로 넘어가지 않는다
+    if (await bonus.offer(points)) points *= 2
+    if (shell.isDestroyed()) return
+    state.score = Math.min(1_000_000, state.score + points)
+    popup = { text: `+${points}`, age: 0 }
   }
 
   const detachInput = attachInput(stage.canvas, {

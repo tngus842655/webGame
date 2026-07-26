@@ -1,26 +1,36 @@
-import { playGameOver, vibrate } from '@/shared/sound'
+import { playDrop, playGameOver, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import { drawHazard, drawRunner } from './sprites'
-import { FIELD, PLAYER_R, PLAYER_Y, createState, scoreOf, update } from './state'
+import { FIELD, GRAZE_POINTS, PLAYER_R, PLAYER_Y, createState, scoreOf, update } from './state'
 
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
-    if (state.phase === 'playing' && update(state, dt)) void gameOver()
+    if (state.phase === 'playing') {
+      const result = update(state, dt)
+      if (result.grazed) {
+        playDrop()
+        grazeFlash = 0.5
+      }
+      if (result.died) void gameOver()
+    }
+    grazeFlash = Math.max(0, grazeFlash - dt)
     draw()
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
   let adContinueUsed = false
+  let grazeFlash = 0 // 스침 보너스 표시 잔상
 
   const overlay = createGameOverOverlay(shell.wrapper, {
     adLabelKey: 'dodge.ad',
     onRetry() {
       if (state.phase !== 'over') return
       adContinueUsed = false
+      grazeFlash = 0
       Object.assign(state, createState())
       overlay.hide()
     },
@@ -106,6 +116,16 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.fillStyle = '#37474F'
     c.font = 'bold 52px sans-serif'
     c.fillText(scoreOf(state).toLocaleString(), 360, 96)
+
+    // 스침 보너스 — 아슬아슬하게 피할수록 점수가 붙는다는 걸 그 자리에서 알려준다
+    if (grazeFlash > 0) {
+      c.save()
+      c.globalAlpha = Math.min(1, grazeFlash * 2)
+      c.fillStyle = '#F4511E'
+      c.font = 'bold 34px sans-serif'
+      c.fillText(`+${GRAZE_POINTS}`, state.playerX, PLAYER_Y - 96 - (0.5 - grazeFlash) * 60)
+      c.restore()
+    }
 
     // 텍스트 없는 조작 안내: 좌우로 움직이는 표식
     if (state.time < 4 && state.phase === 'playing') {

@@ -23,8 +23,8 @@ const ko: Record<string, Guide> = {
   },
   brick: {
     goal: '공을 튕겨 벽돌을 부수세요. 벽돌이 바닥까지 내려오면 끝입니다.',
-    how: '아래에서 당겨 각도를 정하고 놓으면 공이 날아갑니다.',
-    score: '웨이브를 오래 버틸수록 점수가 쌓입니다.',
+    how: '아래에서 당겨 각도를 정하고 놓으면 공이 날아갑니다. 부순 벽돌로 얻은 골드는 아래 두 버튼에서 공격력·공 개수로 바꿉니다.',
+    score: '웨이브를 오래 버틸수록 점수가 쌓입니다. 강화는 판마다 처음부터 다시 쌓습니다.',
   },
   fruit2048: {
     goal: '같은 숫자 과일을 밀어 붙여 합치세요. 더 이상 움직일 수 없으면 끝입니다.',
@@ -41,20 +41,10 @@ const ko: Record<string, Guide> = {
     how: '좌우로 끌어서 움직입니다.',
     score: '버틴 시간이 곧 점수입니다.',
   },
-  golf: {
-    goal: '9홀을 도는 동안 공을 홀컵에 넣으세요.',
-    how: '공에서 반대 방향으로 당겼다 놓으면 그 힘으로 굴러갑니다.',
-    score: '적은 타수로 넣을수록 높은 점수를 받습니다.',
-  },
   survivor: {
     goal: '몰려드는 적 사이에서 살아남으세요. 체력이 다하면 끝입니다.',
     how: '끌어서 이동만 하면 공격은 자동입니다. 레벨업 때 강화를 하나 고르세요.',
     score: '처치 수와 생존 시간을 더해 계산합니다.',
-  },
-  stock: {
-    goal: '90초 동안 싸게 사서 비싸게 팔아 자산을 불리세요.',
-    how: '매수·매도 버튼으로 사고팝니다. 뉴스가 뜨면 가격이 크게 움직여요.',
-    score: '처음 자본보다 얼마나 더 벌었는지가 점수입니다.',
   },
   merge: {
     goal: '같은 식물끼리 합쳐 황금 화분을 만드세요. 제한 시간 안에 목표 개수를 채우면 다음 단계로 갑니다.',
@@ -70,11 +60,6 @@ const ko: Record<string, Guide> = {
     goal: '바닥에 놓인 카드보다 숫자가 하나 크거나 작은 카드를 걷어내 산을 치우세요.',
     how: '조건에 맞는 카드를 탭합니다. 낼 카드가 없으면 더미에서 한 장 뒤집으세요.',
     score: '연속으로 걷어낼수록 배수가 붙습니다.',
-  },
-  mahjong: {
-    goal: '같은 그림의 패 두 장을 찾아 모두 걷어내세요.',
-    how: '좌우가 트인 패만 고를 수 있습니다. 두 장을 차례로 탭하세요.',
-    score: '스테이지를 넘길수록 점수가 쌓입니다.',
   },
   nonogram: {
     goal: '가장자리 숫자를 힌트 삼아 칸을 칠해 그림을 완성하세요. 세 번 틀리면 끝입니다.',
@@ -111,40 +96,15 @@ const ko: Record<string, Guide> = {
     how: '포신이 저절로 돌아갑니다. 적과 일직선이 되는 순간 탭해서 쏘세요.',
     score: '연속으로 맞힐수록 보너스가 커집니다.',
   },
-  estate: {
-    goal: '3분 동안 부동산을 사고팔아 자산을 최대한 불리세요.',
-    how: '매물마다 매수·매도 버튼이 있습니다. 보유하고 있으면 임대료가 계속 들어와요.',
-    score: '끝났을 때의 총자산이 점수입니다.',
-  },
-  store: {
-    goal: '손님이 원하는 상품을 제때 진열하세요. 헛걸음이 쌓여 평판이 바닥나면 폐업입니다.',
-    how: '진열대를 탭해 창고 재고를 채우고, 재고가 떨어지면 발주하세요.',
-    score: '누적 매출이 점수입니다.',
-  },
-  tuber: {
-    goal: '3분 동안 영상을 올려 구독자를 최대한 모으세요.',
-    how: '주제를 고른 뒤 촬영·편집·썸네일 세 번의 타이밍을 맞추세요. 초록 한가운데에서 멈추면 잘 만든 영상입니다.',
-    score: '모은 구독자 수가 점수입니다.',
-  },
-  reigns: {
-    goal: '민심·국고·군사·외교 중 하나라도 바닥나거나 넘치면 왕좌에서 내려옵니다.',
-    how: '안건 카드에서 두 선택지 중 하나를 고르세요. 어떤 지표가 움직이는지 아이콘으로 귀띔해 줍니다.',
-    score: '버틴 재위 년수가 점수입니다.',
-  },
-  focus: {
-    goal: '정한 시간 동안 화면을 지키면 나무가 다 자랍니다. 앱을 벗어나면 시들어요.',
-    how: '집중할 시간을 고르고 기다리기만 하면 됩니다.',
-    score: '오늘 집중한 시간(분)이 그대로 점수입니다.',
-  },
   wordle: {
     goal: '숨은 두 글자 단어를 여섯 번 안에 맞히세요.',
     how: '자음·모음을 눌러 여섯 칸을 채우고 입력하세요. 초록은 자리까지 정답, 노랑은 자리만 틀린 것입니다.',
     score: '적은 횟수로 맞힐수록 높고, 데일리를 연속으로 풀면 보너스가 붙습니다.',
   },
   omok: {
-    goal: 'AI보다 먼저 돌 다섯 개를 나란히 놓으세요. 이길수록 상대가 강해집니다.',
-    how: '바둑판 교차점을 탭해 검은 돌을 둡니다.',
-    score: '연승할수록 점수가 커집니다 — 한 번 지면 끝이에요.',
+    goal: '1단부터 10단까지 AI를 차례로 꺾으세요. 10단을 이기면 완전 정복입니다.',
+    how: '바둑판 교차점을 탭해 검은 돌을 둡니다. 6단부터는 내 차례에만 시계가 갑니다.',
+    score: '단이 오를수록 통과 점수가 커지고, 6단부터는 남긴 시간만큼 더 받습니다.',
   },
   deck: {
     goal: '카드로 적을 쓰러뜨리며 나아가세요. 체력이 다하면 끝입니다.',
@@ -155,11 +115,6 @@ const ko: Record<string, Guide> = {
     goal: '유닛을 사서 배치하고 자동 전투에서 이기세요. 지면 체력이 깎이고, 다 닳으면 끝입니다.',
     how: '상점에서 유닛을 사고, 같은 유닛을 겹쳐 끌면 한 단계 강해집니다.',
     score: '라운드를 오래 버틸수록 점수가 쌓입니다.',
-  },
-  roulette: {
-    goal: '하루 세 번 돌려 최대한 많이 받으세요.',
-    how: '돌리기 버튼을 누르면 됩니다.',
-    score: '오늘 받은 금액이 점수이고, 매일 오면 보너스가 붙습니다.',
   },
 }
 
@@ -176,8 +131,8 @@ const en: Record<string, Guide> = {
   },
   brick: {
     goal: 'Bounce the ball to break bricks. If bricks reach the bottom, the run ends.',
-    how: 'Pull back from the bottom to aim, release to launch.',
-    score: 'Survive more waves to score higher.',
+    how: 'Pull back from the bottom to aim, release to launch. Spend the gold you earn on attack or extra balls.',
+    score: 'Survive more waves to score higher. Upgrades start over every run.',
   },
   fruit2048: {
     goal: 'Slide matching fruits together to merge them. No moves left means game over.',
@@ -194,20 +149,10 @@ const en: Record<string, Guide> = {
     how: 'Drag left and right to move.',
     score: 'Time survived is your score.',
   },
-  golf: {
-    goal: 'Sink the ball across nine holes.',
-    how: 'Pull back from the ball and release to shoot.',
-    score: 'Fewer strokes score higher.',
-  },
   survivor: {
     goal: 'Stay alive in the swarm. When your health runs out, the run ends.',
     how: 'Just drag to move — attacks are automatic. Pick an upgrade on level up.',
     score: 'Kills plus time survived.',
-  },
-  stock: {
-    goal: 'Buy low, sell high and grow your money in 90 seconds.',
-    how: 'Use the buy and sell buttons. News events swing the price hard.',
-    score: 'How much you made above your starting cash.',
   },
   merge: {
     goal: 'Merge plants into golden pots. Reach the target count in time to advance a stage.',
@@ -223,11 +168,6 @@ const en: Record<string, Guide> = {
     goal: 'Clear the peaks by taking cards one rank above or below the base card.',
     how: 'Tap any card that fits. Out of moves? Flip a card from the stock.',
     score: 'Longer streaks build a multiplier.',
-  },
-  mahjong: {
-    goal: 'Find matching pairs and clear the whole board.',
-    how: 'Only tiles free on the left or right can be picked. Tap two of them.',
-    score: 'Score builds as you clear stages.',
   },
   nonogram: {
     goal: 'Use the edge numbers to fill the picture. Three mistakes end the run.',
@@ -264,40 +204,15 @@ const en: Record<string, Guide> = {
     how: 'The turret spins on its own — tap to fire when it lines up.',
     score: 'Consecutive hits build a bonus.',
   },
-  estate: {
-    goal: 'Trade property for three minutes and grow your assets.',
-    how: 'Each listing has buy and sell buttons. Holdings earn rent continuously.',
-    score: 'Your total assets at the end.',
-  },
-  store: {
-    goal: 'Restock what customers want in time. Enough angry customers and you close down.',
-    how: 'Tap a shelf to restock from storage, and order more when storage runs low.',
-    score: 'Total revenue.',
-  },
-  tuber: {
-    goal: 'Post videos for three minutes and gather as many subscribers as you can.',
-    how: 'Pick a topic, then time three taps — filming, editing, thumbnail. Stop in the green centre for a better video.',
-    score: 'Subscribers gained.',
-  },
-  reigns: {
-    goal: 'If people, treasury, army or diplomacy hits zero or overflows, you lose the throne.',
-    how: 'Choose one of two answers on each card. Icons hint at which stats move.',
-    score: 'Years you stayed on the throne.',
-  },
-  focus: {
-    goal: 'Keep the screen for the time you set and the tree grows. Leave the app and it withers.',
-    how: 'Pick a duration and simply wait.',
-    score: 'Minutes you focused today.',
-  },
   wordle: {
     goal: 'Guess the hidden two-syllable word within six tries.',
     how: 'Tap letters to fill six slots and submit. Green is the right spot, yellow is the wrong spot.',
     score: 'Fewer guesses score higher, and daily streaks add a bonus.',
   },
   omok: {
-    goal: 'Line up five stones before the AI does. Each win makes it tougher.',
-    how: 'Tap an intersection to place your black stone.',
-    score: 'Win streaks score higher — one loss ends the run.',
+    goal: 'Beat the AI from stage 1 through 10. Clear stage 10 to finish the run.',
+    how: 'Tap an intersection to place your black stone. From stage 6 your clock runs on your turn.',
+    score: 'Higher stages pay more, and from stage 6 leftover time adds a bonus.',
   },
   deck: {
     goal: 'Fight through enemies with your cards. When your health runs out, the run ends.',
@@ -308,11 +223,6 @@ const en: Record<string, Guide> = {
     goal: 'Buy units, place them, and win the auto battles. Losing costs health.',
     how: 'Buy from the shop and drag matching units together to upgrade them.',
     score: 'Score builds the longer you survive.',
-  },
-  roulette: {
-    goal: 'Three free spins a day — win as much as you can.',
-    how: 'Just press the spin button.',
-    score: "Today's winnings, with a bonus for coming back daily.",
   },
 }
 

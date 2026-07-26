@@ -67,7 +67,7 @@ export const SHAPES: PieceShape[] = [
 ]
 
 export const SCORING = {
-  perCell: 1, // 배치한 칸 수만큼 기본 점수
-  lineBase: 10, // 줄 점수 = lineBase × 줄수² (1줄 10, 2줄 40, 3줄 90)
-  streakBonus: 5, // 연속 클리어 보너스 = (streak-1) × streakBonus
+  perCell: 5, // 배치한 칸 수만큼 기본 점수
+  lineBase: 46, // 줄 점수 = lineBase × 줄수² (1줄 46, 2줄 184, 3줄 414)
+  streakBonus: 23, // 연속 클리어 보너스 = (streak-1) × streakBonus
 } as const
