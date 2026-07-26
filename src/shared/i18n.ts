@@ -176,6 +176,14 @@ const en = {
   'no.fill': 'Fill',
   'no.mark': 'Mark',
   'no.ad': '▶ Watch ad to continue (+1 life)',
+  'game.sudoku': 'Sudoku Daily',
+  'sd.daily': 'Daily {date}',
+  'sd.practice': 'Practice {n}',
+  'sd.streak': '🔥 Streak {n}',
+  'sd.ad': '▶ Watch ad to continue (+1 life)',
+  'game.pipes': 'Pipe Connect',
+  'game.defense': 'Tower Defense',
+  'game.jump': 'Jump Challenge',
 }
 
 const ko: typeof en = {
@@ -316,6 +324,14 @@ const ko: typeof en = {
   'no.fill': '칠하기',
   'no.mark': 'X 표시',
   'no.ad': '▶ 광고 보고 이어하기 (생명 +1)',
+  'game.sudoku': '스도쿠 데일리',
+  'sd.daily': '데일리 {date}',
+  'sd.practice': '연습 {n}',
+  'sd.streak': '🔥 연속 {n}일',
+  'sd.ad': '▶ 광고 보고 이어하기 (생명 +1)',
+  'game.pipes': '파이프 연결',
+  'game.defense': '타워 디펜스',
+  'game.jump': '점프 챌린지',
 }
 
 // 나머지 언어: 허브·게임오버·광고·제목까지 번역, 게임 내부 텍스트는 en 폴백
@@ -391,6 +407,10 @@ const ja: CoreDict = {
   'game.tripeaks': 'トライピークス',
   'game.mahjong': '麻雀ソリティア',
   'game.nonogram': 'お絵かきロジック',
+  'game.sudoku': 'デイリー数独',
+  'game.pipes': 'パイプつなぎ',
+  'game.defense': 'タワーディフェンス',
+  'game.jump': 'ジャンプチャレンジ',
 }
 
 const zhCN: CoreDict = {
@@ -463,6 +483,10 @@ const zhCN: CoreDict = {
   'game.tripeaks': '三峰纸牌',
   'game.mahjong': '麻将连连看',
   'game.nonogram': '数织',
+  'game.sudoku': '每日数独',
+  'game.pipes': '接水管',
+  'game.defense': '塔防合成',
+  'game.jump': '跳跃挑战',
 }
 
 const es: CoreDict = {
@@ -535,6 +559,10 @@ const es: CoreDict = {
   'game.tripeaks': 'Solitario TriPeaks',
   'game.mahjong': 'Mahjong',
   'game.nonogram': 'Nonograma',
+  'game.sudoku': 'Sudoku Diario',
+  'game.pipes': 'Conecta Tuberías',
+  'game.defense': 'Defensa de Torres',
+  'game.jump': 'Reto de Saltos',
 }
 
 const ptBR: CoreDict = {
@@ -607,6 +635,10 @@ const ptBR: CoreDict = {
   'game.tripeaks': 'Paciência TriPeaks',
   'game.mahjong': 'Mahjong',
   'game.nonogram': 'Nonograma',
+  'game.sudoku': 'Sudoku Diário',
+  'game.pipes': 'Conecte os Canos',
+  'game.defense': 'Defesa de Torres',
+  'game.jump': 'Desafio de Pulos',
 }
 
 const fr: CoreDict = {
@@ -679,6 +711,10 @@ const fr: CoreDict = {
   'game.tripeaks': 'Solitaire TriPeaks',
   'game.mahjong': 'Mahjong',
   'game.nonogram': 'Picross',
+  'game.sudoku': 'Sudoku du Jour',
+  'game.pipes': 'Relie les Tuyaux',
+  'game.defense': 'Défense de Tours',
+  'game.jump': 'Défi de Saut',
 }
 
 const de: CoreDict = {
@@ -751,6 +787,10 @@ const de: CoreDict = {
   'game.tripeaks': 'TriPeaks Solitär',
   'game.mahjong': 'Mahjong',
   'game.nonogram': 'Nonogramm',
+  'game.sudoku': 'Tages-Sudoku',
+  'game.pipes': 'Rohr-Puzzle',
+  'game.defense': 'Turmverteidigung',
+  'game.jump': 'Sprung-Challenge',
 }
 
 const ru: CoreDict = {
@@ -823,6 +863,10 @@ const ru: CoreDict = {
   'game.tripeaks': 'Пасьянс Три пика',
   'game.mahjong': 'Маджонг',
   'game.nonogram': 'Японский кроссворд',
+  'game.sudoku': 'Судоку дня',
+  'game.pipes': 'Трубопровод',
+  'game.defense': 'Башенная защита',
+  'game.jump': 'Прыжковый вызов',
 }
 
 const id: CoreDict = {
@@ -895,6 +939,10 @@ const id: CoreDict = {
   'game.tripeaks': 'Solitaire TriPeaks',
   'game.mahjong': 'Mahjong',
   'game.nonogram': 'Nonogram',
+  'game.sudoku': 'Sudoku Harian',
+  'game.pipes': 'Sambung Pipa',
+  'game.defense': 'Pertahanan Menara',
+  'game.jump': 'Tantangan Lompat',
 }
 
 const vi: CoreDict = {
@@ -967,6 +1015,10 @@ const vi: CoreDict = {
   'game.tripeaks': 'Bài TriPeaks',
   'game.mahjong': 'Mạt Chược',
   'game.nonogram': 'Nonogram',
+  'game.sudoku': 'Sudoku Mỗi Ngày',
+  'game.pipes': 'Nối Ống Nước',
+  'game.defense': 'Thủ Tháp',
+  'game.jump': 'Thử Thách Nhảy',
 }
 
 const th: CoreDict = {
@@ -1039,6 +1091,10 @@ const th: CoreDict = {
   'game.tripeaks': 'ไพ่ไตรพีคส์',
   'game.mahjong': 'มาจอง',
   'game.nonogram': 'โนโนแกรม',
+  'game.sudoku': 'ซูโดกุรายวัน',
+  'game.pipes': 'ต่อท่อน้ำ',
+  'game.defense': 'ป้องกันหอคอย',
+  'game.jump': 'ท้าโดด',
 }
 
 const tr: CoreDict = {
@@ -1111,6 +1167,10 @@ const tr: CoreDict = {
   'game.tripeaks': 'TriPeaks Solitaire',
   'game.mahjong': 'Mahjong',
   'game.nonogram': 'Nonogram',
+  'game.sudoku': 'Günlük Sudoku',
+  'game.pipes': 'Boru Bağlama',
+  'game.defense': 'Kule Savunması',
+  'game.jump': 'Zıplama Yarışı',
 }
 
 const messages: Record<Locale, CoreDict> = {

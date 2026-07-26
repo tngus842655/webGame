@@ -73,4 +73,9 @@ export const GAMES: GameMeta[] = [
     titleKey: 'game.nonogram',
     loader: () => import('./nonogram'),
   },
+  {
+    slug: 'sudoku',
+    titleKey: 'game.sudoku',
+    loader: () => import('./sudoku'),
+  },
 ]

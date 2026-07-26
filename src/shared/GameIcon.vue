@@ -168,6 +168,18 @@ defineProps<{ slug: string }>()
       <path d="M16 6 v3 M26 6 v3 M36 6 v3" stroke="#607D8B" stroke-width="2.4" stroke-linecap="round" />
     </g>
 
+    <!-- 스도쿠 데일리 -->
+    <g v-else-if="slug === 'sudoku'">
+      <rect x="5" y="5" width="38" height="38" rx="4" fill="#FFFFFF" stroke="#00695C" stroke-width="2.4" />
+      <rect x="18.5" y="18.5" width="11" height="11" fill="#B2DFDB" />
+      <path d="M17.5 6 V42 M30.5 6 V42 M6 17.5 H42 M6 30.5 H42" stroke="#00897B" stroke-width="2" />
+      <text x="11.5" y="15.5" font-size="10" font-weight="bold" fill="#263238" text-anchor="middle">5</text>
+      <text x="37" y="15.5" font-size="10" font-weight="bold" fill="#00897B" text-anchor="middle">3</text>
+      <text x="24" y="28.3" font-size="10" font-weight="bold" fill="#00897B" text-anchor="middle">7</text>
+      <text x="11.5" y="41" font-size="10" font-weight="bold" fill="#00897B" text-anchor="middle">9</text>
+      <text x="37" y="41" font-size="10" font-weight="bold" fill="#263238" text-anchor="middle">1</text>
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />
