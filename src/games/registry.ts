@@ -73,4 +73,84 @@ export const GAMES: GameMeta[] = [
     titleKey: 'game.nonogram',
     loader: () => import('./nonogram'),
   },
+  {
+    slug: 'sudoku',
+    titleKey: 'game.sudoku',
+    loader: () => import('./sudoku'),
+  },
+  {
+    slug: 'pipes',
+    titleKey: 'game.pipes',
+    loader: () => import('./pipes'),
+  },
+  {
+    slug: 'defense',
+    titleKey: 'game.defense',
+    loader: () => import('./defense'),
+  },
+  {
+    slug: 'jump',
+    titleKey: 'game.jump',
+    loader: () => import('./jump'),
+  },
+  {
+    slug: 'rhythm',
+    titleKey: 'game.rhythm',
+    loader: () => import('./rhythm'),
+  },
+  {
+    slug: 'orbit',
+    titleKey: 'game.orbit',
+    loader: () => import('./orbit'),
+  },
+  {
+    slug: 'estate',
+    titleKey: 'game.estate',
+    loader: () => import('./estate'),
+  },
+  {
+    slug: 'store',
+    titleKey: 'game.store',
+    loader: () => import('./store'),
+  },
+  {
+    slug: 'tuber',
+    titleKey: 'game.tuber',
+    loader: () => import('./tuber'),
+  },
+  {
+    slug: 'reigns',
+    titleKey: 'game.reigns',
+    loader: () => import('./reigns'),
+  },
+  {
+    slug: 'focus',
+    titleKey: 'game.focus',
+    loader: () => import('./focus'),
+  },
+  {
+    slug: 'wordle',
+    titleKey: 'game.wordle',
+    loader: () => import('./wordle'),
+  },
+  {
+    slug: 'omok',
+    titleKey: 'game.omok',
+    loader: () => import('./omok'),
+  },
+  {
+    slug: 'deck',
+    titleKey: 'game.deck',
+    loader: () => import('./deck'),
+  },
+  {
+    slug: 'autochess',
+    titleKey: 'game.autochess',
+    loader: () => import('./autochess'),
+  },
+  {
+    slug: 'roulette',
+    titleKey: 'game.roulette',
+    loader: () => import('./roulette'),
+  },
 ]

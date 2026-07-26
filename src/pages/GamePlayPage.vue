@@ -6,6 +6,7 @@ import type { GameModule } from '@/games/types'
 import { createGameContext } from '@/shared/gameContext'
 import { t } from '@/shared/i18n'
 import { startPlayTracking } from '@/shared/playSessions'
+import { startScoreGuard } from '@/shared/scoreGuard'
 
 const route = useRoute()
 const router = useRouter()
@@ -14,6 +15,7 @@ const host = ref<HTMLDivElement | null>(null)
 let game: GameModule | null = null
 let disposed = false
 let stopTracking: (() => void) | null = null
+let stopScoreGuard: (() => void) | null = null
 
 onMounted(async () => {
   const slug = String(route.params.slug)
@@ -28,10 +30,14 @@ onMounted(async () => {
   game = mod.default
   game.mount(host.value, createGameContext(slug))
   stopTracking = startPlayTracking(slug)
+  stopScoreGuard = startScoreGuard(slug, () => game?.currentScore() ?? null)
 })
 
 onBeforeUnmount(() => {
   disposed = true
+  // 게임을 정리하기 전에 마지막 점수를 읽어야 한다
+  stopScoreGuard?.()
+  stopScoreGuard = null
   game?.unmount()
   game = null
   stopTracking?.()

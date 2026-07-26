@@ -10,20 +10,69 @@ export function getLocalBest(slug: string): number | null {
   return raw === null ? null : Number(raw)
 }
 
-// 점수는 Supabase에 제출하고, localStorage에도 병행 저장한다 (오프라인 대비)
 // DB check 제약(0~1,000,000)을 넘으면 insert 자체가 거부되므로 미리 클램프한다
+export function clampScore(score: number): number {
+  if (!Number.isFinite(score)) return 0
+  return Math.max(0, Math.min(1_000_000, Math.floor(score)))
+}
+
+// 최고점 갱신 시에만 기록 (홈·게임오버 화면의 "최고 기록" 표시용)
+export function updateLocalBest(slug: string, score: number): void {
+  if (score > (getLocalBest(slug) ?? 0)) localStorage.setItem(bestKey(slug), String(score))
+}
+
+// 진행 중 점수 저널 — 제출을 못 하고 앱이 종료돼도 다음 실행에서 올린다 { slug: score }
+const PENDING_KEY = 'webgame:pendingScores'
+
+function readPending(): Record<string, number> {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(PENDING_KEY) ?? '{}')
+    return parsed && typeof parsed === 'object' ? (parsed as Record<string, number>) : {}
+  } catch {
+    return {}
+  }
+}
+
+function writePending(map: Record<string, number>) {
+  if (Object.keys(map).length === 0) localStorage.removeItem(PENDING_KEY)
+  else localStorage.setItem(PENDING_KEY, JSON.stringify(map))
+}
+
+export function stashPendingScore(slug: string, score: number): void {
+  const map = readPending()
+  map[slug] = clampScore(score)
+  writePending(map)
+}
+
+export function clearPendingScore(slug: string): void {
+  const map = readPending()
+  if (!(slug in map)) return
+  delete map[slug]
+  writePending(map)
+}
+
+// 앱 시작 시 호출 — 지난 실행에서 제출하지 못한 점수를 복구한다
+export async function flushPendingScores(): Promise<void> {
+  for (const [slug, score] of Object.entries(readPending())) {
+    await saveScore(slug, Number(score))
+  }
+}
+
+// 점수는 Supabase에 제출하고, localStorage에도 병행 저장한다 (오프라인 대비)
 export async function saveScore(slug: string, score: number): Promise<void> {
-  const safe = Math.max(0, Math.min(1_000_000, Math.floor(score)))
-  const localBest = getLocalBest(slug) ?? 0
-  if (safe > localBest) localStorage.setItem(bestKey(slug), String(safe))
+  const safe = clampScore(score)
+  updateLocalBest(slug, safe)
+  // 전송 도중 앱이 죽어도 복구되도록 먼저 저널에 남긴다
+  stashPendingScore(slug, safe)
   try {
     const userId = await ensureUserId()
     const { error } = await supabase
       .from('scores')
       .insert({ user_id: userId, game_slug: slug, score: safe })
     if (error) throw error
+    clearPendingScore(slug)
   } catch {
-    // 오프라인·로그인 실패 시 로컬 기록만 남긴다
+    // 오프라인·로그인 실패·제출 빈도 제한 — 저널이 남아 다음 실행에 재시도된다
   }
 }
 
