@@ -190,6 +190,11 @@ const en = {
   'df.ad': '▶ Watch ad to revive (5 lives)',
   'game.jump': 'Jump Challenge',
   'jc.ad': '▶ Watch ad for +60s',
+  'game.rhythm': 'Rhythm Tap',
+  'rt.ad': '▶ Watch ad to continue (restore health)',
+  'game.orbit': 'Orbit Shooter',
+  'game.estate': 'Estate Tycoon',
+  'game.store': 'Mini Mart',
 }
 
 const ko: typeof en = {
@@ -344,6 +349,11 @@ const ko: typeof en = {
   'df.ad': '▶ 광고 보고 부활 (생명 5)',
   'game.jump': '점프 챌린지',
   'jc.ad': '▶ 광고 보고 60초 연장',
+  'game.rhythm': '리듬 탭',
+  'rt.ad': '▶ 광고 보고 이어하기 (체력 회복)',
+  'game.orbit': '궤도 슈팅',
+  'game.estate': '부동산 타이쿤',
+  'game.store': '편의점 운영',
 }
 
 // 나머지 언어: 허브·게임오버·광고·제목까지 번역, 게임 내부 텍스트는 en 폴백
@@ -423,6 +433,10 @@ const ja: CoreDict = {
   'game.pipes': 'パイプつなぎ',
   'game.defense': 'タワーディフェンス',
   'game.jump': 'ジャンプチャレンジ',
+  'game.rhythm': 'リズムタップ',
+  'game.orbit': 'オービットシューター',
+  'game.estate': '不動産タイクーン',
+  'game.store': 'コンビニ経営',
 }
 
 const zhCN: CoreDict = {
@@ -499,6 +513,10 @@ const zhCN: CoreDict = {
   'game.pipes': '接水管',
   'game.defense': '塔防合成',
   'game.jump': '跳跃挑战',
+  'game.rhythm': '节奏点击',
+  'game.orbit': '轨道射击',
+  'game.estate': '地产大亨',
+  'game.store': '便利店经营',
 }
 
 const es: CoreDict = {
@@ -575,6 +593,10 @@ const es: CoreDict = {
   'game.pipes': 'Conecta Tuberías',
   'game.defense': 'Defensa de Torres',
   'game.jump': 'Reto de Saltos',
+  'game.rhythm': 'Ritmo Tap',
+  'game.orbit': 'Disparo Orbital',
+  'game.estate': 'Magnate Inmobiliario',
+  'game.store': 'Minimercado',
 }
 
 const ptBR: CoreDict = {
@@ -651,6 +673,10 @@ const ptBR: CoreDict = {
   'game.pipes': 'Conecte os Canos',
   'game.defense': 'Defesa de Torres',
   'game.jump': 'Desafio de Pulos',
+  'game.rhythm': 'Ritmo Tap',
+  'game.orbit': 'Tiro Orbital',
+  'game.estate': 'Magnata Imobiliário',
+  'game.store': 'Minimercado',
 }
 
 const fr: CoreDict = {
@@ -727,6 +753,10 @@ const fr: CoreDict = {
   'game.pipes': 'Relie les Tuyaux',
   'game.defense': 'Défense de Tours',
   'game.jump': 'Défi de Saut',
+  'game.rhythm': 'Rythme Tap',
+  'game.orbit': 'Tir Orbital',
+  'game.estate': 'Magnat Immobilier',
+  'game.store': 'Supérette',
 }
 
 const de: CoreDict = {
@@ -803,6 +833,10 @@ const de: CoreDict = {
   'game.pipes': 'Rohr-Puzzle',
   'game.defense': 'Turmverteidigung',
   'game.jump': 'Sprung-Challenge',
+  'game.rhythm': 'Rhythmus-Tap',
+  'game.orbit': 'Orbit-Schütze',
+  'game.estate': 'Immobilien-Tycoon',
+  'game.store': 'Minimarkt',
 }
 
 const ru: CoreDict = {
@@ -879,6 +913,10 @@ const ru: CoreDict = {
   'game.pipes': 'Трубопровод',
   'game.defense': 'Башенная защита',
   'game.jump': 'Прыжковый вызов',
+  'game.rhythm': 'Ритм-тап',
+  'game.orbit': 'Орбитальный тир',
+  'game.estate': 'Магнат недвижимости',
+  'game.store': 'Мини-маркет',
 }
 
 const id: CoreDict = {
@@ -955,6 +993,10 @@ const id: CoreDict = {
   'game.pipes': 'Sambung Pipa',
   'game.defense': 'Pertahanan Menara',
   'game.jump': 'Tantangan Lompat',
+  'game.rhythm': 'Ketuk Irama',
+  'game.orbit': 'Tembak Orbit',
+  'game.estate': 'Taipan Properti',
+  'game.store': 'Minimarket',
 }
 
 const vi: CoreDict = {
@@ -1031,6 +1073,10 @@ const vi: CoreDict = {
   'game.pipes': 'Nối Ống Nước',
   'game.defense': 'Thủ Tháp',
   'game.jump': 'Thử Thách Nhảy',
+  'game.rhythm': 'Chạm Nhịp',
+  'game.orbit': 'Bắn Quỹ Đạo',
+  'game.estate': 'Trùm Bất Động Sản',
+  'game.store': 'Cửa Hàng Tiện Lợi',
 }
 
 const th: CoreDict = {
@@ -1107,6 +1153,10 @@ const th: CoreDict = {
   'game.pipes': 'ต่อท่อน้ำ',
   'game.defense': 'ป้องกันหอคอย',
   'game.jump': 'ท้าโดด',
+  'game.rhythm': 'แตะจังหวะ',
+  'game.orbit': 'ยิงวงโคจร',
+  'game.estate': 'เศรษฐีอสังหาฯ',
+  'game.store': 'ร้านสะดวกซื้อ',
 }
 
 const tr: CoreDict = {
@@ -1183,6 +1233,10 @@ const tr: CoreDict = {
   'game.pipes': 'Boru Bağlama',
   'game.defense': 'Kule Savunması',
   'game.jump': 'Zıplama Yarışı',
+  'game.rhythm': 'Ritim Dokunuşu',
+  'game.orbit': 'Yörünge Atışı',
+  'game.estate': 'Emlak Kralı',
+  'game.store': 'Market İşletme',
 }
 
 const messages: Record<Locale, CoreDict> = {

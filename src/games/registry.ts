@@ -93,4 +93,9 @@ export const GAMES: GameMeta[] = [
     titleKey: 'game.jump',
     loader: () => import('./jump'),
   },
+  {
+    slug: 'rhythm',
+    titleKey: 'game.rhythm',
+    loader: () => import('./rhythm'),
+  },
 ]

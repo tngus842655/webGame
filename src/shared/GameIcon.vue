@@ -219,6 +219,18 @@ defineProps<{ slug: string }>()
       <path d="M33 14 L35 10 L37 14 M35 10 V17" stroke="#FFFFFF" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
     </g>
 
+    <!-- 리듬 탭 -->
+    <g v-else-if="slug === 'rhythm'">
+      <rect x="4" y="4" width="40" height="40" rx="7" fill="#1A1130" />
+      <rect x="8" y="8" width="8" height="14" rx="3" fill="#FF5A8C" />
+      <rect x="18" y="16" width="8" height="14" rx="3" fill="#FFC94D" />
+      <rect x="28" y="6" width="8" height="14" rx="3" fill="#4DD679" />
+      <rect x="8" y="26" width="8" height="6" rx="2.5" fill="#FF5A8C" opacity="0.4" />
+      <rect x="28" y="24" width="8" height="6" rx="2.5" fill="#4DD679" opacity="0.4" />
+      <path d="M6 36 H42" stroke="#D1C4E9" stroke-width="2.6" stroke-linecap="round" />
+      <circle cx="22" cy="36" r="4.5" fill="none" stroke="#FFD54F" stroke-width="2" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />
