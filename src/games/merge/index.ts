@@ -217,7 +217,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.fillText(t('merge.gen'), gb.x + gb.w / 2 + 30, gb.y + gb.h / 2 + 12)
 
     // 텍스트 없는 조작 안내: 생성 버튼 → 보드로 끌어가는 표식
-    if (!state.movedOnce && state.phase === 'playing' && !drag) {
+    if (!state.hintDone && state.phase === 'playing' && !drag) {
       const k = (state.hintTime % 2.4) / 2.4
       const ease = k < 0.75 ? k / 0.75 : 1
       const fade = k < 0.75 ? 1 : 1 - (k - 0.75) / 0.25
