@@ -103,6 +103,18 @@ export class SuikaWorld {
     this.tierByBody.delete(body.id)
   }
 
+  // 광고 부활: 작은 과일만 걷어내 자리를 만든다. 통을 통째로 비우면 애써 키운
+  // 큰 과일까지 사라져 사실상 새 판이 된다 — 이어하기의 의미가 없다.
+  clearSmallFruits(maxTier: number): number {
+    let removed = 0
+    for (const { body, tier } of this.fruitBodies()) {
+      if (tier > maxTier) continue
+      this.removeFruit(body)
+      removed += 1
+    }
+    return removed
+  }
+
   reset() {
     for (const { body } of this.fruitBodies()) Composite.remove(this.engine.world, body)
     this.tierByBody.clear()

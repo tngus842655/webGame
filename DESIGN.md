@@ -105,8 +105,9 @@ src/
 
 ### 리워드 광고
 
-- `ads.ts`가 매체를 감싼다. 운영은 `VITE_ADSENSE_CLIENT`가 있으면 H5 Games Ads
-  (AdSense Ad Placement API), 없으면 `NoAdProvider` = 광고 버튼 미노출. 개발은 스텁.
+- `ads.ts`가 매체를 감싼다. `VITE_ADSENSE_CLIENT`가 있으면 H5 Games Ads(AdSense
+  Ad Placement API), 없으면 5초 카운트다운 가짜 광고를 쓴다 — 실제 매체를 붙이기
+  전에도 배포본에서 버튼·보상 흐름을 그대로 확인하기 위해서다.
 - 노출 지점은 두 가지. **실패 쪽**은 게임오버 오버레이의 이어하기(대부분의 게임),
   **성공 쪽**은 `clearBonus.ts`의 점수 2배(스도쿠·네모로직·디펜스·머지 가든).
   한 판이 10분 넘게 가는 게임은 실패가 잘 나지 않아 성공 쪽이 유일한 접점이다.

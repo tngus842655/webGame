@@ -1,7 +1,7 @@
 import { t } from './i18n'
 
 // 리워드 광고 추상화. 게임은 이 인터페이스만 알면 되고, 실제 매체는 Provider 구현으로 갈아끼운다.
-// 운영 빌드는 VITE_ADSENSE_CLIENT가 있으면 H5 Games Ads, 없으면 NoAdProvider(=광고 버튼 미노출).
+// VITE_ADSENSE_CLIENT가 있으면 H5 Games Ads, 없으면 5초 카운트다운 가짜 광고(스텁)를 쓴다.
 
 export interface AdProvider {
   isReady(): boolean
@@ -16,7 +16,8 @@ export interface AdProvider {
 
 const AD_SECONDS = 5
 
-// 개발용 가짜 광고: 카운트다운 후 보상. 광고 루프를 실기기에서 미리 검증하기 위한 용도.
+// 가짜 광고: 5초 카운트다운 후 보상. 실제 매체를 붙이기 전까지 배포본에서도 이걸 쓴다 —
+// 버튼 노출·보상 지급 흐름을 실기기에서 그대로 확인할 수 있다.
 class StubAdProvider implements AdProvider {
   private showing = false
 
@@ -68,18 +69,6 @@ class StubAdProvider implements AdProvider {
 
       button?.addEventListener('click', () => finish(remain <= 0))
     })
-  }
-}
-
-// 광고 매체가 없는 빌드. isReady()가 false라 버튼 자체가 노출되지 않지만,
-// 혹시 호출되면 매체 사정으로 못 본 것이므로 보상은 준다.
-class NoAdProvider implements AdProvider {
-  isReady() {
-    return false
-  }
-
-  show(_placement: string): Promise<boolean> {
-    return Promise.resolve(true)
   }
 }
 
@@ -157,9 +146,11 @@ class H5GamesAdProvider implements AdProvider {
 }
 
 function createProvider(): AdProvider {
-  if (import.meta.env.DEV) return new StubAdProvider()
   const client = import.meta.env.VITE_ADSENSE_CLIENT as string | undefined
-  return client ? new H5GamesAdProvider(client) : new NoAdProvider()
+  if (client) return new H5GamesAdProvider(client)
+  // 아직 실제 매체를 붙이지 않았다 — 가짜 광고로 보상 흐름을 그대로 돌린다.
+  // VITE_ADSENSE_CLIENT를 넣는 순간 실제 광고로 바뀐다.
+  return new StubAdProvider()
 }
 
 export const adProvider: AdProvider = createProvider()
