@@ -54,35 +54,40 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     )
   }
 
+  // 손가락이 임계값을 넘는 즉시 옮긴다. 뗄 때까지 기다리면 연속 스와이프가
+  // 굼떠서, 빠르게 밀어붙이는 맛이 사는 이 장르에서 특히 답답하다.
+  const trySwipe = (clientX: number, clientY: number) => {
+    if (!swipeStart || state.phase !== 'playing') return
+    const p = renderer.toBoard(clientX, clientY)
+    const dx = p.x - swipeStart.x
+    const dy = p.y - swipeStart.y
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < SWIPE_THRESHOLD) return
+    // 한 번 눌렀다 뗄 때마다 한 수 — 끌고 다닌다고 연달아 움직이지는 않는다
+    swipeStart = null
+
+    let dir: Direction
+    if (Math.abs(dx) > Math.abs(dy)) dir = dx > 0 ? 'right' : 'left'
+    else dir = dy > 0 ? 'down' : 'up'
+
+    const result = move(state, dir)
+    if (!result.moved) return
+    playDrop()
+    if (result.gained > 0) {
+      playMerge(result.maxMergedTier)
+      vibrate(10)
+    }
+    if (result.gameOver) void gameOver()
+  }
+
   const detachInput = attachInput(renderer.canvas, {
     onDown(clientX, clientY) {
       if (state.phase !== 'playing') return
       swipeStart = renderer.toBoard(clientX, clientY)
     },
-    onMove() {},
+    onMove: trySwipe,
     onUp(clientX, clientY) {
-      if (!swipeStart || state.phase !== 'playing') {
-        swipeStart = null
-        return
-      }
-      const p = renderer.toBoard(clientX, clientY)
-      const dx = p.x - swipeStart.x
-      const dy = p.y - swipeStart.y
+      trySwipe(clientX, clientY)
       swipeStart = null
-      if (Math.max(Math.abs(dx), Math.abs(dy)) < SWIPE_THRESHOLD) return
-
-      let dir: Direction
-      if (Math.abs(dx) > Math.abs(dy)) dir = dx > 0 ? 'right' : 'left'
-      else dir = dy > 0 ? 'down' : 'up'
-
-      const result = move(state, dir)
-      if (!result.moved) return
-      playDrop()
-      if (result.gained > 0) {
-        playMerge(result.maxMergedTier)
-        vibrate(10)
-      }
-      if (result.gameOver) void gameOver()
     },
   })
 

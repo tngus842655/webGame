@@ -34,8 +34,10 @@ export const TIERS: FruitTier[] = [
   { name: '수박', radius: 115, mergeScore: 55, color: '#5CB85C', dark: '#17591B', faceColor: '#0F2E12', dropWeight: 0 },
 ]
 
-// 수박+수박 합체 시 둘 다 소멸하며 받는 보너스
-export const WATERMELON_BONUS = 100
+// 수박+수박 합체 시 둘 다 소멸하며 받는 보너스.
+// 체리부터 수박 하나를 만드는 데 드는 합체 점수가 1,981점이라 100점은 이 게임의
+// 최종 목표치고 너무 초라했다 (들인 것의 5%). 두 개를 붙인 값이 나게 올린다.
+export const WATERMELON_BONUS = 1000
 
 export const PHYSICS = {
   gravityY: 1.6,

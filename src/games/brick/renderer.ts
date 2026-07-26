@@ -1,7 +1,7 @@
 import { t } from '@/shared/i18n'
 import { CanvasStage } from '../stage'
 import { drawBall, drawBrick, drawLauncher } from './brickArt'
-import { BALL, BUTTON_RECTS, LAYOUT, UPGRADES, brickRect } from './config'
+import { BALL, BUTTON_RECTS, LAYOUT, MAX_ROWS, UPGRADES, brickRect } from './config'
 import {
   FLASH_DURATION,
   POPUP_DURATION,
@@ -71,6 +71,21 @@ export class BrickRenderer {
     c.stroke()
     c.restore()
 
+    // 위험선 — 벽돌이 이 줄까지 내려오면 끝이다. 몇 줄 남았는지 보이지 않으면
+    // 갑자기 게임이 끝난 것처럼 느껴진다.
+    const dangerY = LAYOUT.fieldTop + (MAX_ROWS - 1) * LAYOUT.rowH
+    c.save()
+    c.fillStyle = 'rgb(229 57 53 / 0.07)'
+    c.fillRect(LAYOUT.fieldLeft, dangerY, LAYOUT.fieldRight - LAYOUT.fieldLeft, LAYOUT.rowH)
+    c.strokeStyle = 'rgb(229 57 53 / 0.45)'
+    c.lineWidth = 3
+    c.setLineDash([10, 8])
+    c.beginPath()
+    c.moveTo(LAYOUT.fieldLeft, dangerY)
+    c.lineTo(LAYOUT.fieldRight, dangerY)
+    c.stroke()
+    c.restore()
+
     // 발사선
     c.save()
     c.strokeStyle = 'rgb(141 110 99 / 0.35)'
@@ -84,9 +99,20 @@ export class BrickRenderer {
   }
 
   private drawBricks(state: BrickState) {
+    const { c } = this
     for (const brick of state.bricks) {
       const r = brickRect(brick.col, brick.row)
-      drawBrick(this.c, r.x, r.y, r.w, r.h, brick.hp, brick.maxHp)
+      // 다음 턴에 바닥에 닿는 벽돌은 테두리로 알린다
+      if (brick.row >= MAX_ROWS - 1) {
+        c.save()
+        c.strokeStyle = '#E53935'
+        c.lineWidth = 4
+        c.beginPath()
+        c.roundRect(r.x - 3, r.y - 3, r.w + 6, r.h + 6, 10)
+        c.stroke()
+        c.restore()
+      }
+      drawBrick(c, r.x, r.y, r.w, r.h, brick.hp, brick.maxHp)
     }
   }
 
