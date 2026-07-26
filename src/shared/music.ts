@@ -63,7 +63,7 @@ export function stopBgm() {
 
 // 게임마다 곡을 만들 수는 없으니 분위기 셋으로 묶는다.
 const ACTION = new Set(['runner', 'dodge', 'orbit', 'rhythm', 'survivor', 'jump', 'brick', 'defense'])
-const SIM = new Set(['store', 'deck', 'autochess'])
+const SIM = new Set(['deck', 'autochess'])
 
 export function bgmFor(slug: string): string {
   if (ACTION.has(slug)) return 'action'

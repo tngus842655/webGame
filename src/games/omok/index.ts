@@ -5,7 +5,17 @@ import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
-import { applyAiMove, createState, playerMove, resetBoard, undo, SIZE } from './state'
+import {
+  applyAiMove,
+  createState,
+  playerMove,
+  startStage,
+  tickClock,
+  undo,
+  MAX_STAGE,
+  SIZE,
+  TIMED_FROM,
+} from './state'
 
 // 화면 배치 (논리 720×1280): 교차점 방식 바둑판
 const CELL = 44
@@ -17,6 +27,13 @@ const UNDO_BTN = { x: 180, y: 1010, w: 360, h: 92 } as const
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
     state.thinkTimer -= dt
+    // 제한 시간이 붙는 단(6단~)에서 내 차례일 때만 시계가 간다
+    if (state.phase === 'playing' && tickClock(state, dt)) {
+      state.phase = 'lost'
+      state.resultTimer = 2
+      vibrate(80)
+      playGameOver()
+    }
     if (state.phase === 'aiThinking' && state.thinkTimer <= 0) {
       const result = applyAiMove(state)
       playDrop()
@@ -28,10 +45,11 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if ((state.phase === 'won' || state.phase === 'lost') && state.resultTimer > 0) {
       state.resultTimer -= dt
       if (state.resultTimer <= 0) {
-        if (state.phase === 'won') {
-          resetBoard(state)
+        if (state.phase === 'won' && !state.cleared) {
+          startStage(state, state.stage + 1)
           undoUsed = false
         } else {
+          // 패배 또는 10단 통과 — 어느 쪽이든 판이 끝난다
           state.phase = 'over'
           void gameOver()
         }
@@ -58,14 +76,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     },
   })
 
-  // 광고 보상: 패배한 수를 물러 연승을 이어간다 (판당 1회)
+  // 광고 보상: 진 단을 새 판으로 한 번 더 도전한다 (한 판당 1회).
+  // 시간 초과로 졌을 수도 있어 무르기가 아니라 판을 새로 깐다.
   async function continueWithAd() {
-    if (state.phase !== 'over' || adContinueUsed) return
+    if (state.phase !== 'over' || state.cleared || adContinueUsed) return
     const rewarded = await ctx.showRewardAd('omok-continue')
     if (shell.isDestroyed() || !rewarded || state.phase !== 'over') return
     adContinueUsed = true
-    state.phase = 'playing'
-    undo(state)
+    startStage(state, state.stage)
+    undoUsed = false
     overlay.hide()
   }
 
@@ -73,7 +92,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const prevBest = await ctx.getBestScore()
     await ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
-    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adContinueUsed)
+    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adContinueUsed && !state.cleared)
   }
 
   // 광고 보상: 마지막 한 수 무르기
@@ -156,7 +175,14 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.fillText(state.score.toLocaleString(), 360, 108)
     c.fillStyle = '#8D6E63'
     c.font = 'bold 24px sans-serif'
-    c.fillText(`🔥 ${state.wins}`, 360, 146)
+    c.fillText(t('om.stage', { n: state.stage, m: MAX_STAGE }), 360, 146)
+    // 제한 시간이 있는 단은 남은 시간을 크게 보여준다 (10초 아래면 빨갛게)
+    if (state.timeLeft > 0 || state.stage >= TIMED_FROM) {
+      const left = Math.ceil(state.timeLeft)
+      c.fillStyle = left <= 10 ? '#E53935' : '#5D4037'
+      c.font = 'bold 30px sans-serif'
+      c.fillText(`⏱ ${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`, 360, 186)
+    }
 
     // 차례 안내
     c.fillStyle = '#FFF8E1'
@@ -238,11 +264,19 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fillStyle = state.phase === 'won' ? '#FFD54F' : '#EF9A9A'
       c.font = 'bold 52px sans-serif'
       c.textBaseline = 'middle'
-      c.fillText(
-        state.phase === 'won' ? t('om.win', { n: state.wins }) : t('om.lose'),
-        360,
-        630,
-      )
+      const banner = state.cleared
+        ? t('om.cleared')
+        : state.phase === 'won'
+          ? t('om.win', { n: state.stage })
+          : state.stage >= TIMED_FROM && state.timeLeft <= 0
+            ? t('om.timeout')
+            : t('om.lose')
+      c.fillText(banner, 360, state.lastBonus > 0 && state.phase === 'won' ? 610 : 630)
+      if (state.phase === 'won' && state.lastBonus > 0) {
+        c.fillStyle = '#FFF8E1'
+        c.font = 'bold 28px sans-serif'
+        c.fillText(t('om.timeBonus', { n: state.lastBonus.toLocaleString() }), 360, 660)
+      }
       c.restore()
       c.textBaseline = 'alphabetic'
     }

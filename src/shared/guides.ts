@@ -96,20 +96,15 @@ const ko: Record<string, Guide> = {
     how: '포신이 저절로 돌아갑니다. 적과 일직선이 되는 순간 탭해서 쏘세요.',
     score: '연속으로 맞힐수록 보너스가 커집니다.',
   },
-  store: {
-    goal: '손님이 원하는 상품을 제때 진열하세요. 헛걸음이 쌓여 평판이 바닥나면 폐업입니다.',
-    how: '진열대를 탭해 창고 재고를 채우고, 재고가 떨어지면 발주하세요.',
-    score: '누적 매출이 점수입니다.',
-  },
   wordle: {
     goal: '숨은 두 글자 단어를 여섯 번 안에 맞히세요.',
     how: '자음·모음을 눌러 여섯 칸을 채우고 입력하세요. 초록은 자리까지 정답, 노랑은 자리만 틀린 것입니다.',
     score: '적은 횟수로 맞힐수록 높고, 데일리를 연속으로 풀면 보너스가 붙습니다.',
   },
   omok: {
-    goal: 'AI보다 먼저 돌 다섯 개를 나란히 놓으세요. 이길수록 상대가 강해집니다.',
-    how: '바둑판 교차점을 탭해 검은 돌을 둡니다.',
-    score: '연승할수록 점수가 커집니다 — 한 번 지면 끝이에요.',
+    goal: '1단부터 10단까지 AI를 차례로 꺾으세요. 10단을 이기면 완전 정복입니다.',
+    how: '바둑판 교차점을 탭해 검은 돌을 둡니다. 6단부터는 내 차례에만 시계가 갑니다.',
+    score: '단이 오를수록 통과 점수가 커지고, 6단부터는 남긴 시간만큼 더 받습니다.',
   },
   deck: {
     goal: '카드로 적을 쓰러뜨리며 나아가세요. 체력이 다하면 끝입니다.',
@@ -209,20 +204,15 @@ const en: Record<string, Guide> = {
     how: 'The turret spins on its own — tap to fire when it lines up.',
     score: 'Consecutive hits build a bonus.',
   },
-  store: {
-    goal: 'Restock what customers want in time. Enough angry customers and you close down.',
-    how: 'Tap a shelf to restock from storage, and order more when storage runs low.',
-    score: 'Total revenue.',
-  },
   wordle: {
     goal: 'Guess the hidden two-syllable word within six tries.',
     how: 'Tap letters to fill six slots and submit. Green is the right spot, yellow is the wrong spot.',
     score: 'Fewer guesses score higher, and daily streaks add a bonus.',
   },
   omok: {
-    goal: 'Line up five stones before the AI does. Each win makes it tougher.',
-    how: 'Tap an intersection to place your black stone.',
-    score: 'Win streaks score higher — one loss ends the run.',
+    goal: 'Beat the AI from stage 1 through 10. Clear stage 10 to finish the run.',
+    how: 'Tap an intersection to place your black stone. From stage 6 your clock runs on your turn.',
+    score: 'Higher stages pay more, and from stage 6 leftover time adds a bonus.',
   },
   deck: {
     goal: 'Fight through enemies with your cards. When your health runs out, the run ends.',

@@ -89,11 +89,6 @@ export const GAMES: GameMeta[] = [
     loader: () => import('./orbit'),
   },
   {
-    slug: 'store',
-    titleKey: 'game.store',
-    loader: () => import('./store'),
-  },
-  {
     slug: 'wordle',
     titleKey: 'game.wordle',
     loader: () => import('./wordle'),
