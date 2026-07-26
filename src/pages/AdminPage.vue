@@ -56,16 +56,29 @@ onMounted(async () => {
 
 const featuredCount = computed(() => rows.value.filter((row) => row.flag.featured).length)
 
-function toggleFeatured(flag: GameFlag) {
+// 남은 신규 게임의 순서를 1부터 다시 매긴다 (2번을 빼면 3번이 2번이 되도록)
+async function renumber() {
+  const featured = rows.value
+    .filter((row) => row.flag.featured)
+    .sort((a, b) => a.flag.sortOrder - b.flag.sortOrder)
+  for (const [index, row] of featured.entries()) {
+    if (row.flag.sortOrder === index + 1) continue
+    row.flag.sortOrder = index + 1
+    await save(row.flag)
+  }
+}
+
+async function toggleFeatured(flag: GameFlag) {
   // 홈 '신규' 칸이 한 줄뿐이라 넘치면 되돌린다
   if (flag.featured && featuredCount.value > FEATURED_MAX) {
     flag.featured = false
     error.value = t('admin.featuredMax', { n: FEATURED_MAX })
     return
   }
-  // 고정을 풀면 순서 값도 지운다 — 다시 켤 때 예전 숫자가 되살아나지 않도록
-  if (!flag.featured) flag.sortOrder = 0
-  return save(flag)
+  // 체크한 순서대로 뒤에 붙이고, 풀면 그 자리를 메운다
+  flag.sortOrder = flag.featured ? featuredCount.value : 0
+  await save(flag)
+  if (!flag.featured) await renumber()
 }
 
 async function save(flag: GameFlag) {
@@ -137,17 +150,10 @@ async function moveToTrash() {
               />
               {{ t('admin.featured') }}
             </label>
-            <!-- 순서는 상단 고정된 것끼리만 쓰인다 -->
-            <label v-if="row.flag.featured" class="order">
-              {{ t('admin.order') }}
-              <input
-                v-model.number="row.flag.sortOrder"
-                type="number"
-                min="0"
-                max="99"
-                @change="save(row.flag)"
-              />
-            </label>
+            <!-- 순서는 체크한 차례대로 정해진다 — 보여주기만 한다 -->
+            <span v-if="row.flag.featured" class="order">
+              {{ t('admin.order') }} {{ row.flag.sortOrder }}
+            </span>
             <button type="button" class="trash-btn" @click="pending = row">
               {{ t('admin.toTrash') }}
             </button>
@@ -312,12 +318,12 @@ async function moveToTrash() {
   accent-color: #43a047;
 }
 
-.order input {
-  width: 46px;
-  padding: 3px 6px;
-  border: 1px solid #d7ccc8;
-  border-radius: 7px;
-  font: inherit;
+.order {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  font-weight: bold;
 }
 
 
