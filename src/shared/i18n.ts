@@ -193,6 +193,7 @@ const en = {
   'game.rhythm': 'Rhythm Tap',
   'rt.ad': '▶ Watch ad to continue (restore health)',
   'game.orbit': 'Orbit Shooter',
+  'ob.ad': '▶ Watch ad to revive (+2 lives)',
   'game.estate': 'Estate Tycoon',
   'game.store': 'Mini Mart',
 }
@@ -352,6 +353,7 @@ const ko: typeof en = {
   'game.rhythm': '리듬 탭',
   'rt.ad': '▶ 광고 보고 이어하기 (체력 회복)',
   'game.orbit': '궤도 슈팅',
+  'ob.ad': '▶ 광고 보고 부활 (생명 +2)',
   'game.estate': '부동산 타이쿤',
   'game.store': '편의점 운영',
 }

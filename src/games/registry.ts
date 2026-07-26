@@ -98,4 +98,9 @@ export const GAMES: GameMeta[] = [
     titleKey: 'game.rhythm',
     loader: () => import('./rhythm'),
   },
+  {
+    slug: 'orbit',
+    titleKey: 'game.orbit',
+    loader: () => import('./orbit'),
+  },
 ]

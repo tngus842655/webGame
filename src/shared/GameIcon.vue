@@ -231,6 +231,21 @@ defineProps<{ slug: string }>()
       <circle cx="22" cy="36" r="4.5" fill="none" stroke="#FFD54F" stroke-width="2" />
     </g>
 
+    <!-- 궤도 슈팅 -->
+    <g v-else-if="slug === 'orbit'">
+      <rect x="4" y="4" width="40" height="40" rx="7" fill="#101638" />
+      <circle cx="24" cy="24" r="15" fill="none" stroke="#3A4373" stroke-width="1.6" />
+      <circle cx="24" cy="24" r="8" fill="#1E2749" stroke="#5C6BC0" stroke-width="1.8" />
+      <rect x="28" y="21.6" width="9" height="4.8" rx="2" fill="#7986CB" />
+      <circle cx="24" cy="24" r="3" fill="#C5CAE9" />
+      <circle cx="40" cy="24" r="2.2" fill="#80D8FF" />
+      <circle cx="10" cy="13" r="4.6" fill="#FF7043" />
+      <circle cx="8.6" cy="12" r="1.3" fill="#FFFFFF" />
+      <circle cx="11.8" cy="12" r="1.3" fill="#FFFFFF" />
+      <circle cx="36" cy="38" r="5" fill="#AB47BC" />
+      <circle cx="36" cy="38" r="3" fill="none" stroke="#E1BEE7" stroke-width="1.4" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />
