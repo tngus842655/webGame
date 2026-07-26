@@ -273,6 +273,8 @@ const en = {
   'st.floor': 'Floor {n}',
   'st.perfect': 'Perfect!',
   'st.ad': '▶ Watch ad to get half the width back',
+  'game.sortgate': 'Sorting Duty',
+  'sg.ad': '▶ Watch ad for one more life',
 }
 
 const ko: typeof en = {
@@ -507,6 +509,8 @@ const ko: typeof en = {
   'st.floor': '{n}층',
   'st.perfect': '완벽!',
   'st.ad': '▶ 광고 보고 폭 절반 복구',
+  'game.sortgate': '분류 반장',
+  'sg.ad': '▶ 광고 보고 목숨 하나 더',
 }
 
 // 나머지 언어: 허브·게임오버·광고·제목까지 번역, 게임 내부 텍스트는 en 폴백
@@ -711,6 +715,8 @@ const ja: CoreDict = {
   'st.floor': '{n}階',
   'st.perfect': 'パーフェクト！',
   'st.ad': '▶ 広告を見て幅を半分回復',
+  'game.sortgate': '仕分け係',
+  'sg.ad': '▶ 広告を見てライフ+1',
 }
 
 const zhCN: CoreDict = {
@@ -912,6 +918,8 @@ const zhCN: CoreDict = {
   'st.floor': '第{n}层',
   'st.perfect': '完美！',
   'st.ad': '▶ 看广告恢复一半宽度',
+  'game.sortgate': '分类小队长',
+  'sg.ad': '▶ 看广告多一条命',
 }
 
 const es: CoreDict = {
@@ -1113,6 +1121,8 @@ const es: CoreDict = {
   'st.floor': 'Piso {n}',
   'st.perfect': '¡Perfecto!',
   'st.ad': '▶ Ver anuncio y recuperar media anchura',
+  'game.sortgate': 'Clasificador Veloz',
+  'sg.ad': '▶ Ver anuncio por una vida más',
 }
 
 const ptBR: CoreDict = {
@@ -1314,6 +1324,8 @@ const ptBR: CoreDict = {
   'st.floor': 'Andar {n}',
   'st.perfect': 'Perfeito!',
   'st.ad': '▶ Ver anúncio e recuperar metade da largura',
+  'game.sortgate': 'Classificador Veloz',
+  'sg.ad': '▶ Ver anúncio e ganhar uma vida',
 }
 
 const fr: CoreDict = {
@@ -1515,6 +1527,8 @@ const fr: CoreDict = {
   'st.floor': 'Étage {n}',
   'st.perfect': 'Parfait !',
   'st.ad': '▶ Pub pour récupérer la moitié de la largeur',
+  'game.sortgate': 'Chef du Tri',
+  'sg.ad': '▶ Pub pour une vie de plus',
 }
 
 const de: CoreDict = {
@@ -1716,6 +1730,8 @@ const de: CoreDict = {
   'st.floor': 'Etage {n}',
   'st.perfect': 'Perfekt!',
   'st.ad': '▶ Werbung ansehen: halbe Breite zurück',
+  'game.sortgate': 'Sortierdienst',
+  'sg.ad': '▶ Werbung ansehen: ein Leben mehr',
 }
 
 const ru: CoreDict = {
@@ -1917,6 +1933,8 @@ const ru: CoreDict = {
   'st.floor': 'Этаж {n}',
   'st.perfect': 'Идеально!',
   'st.ad': '▶ Реклама: вернуть половину ширины',
+  'game.sortgate': 'Сортировщик',
+  'sg.ad': '▶ Реклама: ещё одна жизнь',
 }
 
 const id: CoreDict = {
@@ -2118,6 +2136,8 @@ const id: CoreDict = {
   'st.floor': 'Lantai {n}',
   'st.perfect': 'Sempurna!',
   'st.ad': '▶ Tonton iklan, lebar kembali setengah',
+  'game.sortgate': 'Petugas Sortir',
+  'sg.ad': '▶ Tonton iklan untuk satu nyawa lagi',
 }
 
 const vi: CoreDict = {
@@ -2319,6 +2339,8 @@ const vi: CoreDict = {
   'st.floor': 'Tầng {n}',
   'st.perfect': 'Hoàn hảo!',
   'st.ad': '▶ Xem quảng cáo để hồi nửa chiều rộng',
+  'game.sortgate': 'Phân Loại Nhanh',
+  'sg.ad': '▶ Xem quảng cáo thêm một mạng',
 }
 
 const th: CoreDict = {
@@ -2520,6 +2542,8 @@ const th: CoreDict = {
   'st.floor': 'ชั้น {n}',
   'st.perfect': 'สมบูรณ์แบบ!',
   'st.ad': '▶ ดูโฆษณาเพื่อคืนความกว้างครึ่งหนึ่ง',
+  'game.sortgate': 'หัวหน้าคัดแยก',
+  'sg.ad': '▶ ดูโฆษณาเพื่อรับชีวิตเพิ่ม',
 }
 
 const tr: CoreDict = {
@@ -2721,6 +2745,8 @@ const tr: CoreDict = {
   'st.floor': '{n}. kat',
   'st.perfect': 'Mükemmel!',
   'st.ad': '▶ Reklam izle, genişliğin yarısı geri gelsin',
+  'game.sortgate': 'Ayırma Nöbeti',
+  'sg.ad': '▶ Reklam izle, bir can daha al',
 }
 
 const messages: Record<Locale, CoreDict> = {

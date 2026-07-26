@@ -289,6 +289,18 @@ defineProps<{ slug: string }>()
       <path d="M12 7 L9 10 L12 13" stroke="#FFCA28" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
     </g>
 
+    <!-- 분류 반장 -->
+    <g v-else-if="slug === 'sortgate'">
+      <rect x="3" y="27" width="18" height="16" rx="3.5" fill="#37474F" />
+      <rect x="27" y="27" width="18" height="16" rx="3.5" fill="#37474F" />
+      <circle cx="12" cy="35" r="5" fill="#EF5350" />
+      <path d="M36 30.5 L40.5 38.5 L31.5 38.5 Z" fill="#42A5F5" />
+      <rect x="18" y="6" width="12" height="12" rx="3" fill="#FFCA28" />
+      <path d="M15 12 L8.5 12 M33 12 L39.5 12" stroke="#B0BEC5" stroke-width="2" stroke-linecap="round" />
+      <path d="M11 9.5 L8.5 12 L11 14.5" stroke="#B0BEC5" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+      <path d="M37 9.5 L39.5 12 L37 14.5" stroke="#B0BEC5" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />

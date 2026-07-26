@@ -113,4 +113,9 @@ export const GAMES: GameMeta[] = [
     titleKey: 'game.stack',
     loader: () => import('./stack'),
   },
+  {
+    slug: 'sortgate',
+    titleKey: 'game.sortgate',
+    loader: () => import('./sortgate'),
+  },
 ]

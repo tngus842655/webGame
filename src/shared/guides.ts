@@ -121,6 +121,11 @@ const ko: Record<string, Guide> = {
     how: '화면 아무 곳이나 탭하면 그 자리에 놓입니다.',
     score: '한 층에 10점. 정확히 맞추면 폭이 조금 돌아오고 연속으로 맞출수록 점수가 커집니다.',
   },
+  sortgate: {
+    goal: '위쪽 두 상자의 기준을 보고 도형을 맞는 쪽으로 미세요. 기준은 몇 개마다 통째로 바뀌고, 바뀔 때 상자가 번쩍입니다. 세 번 틀리면 끝입니다.',
+    how: '좌우로 밀거나 화면의 좌우 절반을 탭하세요.',
+    score: '한 개에 20점, 연속으로 맞히면 최대 50점까지 오릅니다.',
+  },
 }
 
 const en: Record<string, Guide> = {
@@ -233,6 +238,11 @@ const en: Record<string, Guide> = {
     goal: 'Land the sliding block on top of your tower. Whatever hangs over is shaved off, and once there is nothing left to land on, the run ends.',
     how: 'Tap anywhere to drop the block where it is.',
     score: '10 per floor. A dead-centre landing wins back a little width and pays more the longer your streak holds.',
+  },
+  sortgate: {
+    goal: 'Read the two boxes up top and push each shape into the one it belongs to. The rule swaps every few shapes and the boxes flash when it does. Three mistakes end the run.',
+    how: 'Swipe left or right, or tap the left or right half of the screen.',
+    score: '20 per shape, rising to 50 as your streak grows.',
   },
 }
 
@@ -347,6 +357,11 @@ const ja: Record<string, Guide> = {
     how: '画面のどこでもタップするとその位置に置かれます。',
     score: '1階ごとに10点。ぴったり乗せると幅が少し戻り、連続で決めるほど点数が伸びます。',
   },
+  sortgate: {
+    goal: '上の二つの箱の基準を見て、図形を正しい側へ押し出しましょう。基準は数個ごとに丸ごと入れ替わり、その時は箱が光ります。3回間違えると終了です。',
+    how: '左右にスワイプするか、画面の左右半分をタップします。',
+    score: '1個20点、連続で正解すると最大50点まで上がります。',
+  },
 }
 
 const zhCN: Record<string, Guide> = {
@@ -459,6 +474,11 @@ const zhCN: Record<string, Guide> = {
     goal: '把左右移动的方块叠到塔顶。超出的部分会被削掉，没有落脚的宽度就结束。',
     how: '点击屏幕任意位置即可放下方块。',
     score: '每层10分。正中叠放能收回一点宽度，连续命中得分更高。',
+  },
+  sortgate: {
+    goal: '看清上方两个箱子的标准，把图形推向正确的一侧。标准每隔几个就会整体更换，更换时箱子会闪烁。错三次结束。',
+    how: '左右滑动，或点击屏幕左右半边。',
+    score: '每个20分，连对越多最高可达50分。',
   },
 }
 
@@ -573,6 +593,11 @@ const es: Record<string, Guide> = {
     how: 'Toca en cualquier parte para soltar el bloque donde está.',
     score: '10 por piso. Un centrado perfecto recupera algo de ancho y paga más en racha.',
   },
+  sortgate: {
+    goal: 'Mira el criterio de las dos cajas y empuja cada figura al lado correcto. El criterio cambia por completo cada pocas figuras y las cajas destellan al cambiar. Tres fallos y termina.',
+    how: 'Desliza a izquierda o derecha, o toca la mitad izquierda o derecha de la pantalla.',
+    score: '20 por figura, hasta 50 según crece tu racha.',
+  },
 }
 
 const ptBR: Record<string, Guide> = {
@@ -685,6 +710,11 @@ const ptBR: Record<string, Guide> = {
     goal: 'Encaixe o bloco deslizante no topo da torre. O que sobra é cortado e, quando não resta largura, a partida acaba.',
     how: 'Toque em qualquer lugar para soltar o bloco onde ele está.',
     score: '10 por andar. Acertar no centro devolve um pouco de largura e vale mais em sequência.',
+  },
+  sortgate: {
+    goal: 'Olhe o critério das duas caixas e empurre cada figura para o lado certo. O critério muda por completo a cada poucas figuras e as caixas piscam quando isso acontece. Três erros encerram a partida.',
+    how: 'Deslize para a esquerda ou direita, ou toque na metade esquerda ou direita da tela.',
+    score: '20 por figura, chegando a 50 conforme a sequência cresce.',
   },
 }
 
@@ -799,6 +829,11 @@ const fr: Record<string, Guide> = {
     how: 'Touche n\'importe où pour lâcher le bloc à sa position.',
     score: '10 par étage. Un centrage parfait récupère un peu de largeur et rapporte plus en série.',
   },
+  sortgate: {
+    goal: 'Lis le critère des deux boîtes et pousse chaque forme du bon côté. Le critère change entièrement toutes les quelques formes, et les boîtes clignotent à ce moment-là. Trois erreurs et c\'est fini.',
+    how: 'Balaye à gauche ou à droite, ou touche la moitié gauche ou droite de l\'écran.',
+    score: '20 par forme, jusqu\'à 50 selon ta série.',
+  },
 }
 
 const de: Record<string, Guide> = {
@@ -911,6 +946,11 @@ const de: Record<string, Guide> = {
     goal: 'Setze den pendelnden Block oben auf den Turm. Was übersteht, wird abgeschnitten – bleibt keine Breite übrig, ist Schluss.',
     how: 'Tippe irgendwo, um den Block dort abzusetzen.',
     score: '10 pro Etage. Ein perfekt zentrierter Block gibt etwas Breite zurück und bringt in Serie mehr.',
+  },
+  sortgate: {
+    goal: 'Lies das Kriterium der beiden Kisten und schiebe jede Form auf die richtige Seite. Alle paar Formen wird das Kriterium komplett getauscht – dann blinken die Kisten. Drei Fehler beenden die Runde.',
+    how: 'Nach links oder rechts wischen oder die linke bzw. rechte Bildschirmhälfte antippen.',
+    score: '20 pro Form, mit wachsender Serie bis zu 50.',
   },
 }
 
@@ -1025,6 +1065,11 @@ const ru: Record<string, Guide> = {
     how: 'Нажмите в любом месте, чтобы опустить блок там, где он есть.',
     score: '10 за этаж. Точное попадание в центр возвращает немного ширины и даёт больше в серии.',
   },
+  sortgate: {
+    goal: 'Смотрите на признак в двух ящиках и отправляйте фигуру в нужную сторону. Каждые несколько фигур признак полностью меняется — при этом ящики вспыхивают. Три ошибки — конец.',
+    how: 'Свайп влево или вправо либо нажатие на левую или правую половину экрана.',
+    score: '20 за фигуру, до 50 по мере роста серии.',
+  },
 }
 
 const id: Record<string, Guide> = {
@@ -1137,6 +1182,11 @@ const id: Record<string, Guide> = {
     goal: 'Tumpuk balok yang bergerak ke puncak menara. Bagian yang menjorok terpotong, dan kalau lebarnya habis permainan berakhir.',
     how: 'Ketuk di mana saja untuk menjatuhkan balok di posisinya.',
     score: '10 per lantai. Pas di tengah mengembalikan sedikit lebar dan makin besar saat beruntun.',
+  },
+  sortgate: {
+    goal: 'Baca kriteria pada dua kotak di atas dan dorong tiap bentuk ke sisi yang benar. Kriterianya berganti total setiap beberapa bentuk, dan kotaknya berkedip saat itu terjadi. Tiga kesalahan berarti tamat.',
+    how: 'Geser ke kiri atau kanan, atau ketuk separuh kiri atau kanan layar.',
+    score: '20 per bentuk, naik sampai 50 seiring rentetan.',
   },
 }
 
@@ -1251,6 +1301,11 @@ const vi: Record<string, Guide> = {
     how: 'Chạm bất kỳ đâu để thả khối tại vị trí đó.',
     score: '10 điểm mỗi tầng. Đặt trúng giữa sẽ hồi lại chút chiều rộng và càng liên tiếp càng nhiều điểm.',
   },
+  sortgate: {
+    goal: 'Xem tiêu chí trên hai chiếc hộp và đẩy mỗi hình sang bên đúng. Cứ vài hình tiêu chí lại đổi hoàn toàn, khi đó hộp sẽ nháy sáng. Sai ba lần là kết thúc.',
+    how: 'Quét sang trái hoặc phải, hoặc chạm vào nửa trái/phải màn hình.',
+    score: '20 điểm mỗi hình, tăng tới 50 khi chuỗi đúng dài hơn.',
+  },
 }
 
 const th: Record<string, Guide> = {
@@ -1364,6 +1419,11 @@ const th: Record<string, Guide> = {
     how: 'แตะที่ใดก็ได้เพื่อวางบล็อกตรงตำแหน่งนั้น',
     score: 'ชั้นละ 10 คะแนน วางตรงกลางพอดีจะได้ความกว้างคืนเล็กน้อยและยิ่งต่อเนื่องยิ่งได้มาก',
   },
+  sortgate: {
+    goal: 'ดูเกณฑ์บนกล่องสองใบด้านบนแล้วดันรูปทรงไปฝั่งที่ถูก เกณฑ์จะเปลี่ยนทั้งชุดทุก ๆ ไม่กี่รูป และกล่องจะกะพริบตอนเปลี่ยน ผิดสามครั้งจบเกม',
+    how: 'ปัดซ้ายหรือขวา หรือแตะครึ่งซ้าย/ขวาของหน้าจอ',
+    score: 'รูปละ 20 คะแนน ต่อเนื่องได้สูงสุด 50 คะแนน',
+  },
 }
 
 const tr: Record<string, Guide> = {
@@ -1476,6 +1536,11 @@ const tr: Record<string, Guide> = {
     goal: 'Sağa sola giden bloğu kulenin tepesine oturt. Taşan kısım kesilir; oturacak genişlik kalmazsa oyun biter.',
     how: 'Bloğu bulunduğu yere bırakmak için ekranın herhangi bir yerine dokun.',
     score: 'Her kat 10 puan. Tam ortaya oturtmak biraz genişlik geri verir ve seri uzadıkça puan artar.',
+  },
+  sortgate: {
+    goal: 'Üstteki iki kutunun ölçütüne bak ve her şekli doğru tarafa it. Ölçüt her birkaç şekilde tamamen değişir, değişirken kutular parlar. Üç hata oyunu bitirir.',
+    how: 'Sola ya da sağa kaydır, veya ekranın sol/sağ yarısına dokun.',
+    score: 'Şekil başına 20 puan, seri uzadıkça 50 puana kadar çıkar.',
   },
 }
 const TABLES: Record<Locale, Record<string, Guide>> = {
