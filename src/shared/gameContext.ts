@@ -2,20 +2,14 @@ import type { GameContext } from '@/games/types'
 import { adProvider } from './ads'
 import { getLocalBest, saveScore } from './scores'
 
-// 한 판이 짧은 게임(회피·러너·궤도·리듬 등)은 이어하기 광고가 몇 분 만에 반복 노출된다.
-// 광고 정책상으로도 사용자 이탈 면에서도 좋지 않아 게임 화면에 머무는 동안의 상한을 둔다.
-const AD_LIMIT_PER_VISIT = 5
-
+// 리워드 광고에는 횟수 상한을 두지 않는다. 사용자가 버튼을 눌러야만 나오는 광고라
+// 강제 노출과 달리 이탈을 만들지 않고, 빈도 조절은 광고 매체가 알아서 한다.
+// (강제로 뜨는 전면 광고를 넣게 되면 그쪽에 빈도 제한을 건다)
 export function createGameContext(slug: string): GameContext {
-  let adsShown = 0
   return {
     submitScore: (score) => saveScore(slug, score),
     getBestScore: async () => getLocalBest(slug),
-    isRewardAdReady: () => adsShown < AD_LIMIT_PER_VISIT && adProvider.isReady(),
-    showRewardAd: (placement) => {
-      if (adsShown >= AD_LIMIT_PER_VISIT) return Promise.resolve(false)
-      adsShown += 1
-      return adProvider.show(placement)
-    },
+    isRewardAdReady: () => adProvider.isReady(),
+    showRewardAd: (placement) => adProvider.show(placement),
   }
 }
