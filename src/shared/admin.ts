@@ -33,6 +33,9 @@ export async function ensureAdminChecked(): Promise<boolean> {
 // 인기 상위 몇 개를 남길지 — 이 밖으로 밀린 게임이 휴지통 후보다
 export const TOP_KEEP = 30
 
+// 홈 '신규' 칸이 한 줄(카드 3개)이라 그 이상은 고정해도 자리가 없다
+export const FEATURED_MAX = 3
+
 // 휴지통 보관 기간. 이 기간이 지나면 코드에서 제거해도 되는 것으로 본다.
 // 자동으로 지우지는 않는다 — 실제 삭제는 레지스트리와 폴더를 지우는 커밋이라 사람이 한다.
 export const RETENTION_DAYS = 30

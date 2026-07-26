@@ -5,7 +5,13 @@ import { computed, onMounted, ref } from 'vue'
 import { GAMES } from '@/games/registry'
 import GameIcon from '@/shared/GameIcon.vue'
 import { t, type TranslationKey } from '@/shared/i18n'
-import { fetchGameFlags, saveGameFlag, TOP_KEEP, type GameFlag } from '@/shared/admin'
+import {
+  FEATURED_MAX,
+  fetchGameFlags,
+  saveGameFlag,
+  TOP_KEEP,
+  type GameFlag,
+} from '@/shared/admin'
 import { popularityRanks } from '@/shared/scores'
 
 interface Row {
@@ -48,8 +54,16 @@ onMounted(async () => {
   }
 })
 
-// 상단 고정을 풀면 순서 값도 지운다 — 다시 켤 때 예전 숫자가 되살아나지 않도록
+const featuredCount = computed(() => rows.value.filter((row) => row.flag.featured).length)
+
 function toggleFeatured(flag: GameFlag) {
+  // 홈 '신규' 칸이 한 줄뿐이라 넘치면 되돌린다
+  if (flag.featured && featuredCount.value > FEATURED_MAX) {
+    flag.featured = false
+    error.value = t('admin.featuredMax', { n: FEATURED_MAX })
+    return
+  }
+  // 고정을 풀면 순서 값도 지운다 — 다시 켤 때 예전 숫자가 되살아나지 않도록
   if (!flag.featured) flag.sortOrder = 0
   return save(flag)
 }
@@ -73,7 +87,13 @@ async function moveToTrash() {
   const row = pending.value
   if (!row) return
   pending.value = null
-  const next = { ...row.flag, trashedAt: new Date().toISOString() }
+  // 내려보내면서 고정도 푼다 — 되돌렸을 때 신규 칸이 3개를 넘지 않도록
+  const next = {
+    ...row.flag,
+    featured: false,
+    sortOrder: 0,
+    trashedAt: new Date().toISOString(),
+  }
   await save(next)
   if (!error.value) row.flag = next
 }

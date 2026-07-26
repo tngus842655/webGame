@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { GAMES } from '@/games/registry'
 import GameIcon from '@/shared/GameIcon.vue'
 import { t } from '@/shared/i18n'
 import {
+  featuredSlugs,
   fetchMyStats,
   getLocalBest,
   refreshPopularity,
@@ -34,6 +35,14 @@ const cards = ref(
   })),
 )
 
+// 세 칸으로 나눈다 — 신규(관리자가 올린 것), 인기 1~3위, 그 아래 전부.
+// sortByPopularity가 이미 신규를 앞에 세워두므로 여기서는 가르기만 한다.
+const featured = featuredSlugs()
+const fresh = computed(() => cards.value.filter((card) => featured.has(card.slug)))
+const ranked = computed(() => cards.value.filter((card) => !featured.has(card.slug)))
+const popular = computed(() => ranked.value.slice(0, 3))
+const more = computed(() => ranked.value.slice(3))
+
 // 휴지통에 아무것도 없으면 입구를 만들지 않는다
 const trashCount = trashedGames(GAMES).length
 
@@ -61,17 +70,54 @@ onMounted(async () => {
       </nav>
     </header>
 
-    <main class="game-grid">
-      <RouterLink
-        v-for="game in cards"
-        :key="game.slug"
-        class="game-card"
-        :to="`/play/${game.slug}`"
-      >
-        <span class="thumb"><GameIcon :slug="game.slug" /></span>
-        <strong>{{ t(game.titleKey) }}</strong>
-        <small>{{ scoreLabel(game) }}</small>
-      </RouterLink>
+    <main>
+      <section v-if="fresh.length > 0" class="shelf fresh">
+        <h2>{{ t('home.sectionNew') }}</h2>
+        <div class="game-grid">
+          <RouterLink
+            v-for="game in fresh"
+            :key="game.slug"
+            class="game-card"
+            :to="`/play/${game.slug}`"
+          >
+            <span class="thumb"><GameIcon :slug="game.slug" /></span>
+            <strong>{{ t(game.titleKey) }}</strong>
+            <small>{{ scoreLabel(game) }}</small>
+          </RouterLink>
+        </div>
+      </section>
+
+      <section v-if="popular.length > 0" class="shelf popular">
+        <h2>{{ t('home.sectionPopular') }}</h2>
+        <div class="game-grid">
+          <RouterLink
+            v-for="game in popular"
+            :key="game.slug"
+            class="game-card"
+            :to="`/play/${game.slug}`"
+          >
+            <span class="thumb"><GameIcon :slug="game.slug" /></span>
+            <strong>{{ t(game.titleKey) }}</strong>
+            <small>{{ scoreLabel(game) }}</small>
+          </RouterLink>
+        </div>
+      </section>
+
+      <section v-if="more.length > 0" class="shelf more">
+        <h2>{{ t('home.sectionMore') }}</h2>
+        <div class="game-grid">
+          <RouterLink
+            v-for="game in more"
+            :key="game.slug"
+            class="game-card"
+            :to="`/play/${game.slug}`"
+          >
+            <span class="thumb"><GameIcon :slug="game.slug" /></span>
+            <strong>{{ t(game.titleKey) }}</strong>
+            <small>{{ scoreLabel(game) }}</small>
+          </RouterLink>
+        </div>
+      </section>
     </main>
 
     <RouterLink v-if="trashCount > 0" class="trash-entry" to="/trash">
@@ -101,6 +147,54 @@ onMounted(async () => {
   display: flex;
   gap: 14px;
   font-size: 22px;
+}
+
+/* 칸마다 테두리 색을 달리하고, 제목표를 윗선에 걸쳐 놓는다 */
+.shelf {
+  position: relative;
+  padding: 20px 12px 14px;
+  margin-bottom: 20px;
+  border: 2px solid;
+  border-radius: 20px;
+}
+
+.shelf h2 {
+  position: absolute;
+  top: -12px;
+  left: 14px;
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.02em;
+  color: #fff;
+}
+
+.fresh {
+  border-color: #66bb6a;
+  background: rgb(232 245 233 / 0.75);
+}
+
+.fresh h2 {
+  background: #43a047;
+}
+
+.popular {
+  border-color: #ffb74d;
+  background: rgb(255 243 224 / 0.8);
+}
+
+.popular h2 {
+  background: #ef6c00;
+}
+
+.more {
+  border-color: #d7ccc8;
+  background: rgb(255 255 255 / 0.45);
+}
+
+.more h2 {
+  background: #8d6e63;
 }
 
 .game-grid {

@@ -134,6 +134,13 @@ export function popularityRanks(): Map<string, number> {
   return new Map(sorted.map(([slug], index) => [slug, index + 1]))
 }
 
+// 홈 화면이 '신규' 칸을 가르는 데 쓴다 (관리자가 상단에 올린 게임)
+export function featuredSlugs(): Set<string> {
+  const slugs = new Set<string>()
+  for (const [slug, flag] of cachedFlags()) if (flag.featured) slugs.add(slug)
+  return slugs
+}
+
 // 휴지통에 들어간 게임 — 주 목록에서는 빠지지만 홈 하단 휴지통 화면에서 계속 즐길 수 있다.
 // 숨김까지 걸린 게임은 여기서도 빠진다(= 어디에도 안 나온다).
 export function trashedGames<T extends { slug: string }>(games: readonly T[]): T[] {
