@@ -211,6 +211,10 @@ const en = {
   'es.evAllDown': '🏦 Rate hike! Everything falling',
   'es.ad': '▶ Watch ad for +45s',
   'game.store': 'Mini Mart',
+  'st.revenue': 'Revenue',
+  'st.stock': 'Stock {n}',
+  'st.order': 'Order {n}',
+  'st.ad': '▶ Watch ad to reopen (restore reputation)',
 }
 
 const ko: typeof en = {
@@ -386,6 +390,10 @@ const ko: typeof en = {
   'es.evAllDown': '🏦 금리 인상! 전 매물 하락',
   'es.ad': '▶ 광고 보고 45초 연장',
   'game.store': '편의점 운영',
+  'st.revenue': '매출',
+  'st.stock': '창고 {n}',
+  'st.order': '발주 {n}',
+  'st.ad': '▶ 광고 보고 재개장 (평판 회복)',
 }
 
 // 나머지 언어: 허브·게임오버·광고·제목까지 번역, 게임 내부 텍스트는 en 폴백

@@ -267,6 +267,18 @@ defineProps<{ slug: string }>()
       <text x="38" y="15.4" font-size="9" font-weight="bold" fill="#7A4F01" text-anchor="middle">$</text>
     </g>
 
+    <!-- 편의점 운영 -->
+    <g v-else-if="slug === 'store'">
+      <rect x="5" y="14" width="38" height="28" rx="4" fill="#ECEFF1" />
+      <path d="M4 14 L8 6 H40 L44 14 Z" fill="#43A047" />
+      <path d="M4 14 h8 v-2 h8 v2 h8 v-2 h8 v2 h8" stroke="#2E7D32" stroke-width="1.4" fill="none" />
+      <rect x="10" y="20" width="12" height="9" rx="2" fill="#FFCC80" />
+      <rect x="26" y="20" width="12" height="9" rx="2" fill="#80DEEA" />
+      <rect x="10" y="32" width="12" height="9" rx="2" fill="#EF9A9A" />
+      <rect x="26" y="31" width="12" height="11" rx="2" fill="#6D4C41" />
+      <rect x="30.5" y="35" width="3" height="7" fill="#3E2723" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />
