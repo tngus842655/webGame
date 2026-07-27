@@ -26,8 +26,8 @@ export function createGameOverOverlay(
      <p data-label class="gui-label"></p>
      <p data-score class="gui-score">0</p>
      <p data-best class="gui-sub"></p>
-     ${opts.adLabelKey ? '<button data-ad class="gui-btn gui-btn--ad" type="button"></button>' : ''}
-     <button data-retry class="gui-btn gui-btn--go" type="button"></button>`,
+     ${opts.adLabelKey ? '<button data-ad class="btn btn--go" type="button"></button>' : ''}
+     <button data-retry class="btn btn--amber" type="button"></button>`,
   )
 
   if (opts.onContinue) sheet.find('[data-ad]')?.addEventListener('click', opts.onContinue)

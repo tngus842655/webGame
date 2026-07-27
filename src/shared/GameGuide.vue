@@ -34,7 +34,7 @@ const guide = computed(() => guideFor(props.slug))
         </div>
       </dl>
 
-      <button type="button" class="close" @click="$emit('close')">{{ t('guide.close') }}</button>
+      <button type="button" class="close btn btn--go" @click="$emit('close')">{{ t('guide.close') }}</button>
     </div>
   </div>
 </template>
@@ -94,25 +94,6 @@ dd {
 }
 
 .close {
-  width: 100%;
   margin-top: 22px;
-  padding: 13px;
-  border: none;
-  border-radius: 16px;
-  background: linear-gradient(#67d16c, #3ea346);
-  box-shadow: 0 4px 0 #2b7a33;
-  color: #fff;
-  font-size: 16px;
-  font-weight: 800;
-  text-shadow: 0 1px 0 rgb(20 80 26 / 0.35);
-  cursor: pointer;
-  transition:
-    transform 0.08s ease,
-    box-shadow 0.08s ease;
-}
-
-.close:active {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 #2b7a33;
 }
 </style>

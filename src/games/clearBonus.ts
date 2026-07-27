@@ -19,8 +19,8 @@ export function createClearBonus(
     shell.wrapper,
     `<p data-title class="gui-title"></p>
      <p data-gain class="gui-gain"></p>
-     <button data-double class="gui-btn gui-btn--ad" type="button"></button>
-     <button data-keep class="gui-btn gui-btn--ghost" type="button"></button>`,
+     <button data-double class="btn btn--go" type="button"></button>
+     <button data-keep class="btn btn--ghost" type="button"></button>`,
   )
 
   let settle: ((doubled: boolean) => void) | null = null

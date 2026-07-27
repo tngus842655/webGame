@@ -104,61 +104,13 @@
   color: #a98d7d;
 }
 
-/* 눌리면 아래 턱(box-shadow)이 줄면서 실제로 내려앉는다 */
-.gui-btn {
-  display: block;
-  width: 100%;
+/* 버튼 생김새는 main.css의 .btn을 그대로 쓰고, 시트 안 간격만 여기서 준다 */
+.gui-sheet .btn {
   margin-top: 12px;
-  padding: 14px 18px;
-  border: none;
-  border-radius: 18px;
-  font-size: 17px;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  color: #fff;
-  cursor: pointer;
-  transition:
-    transform 0.08s ease,
-    box-shadow 0.08s ease;
 }
 
-.gui-btn:active {
-  transform: translateY(3px);
-}
-
-.gui-btn--ad {
-  background: linear-gradient(#67d16c, #3ea346);
-  box-shadow: 0 4px 0 #2b7a33;
-  text-shadow: 0 1px 0 rgb(20 80 26 / 0.35);
-}
-
-.gui-btn--ad:active {
-  box-shadow: 0 1px 0 #2b7a33;
-}
-
-.gui-btn--go {
-  background: linear-gradient(#ffb85c, #f28f37);
-  box-shadow: 0 4px 0 #c66d20;
-  text-shadow: 0 1px 0 rgb(140 68 8 / 0.32);
-}
-
-.gui-btn--go:active {
-  box-shadow: 0 1px 0 #c66d20;
-}
-
-.gui-btn--ghost {
+.gui-sheet .btn--ghost {
   margin-top: 6px;
-  padding: 11px;
-  background: none;
-  box-shadow: none;
-  color: #9c8175;
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.gui-btn--ghost:active {
-  transform: none;
-  opacity: 0.55;
 }
 
 @keyframes gui-fade {

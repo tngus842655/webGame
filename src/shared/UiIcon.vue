@@ -3,7 +3,17 @@
 // 게임 썸네일(GameIcon)이 색이 있는 그림이라면 이쪽은 선으로만 그린 도구 아이콘이고,
 // currentColor를 따라가므로 놓이는 자리의 글자색을 그대로 쓴다.
 defineProps<{
-  name: 'back' | 'chevron' | 'trophy' | 'gear' | 'wrench' | 'trash' | 'target' | 'tap' | 'star'
+  name:
+    | 'back'
+    | 'chevron'
+    | 'trophy'
+    | 'gear'
+    | 'wrench'
+    | 'trash'
+    | 'target'
+    | 'tap'
+    | 'star'
+    | 'check'
 }>()
 </script>
 
@@ -19,6 +29,8 @@ defineProps<{
     aria-hidden="true"
   >
     <path v-if="name === 'back'" d="M15 4.5 7.5 12 15 19.5" />
+
+    <path v-else-if="name === 'check'" d="M4.8 12.6 9.6 17.4 19.2 6.6" stroke-width="2.6" />
 
     <path v-else-if="name === 'chevron'" d="M9 4.5 16.5 12 9 19.5" />
 
