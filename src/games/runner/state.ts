@@ -67,6 +67,10 @@ export function createState(): RunnerState {
 export interface UpdateResult {
   died: boolean
   coinsTaken: number
+  // 착지한 프레임 — 먼지와 눌림 연출의 신호
+  landed: boolean
+  // 먹은 코인 자리 (효과를 그 자리에 터뜨린다)
+  coinSpots: Array<{ x: number; y: number }>
 }
 
 export function update(state: RunnerState, dt: number): UpdateResult {
@@ -74,12 +78,15 @@ export function update(state: RunnerState, dt: number): UpdateResult {
   const speed = speedAt(state.time)
   state.distance += speed * dt
 
+  const wasAirborne = state.playerY < GROUND_Y
   state.vy += GRAVITY * dt
   state.playerY += state.vy * dt
+  let landed = false
   if (state.playerY >= GROUND_Y) {
     state.playerY = GROUND_Y
     state.vy = 0
     state.jumpsLeft = 2
+    landed = wasAirborne
   }
 
   state.spawnTimer -= dt
@@ -119,6 +126,7 @@ export function update(state: RunnerState, dt: number): UpdateResult {
 
   // 코인 획득
   let coinsTaken = 0
+  const coinSpots: Array<{ x: number; y: number }> = []
   const top = state.playerY - PLAYER_H
   state.coins = state.coins.filter((coin) => {
     if (coin.x < -20) return false
@@ -129,6 +137,7 @@ export function update(state: RunnerState, dt: number): UpdateResult {
     if (hit) {
       coinsTaken += 1
       state.coinScore += 3
+      coinSpots.push({ x: coin.x, y: coin.y })
       return false
     }
     return true
@@ -142,8 +151,8 @@ export function update(state: RunnerState, dt: number): UpdateResult {
     const oy2 = o.air ? AIR_BAR_BOTTOM : GROUND_Y
     if (px2 > o.x && px1 < o.x + o.w && state.playerY > oy1 && top < oy2) {
       state.phase = 'over'
-      return { died: true, coinsTaken }
+      return { died: true, coinsTaken, landed, coinSpots }
     }
   }
-  return { died: false, coinsTaken }
+  return { died: false, coinsTaken, landed, coinSpots }
 }
