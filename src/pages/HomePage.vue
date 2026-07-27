@@ -11,6 +11,7 @@ import {
   popularityRanks,
   refreshPopularity,
   sortByPopularity,
+  syncLocalBests,
   trashedGames,
   type MyGameStat,
 } from '@/shared/scores'
@@ -62,6 +63,8 @@ onMounted(async () => {
     refreshPopularity(),
     fetchMyStats().catch(() => [] as MyGameStat[]),
   ])
+  // 서버 기록을 로컬에 되먹인다 — 안 하면 플레이 화면의 최고 기록이 이 기기 값에 머문다
+  syncLocalBests(myStats)
   const statBySlug = new Map(myStats.map((stat) => [stat.game_slug, stat]))
   cards.value = cards.value.map((card) => ({ ...card, stat: statBySlug.get(card.slug) ?? null }))
 })

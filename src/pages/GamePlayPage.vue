@@ -10,7 +10,7 @@ import { t, type TranslationKey } from '@/shared/i18n'
 import UiIcon from '@/shared/UiIcon.vue'
 import { bgmFor, startBgm, stopBgm } from '@/shared/music'
 import { startPlayTracking } from '@/shared/playSessions'
-import { getLocalBest } from '@/shared/scores'
+import { fetchMyStats, getLocalBest, syncLocalBests } from '@/shared/scores'
 import { startScoreGuard } from '@/shared/scoreGuard'
 
 const route = useRoute()
@@ -55,6 +55,11 @@ onMounted(async () => {
     return
   }
   titleKey.value = meta.titleKey
+  // 홈을 거치지 않고 바로 들어왔을 수도 있다. 서버 최고점을 맞춰두지 않으면
+  // 상단 칩과 게임오버의 신기록 판정이 이 기기 기록만 보고 잘못 나온다.
+  void fetchMyStats()
+    .then(syncLocalBests)
+    .catch(() => {})
   const mod = await meta.loader()
   // 로드 완료 전에 페이지를 떠났으면 mount하지 않는다
   if (disposed) return
