@@ -91,14 +91,36 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     onUp() {},
   })
 
+  // 납작한 원 + 검은 테두리였던 것을 유리구슬로 — 위에서 빛을 받고
+  // 아래쪽에 반사광이 도는 공. 색만으로 갈리던 것이 형태로도 읽힌다.
   const drawMarble = (x: number, y: number, color: number, r = MARBLE_R) => {
     const c = stage.c
+    const ball = c.createRadialGradient(x - r * 0.35, y - r * 0.4, r * 0.1, x, y, r * 1.05)
+    ball.addColorStop(0, 'rgb(255 255 255 / 0.85)')
+    ball.addColorStop(0.28, COLORS[color])
+    ball.addColorStop(1, 'rgb(0 0 0 / 0.35)')
     c.fillStyle = COLORS[color]
     c.beginPath()
     c.arc(x, y, r, 0, Math.PI * 2)
     c.fill()
-    c.strokeStyle = 'rgb(0 0 0 / 0.2)'
-    c.lineWidth = 2
+    c.fillStyle = ball
+    c.beginPath()
+    c.arc(x, y, r, 0, Math.PI * 2)
+    c.fill()
+    // 바닥에서 올라오는 반사광
+    c.fillStyle = 'rgb(255 255 255 / 0.22)'
+    c.beginPath()
+    c.ellipse(x, y + r * 0.52, r * 0.5, r * 0.2, 0, 0, Math.PI * 2)
+    c.fill()
+    // 하이라이트
+    c.fillStyle = 'rgb(255 255 255 / 0.9)'
+    c.beginPath()
+    c.ellipse(x - r * 0.33, y - r * 0.38, r * 0.22, r * 0.14, -0.6, 0, Math.PI * 2)
+    c.fill()
+    c.strokeStyle = 'rgb(0 0 0 / 0.16)'
+    c.lineWidth = 1.5
+    c.beginPath()
+    c.arc(x, y, r, 0, Math.PI * 2)
     c.stroke()
     c.save()
     c.globalAlpha = 0.45
