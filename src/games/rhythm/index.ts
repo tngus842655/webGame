@@ -6,6 +6,7 @@ import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import { createState, tapLane, update, APPROACH, LANES, type Judge } from './state'
+import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 
 // 화면 배치 (논리 720×1280)
 const LANE_X = 40
@@ -164,7 +165,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         c.arc(cx, HIT_Y, 30 + k * 70, 0, Math.PI * 2)
         c.stroke()
       }
-      c.font = 'bold 44px sans-serif'
+      c.font = font(44, true)
       c.textAlign = 'center'
       c.fillStyle = style.color
       c.fillText(style.text, 360, 700 - k * 40)
@@ -174,7 +175,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     // 콤보
     if (state.combo >= 5) {
       c.save()
-      c.font = 'bold 84px sans-serif'
+      c.font = font(84, true)
       c.textAlign = 'center'
       c.fillStyle = 'rgb(255 255 255 / 0.85)'
       c.fillText(`x${state.combo}`, 360, 560)
@@ -182,24 +183,14 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     }
 
     // HUD: 점수 카드 + 체력 바
-    c.textBaseline = 'alphabetic'
-    c.textAlign = 'center'
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.1
-    c.beginPath()
-    c.roundRect(160, 24, 400, 130, 24)
-    c.fill()
-    c.restore()
-    c.fillStyle = 'rgb(255 255 255 / 0.5)'
-    c.font = '18px sans-serif'
-    c.fillText(t('hud.score'), 360, 56)
-    c.fillStyle = '#FFFFFF'
-    c.font = 'bold 48px sans-serif'
-    c.fillText(state.score.toLocaleString(), 360, 112)
-    c.font = '20px sans-serif'
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      sub: true,
+    })
+    c.font = font(20)
     c.fillStyle = 'rgb(255 255 255 / 0.6)'
-    c.fillText(`MAX x${state.maxCombo}`, 360, 144)
+    c.fillText(`MAX x${state.maxCombo}`, SCORE_PANEL.cx, SCORE_PANEL.subY)
 
     const hpRatio = state.health / 100
     c.fillStyle = 'rgb(255 255 255 / 0.15)'

@@ -14,6 +14,7 @@ import {
   scoreOf,
   update,
 } from './state'
+import { font } from '../ui'
 
 function drawHeart(c: CanvasRenderingContext2D, x: number, y: number, r: number, filled: boolean) {
   c.save()
@@ -244,9 +245,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.fill()
     c.restore()
     c.fillStyle = '#5D4037'
-    c.font = 'bold 42px sans-serif'
+    c.font = font(42, true)
     c.fillText(t('sv.time', { n: Math.floor(state.time) }), 360, 74)
-    c.font = '20px sans-serif'
+    c.font = font(20)
     c.fillStyle = '#BCAAA4'
     c.fillText(t('sv.kills', { k: state.kills, lv: state.level }), 360, 118)
 
@@ -298,7 +299,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fillRect(0, 0, 720, 1280)
       c.textAlign = 'center'
       c.fillStyle = '#FFFFFF'
-      c.font = 'bold 40px sans-serif'
+      c.font = font(40, true)
       c.fillText(t('sv.levelup'), 360, 352)
       for (let i = 0; i < CARD_RECTS.length && i < state.choices.length; i++) {
         const r = CARD_RECTS[i]
@@ -319,10 +320,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         drawUpgradeIcon(c, choice.key, r.x + 62, r.y + r.h / 2)
         c.textAlign = 'left'
         c.fillStyle = '#5D4037'
-        c.font = 'bold 32px sans-serif'
+        c.font = font(32, true)
         c.fillText(t(choice.label), r.x + 116, r.y + 56)
         c.fillStyle = '#8D6E63'
-        c.font = '21px sans-serif'
+        c.font = font(21)
         c.fillText(t(choice.desc), r.x + 116, r.y + 94)
         c.textAlign = 'center'
       }

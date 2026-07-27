@@ -9,6 +9,7 @@ import {
   upgradeLevel,
   type BrickState,
 } from './state'
+import { font } from '../ui'
 
 export class BrickRenderer {
   private readonly stage: CanvasStage
@@ -202,12 +203,12 @@ export class BrickRenderer {
     c.fill()
     c.restore()
     c.fillStyle = '#5D4037'
-    c.font = 'bold 48px sans-serif'
+    c.font = font(48, true)
     c.fillText(state.score.toLocaleString(), 360, 86)
 
     // 웨이브
     c.fillStyle = '#BCAAA4'
-    c.font = '20px sans-serif'
+    c.font = font(20)
     c.fillText(t('brick.wave', { n: state.wave }), 360, 136)
 
     // 골드
@@ -223,11 +224,11 @@ export class BrickRenderer {
     c.arc(520, 64, 17, 0, Math.PI * 2)
     c.fill()
     c.fillStyle = '#B8860B'
-    c.font = 'bold 20px sans-serif'
+    c.font = font(20, true)
     c.fillText('G', 520, 71)
     c.textAlign = 'right'
     c.fillStyle = '#5D4037'
-    c.font = 'bold 26px sans-serif'
+    c.font = font(26, true)
     c.fillText(state.run.gold.toLocaleString(), 672, 73)
   }
 
@@ -259,7 +260,7 @@ export class BrickRenderer {
 
       c.textAlign = 'center'
       c.fillStyle = affordable ? '#FFFFFF' : '#8D6E63'
-      c.font = 'bold 26px sans-serif'
+      c.font = font(26, true)
       c.fillText(`${t(def.label)} Lv.${level}`, rect.x + rect.w / 2, rect.y + 50)
 
       // 비용
@@ -268,10 +269,10 @@ export class BrickRenderer {
       c.arc(rect.x + rect.w / 2 - 44, rect.y + 88, 13, 0, Math.PI * 2)
       c.fill()
       c.fillStyle = affordable ? '#2E7D32' : '#E0D6CF'
-      c.font = 'bold 15px sans-serif'
+      c.font = font(15, true)
       c.fillText('G', rect.x + rect.w / 2 - 44, rect.y + 93)
       c.fillStyle = affordable ? '#FFFFFF' : '#BCAAA4'
-      c.font = 'bold 24px sans-serif'
+      c.font = font(24, true)
       c.fillText(cost.toLocaleString(), rect.x + rect.w / 2 + 22, rect.y + 96)
       c.restore()
     }
@@ -280,7 +281,7 @@ export class BrickRenderer {
   private drawPopups(state: BrickState) {
     const { c } = this
     c.textAlign = 'center'
-    c.font = 'bold 34px sans-serif'
+    c.font = font(34, true)
     for (const p of state.popups) {
       const k = p.age / POPUP_DURATION
       c.globalAlpha = 1 - k * k

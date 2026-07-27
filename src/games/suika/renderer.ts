@@ -3,6 +3,7 @@ import { BOARD, TIERS } from './config'
 import { drawFruit } from '../fruitArt'
 import { POP_DURATION, POPUP_DURATION, SPARK_DURATION, type SuikaState } from './state'
 import type { SuikaWorld } from './world'
+import { font } from '../ui'
 
 const JAR_RADIUS = 62
 const DANGER_BAND = 120 // 위험 경고 그라데이션 높이
@@ -265,7 +266,7 @@ export class SuikaRenderer {
     c.globalAlpha = 1
 
     c.textAlign = 'center'
-    c.font = 'bold 38px sans-serif'
+    c.font = font(38, true)
     for (const p of state.popups) {
       const k = p.age / POPUP_DURATION
       c.globalAlpha = 1 - k * k
@@ -291,7 +292,7 @@ export class SuikaRenderer {
     c.fill()
     c.restore()
     c.fillStyle = '#5D4037'
-    c.font = 'bold 58px sans-serif'
+    c.font = font(58, true)
     c.fillText(state.score.toLocaleString(), 360, 106)
 
     // 다음 과일 (라벨 대신 작은 점 3개로 표현)

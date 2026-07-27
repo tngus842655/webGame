@@ -32,6 +32,7 @@ import {
   updateEffects,
   type Pos,
 } from './state'
+import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 
 // 보석 도형 패스 (중심 기준, stroke lineJoin=round로 모서리를 둥글린다)
 function traceGem(c: CanvasRenderingContext2D, shape: GemShape) {
@@ -305,26 +306,23 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.fillRect(0, 0, 720, 1280)
 
     // HUD 카드
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.92
-    c.beginPath()
-    c.roundRect(90, 40, 540, 170, 28)
-    c.fill()
-    c.restore()
-    c.textAlign = 'center'
-    c.fillStyle = '#4A3580'
-    c.font = 'bold 54px sans-serif'
-    c.fillText(state.score.toLocaleString(), 360, 112)
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      sub: true,
+      panelColor: 'rgb(255 255 255 / 0.92)',
+      labelColor: '#A99BD0',
+      valueColor: '#4A3580',
+    })
     c.fillStyle = state.moves <= 5 ? '#C62838' : '#8A7BB5'
-    c.font = '21px sans-serif'
+    c.font = font(21)
     const info = `${t('m3.level', { n: state.level })} · ${t('m3.goal', { n: state.goal.toLocaleString() })} · ${t('m3.moves', { n: state.moves })}`
-    c.fillText(info, 360, 150)
-    // 목표 진행 바
+    c.fillText(info, SCORE_PANEL.cx, SCORE_PANEL.subY)
+    // 목표 진행 바 (카드 바로 아래)
     const progress = Math.min(1, (state.score - state.goalBase) / (state.goal - state.goalBase))
-    c.fillStyle = '#E7E2F4'
+    c.fillStyle = 'rgb(255 255 255 / 0.16)'
     c.beginPath()
-    c.roundRect(150, 168, 420, 16, 8)
+    c.roundRect(150, 186, 420, 16, 8)
     c.fill()
     if (progress > 0) {
       const barGrad = c.createLinearGradient(150, 0, 570, 0)
@@ -332,7 +330,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       barGrad.addColorStop(1, '#5E8BF0')
       c.fillStyle = barGrad
       c.beginPath()
-      c.roundRect(150, 168, Math.max(16, 420 * progress), 16, 8)
+      c.roundRect(150, 186, Math.max(16, 420 * progress), 16, 8)
       c.fill()
     }
 
@@ -409,7 +407,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     // 점수 팝업
     for (const p of state.popups) {
       c.globalAlpha = 1 - p.age / POPUP_DURATION
-      c.font = 'bold 42px sans-serif'
+      c.font = font(42, true)
       c.lineWidth = 7
       c.strokeStyle = 'rgb(42 33 68 / 0.8)'
       c.fillStyle = '#FFD54F'
@@ -427,7 +425,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fillStyle = 'rgb(74 53 128 / 0.85)'
       c.fillRect(0, 570, 720, 104)
       c.fillStyle = '#FFE082'
-      c.font = 'bold 56px sans-serif'
+      c.font = font(56, true)
       c.fillText(t('m3.level', { n: state.level }), 360, 642)
       c.restore()
     }

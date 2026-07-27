@@ -6,6 +6,7 @@ import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import { drawHazard, drawRunner } from './sprites'
 import { FIELD, GRAZE_POINTS, PLAYER_R, PLAYER_Y, createState, scoreOf, update } from './state'
+import { font } from '../ui'
 
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
@@ -114,7 +115,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.fill()
     c.restore()
     c.fillStyle = '#37474F'
-    c.font = 'bold 52px sans-serif'
+    c.font = font(52, true)
     c.fillText(scoreOf(state).toLocaleString(), 360, 96)
 
     // 스침 보너스 — 아슬아슬하게 피할수록 점수가 붙는다는 걸 그 자리에서 알려준다
@@ -122,7 +123,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.save()
       c.globalAlpha = Math.min(1, grazeFlash * 2)
       c.fillStyle = '#F4511E'
-      c.font = 'bold 34px sans-serif'
+      c.font = font(34, true)
       c.fillText(`+${GRAZE_POINTS}`, state.playerX, PLAYER_Y - 96 - (0.5 - grazeFlash) * 60)
       c.restore()
     }

@@ -17,6 +17,8 @@ import {
   WAYPOINTS,
   type Enemy,
 } from './state'
+import { drawScorePanel, font } from '../ui'
+import { drawIconValue } from '../icons'
 
 const TIER_COLORS = ['', '#8D6E63', '#43A047', '#1E88E5', '#8E24AA', '#F4511E', '#FDD835', '#E53935']
 const ENEMY_COLORS = { normal: '#EF5350', fast: '#FFB300', tank: '#795548', boss: '#7B1FA2' } as const
@@ -252,7 +254,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.arc(x, y - 4, 22, 0, Math.PI * 2)
       c.fill()
       c.fillStyle = '#FFFFFF'
-      c.font = 'bold 22px sans-serif'
+      c.font = font(22, true)
       c.textAlign = 'center'
       c.textBaseline = 'middle'
       c.fillText(String(tower.tier), x, y + 22)
@@ -287,28 +289,19 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     }
 
     // HUD: 점수 카드 + 웨이브 + 생명
-    c.textBaseline = 'alphabetic'
-    c.textAlign = 'center'
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.94
-    c.beginPath()
-    c.roundRect(160, 16, 400, 116, 22)
-    c.fill()
-    c.restore()
-    c.fillStyle = '#AED581'
-    c.font = '17px sans-serif'
-    c.fillText(t('hud.score'), 360, 44)
-    c.fillStyle = '#33691E'
-    c.font = 'bold 44px sans-serif'
-    c.fillText(state.score.toLocaleString(), 360, 96)
-    c.font = 'bold 30px sans-serif'
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      panelColor: 'rgb(255 255 255 / 0.94)',
+      labelColor: '#AED581',
+      valueColor: '#33691E',
+    })
+    c.font = font(30, true)
     c.fillStyle = '#FFFFFF'
     c.textAlign = 'left'
     c.fillText(t('df.wave', { n: state.wave }), 36, 190)
-    c.textAlign = 'right'
     c.fillStyle = leakFlash > 0 ? '#FF5252' : '#FFFFFF'
-    c.fillText(`❤ ${state.lives}`, 684, 190)
+    drawIconValue(c, 'heart', String(state.lives), 684, 180, 16, 'right')
     c.textAlign = 'center'
 
     // 하단 바: 소환 버튼 + 골드
@@ -320,19 +313,27 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.roundRect(SUMMON_BTN.x, SUMMON_BTN.y, SUMMON_BTN.w, SUMMON_BTN.h, 28)
     c.fill()
     c.fillStyle = '#FFFFFF'
-    c.font = 'bold 38px sans-serif'
-    c.textBaseline = 'middle'
-    c.fillText(
-      `🎲 ${t('df.summon', { n: state.summonCost })}`,
+    c.font = font(38, true)
+    drawIconValue(
+      c,
+      'dice',
+      t('df.summon', { n: state.summonCost }),
       SUMMON_BTN.x + SUMMON_BTN.w / 2,
       SUMMON_BTN.y + SUMMON_BTN.h / 2 + 2,
+      20,
     )
     c.restore()
     c.fillStyle = '#FFF59D'
-    c.font = 'bold 40px sans-serif'
-    c.textAlign = 'right'
-    c.textBaseline = 'middle'
-    c.fillText(`💰 ${state.gold.toLocaleString()}`, 684, SUMMON_BTN.y + SUMMON_BTN.h / 2 + 2)
+    c.font = font(40, true)
+    drawIconValue(
+      c,
+      'coin',
+      state.gold.toLocaleString(),
+      684,
+      SUMMON_BTN.y + SUMMON_BTN.h / 2 + 2,
+      20,
+      'right',
+    )
     c.textAlign = 'center'
     c.textBaseline = 'alphabetic'
 
@@ -340,7 +341,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (state.waveBreak > 0 && state.phase === 'playing') {
       c.save()
       c.globalAlpha = Math.min(1, state.waveBreak)
-      c.font = 'bold 72px sans-serif'
+      c.font = font(72, true)
       c.lineWidth = 10
       c.strokeStyle = '#FFFFFF'
       c.fillStyle = '#33691E'

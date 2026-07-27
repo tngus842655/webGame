@@ -15,6 +15,8 @@ import {
   CARD_DEFS,
   type CardId,
 } from './state'
+import { font } from '../ui'
+import { type IconName, drawIconValue, iconValueWidth } from '../icons'
 
 const NAME_KEYS: Record<CardId, TranslationKey> = {
   strike: 'dk.strike',
@@ -27,15 +29,28 @@ const NAME_KEYS: Record<CardId, TranslationKey> = {
   nova: 'dk.nova',
 }
 
-// 카드 효과 요약 (아이콘+숫자라 번역 불필요)
-function cardDesc(id: CardId): string {
+// 카드 효과 요약 — 아이콘과 숫자를 한 줄로 늘어놓는다 (숫자뿐이라 번역 불필요)
+function drawCardDesc(
+  c: CanvasRenderingContext2D,
+  id: CardId,
+  cx: number,
+  cy: number,
+  size: number,
+) {
   const def = CARD_DEFS[id]
-  const parts: string[] = []
-  if (def.dmg) parts.push(`⚔${def.dmg}${def.hits ? `×${def.hits}` : ''}`)
-  if (def.block) parts.push(`🛡${def.block}`)
-  if (def.heal) parts.push(`❤+${def.heal}`)
-  if (def.draw) parts.push(`🃏+${def.draw}`)
-  return parts.join(' ')
+  const parts: Array<[IconName, string]> = []
+  if (def.dmg) parts.push(['sword', `${def.dmg}${def.hits ? `×${def.hits}` : ''}`])
+  if (def.block) parts.push(['shield', String(def.block)])
+  if (def.heal) parts.push(['heart', `+${def.heal}`])
+  if (def.draw) parts.push(['card', `+${def.draw}`])
+  if (parts.length === 0) return
+  const gap = size * 1.1
+  const widths = parts.map(([, text]) => iconValueWidth(c, text, size))
+  let x = cx - (widths.reduce((a, b) => a + b, 0) + gap * (parts.length - 1)) / 2
+  parts.forEach(([icon, text], i) => {
+    drawIconValue(c, icon, text, x, cy, size, 'left')
+    x += widths[i] + gap
+  })
 }
 
 // 화면 배치 (논리 720×1280)
@@ -189,16 +204,16 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.arc(x + 24, y + 24, 18, 0, Math.PI * 2)
     c.fill()
     c.fillStyle = '#FFFFFF'
-    c.font = 'bold 22px sans-serif'
+    c.font = font(22, true)
     c.textAlign = 'center'
     c.textBaseline = 'middle'
     c.fillText(String(def.cost), x + 24, y + 25)
     // 이름·효과
     c.fillStyle = '#37474F'
-    c.font = `bold ${Math.round(w * 0.17)}px sans-serif`
+    c.font = font(Math.round(w * 0.17), true)
     c.fillText(t(NAME_KEYS[id]), x + w / 2, y + h * 0.42)
-    c.font = `${Math.round(w * 0.15)}px sans-serif`
-    c.fillText(cardDesc(id), x + w / 2, y + h * 0.68)
+    c.font = font(Math.round(w * 0.15))
+    drawCardDesc(c, id, x + w / 2, y + h * 0.68, Math.round(w * 0.075))
     c.textBaseline = 'alphabetic'
     c.restore()
   }
@@ -209,11 +224,11 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     // 스테이지·점수
     c.textAlign = 'center'
     c.fillStyle = 'rgb(255 255 255 / 0.6)'
-    c.font = 'bold 26px sans-serif'
+    c.font = font(26, true)
     c.fillText(t('dk.stage', { n: state.stage }), 130, 52)
     c.textAlign = 'right'
     c.fillStyle = '#FFFFFF'
-    c.font = 'bold 34px sans-serif'
+    c.font = font(34, true)
     c.fillText(state.score.toLocaleString(), 690, 56)
     c.textAlign = 'center'
 
@@ -266,15 +281,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.roundRect(210, 420, Math.max(10, (300 * state.enemy.hp) / state.enemy.maxHp), 22, 11)
     c.fill()
     c.fillStyle = '#FFFFFF'
-    c.font = 'bold 20px sans-serif'
+    c.font = font(20, true)
     c.textBaseline = 'middle'
     c.fillText(`${state.enemy.hp}/${state.enemy.maxHp}`, 360, 432)
     c.textBaseline = 'alphabetic'
     // 의도
     if (state.phase === 'player' || state.phase === 'enemy') {
-      c.font = 'bold 30px sans-serif'
+      c.font = font(30, true)
       c.fillStyle = intentDamage(state) > 6 + state.stage * 2 ? '#FF8A80' : '#FFCC80'
-      c.fillText(`⚔ ${intentDamage(state)}`, 360, 180)
+      drawIconValue(c, 'sword', String(intentDamage(state)), 360, 170, 16)
     }
 
     // 플레이어 상태
@@ -283,15 +298,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.beginPath()
     c.roundRect(40, 860, 640, 70, 18)
     c.fill()
-    c.font = 'bold 30px sans-serif'
+    c.font = font(30, true)
     c.textBaseline = 'middle'
     c.textAlign = 'left'
     c.fillStyle = '#EF9A9A'
-    c.fillText(`❤ ${state.hp}/${state.maxHp}`, 70, 896)
+    drawIconValue(c, 'heart', `${state.hp}/${state.maxHp}`, 70, 896, 16, 'left')
     c.fillStyle = '#90CAF9'
-    c.fillText(`🛡 ${state.block}`, 320, 896)
+    drawIconValue(c, 'shield', String(state.block), 320, 896, 16, 'left')
     c.fillStyle = '#FFD54F'
-    c.fillText(`⚡ ${state.energy}/3`, 500, 896)
+    drawIconValue(c, 'bolt', `${state.energy}/3`, 500, 896, 16, 'left')
     c.textAlign = 'center'
     c.textBaseline = 'alphabetic'
 
@@ -302,7 +317,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.roundRect(END_BTN.x, END_BTN.y, END_BTN.w, END_BTN.h, 20)
       c.fill()
       c.fillStyle = '#FFFFFF'
-      c.font = 'bold 28px sans-serif'
+      c.font = font(28, true)
       c.textBaseline = 'middle'
       c.fillText(t('dk.endTurn'), END_BTN.x + END_BTN.w / 2, END_BTN.y + END_BTN.h / 2 + 1)
       c.textBaseline = 'alphabetic'
@@ -328,7 +343,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fillStyle = 'rgb(0 0 0 / 0.6)'
       c.fillRect(0, 0, 720, 1280)
       c.fillStyle = '#FFFFFF'
-      c.font = 'bold 38px sans-serif'
+      c.font = font(38, true)
       c.fillText(t('dk.pick'), 360, 420)
       for (let i = 0; i < 3; i++) {
         drawCard(c, state.rewards[i], 60 + i * 212, REWARD_Y, 188, 250, true)
@@ -338,7 +353,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.roundRect(260, REWARD_Y + 290, 200, 70, 18)
       c.fill()
       c.fillStyle = '#FFFFFF'
-      c.font = 'bold 26px sans-serif'
+      c.font = font(26, true)
       c.textBaseline = 'middle'
       c.fillText(t('dk.skip'), 360, REWARD_Y + 326)
       c.textBaseline = 'alphabetic'

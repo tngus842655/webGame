@@ -15,35 +15,14 @@ import {
   type CellState,
   type Mode,
 } from './state'
+import { SCORE_PANEL, drawScorePanel, font } from '../ui'
+import { drawIcon } from '../icons'
 
 // 화면 배치 (논리 720×1280): 좌측·상단 힌트 영역 ~170px, 그리드는 정사각
 const GRID_X = 190
 const GRID_Y = 370
 const GRID_W = 510
 const BTN = { y: 1040, h: 150, w: 290, x1: 50, x2: 380 } as const
-
-// 하트 그리기 (cx, cy 중심, s = 반너비)
-function drawHeart(
-  c: CanvasRenderingContext2D,
-  cx: number,
-  cy: number,
-  s: number,
-  on: boolean,
-  alpha = 1,
-) {
-  c.save()
-  c.globalAlpha = alpha
-  c.fillStyle = on ? '#E53935' : '#CDD3EA'
-  const top = cy - s * 0.75
-  c.beginPath()
-  c.moveTo(cx, top + s * 0.45)
-  c.bezierCurveTo(cx, top, cx - s, top, cx - s, top + s * 0.45)
-  c.bezierCurveTo(cx - s, top + s * 0.95, cx, top + s * 1.25, cx, top + s * 1.55)
-  c.bezierCurveTo(cx, top + s * 1.25, cx + s, top + s * 0.95, cx + s, top + s * 0.45)
-  c.bezierCurveTo(cx + s, top, cx, top, cx, top + s * 0.45)
-  c.fill()
-  c.restore()
-}
 
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
@@ -208,31 +187,28 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const clearing = state.phase === 'clearing'
 
     // HUD: 흰 카드 + 점수 + 퍼즐 번호 + 하트
-    c.textBaseline = 'alphabetic'
-    c.textAlign = 'center'
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.92
-    c.beginPath()
-    c.roundRect(160, 24, 400, 150, 24)
-    c.fill()
-    c.restore()
-    c.fillStyle = '#9FA8DA'
-    c.font = '18px sans-serif'
-    c.fillText(t('hud.score'), 360, 56)
-    c.fillStyle = '#283593'
-    c.font = 'bold 50px sans-serif'
-    c.fillText(state.score.toLocaleString(), 360, 110)
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      sub: true,
+      panelColor: 'rgb(255 255 255 / 0.92)',
+      labelColor: '#9FA8DA',
+      valueColor: '#283593',
+    })
     c.fillStyle = '#5C6BC0'
-    c.font = '24px sans-serif'
+    c.font = font(24)
     c.textAlign = 'left'
-    c.fillText(t('no.puzzle', { n: state.level }), 196, 152)
+    c.fillText(t('no.puzzle', { n: state.level }), SCORE_PANEL.left, SCORE_PANEL.subY)
     c.textAlign = 'center'
-    const heartX = (i: number) => 428 + i * 46
-    for (let i = 0; i < 3; i++) drawHeart(c, heartX(i), 142, 16, i < state.lives)
+    const heartX = (i: number) => 462 + i * 42
+    for (let i = 0; i < 3; i++) {
+      drawIcon(c, 'heart', heartX(i), SCORE_PANEL.subY - 8, 14, { dim: i >= state.lives })
+    }
     if (lostHeart) {
       const k = lostHeart.age / 0.6
-      drawHeart(c, heartX(lostHeart.index), 142 - k * 28, 16, true, 1 - k)
+      drawIcon(c, 'heart', heartX(lostHeart.index), SCORE_PANEL.subY - 8 - k * 28, 14, {
+        alpha: 1 - k,
+      })
     }
 
     // 그리드 (오답 시 좌우 흔들림)
@@ -284,9 +260,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       }
 
       // 힌트 숫자 (완성한 줄은 회색 처리)
-      const font = size === 5 ? 40 : size === 8 ? 32 : 27
-      const gap = font + 6
-      c.font = `bold ${font}px sans-serif`
+      const hintSize = size === 5 ? 40 : size === 8 ? 32 : 27
+      const gap = hintSize + 6
+      c.font = font(hintSize, true)
       c.textAlign = 'center'
       c.textBaseline = 'middle'
       for (let col = 0; col < size; col++) {
@@ -313,7 +289,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (popup) {
       c.save()
       c.globalAlpha = 1 - popup.age
-      c.font = 'bold 64px sans-serif'
+      c.font = font(64, true)
       c.textAlign = 'center'
       c.lineWidth = 8
       c.strokeStyle = '#FFFFFF'
@@ -334,7 +310,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fill()
       c.stroke()
       c.fillStyle = active ? '#FFFFFF' : '#3949AB'
-      c.font = 'bold 40px sans-serif'
+      c.font = font(40, true)
       c.textAlign = 'center'
       c.textBaseline = 'middle'
       c.fillText(label, x + BTN.w / 2, BTN.y + BTN.h / 2)

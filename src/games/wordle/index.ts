@@ -12,6 +12,8 @@ import {
   WORD_LEN,
   type CellStatus,
 } from './state'
+import { font } from '../ui'
+import { drawIcon } from '../icons'
 
 // 화면 배치 (논리 720×1280)
 const CELL = 84
@@ -190,7 +192,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     }
     if (jamo) {
       c.fillStyle = status ? '#FFFFFF' : '#263238'
-      c.font = 'bold 46px sans-serif'
+      c.font = font(46, true)
       c.textAlign = 'center'
       c.textBaseline = 'middle'
       c.fillText(jamo, x + CELL / 2, rowY + CELL / 2 + 2)
@@ -204,7 +206,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     // 상단: 라벨 + 스트릭 + 점수 + 공유
     c.textAlign = 'left'
     c.fillStyle = '#455A64'
-    c.font = 'bold 28px sans-serif'
+    c.font = font(28, true)
     const d = new Date()
     const label = state.daily
       ? t('sd.daily', { date: `${d.getMonth() + 1}/${d.getDate()}` })
@@ -212,7 +214,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.fillText(`${label} · ${t('sd.streak', { n: state.streak })}`, 24, 64)
     c.textAlign = 'right'
     c.fillStyle = '#263238'
-    c.font = 'bold 40px sans-serif'
+    c.font = font(40, true)
     c.fillText(state.score.toLocaleString(), 696, 66)
     c.textAlign = 'center'
     if (state.dailyShare) {
@@ -221,7 +223,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.roundRect(560, 96, 140, 60, 16)
       c.fill()
       c.fillStyle = '#FFFFFF'
-      c.font = 'bold 26px sans-serif'
+      c.font = font(26, true)
       c.textBaseline = 'middle'
       c.fillText(t('wd.share'), 630, 128)
       c.textBaseline = 'alphabetic'
@@ -246,7 +248,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     // 정답 연출
     if (state.phase === 'won') {
       c.save()
-      c.font = 'bold 56px sans-serif'
+      c.font = font(56, true)
       c.fillStyle = '#6AAA64'
       c.lineWidth = 8
       c.strokeStyle = '#FFFFFF'
@@ -261,7 +263,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       const y = KEY_Y + row * (KEY_H + KEY_GAP)
       const keys = KEY_ROWS[row]
       const x0 = row < 3 ? 20 : 54
-      c.font = 'bold 36px sans-serif'
+      c.font = font(36, true)
       c.textBaseline = 'middle'
       for (let k = 0; k < keys.length; k++) {
         const x = x0 + k * (KEY_W + GAP)
@@ -279,15 +281,14 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         c.beginPath()
         c.roundRect(backX, y, 120, KEY_H, 12)
         c.fill()
-        c.fillStyle = '#37474F'
-        c.fillText('⌫', backX + 60, y + KEY_H / 2 + 2)
+        drawIcon(c, 'backspace', backX + 60, y + KEY_H / 2, 20, { color: '#37474F' })
         const ready = state.current.length === WORD_LEN && state.phase === 'playing'
         c.fillStyle = ready ? '#6AAA64' : '#B0BEC5'
         c.beginPath()
         c.roundRect(backX + 128, y, 190, KEY_H, 12)
         c.fill()
         c.fillStyle = '#FFFFFF'
-        c.font = 'bold 30px sans-serif'
+        c.font = font(30, true)
         c.fillText(t('wd.enter'), backX + 128 + 95, y + KEY_H / 2 + 2)
       }
       c.textBaseline = 'alphabetic'
@@ -298,7 +299,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.save()
       c.globalAlpha = Math.min(1, (toast.life - toast.age) / 0.4)
       c.fillStyle = 'rgb(38 50 56 / 0.9)'
-      c.font = 'bold 32px sans-serif'
+      c.font = font(32, true)
       const w = c.measureText(toast.text).width + 60
       c.beginPath()
       c.roundRect(360 - w / 2, 440, w, 74, 20)

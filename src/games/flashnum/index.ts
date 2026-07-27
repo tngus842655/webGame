@@ -6,6 +6,8 @@ import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import { BUBBLE_R, createState, reviveAtLevel, tapAt, update, type Bubble } from './state'
+import { font } from '../ui'
+import { drawIconRow } from '../icons'
 
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
@@ -116,7 +118,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     if (showNumber) {
       c.fillStyle = b.wrong ? '#FFFFFF' : '#06323F'
-      c.font = 'bold 46px sans-serif'
+      c.font = font(46, true)
       c.textAlign = 'center'
       c.textBaseline = 'middle'
       c.fillText(String(b.n), b.x, b.y + 2)
@@ -153,17 +155,17 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.roundRect(360 - w / 2, 236, w * (state.showTimer / state.showSpan), 12, 6)
       c.fill()
       c.fillStyle = 'rgb(255 255 255 / 0.75)'
-      c.font = '22px sans-serif'
+      c.font = font(22)
       c.fillText(t('fn.memorize'), 360, 218)
     } else if (state.phase === 'recall' && state.level <= 2) {
       c.fillStyle = 'rgb(255 255 255 / 0.5)'
-      c.font = '22px sans-serif'
+      c.font = font(22)
       c.fillText(t('fn.order'), 360, 240)
     }
 
     if (state.phase === 'clear') {
       c.fillStyle = '#FFD54F'
-      c.font = 'bold 38px sans-serif'
+      c.font = font(38, true)
       c.fillText(`+${state.gain}`, 360, 240)
     }
 
@@ -176,13 +178,12 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.fill()
     c.restore()
     c.fillStyle = 'rgb(255 255 255 / 0.5)'
-    c.font = '18px sans-serif'
+    c.font = font(18)
     c.fillText(`${t('hud.score')} · ${t('fn.level', { n: state.level })}`, 360, 56)
     c.fillStyle = '#FFFFFF'
-    c.font = 'bold 48px sans-serif'
+    c.font = font(48, true)
     c.fillText(state.score.toLocaleString(), 360, 112)
-    c.font = 'bold 26px sans-serif'
-    c.fillText('❤'.repeat(state.hearts), 360, 144)
+    drawIconRow(c, 'heart', 360, 138, 13, state.hearts, Math.max(3, state.hearts))
   }
 
   shell.addCleanup(detachInput)

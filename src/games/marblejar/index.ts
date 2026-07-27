@@ -6,6 +6,7 @@ import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import { CAP, COLORS, JARS, createState, emptyFullestJar, isMixed, place, update } from './state'
+import { font } from '../ui'
 
 const JAR_W = 130
 const JAR_GAP = 40
@@ -115,7 +116,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     drawMarble(360, 380, state.marble, 46)
     c.textAlign = 'center'
     c.fillStyle = 'rgb(255 255 255 / 0.45)'
-    c.font = '22px sans-serif'
+    c.font = font(22)
     c.fillText(t('mj.hint'), 360, 484)
 
     for (let i = 0; i < JARS; i++) {
@@ -170,9 +171,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // HUD
     c.fillStyle = '#FFFFFF'
-    c.font = 'bold 46px sans-serif'
+    c.font = font(46, true)
     c.fillText(state.score.toLocaleString(), 360, 74)
-    c.font = '22px sans-serif'
+    c.font = font(22)
     c.fillStyle = 'rgb(255 255 255 / 0.55)'
     c.fillText(t('mj.colors', { n: state.colors }), 360, 116)
 

@@ -15,6 +15,7 @@ import {
   scoreOf,
   update,
 } from './state'
+import { font } from '../ui'
 
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
@@ -242,7 +243,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.fill()
     c.restore()
     c.fillStyle = '#0D47A1'
-    c.font = 'bold 52px sans-serif'
+    c.font = font(52, true)
     c.fillText(scoreOf(state).toLocaleString(), 360, 96)
 
     // 텍스트 없는 조작 안내: 위로 튀는 탭 표식

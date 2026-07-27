@@ -6,6 +6,7 @@ import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import { SLOTS, clearBlockingSlot, createState, legalSlots, place, update } from './state'
+import { drawScorePanel, font } from '../ui'
 
 const SLOT_X = 56
 const SLOT_W = 372
@@ -114,7 +115,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
       if (value !== null) {
         c.fillStyle = '#FFFFFF'
-        c.font = 'bold 32px sans-serif'
+        c.font = font(32, true)
         c.textAlign = 'center'
         c.textBaseline = 'middle'
         c.fillText(String(value), SLOT_X + SLOT_W / 2, y + SLOT_H / 2 + 1)
@@ -127,7 +128,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // 판 수
     c.fillStyle = 'rgb(255 255 255 / 0.45)'
-    c.font = '22px sans-serif'
+    c.font = font(22)
     c.fillText(t('nm.round', { n: state.round }), cx, 250)
 
     // 위는 작게 아래는 크게 — 규칙을 글자 없이 알려 주는 쐐기
@@ -140,9 +141,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.closePath()
     c.fill()
     c.fillStyle = 'rgb(255 255 255 / 0.3)'
-    c.font = '20px sans-serif'
+    c.font = font(20)
     c.fillText('1', cx, 292)
-    c.font = '26px sans-serif'
+    c.font = font(26)
     c.fillText('999', cx, 494)
 
     // 손에 든 카드
@@ -154,7 +155,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.lineWidth = 3
     c.stroke()
     c.fillStyle = '#3E2723'
-    c.font = 'bold 62px sans-serif'
+    c.font = font(62, true)
     c.fillText(String(state.card), cx, 638)
 
     if (state.clearFlash > 0) {
@@ -163,26 +164,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fillStyle = 'rgb(0 0 0 / 0.6)'
       c.fillRect(0, 742, 720, 120)
       c.fillStyle = '#FFD54F'
-      c.font = 'bold 40px sans-serif'
+      c.font = font(40, true)
       c.fillText(t('nm.clear', { n: state.clearGain }), 360, 818)
       c.restore()
     }
 
     // HUD
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.1
-    c.beginPath()
-    c.roundRect(200, 18, 320, 118, 22)
-    c.fill()
-    c.restore()
-    c.textAlign = 'center'
-    c.fillStyle = 'rgb(255 255 255 / 0.5)'
-    c.font = '18px sans-serif'
-    c.fillText(t('hud.score'), 360, 50)
-    c.fillStyle = '#FFFFFF'
-    c.font = 'bold 44px sans-serif'
-    c.fillText(state.score.toLocaleString(), 360, 106)
+    drawScorePanel(c, { label: t('hud.score'), value: state.score.toLocaleString() })
   }
 
   shell.addCleanup(detachInput)

@@ -16,6 +16,8 @@ import {
   SIZE,
   TIMED_FROM,
 } from './state'
+import { SCORE_PANEL, drawScorePanel, font } from '../ui'
+import { drawIconValue } from '../icons'
 
 // 화면 배치 (논리 720×1280): 교차점 방식 바둑판
 const CELL = 44
@@ -158,35 +160,38 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const c = stage.begin('#4E342E', '#D7A86E')
 
     // HUD: 점수(연승 기반) + 연승 수
-    c.textBaseline = 'alphabetic'
-    c.textAlign = 'center'
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.94
-    c.beginPath()
-    c.roundRect(160, 24, 400, 140, 24)
-    c.fill()
-    c.restore()
-    c.fillStyle = '#BCAAA4'
-    c.font = '18px sans-serif'
-    c.fillText(t('hud.score'), 360, 54)
-    c.fillStyle = '#4E342E'
-    c.font = 'bold 48px sans-serif'
-    c.fillText(state.score.toLocaleString(), 360, 108)
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      sub: true,
+      panelColor: 'rgb(255 255 255 / 0.94)',
+      labelColor: '#BCAAA4',
+      valueColor: '#4E342E',
+    })
     c.fillStyle = '#8D6E63'
-    c.font = 'bold 24px sans-serif'
-    c.fillText(t('om.stage', { n: state.stage, m: MAX_STAGE }), 360, 146)
+    c.font = font(24, true)
+    c.fillText(t('om.stage', { n: state.stage, m: MAX_STAGE }), SCORE_PANEL.cx, SCORE_PANEL.subY)
     // 제한 시간이 있는 단은 남은 시간을 크게 보여준다 (10초 아래면 빨갛게)
     if (state.timeLeft > 0 || state.stage >= TIMED_FROM) {
       const left = Math.ceil(state.timeLeft)
-      c.fillStyle = left <= 10 ? '#E53935' : '#5D4037'
-      c.font = 'bold 30px sans-serif'
-      c.fillText(`⏱ ${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`, 360, 186)
+      const urgent = left <= 10
+      c.fillStyle = urgent ? '#E53935' : '#5D4037'
+      c.font = font(30, true)
+      drawIconValue(
+        c,
+        'timer',
+        `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`,
+        SCORE_PANEL.cx,
+        200,
+        16,
+        'center',
+        { color: urgent ? '#E53935' : '#6D4C41' },
+      )
     }
 
     // 차례 안내
     c.fillStyle = '#FFF8E1'
-    c.font = 'bold 28px sans-serif'
+    c.font = font(28, true)
     if (state.phase === 'playing') c.fillText(t('om.you'), 360, 232)
     else if (state.phase === 'aiThinking') c.fillText(t('om.think'), 360, 232)
 
@@ -250,7 +255,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.roundRect(UNDO_BTN.x, UNDO_BTN.y, UNDO_BTN.w, UNDO_BTN.h, 24)
       c.fill()
       c.fillStyle = '#FFFFFF'
-      c.font = 'bold 28px sans-serif'
+      c.font = font(28, true)
       c.textBaseline = 'middle'
       c.fillText(t('om.undo'), 360, UNDO_BTN.y + UNDO_BTN.h / 2 + 1)
       c.textBaseline = 'alphabetic'
@@ -262,7 +267,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fillStyle = 'rgb(0 0 0 / 0.5)'
       c.fillRect(0, 560, 720, 140)
       c.fillStyle = state.phase === 'won' ? '#FFD54F' : '#EF9A9A'
-      c.font = 'bold 52px sans-serif'
+      c.font = font(52, true)
       c.textBaseline = 'middle'
       const banner = state.cleared
         ? t('om.cleared')
@@ -274,7 +279,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fillText(banner, 360, state.lastBonus > 0 && state.phase === 'won' ? 610 : 630)
       if (state.phase === 'won' && state.lastBonus > 0) {
         c.fillStyle = '#FFF8E1'
-        c.font = 'bold 28px sans-serif'
+        c.font = font(28, true)
         c.fillText(t('om.timeBonus', { n: state.lastBonus.toLocaleString() }), 360, 660)
       }
       c.restore()

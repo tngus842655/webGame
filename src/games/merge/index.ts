@@ -24,6 +24,8 @@ import {
   stageSeconds,
   update,
 } from './state'
+import { font } from '../ui'
+import { drawIcon } from '../icons'
 
 const REVIVE_SECONDS = 60
 
@@ -41,7 +43,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, LAYOUT.width, LAYOUT.height)
   const state = createState()
-  const popups: Array<{ x: number; y: number; text: string; age: number }> = []
+  const popups: Array<{ x: number; y: number; age: number }> = []
   let adReviveUsed = false
   const bonus = createClearBonus(shell, ctx, 'merge-clear')
   let drag: { from: number; x: number; y: number } | null = null
@@ -138,7 +140,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         const row = Math.floor(to / COLS)
         const [px, py] = cellPos(col, row)
         const cellSize = LAYOUT.cell - LAYOUT.gap * 2
-        popups.push({ x: px + cellSize / 2, y: py, text: '🏆', age: 0 })
+        popups.push({ x: px + cellSize / 2, y: py, age: 0 })
         vibrate([25, 40, 25])
       }
       if (result.stageClear) void offerStageBonus(state.lastBonus)
@@ -168,22 +170,22 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.textAlign = 'center'
     card(30, 24, 150, 80)
     c.fillStyle = '#A1887F'
-    c.font = '18px sans-serif'
+    c.font = font(18)
     c.fillText(t('merge.stageLabel'), 105, 50)
     c.fillStyle = '#5D4037'
-    c.font = 'bold 34px sans-serif'
+    c.font = font(34, true)
     c.fillText(String(state.stage), 105, 88)
 
     card(196, 24, 244, 80)
     c.fillStyle = '#5D4037'
-    c.font = 'bold 42px sans-serif'
+    c.font = font(42, true)
     c.fillText(state.score.toLocaleString(), 318, 80)
 
     const goal = stageGoal(state.stage)
     card(456, 24, 234, 80)
     drawPlant(c, 496, 66, 26, MAX_LEVEL)
     c.fillStyle = '#5D4037'
-    c.font = 'bold 34px sans-serif'
+    c.font = font(34, true)
     c.fillText(`${state.goldMade} / ${goal}`, 600, 78)
 
     // 남은 시간 바
@@ -212,7 +214,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const mm = Math.floor(state.timeLeft / 60)
     const ss = String(Math.floor(state.timeLeft % 60)).padStart(2, '0')
     c.fillStyle = '#FFFFFF'
-    c.font = 'bold 21px sans-serif'
+    c.font = font(21, true)
     c.textBaseline = 'middle'
     c.fillText(`${mm}:${ss}`, barX + barW / 2, barY + barH / 2 + 1)
     c.textBaseline = 'alphabetic'
@@ -270,12 +272,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // 수확 연출
     for (const popup of popups) {
-      c.save()
-      c.globalAlpha = 1 - popup.age / 1.1
-      c.font = 'bold 58px sans-serif'
-      c.textAlign = 'center'
-      c.fillText(popup.text, popup.x, popup.y - popup.age * 70)
-      c.restore()
+      drawIcon(c, 'trophy', popup.x, popup.y - popup.age * 70, 30, {
+        alpha: 1 - popup.age / 1.1,
+      })
     }
 
     // 자리가 없으면 무엇을 해야 하는지 알린다
@@ -283,7 +282,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (!roomLeft && state.phase === 'playing') {
       c.textAlign = 'center'
       c.fillStyle = '#8D6E63'
-      c.font = 'bold 26px sans-serif'
+      c.font = font(26, true)
       c.fillText(t('merge.full'), 360, 176)
     }
 
@@ -302,7 +301,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     drawPlant(c, gb.x + 62, gb.y + gb.h / 2 + 4, 30, 1)
     c.textAlign = 'center'
     c.fillStyle = '#FFFFFF'
-    c.font = 'bold 34px sans-serif'
+    c.font = font(34, true)
     c.fillText(t('merge.gen'), gb.x + gb.w / 2 + 30, gb.y + gb.h / 2 + 12)
     c.restore()
 
@@ -326,14 +325,14 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fillRect(0, 0, LAYOUT.width, LAYOUT.height)
       c.textAlign = 'center'
       c.fillStyle = '#FFFFFF'
-      c.font = 'bold 48px sans-serif'
+      c.font = font(48, true)
       c.fillText(state.cleared ? t('merge.cleared') : t('merge.clear', { n: state.stage }), 360, 560)
       c.fillStyle = '#FFD54F'
-      c.font = 'bold 62px sans-serif'
+      c.font = font(62, true)
       c.fillText(`+${state.lastBonus.toLocaleString()}`, 360, 650)
       if (!state.cleared) {
         c.fillStyle = 'rgb(255 255 255 / 0.85)'
-        c.font = '28px sans-serif'
+        c.font = font(28)
         c.fillText(t('merge.nextStage', { n: state.stage + 1, g: stageGoal(state.stage + 1) }), 360, 720)
       }
       c.restore()

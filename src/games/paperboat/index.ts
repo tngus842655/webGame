@@ -17,6 +17,7 @@ import {
   update,
   type Boat,
 } from './state'
+import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
@@ -186,7 +187,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.save()
       c.globalAlpha = 1 - pop.age
       c.fillStyle = '#FFECB3'
-      c.font = 'bold 30px sans-serif'
+      c.font = font(30, true)
       c.textAlign = 'center'
       c.fillText(pop.text, pop.x, pop.y - 60 - pop.age * 30)
       c.restore()
@@ -217,30 +218,21 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     // 첫 배를 보내기 전까지만 조작을 알려 준다 (입력이 한눈에 보이지 않는 게임이라)
     if (state.docked === 0) {
       c.fillStyle = 'rgb(255 255 255 / 0.5)'
-      c.font = '22px sans-serif'
+      c.font = font(22)
       c.textAlign = 'center'
       c.fillText(t('pb.hint'), 360, 1150)
     }
 
     // HUD: 점수 + 콤보
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.1
-    c.beginPath()
-    c.roundRect(200, 20, 320, 118, 22)
-    c.fill()
-    c.restore()
-    c.textAlign = 'center'
-    c.fillStyle = 'rgb(255 255 255 / 0.5)'
-    c.font = '18px sans-serif'
-    c.fillText(t('hud.score'), 360, 52)
-    c.fillStyle = '#FFFFFF'
-    c.font = 'bold 44px sans-serif'
-    c.fillText(state.score.toLocaleString(), 360, 108)
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      sub: state.combo >= 2,
+    })
     if (state.combo >= 2) {
       c.fillStyle = '#FFD54F'
-      c.font = 'bold 26px sans-serif'
-      c.fillText(`x${state.combo}`, 360, 136)
+      c.font = font(26, true)
+      c.fillText(`x${state.combo}`, SCORE_PANEL.cx, SCORE_PANEL.subY)
     }
   }
 

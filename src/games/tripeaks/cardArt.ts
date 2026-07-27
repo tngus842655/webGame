@@ -1,6 +1,7 @@
 // 카드 아트 — 무늬는 벡터 패스로 직접 그린다 (플랫폼별 텍스트 글리프 렌더 차이 방지)
 
 import { CARD_H, CARD_W } from './state'
+import { font } from '../ui'
 
 const RANK_LABELS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
 const RED = '#C62828'
@@ -89,7 +90,7 @@ export function drawCardFace(
 
   const color = suitColor(suit)
   c.fillStyle = color
-  c.font = 'bold 24px sans-serif'
+  c.font = font(24, true)
   c.textAlign = 'left'
   c.textBaseline = 'top'
   c.fillText(RANK_LABELS[rank], x + 8, y + 8)

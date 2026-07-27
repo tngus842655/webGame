@@ -15,6 +15,7 @@ import {
   update,
   worldTopY,
 } from './state'
+import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 
 // 층마다 색을 조금씩 돌려 위로 갈수록 색이 변하는 탑이 된다
 const faceColor = (level: number) => `hsl(${(level * 11) % 360} 58% 56%)`
@@ -168,7 +169,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.lineWidth = 4
       c.strokeRect(top.x - top.w / 2 - 4, topScreenY - 4, top.w + 8, BLOCK_H + 8)
       c.fillStyle = '#FFECB3'
-      c.font = 'bold 30px sans-serif'
+      c.font = font(30, true)
       c.textAlign = 'center'
       c.fillText(
         state.combo >= 2 ? `${t('st.perfect')} x${state.combo}` : t('st.perfect'),
@@ -179,23 +180,14 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     }
 
     // HUD: 점수 + 층수
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.1
-    c.beginPath()
-    c.roundRect(160, 24, 400, 130, 24)
-    c.fill()
-    c.restore()
-    c.textAlign = 'center'
-    c.fillStyle = 'rgb(255 255 255 / 0.5)'
-    c.font = '18px sans-serif'
-    c.fillText(t('hud.score'), 360, 56)
-    c.fillStyle = '#FFFFFF'
-    c.font = 'bold 48px sans-serif'
-    c.fillText(state.score.toLocaleString(), 360, 112)
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      sub: true,
+    })
     c.fillStyle = 'rgb(255 255 255 / 0.65)'
-    c.font = '20px sans-serif'
-    c.fillText(t('st.floor', { n: state.blocks.length }), 360, 144)
+    c.font = font(20)
+    c.fillText(t('st.floor', { n: state.blocks.length }), SCORE_PANEL.cx, SCORE_PANEL.subY)
   }
 
   shell.addCleanup(detachInput)
