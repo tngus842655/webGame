@@ -117,6 +117,17 @@ button {
   box-shadow: 0 1px 0 #c66d20;
 }
 
+/* 입력칸 옆이나 안내 상자 안처럼 줄 속에 놓이는 작은 버튼 */
+.btn--sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  padding: 0 18px;
+  border-radius: 14px;
+  font-size: 15px;
+}
+
 .btn--ghost {
   padding: 11px;
   background: none;

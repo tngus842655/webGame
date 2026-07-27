@@ -7,6 +7,7 @@ import { LOCALES, locale, setLocale, t, type Locale } from './i18n'
 import { ensureUserId, signInSocial, type SocialProvider } from './auth'
 import { updateMyNickname } from './profile'
 import { flushPendingScores } from './scores'
+import SocialLogo from './SocialLogo.vue'
 import UiIcon from './UiIcon.vue'
 
 const emit = defineEmits<{ done: [] }>()
@@ -97,10 +98,12 @@ async function start() {
         <p class="body">{{ t('onboard.accountBody') }}</p>
         <div class="socials">
           <button type="button" class="social google" :disabled="busy" @click="signIn('google')">
-            {{ t('account.google') }}
+            <SocialLogo provider="google" />
+            <span>{{ t('account.google') }}</span>
           </button>
           <button type="button" class="social kakao" :disabled="busy" @click="signIn('kakao')">
-            {{ t('account.kakao') }}
+            <SocialLogo provider="kakao" />
+            <span>{{ t('account.kakao') }}</span>
           </button>
         </div>
         <p v-if="error" class="error">{{ error }}</p>
@@ -257,6 +260,11 @@ h2 {
 
 .social {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
   padding: 15px 10px;
   border: none;
   border-radius: 16px;
