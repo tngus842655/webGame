@@ -4,6 +4,7 @@ import { GAMES } from '@/games/registry'
 import GameIcon from '@/shared/GameIcon.vue'
 import { t } from '@/shared/i18n'
 import { refreshPopularity, sortByPopularity } from '@/shared/scores'
+import UiIcon from '@/shared/UiIcon.vue'
 
 // 홈과 동일한 인기순 정렬 — 캐시로 첫 렌더부터 확정하고, 새 값은 다음 진입에 반영한다
 const games = sortByPopularity(GAMES)
@@ -16,7 +17,7 @@ onMounted(() => {
 <template>
   <div class="ranking-hub">
     <header class="hub-header">
-      <RouterLink class="back" to="/">←</RouterLink>
+      <RouterLink class="back" to="/"><UiIcon name="back" /></RouterLink>
       <h1>{{ t('home.ranking') }}</h1>
     </header>
 
@@ -25,7 +26,7 @@ onMounted(() => {
         <RouterLink class="row" :to="`/ranking/${game.slug}`">
           <span class="thumb"><GameIcon :slug="game.slug" /></span>
           <span class="title">{{ t(game.titleKey) }}</span>
-          <span class="arrow">›</span>
+          <span class="arrow"><UiIcon name="chevron" /></span>
         </RouterLink>
       </li>
     </ul>
@@ -44,11 +45,6 @@ onMounted(() => {
   margin-bottom: 16px;
 }
 
-.back {
-  font-size: 22px;
-  padding: 4px 8px;
-}
-
 .hub-header h1 {
   font-size: 20px;
 }
@@ -64,24 +60,35 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 14px;
+  padding: 11px 12px 11px 14px;
   background: #fff;
-  border-radius: 12px;
+  border-radius: 14px;
+  box-shadow: 0 1px 4px rgb(93 64 55 / 0.07);
+  transition: transform 0.1s ease;
+}
+
+.row:active {
+  transform: scale(0.985);
+  background: #fffaf2;
 }
 
 .thumb {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   flex-shrink: 0;
 }
 
 .title {
   flex: 1;
-  font-weight: bold;
+  font-weight: 700;
+  color: #4e342e;
 }
 
 .arrow {
-  color: #bcaaa4;
-  font-size: 20px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  color: #cbbcb5;
 }
 </style>

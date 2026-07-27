@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { DEV_NOTES } from '@/shared/devNotes'
 import { t } from '@/shared/i18n'
+import UiIcon from '@/shared/UiIcon.vue'
 
 // 최신 기록이 위로
 const notes = computed(() => [...DEV_NOTES].sort((a, b) => b.date.localeCompare(a.date)))
@@ -10,7 +11,7 @@ const notes = computed(() => [...DEV_NOTES].sort((a, b) => b.date.localeCompare(
 <template>
   <div class="notes">
     <header class="notes-header">
-      <RouterLink class="back" to="/settings">←</RouterLink>
+      <RouterLink class="back" to="/settings"><UiIcon name="back" /></RouterLink>
       <h1>{{ t('notes.title') }}</h1>
     </header>
 
@@ -42,11 +43,6 @@ const notes = computed(() => [...DEV_NOTES].sort((a, b) => b.date.localeCompare(
   align-items: center;
   gap: 12px;
   margin-bottom: 18px;
-}
-
-.back {
-  font-size: 22px;
-  padding: 4px 8px;
 }
 
 .notes-header h1 {

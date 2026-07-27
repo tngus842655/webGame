@@ -5,6 +5,7 @@ import { GAMES } from '@/games/registry'
 import { getCurrentUserId } from '@/shared/auth'
 import { t } from '@/shared/i18n'
 import { fetchLeaderboard, type LeaderboardEntry } from '@/shared/scores'
+import UiIcon from '@/shared/UiIcon.vue'
 
 const route = useRoute()
 const slug = String(route.params.slug)
@@ -38,7 +39,7 @@ watch(period, load)
 <template>
   <div class="ranking">
     <header class="ranking-header">
-      <RouterLink class="back" to="/ranking">←</RouterLink>
+      <RouterLink class="back" to="/ranking"><UiIcon name="back" /></RouterLink>
       <h1>{{ t('ranking.title', { name: game ? t(game.titleKey) : t('ranking.unknown') }) }}</h1>
     </header>
 
@@ -74,11 +75,6 @@ watch(period, load)
   align-items: center;
   gap: 12px;
   margin-bottom: 16px;
-}
-
-.back {
-  font-size: 22px;
-  padding: 4px 8px;
 }
 
 .ranking-header h1 {

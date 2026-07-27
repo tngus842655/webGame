@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { GAMES } from '@/games/registry'
 import GameCard from '@/shared/GameCard.vue'
 import { t } from '@/shared/i18n'
+import UiIcon from '@/shared/UiIcon.vue'
 import {
   featuredSlugs,
   fetchMyStats,
@@ -14,7 +15,6 @@ import {
   type MyGameStat,
 } from '@/shared/scores'
 import { ensureAdminChecked, fetchGameFlags, isAdmin } from '@/shared/admin'
-
 
 // 기록이 없어도 빈 문자열을 반환해 한 줄을 차지한다 (CSS에서 높이 확보)
 function scoreLabel(card: { best: number | null; stat: MyGameStat | null }): string {
@@ -72,9 +72,11 @@ onMounted(async () => {
     <header class="home-header">
       <h1>{{ t('app.title') }}</h1>
       <nav class="header-links">
-        <RouterLink to="/ranking" :aria-label="t('home.ranking')">🏆</RouterLink>
-        <RouterLink v-if="isAdmin" to="/admin" :aria-label="t('admin.title')">🛠️</RouterLink>
-        <RouterLink to="/settings" :aria-label="t('settings.title')">⚙️</RouterLink>
+        <RouterLink to="/ranking" :aria-label="t('home.ranking')"><UiIcon name="trophy" /></RouterLink>
+        <RouterLink v-if="isAdmin" to="/admin" :aria-label="t('admin.title')">
+          <UiIcon name="wrench" />
+        </RouterLink>
+        <RouterLink to="/settings" :aria-label="t('settings.title')"><UiIcon name="gear" /></RouterLink>
       </nav>
     </header>
 
@@ -101,51 +103,73 @@ onMounted(async () => {
     </main>
 
     <RouterLink v-if="trashCount > 0" class="trash-entry" to="/trash">
-      <span>🗑️ {{ t('trash.title') }}</span>
-      <span class="count">{{ trashCount }} ›</span>
+      <span class="trash-label"><UiIcon name="trash" />{{ t('trash.title') }}</span>
+      <span class="count">{{ trashCount }}<UiIcon name="chevron" /></span>
     </RouterLink>
   </div>
 </template>
 
 <style scoped>
 .home {
-  padding: 20px 16px;
+  padding: 18px 16px 24px;
 }
 
 .home-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .home-header h1 {
-  font-size: 24px;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #4e342e;
 }
 
+/* 이모지 링크였을 때는 기기마다 크기가 제각각이고 과녁도 작았다 */
 .header-links {
   display: flex;
-  gap: 14px;
-  font-size: 22px;
+  gap: 6px;
+}
+
+.header-links a {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: #8d6e63;
+  transition: background-color 0.12s ease;
+}
+
+.header-links a:active {
+  background: rgb(93 64 55 / 0.1);
+}
+
+.header-links svg {
+  width: 23px;
+  height: 23px;
 }
 
 /* 칸마다 테두리 색을 달리하고, 제목표를 윗선에 걸쳐 놓는다 */
 .shelf {
   position: relative;
-  padding: 20px 12px 14px;
-  margin-bottom: 20px;
+  padding: 22px 12px 14px;
+  margin-bottom: 22px;
   border: 2px solid;
-  border-radius: 20px;
+  border-radius: 22px;
 }
 
 .shelf h2 {
   position: absolute;
   top: -12px;
   left: 14px;
-  padding: 3px 12px;
+  padding: 4px 13px;
   border-radius: 999px;
   font-size: 12px;
-  font-weight: bold;
+  font-weight: 800;
   letter-spacing: 0.02em;
   color: #fff;
 }
@@ -157,6 +181,7 @@ onMounted(async () => {
 
 .fresh h2 {
   background: #43a047;
+  box-shadow: 0 2px 6px rgb(67 160 71 / 0.35);
 }
 
 .popular {
@@ -166,6 +191,7 @@ onMounted(async () => {
 
 .popular h2 {
   background: #ef6c00;
+  box-shadow: 0 2px 6px rgb(239 108 0 / 0.32);
 }
 
 .more {
@@ -175,6 +201,7 @@ onMounted(async () => {
 
 .more h2 {
   background: #8d6e63;
+  box-shadow: 0 2px 6px rgb(141 110 99 / 0.3);
 }
 
 .game-grid {
@@ -187,16 +214,38 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 16px;
-  margin-top: 14px;
+  padding: 14px 14px 14px 16px;
   background: rgb(255 255 255 / 0.6);
-  border-radius: 14px;
+  border-radius: 16px;
   font-size: 14px;
+  font-weight: 700;
   color: #8d6e63;
 }
 
+.trash-entry:active {
+  background: rgb(255 255 255 / 0.9);
+}
+
+.trash-label,
 .trash-entry .count {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trash-entry .count {
+  gap: 2px;
   color: #bcaaa4;
+}
+
+.trash-label svg {
+  width: 18px;
+  height: 18px;
+}
+
+.trash-entry .count svg {
+  width: 16px;
+  height: 16px;
 }
 
 </style>

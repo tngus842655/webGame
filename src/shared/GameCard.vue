@@ -37,9 +37,20 @@ function rankClass(rank: number): string {
   gap: 3px;
   padding: 12px 6px 10px;
   background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 2px 8px rgb(93 64 55 / 0.08);
+  border-radius: 16px;
+  box-shadow:
+    0 1px 2px rgb(93 64 55 / 0.06),
+    0 4px 12px rgb(93 64 55 / 0.09);
   text-align: center;
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
+}
+
+/* 눌리는 게 손끝에 느껴지도록 살짝 가라앉힌다 */
+.game-card:active {
+  transform: scale(0.96);
+  box-shadow: 0 1px 3px rgb(93 64 55 / 0.1);
 }
 
 /* 카드 크기는 그대로 두고 왼쪽 위 여백에 얹는다 */
@@ -85,29 +96,33 @@ function rankClass(rank: number): string {
 .thumb {
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
-  font-size: 30px;
-  background: #fff8e1;
-  border-radius: 12px;
-  margin-bottom: 2px;
+  width: 52px;
+  height: 52px;
+  padding: 2px;
+  background: linear-gradient(#fffdf6, #fff2d4);
+  border-radius: 14px;
+  margin-bottom: 3px;
 }
 
 strong {
   font-size: 13px;
+  font-weight: 700;
   line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: #4e342e;
   word-break: keep-all;
 }
 
 /* 서버에서 순위가 도착하기 전에도 카드 높이가 같도록 한 줄을 비워둔다 */
 small {
   font-size: 11px;
+  font-weight: 600;
   line-height: 14px;
   min-height: 14px;
   max-width: 100%;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  color: #bcaaa4;
+  color: #b3a099;
 }
 </style>

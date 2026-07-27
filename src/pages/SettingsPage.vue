@@ -11,6 +11,7 @@ import { LOCALES, locale, setLocale, t, type Locale } from '@/shared/i18n'
 import { adoptSocialNickname, fetchMyProfile, updateMyNickname } from '@/shared/profile'
 import { isMusicEnabled, setMusicEnabled } from '@/shared/music'
 import { isSoundEnabled, setSoundEnabled } from '@/shared/sound'
+import UiIcon from '@/shared/UiIcon.vue'
 
 const nickname = ref('')
 const loaded = ref(false)
@@ -128,7 +129,7 @@ function onLangChange() {
 <template>
   <div class="settings">
     <header class="settings-header">
-      <RouterLink class="back" to="/">←</RouterLink>
+      <RouterLink class="back" to="/"><UiIcon name="back" /></RouterLink>
       <h1>{{ t('settings.title') }}</h1>
     </header>
 
@@ -278,11 +279,6 @@ function onLangChange() {
   align-items: center;
   gap: 12px;
   margin-bottom: 20px;
-}
-
-.back {
-  font-size: 22px;
-  padding: 4px 8px;
 }
 
 .settings-header h1 {

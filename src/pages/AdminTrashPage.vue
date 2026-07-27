@@ -7,6 +7,7 @@ import GameIcon from '@/shared/GameIcon.vue'
 import { t, locale, type TranslationKey } from '@/shared/i18n'
 import { daysLeft, fetchGameFlags, RETENTION_DAYS, saveGameFlag, type GameFlag } from '@/shared/admin'
 import { popularityRanks } from '@/shared/scores'
+import UiIcon from '@/shared/UiIcon.vue'
 
 interface Row {
   slug: string
@@ -84,7 +85,7 @@ function trashedOn(iso: string): string {
 <template>
   <div class="trash">
     <header class="trash-header">
-      <RouterLink class="back" to="/admin">←</RouterLink>
+      <RouterLink class="back" to="/admin"><UiIcon name="back" /></RouterLink>
       <h1>{{ t('admin.trash') }}</h1>
     </header>
 
@@ -139,11 +140,6 @@ function trashedOn(iso: string): string {
   align-items: center;
   gap: 12px;
   margin-bottom: 12px;
-}
-
-.back {
-  font-size: 22px;
-  padding: 4px 8px;
 }
 
 .trash-header h1 {

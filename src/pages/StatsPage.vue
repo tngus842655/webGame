@@ -4,6 +4,7 @@ import { GAMES } from '@/games/registry'
 import GameIcon from '@/shared/GameIcon.vue'
 import { t } from '@/shared/i18n'
 import { fetchGameStats, fetchTotalPlayers, type GameStat } from '@/shared/playSessions'
+import UiIcon from '@/shared/UiIcon.vue'
 
 const PERIODS = [1, 7, 30] as const
 
@@ -71,7 +72,7 @@ function duration(sec: number): string {
 <template>
   <div class="stats">
     <header class="stats-header">
-      <RouterLink class="back" to="/">←</RouterLink>
+      <RouterLink class="back" to="/"><UiIcon name="back" /></RouterLink>
       <h1>{{ t('stats.title') }}</h1>
     </header>
 
@@ -142,11 +143,6 @@ function duration(sec: number): string {
   align-items: center;
   gap: 12px;
   margin-bottom: 16px;
-}
-
-.back {
-  font-size: 22px;
-  padding: 4px 8px;
 }
 
 .stats-header h1 {
