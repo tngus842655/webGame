@@ -14,7 +14,7 @@ import {
   scoreOf,
   update,
 } from './state'
-import { font } from '../ui'
+import { drawScorePanel, font } from '../ui'
 
 function drawHeart(c: CanvasRenderingContext2D, x: number, y: number, r: number, filled: boolean) {
   c.save()
@@ -235,21 +235,16 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     drawHero(c, p.x, p.y, PLAYER_R, state.joystick?.dx ?? 0)
     c.restore()
 
-    // HUD
-    c.textAlign = 'center'
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.72
-    c.beginPath()
-    c.roundRect(258, 22, 204, 74, 22)
-    c.fill()
-    c.restore()
-    c.fillStyle = '#5D4037'
-    c.font = font(42, true)
-    c.fillText(t('sv.time', { n: Math.floor(state.time) }), 360, 74)
-    c.font = font(20)
-    c.fillStyle = '#BCAAA4'
-    c.fillText(t('sv.kills', { k: state.kills, lv: state.level }), 360, 118)
+    // HUD — 판(ARENA.top=150) 위에 얹혀야 해서 좁고 짧은 판을 쓴다.
+    // 이 게임의 성적은 버틴 시간이라 큰 숫자 자리에 시간이 온다.
+    drawScorePanel(c, {
+      label: t('sv.kills', { k: state.kills, lv: state.level }),
+      value: t('sv.time', { n: Math.floor(state.time) }),
+      compact: true,
+      panelColor: 'rgb(255 255 255 / 0.72)',
+      labelColor: '#BCAAA4',
+      valueColor: '#5D4037',
+    })
 
     // 체력 하트
     for (let i = 0; i < p.maxHp; i++) {

@@ -30,6 +30,9 @@ export interface ScorePanelOptions {
   value: string
   // 판 안에 아랫줄을 그릴 때 true — 판이 길어진다
   sub?: boolean
+  // 낙하물처럼 위에서 내려오는 것을 가리면 안 되거나 판이 고정된 게임은 좁게.
+  // 글자 자리(labelY·valueY)는 그대로라 게임을 옮겨 다녀도 숫자 높이는 같다.
+  compact?: boolean
   // 밝은 배경 위에 놓는 게임은 불투명한 흰 판에 게임 팔레트 색을 쓴다
   panelColor?: string
   labelColor?: string
@@ -37,11 +40,12 @@ export interface ScorePanelOptions {
 }
 
 export function drawScorePanel(c: CanvasRenderingContext2D, o: ScorePanelOptions) {
-  const { x, y, w, cx, labelY, valueY } = SCORE_PANEL
+  const { y, w, cx, labelY, valueY } = SCORE_PANEL
+  const panelW = o.compact ? 260 : w
   c.save()
   c.fillStyle = o.panelColor ?? 'rgb(255 255 255 / 0.1)'
   c.beginPath()
-  c.roundRect(x, y, w, o.sub ? 150 : 118, 26)
+  c.roundRect(cx - panelW / 2, y, panelW, o.sub ? 150 : 118, 26)
   c.fill()
   c.restore()
   c.textAlign = 'center'

@@ -1,3 +1,4 @@
+import { t } from '@/shared/i18n'
 import { playDrop, playGameOver, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
@@ -6,7 +7,7 @@ import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import { drawHazard, drawRunner } from './sprites'
 import { FIELD, GRAZE_POINTS, PLAYER_R, PLAYER_Y, createState, scoreOf, update } from './state'
-import { font } from '../ui'
+import { drawScorePanel, font } from '../ui'
 
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
@@ -105,18 +106,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     drawRunner(c, state.playerX, PLAYER_Y, PLAYER_R, state.time, moveDir)
     c.restore()
 
-    // HUD
-    c.textAlign = 'center'
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.8
-    c.beginPath()
-    c.roundRect(240, 34, 240, 88, 24)
-    c.fill()
-    c.restore()
-    c.fillStyle = '#37474F'
-    c.font = font(52, true)
-    c.fillText(scoreOf(state).toLocaleString(), 360, 96)
+    // HUD — 낙하물이 지나는 자리라 좁은 판을 쓴다
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: scoreOf(state).toLocaleString(),
+      compact: true,
+      panelColor: 'rgb(255 255 255 / 0.8)',
+      labelColor: '#A6B4BC',
+      valueColor: '#37474F',
+    })
 
     // 스침 보너스 — 아슬아슬하게 피할수록 점수가 붙는다는 걸 그 자리에서 알려준다
     if (grazeFlash > 0) {
