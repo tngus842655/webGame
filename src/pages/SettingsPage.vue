@@ -330,14 +330,14 @@ function onLangChange() {
 .social.google {
   border: none;
   background: #fff;
-  box-shadow: inset 0 0 0 1.5px #e0d8d3;
-  color: #3c4043;
+  box-shadow: inset 0 0 0 1px #747775;
+  color: #1f1f1f;
 }
 
 .social.kakao {
   border: none;
   background: #fee500;
-  color: #191600;
+  color: rgb(25 22 0 / 0.85);
 }
 
 .linked {

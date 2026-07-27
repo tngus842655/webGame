@@ -1,6 +1,11 @@
 <script setup lang="ts">
-// 소셜 로그인 버튼의 브랜드 로고 — 설정 화면과 온보딩이 같은 것을 쓴다.
+// 소셜 로그인 버튼의 브랜드 심벌 — 설정 화면과 온보딩이 같은 것을 쓴다.
 // 각 사의 브랜드 색이라 currentColor를 따르지 않는다.
+//
+// 두 회사가 주는 '완성 버튼' 이미지는 구글이 영어, 카카오가 한국어/영어뿐이라
+// 13개 언어를 쓰는 이 앱에는 그대로 넣을 수 없다. 그래서 양쪽 다 허용하는
+// '직접 만든 버튼 + 공식 심벌' 방식을 쓴다. 버튼이 따르는 값(테두리·색)의
+// 출처는 brand/README.md 참고.
 import type { SocialProvider } from './auth'
 
 defineProps<{ provider: SocialProvider }>()
