@@ -149,6 +149,87 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     },
   })
 
+  // 사거리 안에서 가장 앞선 적 — 포신이 그쪽을 향한다.
+  // 어느 타워가 무엇을 맡고 있는지 눈으로 보이게 하려는 것이다.
+  const aimAngle = (x: number, y: number, tier: number): number | null => {
+    const range = towerRange(tier)
+    let best: number | null = null
+    let bestDist = -1
+    for (const enemy of state.enemies) {
+      const p = pointAt(enemy.dist)
+      if (Math.hypot(p.x - x, p.y - y) > range) continue
+      if (enemy.dist > bestDist) {
+        bestDist = enemy.dist
+        best = Math.atan2(p.y - y, p.x - x)
+      }
+    }
+    return best
+  }
+
+  // 등급이 색과 숫자로만 갈리던 것을 포탑 모양으로 바꾼다 — 포신 길이·받침 크기가
+  // 등급을 따라가고, 등급 표시는 받침에 박힌 원판으로 읽는다.
+  const drawTower = (c: CanvasRenderingContext2D, x: number, y: number, tier: number) => {
+    const color = TIER_COLORS[tier]
+    const angle = aimAngle(x, y, tier) ?? -Math.PI / 2
+
+    // 받침대
+    c.fillStyle = 'rgb(62 39 35 / 0.25)'
+    c.beginPath()
+    c.ellipse(x, y + 26, 34, 11, 0, 0, Math.PI * 2)
+    c.fill()
+    const base = c.createLinearGradient(x, y - 30, x, y + 26)
+    base.addColorStop(0, '#8D6E63')
+    base.addColorStop(1, '#5D4037')
+    c.fillStyle = base
+    c.beginPath()
+    c.roundRect(x - 32, y - 18, 64, 44, 12)
+    c.fill()
+    c.fillStyle = 'rgb(255 255 255 / 0.16)'
+    c.beginPath()
+    c.roundRect(x - 32, y - 18, 64, 12, [12, 12, 0, 0])
+    c.fill()
+
+    // 포신 — 등급이 오를수록 길고 굵어진다
+    c.save()
+    c.translate(x, y - 6)
+    c.rotate(angle)
+    c.fillStyle = '#455A64'
+    c.beginPath()
+    c.roundRect(4, -(4 + tier * 0.7), 24 + tier * 4, 8 + tier * 1.4, 4)
+    c.fill()
+    c.fillStyle = 'rgb(255 255 255 / 0.2)'
+    c.beginPath()
+    c.roundRect(4, -(4 + tier * 0.7), 24 + tier * 4, 3, 2)
+    c.fill()
+    c.restore()
+
+    // 포탑 머리
+    const dome = c.createRadialGradient(x - 7, y - 14, 3, x, y - 6, 22)
+    dome.addColorStop(0, 'rgb(255 255 255 / 0.65)')
+    dome.addColorStop(0.45, color)
+    dome.addColorStop(1, 'rgb(0 0 0 / 0.25)')
+    c.fillStyle = color
+    c.beginPath()
+    c.arc(x, y - 6, 20, 0, Math.PI * 2)
+    c.fill()
+    c.fillStyle = dome
+    c.beginPath()
+    c.arc(x, y - 6, 20, 0, Math.PI * 2)
+    c.fill()
+
+    // 등급 원판
+    c.fillStyle = '#FFF8E1'
+    c.beginPath()
+    c.arc(x, y + 14, 13, 0, Math.PI * 2)
+    c.fill()
+    c.fillStyle = color
+    c.font = font(18, true)
+    c.textAlign = 'center'
+    c.textBaseline = 'middle'
+    c.fillText(String(tier), x, y + 15)
+    c.textBaseline = 'alphabetic'
+  }
+
   const drawEnemy = (c: CanvasRenderingContext2D, enemy: Enemy) => {
     const p = pointAt(enemy.dist)
     const r = enemy.radius
@@ -242,22 +323,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       const tower = state.slots[i]
       if (!tower) continue
       const [x, y] = SLOTS[i]
-      const dragged = drag?.from === i
       c.save()
-      if (dragged) c.globalAlpha = 0.35
-      c.fillStyle = '#6D4C41'
-      c.beginPath()
-      c.roundRect(x - 34, y - 34, 68, 68, 12)
-      c.fill()
-      c.fillStyle = TIER_COLORS[tower.tier]
-      c.beginPath()
-      c.arc(x, y - 4, 22, 0, Math.PI * 2)
-      c.fill()
-      c.fillStyle = '#FFFFFF'
-      c.font = font(22, true)
-      c.textAlign = 'center'
-      c.textBaseline = 'middle'
-      c.fillText(String(tower.tier), x, y + 22)
+      if (drag?.from === i) c.globalAlpha = 0.35
+      drawTower(c, x, y, tower.tier)
       c.restore()
     }
 
