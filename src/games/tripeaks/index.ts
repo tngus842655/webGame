@@ -21,6 +21,7 @@ import {
   type PlayingCard,
   type TableCard,
 } from './state'
+import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 
 const FLIGHT_TIME = 0.18 // 웨이스트로 날아가는 애니메이션 시간(초)
 const MAX_SCORE = 1_000_000 // DB check 제약
@@ -192,7 +193,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.arc(STOCK_POS.x + CARD_W / 2 - 4, STOCK_POS.y - CARD_H / 2 + 4, 19, 0, Math.PI * 2)
       c.fill()
       c.fillStyle = '#4E342E'
-      c.font = 'bold 20px sans-serif'
+      c.font = font(20, true)
       c.textAlign = 'center'
       c.textBaseline = 'middle'
       c.fillText(String(state.stock.length), STOCK_POS.x + CARD_W / 2 - 4, STOCK_POS.y - CARD_H / 2 + 5)
@@ -224,34 +225,27 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     }
 
     // HUD (골프식 흰 카드)
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.85
-    c.beginPath()
-    c.roundRect(190, 24, 340, 112, 24)
-    c.fill()
-    c.restore()
-    c.textAlign = 'center'
-    c.textBaseline = 'alphabetic'
-    c.fillStyle = '#8CA08E'
-    c.font = '15px sans-serif'
-    c.fillText(t('hud.score'), 360, 52)
-    c.fillStyle = '#1B5E20'
-    c.font = 'bold 46px sans-serif'
-    c.fillText(state.score.toLocaleString(), 360, 96)
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      sub: true,
+      panelColor: 'rgb(255 255 255 / 0.85)',
+      labelColor: '#8CA08E',
+      valueColor: '#1B5E20',
+    })
     c.fillStyle = '#7C8F7E'
-    c.font = '18px sans-serif'
-    c.fillText(t('tp.stage', { n: state.stage }), 360, 124)
+    c.font = font(18)
+    c.fillText(t('tp.stage', { n: state.stage }), SCORE_PANEL.cx, SCORE_PANEL.subY)
 
     // 스트릭 (2 이상일 때만 강조)
     if (state.streak >= 2) {
       const text = t('tp.streak', { n: state.streak })
-      c.font = 'bold 30px sans-serif'
+      c.font = font(30, true)
       c.lineWidth = 6
       c.strokeStyle = '#FFFFFF'
-      c.strokeText(text, 360, 182)
+      c.strokeText(text, SCORE_PANEL.cx, 204)
       c.fillStyle = '#FF6F00'
-      c.fillText(text, 360, 182)
+      c.fillText(text, SCORE_PANEL.cx, 204)
     }
 
     // 텍스트 없는 첫 판 힌트: 낼 수 있는 카드 위 통통 튀는 화살표

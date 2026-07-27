@@ -5,6 +5,7 @@ import { GAMES } from '@/games/registry'
 import GameCard from '@/shared/GameCard.vue'
 import { t } from '@/shared/i18n'
 import { getLocalBest, popularityRanks, trashedGames } from '@/shared/scores'
+import UiIcon from '@/shared/UiIcon.vue'
 
 // 순위는 홈과 같은 기준으로 매긴다 — 그래서 홈에서 비어 보이는 번호가 여기에 있다
 const ranks = popularityRanks(GAMES)
@@ -18,7 +19,7 @@ const cards = trashedGames(GAMES).map((game) => ({
 <template>
   <div class="trash">
     <header class="trash-header">
-      <RouterLink class="back" to="/">←</RouterLink>
+      <RouterLink class="back" to="/"><UiIcon name="back" /></RouterLink>
       <h1>{{ t('trash.title') }}</h1>
     </header>
 
@@ -48,11 +49,6 @@ const cards = trashedGames(GAMES).map((game) => ({
   align-items: center;
   gap: 12px;
   margin-bottom: 10px;
-}
-
-.back {
-  font-size: 22px;
-  padding: 4px 8px;
 }
 
 .trash-header h1 {

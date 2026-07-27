@@ -2,6 +2,7 @@ import { CanvasStage } from '../stage'
 import { LAYOUT, SIZE, cellPos } from './config'
 import { drawTile } from './tileArt'
 import type { F2State } from './state'
+import { font } from '../ui'
 
 export class F2Renderer {
   private readonly stage: CanvasStage
@@ -119,7 +120,7 @@ export class F2Renderer {
     c.fill()
     c.restore()
     c.fillStyle = '#5D4037'
-    c.font = 'bold 58px sans-serif'
+    c.font = font(58, true)
     c.fillText(state.score.toLocaleString(), 360, 132)
   }
 

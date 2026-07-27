@@ -11,6 +11,7 @@ import {
   type BBState,
   type Piece,
 } from './state'
+import { font } from '../ui'
 
 export interface DragState {
   trayIndex: number
@@ -207,7 +208,7 @@ export class BBRenderer {
   private drawPopups(state: BBState) {
     const { c } = this
     c.textAlign = 'center'
-    c.font = 'bold 40px sans-serif'
+    c.font = font(40, true)
     for (const p of state.popups) {
       const k = p.age / POPUP_DURATION
       c.globalAlpha = 1 - k * k
@@ -232,7 +233,7 @@ export class BBRenderer {
     c.fill()
     c.restore()
     c.fillStyle = '#5D4037'
-    c.font = 'bold 58px sans-serif'
+    c.font = font(58, true)
     c.fillText(state.score.toLocaleString(), 360, 112)
 
     // 연속 클리어 배지 (숫자만 — 언어 무관)
@@ -246,7 +247,7 @@ export class BBRenderer {
       c.roundRect(-46, -30, 92, 60, 30)
       c.fill()
       c.fillStyle = '#FFFFFF'
-      c.font = 'bold 38px sans-serif'
+      c.font = font(38, true)
       c.fillText(`×${state.streak}`, 0, 14)
       c.restore()
     }

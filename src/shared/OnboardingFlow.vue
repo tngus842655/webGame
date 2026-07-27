@@ -2,19 +2,27 @@
 // 첫 실행 온보딩 — 언어 → 기존 회원 유무 → 닉네임 순으로 물어본다.
 // 이 흐름을 마치기 전까지는 계정을 만들지 않는다. 사이트만 열고 나간 사람까지
 // 익명 계정이 쌓이던 문제와, 무작위 '게스트-xxxx' 닉네임이 랭킹에 나가던 문제를 함께 없앤다.
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { LOCALES, locale, setLocale, t, type Locale } from './i18n'
 import { ensureUserId, signInSocial, type SocialProvider } from './auth'
 import { updateMyNickname } from './profile'
 import { flushPendingScores } from './scores'
+import SocialLogo from './SocialLogo.vue'
+import UiIcon from './UiIcon.vue'
 
 const emit = defineEmits<{ done: [] }>()
 
-type Step = 'lang' | 'account' | 'nickname'
+const STEPS = ['lang', 'account', 'nickname'] as const
+type Step = (typeof STEPS)[number]
+
 const step = ref<Step>('lang')
 const nickname = ref('')
 const busy = ref(false)
 const error = ref('')
+
+// 세 걸음 중 어디인지 — 몇 개가 남았는지 보이지 않으면 첫 화면에서 그냥 나간다
+const stepIndex = computed(() => STEPS.indexOf(step.value))
+const nickLength = computed(() => nickname.value.trim().length)
 
 function pickLocale(code: Locale) {
   setLocale(code)
@@ -56,6 +64,13 @@ async function start() {
 <template>
   <div class="onboard">
     <div class="card">
+      <header class="brand">
+        <p class="app-name">{{ t('app.title') }}</p>
+        <div class="dots" aria-hidden="true">
+          <span v-for="(name, i) in STEPS" :key="name" :class="{ done: i <= stepIndex }" />
+        </div>
+      </header>
+
       <!-- 1. 언어 -->
       <template v-if="step === 'lang'">
         <h2>{{ t('onboard.langTitle') }}</h2>
@@ -68,10 +83,11 @@ async function start() {
             :class="{ on: locale === option.code }"
             @click="pickLocale(option.code)"
           >
-            {{ option.label }}
+            <span>{{ option.label }}</span>
+            <UiIcon v-if="locale === option.code" name="check" />
           </button>
         </div>
-        <button type="button" class="primary" @click="step = 'account'">
+        <button type="button" class="btn btn--go" @click="step = 'account'">
           {{ t('onboard.next') }}
         </button>
       </template>
@@ -81,15 +97,17 @@ async function start() {
         <h2>{{ t('onboard.accountTitle') }}</h2>
         <p class="body">{{ t('onboard.accountBody') }}</p>
         <div class="socials">
-          <button type="button" class="social" :disabled="busy" @click="signIn('google')">
-            {{ t('account.google') }}
+          <button type="button" class="social google" :disabled="busy" @click="signIn('google')">
+            <SocialLogo provider="google" />
+            <span>{{ t('account.google') }}</span>
           </button>
-          <button type="button" class="social" :disabled="busy" @click="signIn('kakao')">
-            {{ t('account.kakao') }}
+          <button type="button" class="social kakao" :disabled="busy" @click="signIn('kakao')">
+            <SocialLogo provider="kakao" />
+            <span>{{ t('account.kakao') }}</span>
           </button>
         </div>
         <p v-if="error" class="error">{{ error }}</p>
-        <button type="button" class="ghost" :disabled="busy" @click="step = 'nickname'">
+        <button type="button" class="btn btn--ghost" :disabled="busy" @click="step = 'nickname'">
           {{ t('onboard.accountNo') }}
         </button>
       </template>
@@ -98,20 +116,24 @@ async function start() {
       <template v-else>
         <h2>{{ t('onboard.nickTitle') }}</h2>
         <p class="body">{{ t('settings.nicknameHint') }}</p>
-        <input
-          v-model="nickname"
-          class="nick"
-          type="text"
-          maxlength="12"
-          :placeholder="t('settings.placeholder')"
-          :disabled="busy"
-          @keyup.enter="start"
-        />
+        <div class="nick-field">
+          <input
+            v-model="nickname"
+            class="nick"
+            type="text"
+            maxlength="12"
+            :placeholder="t('settings.placeholder')"
+            :disabled="busy"
+            @keyup.enter="start"
+          />
+          <!-- 2~12자 규칙을 눌러보고 나서야 알게 되던 것을 입력 중에 알려준다 -->
+          <span class="counter" :class="{ short: nickLength < 2 }">{{ nickLength }}/12</span>
+        </div>
         <p v-if="error" class="error">{{ error }}</p>
-        <button type="button" class="primary" :disabled="busy" @click="start">
+        <button type="button" class="btn btn--go" :disabled="busy" @click="start">
           {{ busy ? t('onboard.saving') : t('onboard.start') }}
         </button>
-        <button type="button" class="back" :disabled="busy" @click="step = 'account'">
+        <button type="button" class="btn btn--ghost" :disabled="busy" @click="step = 'account'">
           {{ t('onboard.back') }}
         </button>
       </template>
@@ -127,8 +149,8 @@ async function start() {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  background: #fff8e1;
+  padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+  background: linear-gradient(#fff8e1, #ffe0b2);
 }
 
 .card {
@@ -140,39 +162,95 @@ async function start() {
   text-align: center;
 }
 
+.brand {
+  margin-bottom: 6px;
+}
+
+.app-name {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #c0a695;
+}
+
+/* 세 걸음 중 어디까지 왔는지 */
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: rgb(141 110 99 / 0.22);
+  transition:
+    width 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.dots span.done {
+  width: 20px;
+  background: #43a047;
+}
+
 h2 {
-  font-size: 22px;
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   color: #4e342e;
 }
 
 .body {
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.55;
   color: #8d6e63;
+  word-break: keep-all;
 }
 
 .langs {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  max-height: 46vh;
+  max-height: 44vh;
+  padding: 2px;
   overflow-y: auto;
 }
 
 .lang {
-  padding: 12px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 13px 8px;
   border: 2px solid transparent;
   border-radius: 14px;
   background: #fff;
+  box-shadow: 0 1px 3px rgb(93 64 55 / 0.07);
   color: #5d4037;
   font-size: 15px;
   cursor: pointer;
+  transition: transform 0.1s ease;
 }
 
+.lang:active {
+  transform: scale(0.97);
+}
+
+/* 테두리만 바뀌면 어느 쪽이 골라졌는지 흘긋 봐서는 모른다 */
 .lang.on {
   border-color: #43a047;
   background: #e8f5e9;
-  font-weight: bold;
+  color: #2e7d32;
+  font-weight: 700;
+}
+
+.lang svg {
+  width: 15px;
+  height: 15px;
+  color: #43a047;
 }
 
 .socials {
@@ -182,50 +260,78 @@ h2 {
 
 .social {
   flex: 1;
-  padding: 14px;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 15px 10px;
   border: none;
   border-radius: 16px;
-  background: #fff;
-  color: #5d4037;
   font-size: 15px;
-  font-weight: bold;
+  font-weight: 700;
   cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.social:not(:disabled):active {
+  transform: scale(0.97);
+}
+
+/* 두 서비스의 브랜드 색을 따른다 — 흰 버튼 둘이면 어느 쪽인지 글자를 읽어야 안다 */
+.social.google {
+  background: #fff;
+  box-shadow:
+    inset 0 0 0 1px #747775,
+    0 1px 4px rgb(93 64 55 / 0.08);
+  color: #1f1f1f;
+}
+
+.social.kakao {
+  background: #fee500;
+  box-shadow: 0 1px 4px rgb(93 64 55 / 0.12);
+  color: rgb(25 22 0 / 0.85);
+}
+
+.nick-field {
+  position: relative;
 }
 
 .nick {
-  padding: 14px;
-  border: 2px solid #d7ccc8;
+  width: 100%;
+  padding: 15px 62px 15px 18px;
+  border: 2px solid #e2d8d2;
   border-radius: 16px;
   background: #fff;
   color: #4e342e;
   font-size: 17px;
+  font-weight: 600;
   text-align: center;
 }
 
-.primary {
-  padding: 15px;
-  border: none;
-  border-radius: 16px;
-  background: #43a047;
-  color: #fff;
-  font-size: 17px;
-  font-weight: bold;
-  cursor: pointer;
+.nick:focus {
+  border-color: #66bb6a;
+  outline: none;
 }
 
-.ghost,
-.back {
-  padding: 12px;
-  border: none;
-  border-radius: 16px;
-  background: transparent;
-  color: #8d6e63;
-  font-size: 15px;
-  cursor: pointer;
+.counter {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  font-size: 12px;
+  font-weight: 700;
+  color: #a1887f;
+  pointer-events: none;
+}
+
+.counter.short {
+  color: #d7ccc8;
 }
 
 .error {
   font-size: 13px;
+  font-weight: 600;
   color: #c62828;
 }
 

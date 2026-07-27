@@ -1,5 +1,7 @@
 // 벽돌·공 벡터 아트 — HP 크기에 따라 색이 단계적으로 바뀐다(위험도 인지용)
 
+import { font } from '../ui'
+
 interface Palette {
   base: string
   light: string
@@ -77,7 +79,7 @@ export function drawBrick(
   // HP 숫자
   c.save()
   c.textAlign = 'center'
-  c.font = `bold ${Math.round(h * 0.4)}px sans-serif`
+  c.font = font(Math.round(h * 0.4), true)
   c.lineWidth = 5
   c.strokeStyle = p.dark
   c.strokeText(String(hp), x + w / 2, y + h / 2 + h * 0.11)
@@ -130,7 +132,7 @@ export function drawLauncher(c: CanvasRenderingContext2D, x: number, y: number, 
   // 보유 공 개수 (숫자만)
   c.textAlign = 'center'
   c.fillStyle = '#8D6E63'
-  c.font = 'bold 22px sans-serif'
+  c.font = font(22, true)
   c.fillText(`×${count}`, x, y + 44)
   c.restore()
 }

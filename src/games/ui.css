@@ -1,0 +1,145 @@
+/* 게임 위에 뜨는 팝업(게임오버·클리어 보너스)의 공통 생김새.
+   게임 청크에서만 쓰이므로 전역 main.css가 아니라 여기 둔다. */
+
+/* 캔버스 HUD와 같은 서체를 쓴다 — 값은 ui.ts의 UI_FONT와 맞춰 고칠 것 */
+.gui-scrim {
+  position: absolute;
+  inset: 0;
+  display: none;
+  place-items: center;
+  padding: 24px;
+  background: rgb(26 17 12 / 0.58);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  font-family:
+    ui-rounded, 'SF Pro Rounded', system-ui, 'Apple SD Gothic Neo', 'Malgun Gothic',
+    'Noto Sans KR', sans-serif;
+  color: #3a2e2a;
+}
+
+.gui-scrim.is-open {
+  display: grid;
+  animation: gui-fade 0.18s ease-out;
+}
+
+.gui-sheet {
+  width: min(336px, 100%);
+  padding: 24px 22px 20px;
+  border-radius: 30px;
+  background: linear-gradient(#fffdfa, #fff0da);
+  box-shadow:
+    0 26px 60px rgb(22 11 4 / 0.42),
+    inset 0 2px 0 #fff;
+  text-align: center;
+  animation: gui-rise 0.34s cubic-bezier(0.2, 1.15, 0.4, 1);
+}
+
+/* 신기록 배지 — 빛이 한 번 스쳐 지나간다 */
+.gui-badge {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  padding: 6px 18px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  background: linear-gradient(#ffdc82, #f2a01c);
+  box-shadow:
+    0 4px 12px rgb(228 146 16 / 0.45),
+    inset 0 1px 0 rgb(255 255 255 / 0.75);
+  color: #6b3c02;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.gui-badge::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 -60%;
+  width: 50%;
+  background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.75), transparent);
+  animation: gui-shine 2.4s 0.35s ease-in-out infinite;
+}
+
+.gui-title {
+  font-size: 19px;
+  font-weight: 800;
+  color: #7a6053;
+}
+
+.gui-label {
+  margin-top: 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #bda695;
+}
+
+.gui-score {
+  font-size: 58px;
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  color: #34271e;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 클리어 보너스에서 강조하는 획득 점수 */
+.gui-gain {
+  margin: 6px 0 2px;
+  font-size: 52px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: #ef8f14;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 2px 0 rgb(255 255 255 / 0.9);
+}
+
+.gui-sub {
+  min-height: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #a98d7d;
+}
+
+/* 버튼 생김새는 main.css의 .btn을 그대로 쓰고, 시트 안 간격만 여기서 준다 */
+.gui-sheet .btn {
+  margin-top: 12px;
+}
+
+.gui-sheet .btn--ghost {
+  margin-top: 6px;
+}
+
+@keyframes gui-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes gui-rise {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.94);
+  }
+}
+
+@keyframes gui-shine {
+  0% {
+    transform: translateX(0);
+  }
+  55%,
+  100% {
+    transform: translateX(520%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gui-scrim.is-open,
+  .gui-sheet,
+  .gui-badge::after {
+    animation: none;
+  }
+}

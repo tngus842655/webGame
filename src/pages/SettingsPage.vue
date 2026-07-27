@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import {
   linkedProvider,
   linkSocial,
@@ -11,6 +11,8 @@ import { LOCALES, locale, setLocale, t, type Locale } from '@/shared/i18n'
 import { adoptSocialNickname, fetchMyProfile, updateMyNickname } from '@/shared/profile'
 import { isMusicEnabled, setMusicEnabled } from '@/shared/music'
 import { isSoundEnabled, setSoundEnabled } from '@/shared/sound'
+import SocialLogo from '@/shared/SocialLogo.vue'
+import UiIcon from '@/shared/UiIcon.vue'
 
 const nickname = ref('')
 const loaded = ref(false)
@@ -29,6 +31,7 @@ const failedProvider = ref<SocialProvider | null>(null)
 const switching = ref(false)
 // 소셜 닉네임이 자동 적용됐을 때의 안내 (랭킹에 실명이 노출될 수 있어 반드시 알린다)
 const nicknameNotice = ref('')
+const nickLength = computed(() => nickname.value.trim().length)
 
 // 소셜 화면에서 뒤로가기로 돌아오면 버튼이 '여는 중…'에 잠긴 채 복원된다
 function resetBusy() {
@@ -128,7 +131,7 @@ function onLangChange() {
 <template>
   <div class="settings">
     <header class="settings-header">
-      <RouterLink class="back" to="/">←</RouterLink>
+      <RouterLink class="back" to="/"><UiIcon name="back" /></RouterLink>
       <h1>{{ t('settings.title') }}</h1>
     </header>
 
@@ -136,14 +139,24 @@ function onLangChange() {
       <h2>{{ t('settings.nickname') }}</h2>
       <p v-if="nicknameNotice" class="notice">{{ nicknameNotice }}</p>
       <div class="nickname-row">
-        <input
-          v-model="nickname"
-          type="text"
-          maxlength="12"
-          :placeholder="t('settings.placeholder')"
-          :disabled="!loaded"
-        />
-        <button type="button" :disabled="!loaded || saving" @click="save">
+        <div class="nick-field">
+          <input
+            v-model="nickname"
+            type="text"
+            maxlength="12"
+            :placeholder="t('settings.placeholder')"
+            :disabled="!loaded"
+            @keyup.enter="save"
+          />
+          <!-- 2~12자 규칙을 저장을 눌러보고 나서야 알던 것을 입력 중에 알려준다 (온보딩과 같다) -->
+          <span class="counter" :class="{ short: nickLength < 2 }">{{ nickLength }}/12</span>
+        </div>
+        <button
+          type="button"
+          class="btn btn--go btn--sm"
+          :disabled="!loaded || saving"
+          @click="save"
+        >
           {{ saving ? t('settings.saving') : t('settings.save') }}
         </button>
       </div>
@@ -167,7 +180,7 @@ function onLangChange() {
         <div v-if="existingAccount" class="restore">
           <p>{{ t('account.exists', { provider: providerLabel(existingAccount) }) }}</p>
           <p class="warn">{{ t('account.existsWarn') }}</p>
-          <button type="button" @click="signIn(existingAccount)">
+          <button type="button" class="btn btn--go btn--sm" @click="signIn(existingAccount)">
             {{ busy === existingAccount ? t('account.linking') : t('account.restore') }}
           </button>
         </div>
@@ -181,24 +194,7 @@ function onLangChange() {
             :disabled="!!busy"
             @click="switching ? signIn('google') : link('google')"
           >
-            <svg class="logo" viewBox="0 0 48 48" aria-hidden="true">
-              <path
-                fill="#4285f4"
-                d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"
-              />
-              <path
-                fill="#34a853"
-                d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"
-              />
-              <path
-                fill="#fbbc05"
-                d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z"
-              />
-              <path
-                fill="#ea4335"
-                d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"
-              />
-            </svg>
+            <SocialLogo provider="google" />
             <span>{{ busy === 'google' ? t('account.linking') : t('account.google') }}</span>
           </button>
           <button
@@ -207,12 +203,7 @@ function onLangChange() {
             :disabled="!!busy"
             @click="switching ? signIn('kakao') : link('kakao')"
           >
-            <svg class="logo" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                fill="#3c1e1e"
-                d="M12 3.4c-5.08 0-9.2 3.26-9.2 7.27 0 2.55 1.67 4.79 4.19 6.08-.18.66-.67 2.46-.77 2.84-.12.48.18.47.37.34.15-.1 2.39-1.62 3.36-2.29.66.1 1.35.15 2.05.15 5.08 0 9.2-3.26 9.2-7.12S17.08 3.4 12 3.4z"
-              />
-            </svg>
+            <SocialLogo provider="kakao" />
             <span>{{ busy === 'kakao' ? t('account.linking') : t('account.kakao') }}</span>
           </button>
         </div>
@@ -236,30 +227,34 @@ function onLangChange() {
 
     <section class="section">
       <h2>{{ t('settings.sound') }}</h2>
-      <div class="toggles">
-        <label class="toggle-row">
-          <input v-model="sound" type="checkbox" @change="onSoundChange" />
-          {{ t('settings.soundOn') }}
-        </label>
-        <label class="toggle-row">
-          <input v-model="music" type="checkbox" @change="onMusicChange" />
-          {{ t('settings.musicOn') }}
-        </label>
-      </div>
+      <label class="toggle">
+        <span>{{ t('settings.soundOn') }}</span>
+        <input v-model="sound" type="checkbox" @change="onSoundChange" />
+        <span class="switch"></span>
+      </label>
+      <label class="toggle">
+        <span>{{ t('settings.musicOn') }}</span>
+        <input v-model="music" type="checkbox" @change="onMusicChange" />
+        <span class="switch"></span>
+      </label>
     </section>
 
     <section class="section">
       <h2>{{ t('settings.language') }}</h2>
-      <select v-model="lang" class="lang-select" @change="onLangChange">
-        <option v-for="option in LOCALES" :key="option.code" :value="option.code">
-          {{ option.label }}
-        </option>
-      </select>
+      <!-- 목록은 OS가 띄우게 두고(13개라 자체 목록은 화면을 다 먹는다) 닫힌 모습만 앱에 맞춘다 -->
+      <div class="lang-field">
+        <select v-model="lang" class="lang-select" @change="onLangChange">
+          <option v-for="option in LOCALES" :key="option.code" :value="option.code">
+            {{ option.label }}
+          </option>
+        </select>
+        <UiIcon name="chevron" />
+      </div>
     </section>
 
     <RouterLink class="menu-link" to="/notes">
       <span>{{ t('notes.title') }}</span>
-      <span class="arrow">›</span>
+      <span class="arrow"><UiIcon name="chevron" /></span>
     </RouterLink>
 
     <footer class="settings-footer">
@@ -270,35 +265,37 @@ function onLangChange() {
 
 <style scoped>
 .settings {
-  padding: 20px 16px;
+  padding: 20px 16px 8px;
 }
 
 .settings-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 20px;
-}
-
-.back {
-  font-size: 22px;
-  padding: 4px 8px;
+  margin-bottom: 18px;
 }
 
 .settings-header h1 {
-  font-size: 20px;
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #4e342e;
 }
 
 .section {
   background: #fff;
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 16px;
   margin-bottom: 12px;
+  box-shadow: 0 1px 4px rgb(93 64 55 / 0.06);
 }
 
 .section h2 {
-  font-size: 16px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #b09a8c;
 }
 
 .social-row {
@@ -313,17 +310,16 @@ function onLangChange() {
   align-items: center;
   justify-content: center;
   gap: 9px;
-  padding: 12px;
-  border-radius: 10px;
+  padding: 13px 10px;
+  border-radius: 14px;
   font: inherit;
-  font-weight: bold;
+  font-weight: 700;
   cursor: pointer;
+  transition: transform 0.1s ease;
 }
 
-.logo {
-  width: 18px;
-  height: 18px;
-  flex: none;
+.social:not(:disabled):active {
+  transform: scale(0.97);
 }
 
 .social:disabled {
@@ -332,19 +328,21 @@ function onLangChange() {
 }
 
 .social.google {
-  border: 1px solid #d7ccc8;
+  border: none;
   background: #fff;
-  color: #4a4a4a;
+  box-shadow: inset 0 0 0 1px #747775;
+  color: #1f1f1f;
 }
 
 .social.kakao {
   border: none;
   background: #fee500;
-  color: #3c1e1e;
+  color: rgb(25 22 0 / 0.85);
 }
 
 .linked {
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 600;
   color: #5d4037;
 }
 
@@ -367,13 +365,13 @@ function onLangChange() {
 
 /* 자동으로 정해진 닉네임은 랭킹에 그대로 공개되므로 눈에 띄게 알린다 */
 .section.flagged {
-  border: 1px solid #ffd54f;
+  box-shadow: 0 0 0 2px #ffd54f;
 }
 
 .notice {
   padding: 10px 12px;
   margin-bottom: 10px;
-  border-radius: 10px;
+  border-radius: 12px;
   background: #fff8e1;
   font-size: 13px;
   line-height: 1.5;
@@ -382,9 +380,9 @@ function onLangChange() {
 }
 
 .restore {
-  padding: 12px;
+  padding: 14px;
   margin-bottom: 12px;
-  border-radius: 12px;
+  border-radius: 14px;
   background: #fff8e1;
   font-size: 14px;
   line-height: 1.45;
@@ -396,25 +394,40 @@ function onLangChange() {
   color: #c62828;
 }
 
-.restore button {
-  margin-top: 10px;
-  padding: 9px 16px;
-  border: none;
-  border-radius: 9px;
-  background: #43a047;
-  color: #fff;
-  font: inherit;
-  font-weight: bold;
-  cursor: pointer;
+.restore .btn {
+  height: 42px;
+  margin-top: 12px;
+}
+
+/* 목록은 OS가 그리지만 닫힌 모습은 앱에 맞춘다 */
+.lang-field {
+  position: relative;
 }
 
 .lang-select {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #d7ccc8;
-  border-radius: 10px;
-  font: inherit;
+  padding: 14px 42px 14px 15px;
+  border: none;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 1.5px #e2d8d2;
   background: #fff;
+  font: inherit;
+  font-weight: 600;
+  color: #4e342e;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.lang-field svg {
+  position: absolute;
+  top: 50%;
+  right: 15px;
+  width: 15px;
+  height: 15px;
+  color: #bcaaa4;
+  transform: translateY(-50%) rotate(90deg);
+  pointer-events: none;
 }
 
 .nickname-row {
@@ -422,47 +435,101 @@ function onLangChange() {
   gap: 8px;
 }
 
-.nickname-row input {
+.nick-field {
+  position: relative;
   flex: 1;
   min-width: 0;
-  padding: 10px 12px;
-  border: 1px solid #d7ccc8;
-  border-radius: 10px;
-  font: inherit;
 }
 
-.nickname-row button {
-  padding: 10px 18px;
+.nick-field input {
+  width: 100%;
+  padding: 13px 54px 13px 15px;
   border: none;
-  border-radius: 10px;
-  background: #43a047;
-  color: #fff;
-  font-weight: bold;
+  border-radius: 14px;
+  box-shadow: inset 0 0 0 1.5px #e2d8d2;
+  font: inherit;
+  font-weight: 600;
+  color: #4e342e;
+}
+
+.nick-field input:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px #66bb6a;
+}
+
+.counter {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  font-size: 12px;
+  font-weight: 700;
+  color: #a1887f;
+  pointer-events: none;
+}
+
+.counter.short {
+  color: #d7ccc8;
+}
+
+/* 기본 체크박스를 스위치로 — 켜짐/꺼짐이 한눈에 보이고 과녁도 줄 전체가 된다 */
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 2px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #5d4037;
   cursor: pointer;
 }
 
-.nickname-row button:disabled {
-  background: #d7ccc8;
-  cursor: default;
+.toggle + .toggle {
+  border-top: 1px solid #f5efeb;
 }
 
-/* 두 항목이 짧아 한 줄에 나란히 놓는다 — 글자가 길어지는 언어에서는 아래로 접힌다 */
-.toggles {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 24px;
+.toggle input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
 }
 
-.toggle-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.switch {
+  position: relative;
+  flex: none;
+  width: 48px;
+  height: 28px;
+  border-radius: 999px;
+  background: #ded4cf;
+  transition: background-color 0.18s ease;
 }
 
-.toggle-row input {
-  width: 20px;
-  height: 20px;
-  accent-color: #43a047;
+.switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(62 39 35 / 0.3);
+  transition: transform 0.18s ease;
+}
+
+.toggle input:checked ~ .switch {
+  background: #43a047;
+}
+
+.toggle input:checked ~ .switch::after {
+  transform: translateX(20px);
+}
+
+.toggle input:focus-visible ~ .switch {
+  outline: 2px solid #66bb6a;
+  outline-offset: 2px;
 }
 
 .menu-link {
@@ -471,32 +538,44 @@ function onLangChange() {
   justify-content: space-between;
   padding: 16px;
   background: #fff;
-  border-radius: 16px;
+  border-radius: 18px;
   margin-bottom: 12px;
-  font-size: 16px;
-  font-weight: bold;
+  box-shadow: 0 1px 4px rgb(93 64 55 / 0.06);
+  font-size: 15px;
+  font-weight: 700;
+  color: #4e342e;
+}
+
+.menu-link:active {
+  background: #fffaf2;
 }
 
 .menu-link .arrow {
-  color: #bcaaa4;
-  font-size: 20px;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  color: #cbbcb5;
 }
 
 .hint {
-  margin-top: 8px;
+  margin-top: 10px;
   font-size: 13px;
+  line-height: 1.45;
   color: #bcaaa4;
+  word-break: keep-all;
 }
 
 .message {
-  padding: 4px 2px;
+  padding: 6px 2px 0;
   font-size: 14px;
+  font-weight: 600;
   color: #5d4037;
 }
 
 .settings-footer {
-  margin-top: 20px;
-  padding-bottom: 12px;
+  margin-top: 18px;
+  padding-bottom: 16px;
   text-align: center;
 }
 

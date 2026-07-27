@@ -90,6 +90,19 @@ export async function fetchMyStats(): Promise<MyGameStat[]> {
   return (data ?? []) as MyGameStat[]
 }
 
+// 서버가 아는 최고점을 로컬 캐시에 되먹인다.
+//
+// localStorage의 최고점은 '이 기기에서 낸 점수'만 쌓인다. 다른 기기에서 놀았거나
+// 저장소를 지웠다가 소셜 로그인으로 돌아오면 서버 기록이 더 높은데, 되먹이는 곳이
+// 없어서 화면마다 다른 숫자가 나왔다 — 허브·랭킹은 서버 값, 플레이 화면 최고 기록
+// 칩과 게임오버 판정은 로컬 값. 그래서 이미 1,103점이 있는데도 400점에 '신기록'
+// 배지가 붙는 일이 생긴다.
+//
+// 올리기만 한다 — 아직 제출하지 못한 점수(pending)가 로컬에 남아 있으면 그쪽이 더 높다.
+export function syncLocalBests(stats: readonly MyGameStat[]): void {
+  for (const stat of stats) updateLocalBest(stat.game_slug, clampScore(stat.best_score))
+}
+
 const POPULARITY_KEY = 'webgame:popularity'
 
 // 인기도(최근 7일 플레이 시간 × sqrt(이용자 수))는 서버에서 받아오므로 첫 렌더에 쓸 수 없다.

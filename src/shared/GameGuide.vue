@@ -4,6 +4,7 @@
 import { computed } from 'vue'
 import { guideFor } from './guides'
 import { t } from './i18n'
+import UiIcon from './UiIcon.vue'
 
 const props = defineProps<{ slug: string; title: string }>()
 defineEmits<{ close: [] }>()
@@ -20,20 +21,20 @@ const guide = computed(() => guideFor(props.slug))
 
       <dl v-if="guide">
         <div class="row">
-          <dt><span aria-hidden="true">🎯</span> {{ t('guide.goal') }}</dt>
+          <dt><UiIcon name="target" /> {{ t('guide.goal') }}</dt>
           <dd>{{ guide.goal }}</dd>
         </div>
         <div class="row">
-          <dt><span aria-hidden="true">👆</span> {{ t('guide.how') }}</dt>
+          <dt><UiIcon name="tap" /> {{ t('guide.how') }}</dt>
           <dd>{{ guide.how }}</dd>
         </div>
         <div class="row">
-          <dt><span aria-hidden="true">⭐</span> {{ t('guide.score') }}</dt>
+          <dt><UiIcon name="star" /> {{ t('guide.score') }}</dt>
           <dd>{{ guide.score }}</dd>
         </div>
       </dl>
 
-      <button type="button" class="close" @click="$emit('close')">{{ t('guide.close') }}</button>
+      <button type="button" class="close btn btn--go" @click="$emit('close')">{{ t('guide.close') }}</button>
     </div>
   </div>
 </template>
@@ -73,10 +74,18 @@ const guide = computed(() => guideFor(props.slug))
 }
 
 dt {
-  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
   font-size: 13px;
-  font-weight: bold;
+  font-weight: 700;
   color: #a1887f;
+}
+
+dt svg {
+  width: 15px;
+  height: 15px;
 }
 
 dd {
@@ -85,15 +94,6 @@ dd {
 }
 
 .close {
-  width: 100%;
   margin-top: 22px;
-  padding: 13px;
-  border: none;
-  border-radius: 16px;
-  background: #43a047;
-  color: #fff;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
 }
 </style>

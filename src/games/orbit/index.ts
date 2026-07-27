@@ -6,6 +6,8 @@ import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import { createState, fire, update, CENTER_X, CENTER_Y, CORE_R, SPAWN_R } from './state'
+import { SCORE_PANEL, drawScorePanel, font } from '../ui'
+import { drawIconRow } from '../icons'
 
 interface Particle {
   x: number
@@ -216,30 +218,20 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // 스트릭
     if (state.streak >= 3) {
-      c.font = 'bold 34px sans-serif'
+      c.font = font(34, true)
       c.textAlign = 'center'
       c.fillStyle = '#FFD54F'
       c.fillText(`x${state.streak}`, CENTER_X, CENTER_Y - 110)
     }
 
     // HUD: 점수 카드 + 생명
-    c.textBaseline = 'alphabetic'
-    c.textAlign = 'center'
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.1
-    c.beginPath()
-    c.roundRect(160, 24, 400, 130, 24)
-    c.fill()
-    c.restore()
-    c.fillStyle = 'rgb(255 255 255 / 0.5)'
-    c.font = '18px sans-serif'
-    c.fillText(t('hud.score'), 360, 56)
-    c.fillStyle = '#FFFFFF'
-    c.font = 'bold 48px sans-serif'
-    c.fillText(state.score.toLocaleString(), 360, 112)
-    c.font = 'bold 28px sans-serif'
-    c.fillText('❤'.repeat(Math.max(0, state.lives)) || '', 360, 146)
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      sub: true,
+    })
+    const lives = Math.max(0, state.lives)
+    drawIconRow(c, 'heart', SCORE_PANEL.cx, SCORE_PANEL.subY - 6, 13, lives, Math.max(3, lives))
   }
 
   shell.addCleanup(detachInput)

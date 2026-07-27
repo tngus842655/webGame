@@ -16,8 +16,10 @@ import {
   UNIT_COST,
   type Unit,
 } from './state'
+import { drawScorePanel, font } from '../ui'
+import { type IconName, drawIcon, drawIconRow, drawIconValue } from '../icons'
 
-const ICONS = ['🗡️', '🏹', '🛡️', '🔮']
+const SPECIES_ICONS: IconName[] = ['sword', 'bow', 'shield', 'orb']
 const COLORS = ['#E57373', '#81C784', '#64B5F6', '#BA68C8']
 const NAME_KEYS: TranslationKey[] = ['ac.s1', 'ac.s2', 'ac.s3', 'ac.s4']
 
@@ -182,20 +184,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.beginPath()
     c.arc(x, y, r, 0, Math.PI * 2)
     c.fill()
-    c.font = `${Math.round(r * 1.05)}px sans-serif`
-    c.textAlign = 'center'
-    c.textBaseline = 'middle'
-    c.fillText(ICONS[unit.species], x, y + 2)
-    // 레벨 별
-    c.font = `${Math.round(r * 0.42)}px sans-serif`
-    c.fillText('⭐'.repeat(unit.level), x, y - r - 12)
+    // 말 색이 파스텔이라 종족 아이콘은 흰색으로 얹어야 읽힌다
+    drawIcon(c, SPECIES_ICONS[unit.species], x, y, r * 0.62, { color: '#FFFFFF' })
+    drawIconRow(c, 'star', x, y - r - 14, r * 0.2, unit.level)
     if (showHp) {
       c.fillStyle = 'rgb(0 0 0 / 0.45)'
       c.fillRect(x - r, y + r + 6, r * 2, 8)
       c.fillStyle = '#66BB6A'
       c.fillRect(x - r, y + r + 6, (r * 2 * Math.max(0, unit.hp)) / unit.maxHp, 8)
     }
-    c.textBaseline = 'alphabetic'
     c.restore()
   }
 
@@ -203,28 +200,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const c = stage.begin('#263238', '#37474F')
 
     // HUD: 점수 + 라운드 + 체력 + 골드
-    c.textAlign = 'center'
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.1
-    c.beginPath()
-    c.roundRect(160, 20, 400, 118, 22)
-    c.fill()
-    c.restore()
-    c.fillStyle = 'rgb(255 255 255 / 0.5)'
-    c.font = '17px sans-serif'
-    c.fillText(t('hud.score'), 360, 48)
-    c.fillStyle = '#FFFFFF'
-    c.font = 'bold 44px sans-serif'
-    c.fillText(state.score.toLocaleString(), 360, 100)
-    c.font = 'bold 28px sans-serif'
+    drawScorePanel(c, { label: t('hud.score'), value: state.score.toLocaleString() })
+    c.font = font(28, true)
     c.textAlign = 'left'
+    c.fillStyle = '#FFFFFF'
     c.fillText(t('ac.round', { n: state.round }), 36, 190)
-    c.textAlign = 'right'
     c.fillStyle = '#EF9A9A'
-    c.fillText(`❤ ${state.hp}`, 560, 190)
+    drawIconValue(c, 'heart', String(state.hp), 560, 180, 15, 'right')
     c.fillStyle = '#FFD54F'
-    c.fillText(`💰 ${state.gold}`, 690, 190)
+    drawIconValue(c, 'coin', String(state.gold), 690, 180, 15, 'right')
     c.textAlign = 'center'
 
     if (state.phase === 'prep') {
@@ -257,14 +241,14 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.roundRect(FIGHT_BTN.x, FIGHT_BTN.y, FIGHT_BTN.w, FIGHT_BTN.h, 24)
       c.fill()
       c.fillStyle = '#FFFFFF'
-      c.font = 'bold 34px sans-serif'
+      c.font = font(34, true)
       c.textBaseline = 'middle'
       c.fillText(t('ac.fight'), 360, FIGHT_BTN.y + FIGHT_BTN.h / 2 + 1)
       c.textBaseline = 'alphabetic'
 
       // 상점
       c.fillStyle = 'rgb(255 255 255 / 0.5)'
-      c.font = '22px sans-serif'
+      c.font = font(22)
       c.fillText(t('ac.shop'), 360, SHOP_Y - 20)
       for (let i = 0; i < 3; i++) {
         const x = 40 + i * (SHOP_W + 20)
@@ -280,14 +264,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
           c.beginPath()
           c.arc(x + SHOP_W / 2, SHOP_Y + 78, 44, 0, Math.PI * 2)
           c.fill()
-          c.font = '46px sans-serif'
-          c.fillText(ICONS[species], x + SHOP_W / 2, SHOP_Y + 94)
+          drawIcon(c, SPECIES_ICONS[species], x + SHOP_W / 2, SHOP_Y + 78, 28, { color: '#FFFFFF' })
           c.fillStyle = '#FFFFFF'
-          c.font = 'bold 24px sans-serif'
+          c.font = font(24, true)
           c.fillText(t(NAME_KEYS[species]), x + SHOP_W / 2, SHOP_Y + 156)
           c.fillStyle = '#FFD54F'
-          c.font = 'bold 22px sans-serif'
-          c.fillText(`💰 ${UNIT_COST}`, x + SHOP_W / 2, SHOP_Y + 190)
+          c.font = font(22, true)
+          drawIconValue(c, 'coin', String(UNIT_COST), x + SHOP_W / 2, SHOP_Y + 182, 12)
         }
         c.restore()
       }
@@ -303,15 +286,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       }
       lineup(state.mine, 200, true)
       lineup(state.foes, 520, false)
-      c.fillStyle = 'rgb(255 255 255 / 0.25)'
-      c.font = 'bold 60px sans-serif'
-      c.fillText('⚔', 360, 560)
+      drawIcon(c, 'sword', 360, 545, 30, { alpha: 0.3 })
 
       if (state.phase === 'result') {
         c.save()
         c.fillStyle = 'rgb(0 0 0 / 0.55)'
         c.fillRect(0, 560, 720, 150)
-        c.font = 'bold 52px sans-serif'
+        c.font = font(52, true)
         c.textBaseline = 'middle'
         if (state.won) {
           c.fillStyle = '#FFD54F'

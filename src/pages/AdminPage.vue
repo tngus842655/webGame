@@ -13,6 +13,7 @@ import {
   type GameFlag,
 } from '@/shared/admin'
 import { popularityRanks } from '@/shared/scores'
+import UiIcon from '@/shared/UiIcon.vue'
 
 interface Row {
   slug: string
@@ -115,14 +116,14 @@ async function moveToTrash() {
 <template>
   <div class="admin">
     <header class="admin-header">
-      <RouterLink class="back" to="/">←</RouterLink>
+      <RouterLink class="back" to="/"><UiIcon name="back" /></RouterLink>
       <h1>{{ t('admin.title') }}</h1>
       <RouterLink class="stats-link" to="/stats">{{ t('stats.title') }}</RouterLink>
     </header>
 
     <RouterLink class="menu-link" to="/admin/trash">
-      <span>🗑️ {{ t('admin.trash') }}</span>
-      <span class="count">{{ trashedCount > 0 ? trashedCount : '' }} ›</span>
+      <span class="trash-label"><UiIcon name="trash" />{{ t('admin.trash') }}</span>
+      <span class="count">{{ trashedCount > 0 ? trashedCount : '' }}<UiIcon name="chevron" /></span>
     </RouterLink>
 
     <p class="hint">{{ t('admin.hint') }}</p>
@@ -190,11 +191,6 @@ async function moveToTrash() {
   margin-bottom: 12px;
 }
 
-.back {
-  font-size: 22px;
-  padding: 4px 8px;
-}
-
 .admin-header h1 {
   flex: 1;
   font-size: 20px;
@@ -216,6 +212,28 @@ async function moveToTrash() {
   border-radius: 14px;
   font-size: 15px;
   font-weight: bold;
+}
+
+.trash-label,
+.menu-link .count {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.menu-link .count {
+  gap: 2px;
+  color: #bcaaa4;
+}
+
+.trash-label svg {
+  width: 18px;
+  height: 18px;
+}
+
+.menu-link .count svg {
+  width: 16px;
+  height: 16px;
 }
 
 .count {
@@ -325,7 +343,6 @@ async function moveToTrash() {
   color: #2e7d32;
   font-weight: bold;
 }
-
 
 .dim {
   position: fixed;

@@ -48,3 +48,102 @@ a {
 button {
   font: inherit;
 }
+
+/* 좌상단 뒤로가기 — 아홉 개 화면이 같은 것을 쓴다.
+   글리프 하나(←)일 때는 손가락에 비해 과녁이 작았다. */
+.back {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  /* 아이콘 좌우 여백만큼 당겨 옆의 제목과 왼쪽 선을 맞춘다 */
+  margin-left: -9px;
+  border-radius: 50%;
+  color: #8d6e63;
+  transition: background-color 0.12s ease;
+}
+
+.back:active {
+  background: rgb(93 64 55 / 0.1);
+}
+
+.back svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* 눌리면 아래 턱이 줄면서 실제로 내려앉는 버튼.
+   게임 팝업·설명 팝업·온보딩이 같은 것을 쓴다. */
+.btn {
+  display: block;
+  width: 100%;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 18px;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #fff;
+  cursor: pointer;
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.08s ease;
+}
+
+.btn:active {
+  transform: translateY(3px);
+}
+
+/* 앞으로 나아가는 쪽 */
+.btn--go {
+  background: linear-gradient(#67d16c, #3ea346);
+  box-shadow: 0 4px 0 #2b7a33;
+  text-shadow: 0 1px 0 rgb(20 80 26 / 0.35);
+}
+
+.btn--go:active {
+  box-shadow: 0 1px 0 #2b7a33;
+}
+
+/* 다시 하는 쪽 */
+.btn--amber {
+  background: linear-gradient(#ffb85c, #f28f37);
+  box-shadow: 0 4px 0 #c66d20;
+  text-shadow: 0 1px 0 rgb(140 68 8 / 0.32);
+}
+
+.btn--amber:active {
+  box-shadow: 0 1px 0 #c66d20;
+}
+
+/* 입력칸 옆이나 안내 상자 안처럼 줄 속에 놓이는 작은 버튼 */
+.btn--sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  padding: 0 18px;
+  border-radius: 14px;
+  font-size: 15px;
+}
+
+.btn--ghost {
+  padding: 11px;
+  background: none;
+  box-shadow: none;
+  color: #9c8175;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.btn--ghost:active {
+  transform: none;
+  opacity: 0.55;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  transform: none;
+  cursor: default;
+}

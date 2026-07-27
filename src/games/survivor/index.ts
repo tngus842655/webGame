@@ -14,6 +14,7 @@ import {
   scoreOf,
   update,
 } from './state'
+import { drawScorePanel, font } from '../ui'
 
 function drawHeart(c: CanvasRenderingContext2D, x: number, y: number, r: number, filled: boolean) {
   c.save()
@@ -234,21 +235,16 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     drawHero(c, p.x, p.y, PLAYER_R, state.joystick?.dx ?? 0)
     c.restore()
 
-    // HUD
-    c.textAlign = 'center'
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.72
-    c.beginPath()
-    c.roundRect(258, 22, 204, 74, 22)
-    c.fill()
-    c.restore()
-    c.fillStyle = '#5D4037'
-    c.font = 'bold 42px sans-serif'
-    c.fillText(t('sv.time', { n: Math.floor(state.time) }), 360, 74)
-    c.font = '20px sans-serif'
-    c.fillStyle = '#BCAAA4'
-    c.fillText(t('sv.kills', { k: state.kills, lv: state.level }), 360, 118)
+    // HUD — 판(ARENA.top=150) 위에 얹혀야 해서 좁고 짧은 판을 쓴다.
+    // 이 게임의 성적은 버틴 시간이라 큰 숫자 자리에 시간이 온다.
+    drawScorePanel(c, {
+      label: t('sv.kills', { k: state.kills, lv: state.level }),
+      value: t('sv.time', { n: Math.floor(state.time) }),
+      compact: true,
+      panelColor: 'rgb(255 255 255 / 0.72)',
+      labelColor: '#BCAAA4',
+      valueColor: '#5D4037',
+    })
 
     // 체력 하트
     for (let i = 0; i < p.maxHp; i++) {
@@ -298,7 +294,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fillRect(0, 0, 720, 1280)
       c.textAlign = 'center'
       c.fillStyle = '#FFFFFF'
-      c.font = 'bold 40px sans-serif'
+      c.font = font(40, true)
       c.fillText(t('sv.levelup'), 360, 352)
       for (let i = 0; i < CARD_RECTS.length && i < state.choices.length; i++) {
         const r = CARD_RECTS[i]
@@ -319,10 +315,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         drawUpgradeIcon(c, choice.key, r.x + 62, r.y + r.h / 2)
         c.textAlign = 'left'
         c.fillStyle = '#5D4037'
-        c.font = 'bold 32px sans-serif'
+        c.font = font(32, true)
         c.fillText(t(choice.label), r.x + 116, r.y + 56)
         c.fillStyle = '#8D6E63'
-        c.font = '21px sans-serif'
+        c.font = font(21)
         c.fillText(t(choice.desc), r.x + 116, r.y + 94)
         c.textAlign = 'center'
       }

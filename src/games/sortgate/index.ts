@@ -21,6 +21,8 @@ import {
   type ShapeKind,
   type Side,
 } from './state'
+import { SCORE_PANEL, drawScorePanel } from '../ui'
+import { drawIconRow } from '../icons'
 
 const TAP_SLOP = 40 // 이보다 적게 움직이면 스와이프가 아니라 좌우 절반 탭으로 본다
 
@@ -266,22 +268,12 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     }
 
     // HUD: 점수 + 목숨
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.1
-    c.beginPath()
-    c.roundRect(160, 24, 400, 130, 24)
-    c.fill()
-    c.restore()
-    c.textAlign = 'center'
-    c.fillStyle = 'rgb(255 255 255 / 0.5)'
-    c.font = '18px sans-serif'
-    c.fillText(t('hud.score'), 360, 56)
-    c.fillStyle = '#FFFFFF'
-    c.font = 'bold 48px sans-serif'
-    c.fillText(state.score.toLocaleString(), 360, 112)
-    c.font = 'bold 26px sans-serif'
-    c.fillText('❤'.repeat(state.lives), 360, 144)
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      sub: true,
+    })
+    drawIconRow(c, 'heart', SCORE_PANEL.cx, SCORE_PANEL.subY - 6, 13, state.lives, Math.max(3, state.lives))
   }
 
   shell.addCleanup(detachInput)

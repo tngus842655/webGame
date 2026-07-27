@@ -19,6 +19,8 @@ import {
   update,
   type Dir,
 } from './state'
+import { font } from '../ui'
+import { drawIconValue } from '../icons'
 
 const SWIPE_THRESHOLD = 40
 const UNDO_BTN = { x: 196, y: 1112, w: 328, h: 88 } as const
@@ -231,25 +233,24 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     // HUD
     c.textAlign = 'center'
     c.fillStyle = '#FFFFFF'
-    c.font = 'bold 44px sans-serif'
+    c.font = font(44, true)
     c.fillText(state.score.toLocaleString(), 360, 66)
-    c.font = '22px sans-serif'
+    c.font = font(22)
     c.fillStyle = 'rgb(255 255 255 / 0.6)'
     c.fillText(t('ic.level', { n: state.level }), 360, 104)
 
     // 남은 이동이 곧 수명이라 크게 보여 준다
     c.textAlign = 'left'
     c.fillStyle = state.moves <= 3 ? '#FF8A65' : '#FFFFFF'
-    c.font = 'bold 30px sans-serif'
+    c.font = font(30, true)
     c.fillText(t('ic.moves', { n: state.moves }), 30, 200)
-    c.textAlign = 'right'
     c.fillStyle = '#FFCA28'
-    c.fillText(`★ ${state.starsLeft}`, 690, 200)
+    drawIconValue(c, 'star', String(state.starsLeft), 690, 190, 15, 'right')
     c.textAlign = 'center'
 
     if (state.level === 1 && state.history.length === 0) {
       c.fillStyle = 'rgb(255 255 255 / 0.5)'
-      c.font = '22px sans-serif'
+      c.font = font(22)
       c.fillText(t('ic.hint'), 360, 148)
     }
 
@@ -262,7 +263,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.roundRect(UNDO_BTN.x, UNDO_BTN.y, UNDO_BTN.w, UNDO_BTN.h, 22)
       c.fill()
       c.fillStyle = '#FFFFFF'
-      c.font = 'bold 25px sans-serif'
+      c.font = font(25, true)
       c.textBaseline = 'middle'
       c.fillText(
         useAd ? t('ic.undoAd') : t('ic.undo', { n: state.freeUndo }),
@@ -278,7 +279,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fillStyle = 'rgb(0 0 0 / 0.6)'
       c.fillRect(0, 600, 720, 120)
       c.fillStyle = '#FFD54F'
-      c.font = 'bold 40px sans-serif'
+      c.font = font(40, true)
       c.fillText(t('ic.clear', { n: state.clearGain }), 360, 676)
       c.restore()
     }

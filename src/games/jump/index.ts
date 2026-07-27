@@ -15,6 +15,8 @@ import {
   PLAYER_HALF,
   type Platform,
 } from './state'
+import { SCORE_PANEL, drawScorePanel, font } from '../ui'
+import { drawIconValue } from '../icons'
 
 // 고도에 따라 하늘색이 어두워진다
 const SKY_LOW = [142, 208, 245]
@@ -212,31 +214,25 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     }
 
     // HUD: 최고 높이 + 현재 높이 + 남은 시간
-    c.textBaseline = 'alphabetic'
-    c.textAlign = 'center'
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.92
-    c.beginPath()
-    c.roundRect(160, 24, 400, 140, 24)
-    c.fill()
-    c.restore()
-    c.fillStyle = '#90A4AE'
-    c.font = '18px sans-serif'
-    c.fillText(t('hud.score'), 360, 56)
-    c.fillStyle = '#37474F'
-    c.font = 'bold 48px sans-serif'
-    c.fillText(`${meters(state.maxHeight)}m`, 360, 106)
-    c.font = '24px sans-serif'
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: `${meters(state.maxHeight)}m`,
+      sub: true,
+      panelColor: 'rgb(255 255 255 / 0.92)',
+      labelColor: '#90A4AE',
+      valueColor: '#37474F',
+    })
+    c.font = font(24)
     c.fillStyle = '#78909C'
     c.textAlign = 'left'
-    c.fillText(`${meters(state.y)}m`, 192, 146)
+    c.fillText(`${meters(state.y)}m`, SCORE_PANEL.left, SCORE_PANEL.subY)
     const low = state.timeLeft < 30
     c.fillStyle = low ? '#E53935' : '#78909C'
-    c.textAlign = 'right'
     const mm = Math.floor(state.timeLeft / 60)
     const ss = String(Math.floor(state.timeLeft % 60)).padStart(2, '0')
-    c.fillText(`⏱ ${mm}:${ss}`, 528, 146)
+    drawIconValue(c, 'timer', `${mm}:${ss}`, SCORE_PANEL.right, SCORE_PANEL.subY - 8, 13, 'right', {
+      color: low ? '#E53935' : '#78909C',
+    })
     c.textAlign = 'center'
   }
 

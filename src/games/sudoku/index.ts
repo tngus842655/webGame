@@ -13,6 +13,8 @@ import {
   placeDigit,
   recordDailyClear,
 } from './state'
+import { SCORE_PANEL, drawScorePanel, font } from '../ui'
+import { drawIcon } from '../icons'
 
 // 화면 배치 (논리 720×1280)
 const GRID_X = 36
@@ -20,29 +22,6 @@ const GRID_Y = 240
 const CELL = 72
 const GRID_W = CELL * 9
 const PAD = { y: 952, h: 116, w: 68, gap: 4, x: 38 } as const
-
-// 하트 그리기 (cx, cy 중심, s = 반너비)
-function drawHeart(
-  c: CanvasRenderingContext2D,
-  cx: number,
-  cy: number,
-  s: number,
-  on: boolean,
-  alpha = 1,
-) {
-  c.save()
-  c.globalAlpha = alpha
-  c.fillStyle = on ? '#E53935' : '#B2DFDB'
-  const top = cy - s * 0.75
-  c.beginPath()
-  c.moveTo(cx, top + s * 0.45)
-  c.bezierCurveTo(cx, top, cx - s, top, cx - s, top + s * 0.45)
-  c.bezierCurveTo(cx - s, top + s * 0.95, cx, top + s * 1.25, cx, top + s * 1.55)
-  c.bezierCurveTo(cx, top + s * 1.25, cx + s, top + s * 0.95, cx + s, top + s * 0.45)
-  c.bezierCurveTo(cx + s, top, cx, top, cx, top + s * 0.45)
-  c.fill()
-  c.restore()
-}
 
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
@@ -172,43 +151,40 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const selDigit = sel >= 0 ? state.cells[sel] : 0
 
     // HUD 카드: 점수 + 퍼즐 종류 + 하트
-    c.textBaseline = 'alphabetic'
-    c.textAlign = 'center'
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.94
-    c.beginPath()
-    c.roundRect(120, 24, 480, 148, 24)
-    c.fill()
-    c.restore()
-    c.fillStyle = '#80CBC4'
-    c.font = '18px sans-serif'
-    c.fillText(t('hud.score'), 360, 56)
-    c.fillStyle = '#004D40'
-    c.font = 'bold 50px sans-serif'
-    c.fillText(state.score.toLocaleString(), 360, 110)
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      sub: true,
+      panelColor: 'rgb(255 255 255 / 0.94)',
+      labelColor: '#80CBC4',
+      valueColor: '#004D40',
+    })
     c.fillStyle = '#00796B'
-    c.font = '24px sans-serif'
+    c.font = font(24)
     c.textAlign = 'left'
     const now = new Date()
     c.fillText(
       state.daily
         ? t('sd.daily', { date: `${now.getMonth() + 1}/${now.getDate()}` })
         : t('sd.practice', { n: state.level }),
-      152,
-      150,
+      SCORE_PANEL.left,
+      SCORE_PANEL.subY,
     )
     c.textAlign = 'center'
-    const heartX = (i: number) => 470 + i * 46
-    for (let i = 0; i < 3; i++) drawHeart(c, heartX(i), 140, 16, i < state.lives)
+    const heartX = (i: number) => 462 + i * 42
+    for (let i = 0; i < 3; i++) {
+      drawIcon(c, 'heart', heartX(i), SCORE_PANEL.subY - 8, 14, { dim: i >= state.lives })
+    }
     if (lostHeart) {
       const k = lostHeart.age / 0.6
-      drawHeart(c, heartX(lostHeart.index), 140 - k * 28, 16, true, 1 - k)
+      drawIcon(c, 'heart', heartX(lostHeart.index), SCORE_PANEL.subY - 8 - k * 28, 14, {
+        alpha: 1 - k,
+      })
     }
 
     // 스트릭·경과 시간
     c.fillStyle = '#FFFFFF'
-    c.font = 'bold 26px sans-serif'
+    c.font = font(26, true)
     c.textAlign = 'left'
     c.fillText(t('sd.streak', { n: state.streak }), GRID_X + 4, 216)
     const mm = Math.floor(state.elapsed / 60)
@@ -251,7 +227,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     }
 
     // 숫자
-    c.font = 'bold 44px sans-serif'
+    c.font = font(44, true)
     c.textAlign = 'center'
     c.textBaseline = 'middle'
     for (let i = 0; i < 81; i++) {
@@ -282,7 +258,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (popup) {
       c.save()
       c.globalAlpha = Math.min(1, 1.2 - popup.age)
-      c.font = 'bold 64px sans-serif'
+      c.font = font(64, true)
       c.textAlign = 'center'
       c.lineWidth = 8
       c.strokeStyle = '#FFFFFF'
@@ -307,11 +283,11 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fill()
       c.stroke()
       c.fillStyle = '#00695C'
-      c.font = 'bold 44px sans-serif'
+      c.font = font(44, true)
       c.textAlign = 'center'
       c.fillText(String(d), x + PAD.w / 2, PAD.y + 58)
       c.fillStyle = '#80CBC4'
-      c.font = 'bold 22px sans-serif'
+      c.font = font(22, true)
       c.fillText(String(left), x + PAD.w / 2, PAD.y + 94)
       c.restore()
     }

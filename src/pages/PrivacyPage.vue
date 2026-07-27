@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { t } from '@/shared/i18n'
+import UiIcon from '@/shared/UiIcon.vue'
 
 // 법적 고지 문서라 임의 번역 시 효력 문제가 생길 수 있어 운영 언어(한국어)로만 제공한다.
 // 문의처는 운영자 연락 이메일과 일치시킬 것.
@@ -9,7 +10,7 @@ const CONTACT_EMAIL = 'tngus842655@gmail.com'
 <template>
   <div class="privacy">
     <header class="privacy-header">
-      <RouterLink class="back" to="/settings">←</RouterLink>
+      <RouterLink class="back" to="/settings"><UiIcon name="back" /></RouterLink>
       <div>
         <h1>{{ t('privacy.title') }}</h1>
         <p class="effective">시행일자 2026년 7월 25일</p>
@@ -80,11 +81,6 @@ const CONTACT_EMAIL = 'tngus842655@gmail.com'
   align-items: flex-start;
   gap: 12px;
   margin-bottom: 18px;
-}
-
-.back {
-  font-size: 22px;
-  padding: 4px 8px;
 }
 
 .privacy-header h1 {

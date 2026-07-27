@@ -15,6 +15,8 @@ import {
   update,
   type Comet,
 } from './state'
+import { SCORE_PANEL, drawScorePanel, font } from '../ui'
+import { drawIconRow } from '../icons'
 
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
@@ -176,35 +178,26 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.save()
       c.globalAlpha = Math.max(0, 1 - pop.age / 1.1)
       c.fillStyle = '#FFF59D'
-      c.font = 'bold 34px sans-serif'
+      c.font = font(34, true)
       c.textAlign = 'center'
       c.fillText(pop.text, pop.x, pop.y - 40 - pop.age * 40)
       c.restore()
     }
 
     // HUD: 점수 + 놓친 개수 + 최다 연결
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.09
-    c.beginPath()
-    c.roundRect(160, 22, 400, 128, 24)
-    c.fill()
-    c.restore()
-    c.textAlign = 'center'
-    c.fillStyle = 'rgb(255 255 255 / 0.5)'
-    c.font = '18px sans-serif'
-    c.fillText(t('hud.score'), 360, 54)
-    c.fillStyle = '#FFFFFF'
-    c.font = 'bold 46px sans-serif'
-    c.fillText(state.score.toLocaleString(), 360, 108)
-    c.font = '20px sans-serif'
-    c.fillStyle = 'rgb(255 255 255 / 0.6)'
-    if (state.bestChain >= 2) c.fillText(t('cm.chain', { n: state.bestChain }), 360, 140)
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      sub: state.bestChain >= 2,
+    })
+    if (state.bestChain >= 2) {
+      c.font = font(20)
+      c.fillStyle = 'rgb(255 255 255 / 0.6)'
+      c.fillText(t('cm.chain', { n: state.bestChain }), SCORE_PANEL.cx, SCORE_PANEL.subY)
+    }
 
     // 놓친 개수는 남은 기회로 보여 준다
-    c.font = 'bold 30px sans-serif'
-    c.fillStyle = '#FF8A65'
-    c.fillText('✕'.repeat(state.misses) + '·'.repeat(Math.max(0, MAX_MISS - state.misses)), 620, 66)
+    drawIconRow(c, 'cross', 638, 58, 12, state.misses, MAX_MISS)
   }
 
   shell.addCleanup(detachInput)

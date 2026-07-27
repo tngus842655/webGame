@@ -15,10 +15,10 @@ import {
   update,
   worldTopY,
 } from './state'
+import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 
 // 층마다 색을 조금씩 돌려 위로 갈수록 색이 변하는 탑이 된다
-const faceColor = (level: number) => `hsl(${(level * 11) % 360} 58% 56%)`
-const topColor = (level: number) => `hsl(${(level * 11) % 360} 62% 70%)`
+const hueOf = (level: number) => (level * 11) % 360
 
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
@@ -90,14 +90,43 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     onUp() {},
   })
 
+  // 납작한 색 띠였던 것을 윗면·앞면·그늘이 있는 덩어리로 그린다.
+  // 쌓는 게임이라 화면의 거의 전부가 이 블록이다.
   const drawBlock = (x: number, screenY: number, w: number, level: number) => {
     const c = stage.c
-    c.fillStyle = faceColor(level)
-    c.fillRect(x - w / 2, screenY, w, BLOCK_H)
-    c.fillStyle = topColor(level)
-    c.fillRect(x - w / 2, screenY, w, 7)
-    c.fillStyle = 'rgb(0 0 0 / 0.18)'
-    c.fillRect(x - w / 2, screenY + BLOCK_H - 5, w, 5)
+    const hue = hueOf(level)
+    const left = x - w / 2
+    const lip = 9 // 윗면 두께
+
+    // 앞면 — 위에서 아래로 어두워진다
+    const face = c.createLinearGradient(0, screenY, 0, screenY + BLOCK_H)
+    face.addColorStop(0, `hsl(${hue} 58% 58%)`)
+    face.addColorStop(1, `hsl(${hue} 52% 41%)`)
+    c.fillStyle = face
+    c.beginPath()
+    c.roundRect(left, screenY, w, BLOCK_H, 5)
+    c.fill()
+
+    // 윗면 — 빛을 받는 면
+    const top = c.createLinearGradient(left, 0, left + w, 0)
+    top.addColorStop(0, `hsl(${hue} 66% 78%)`)
+    top.addColorStop(1, `hsl(${hue} 60% 66%)`)
+    c.fillStyle = top
+    c.beginPath()
+    c.roundRect(left, screenY, w, lip, [5, 5, 0, 0])
+    c.fill()
+
+    // 왼쪽에서 들어오는 빛 / 오른쪽 그늘
+    c.fillStyle = 'rgb(255 255 255 / 0.14)'
+    c.fillRect(left, screenY + lip, Math.min(10, w * 0.12), BLOCK_H - lip)
+    c.fillStyle = 'rgb(0 0 0 / 0.16)'
+    c.fillRect(left + w - Math.min(10, w * 0.12), screenY + lip, Math.min(10, w * 0.12), BLOCK_H - lip)
+
+    // 아래 그늘 — 층이 겹쳐 보이게 한다
+    c.fillStyle = 'rgb(0 0 0 / 0.22)'
+    c.beginPath()
+    c.roundRect(left, screenY + BLOCK_H - 5, w, 5, [0, 0, 5, 5])
+    c.fill()
   }
 
   const draw = () => {
@@ -137,8 +166,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.globalAlpha = Math.max(0, 1 - chip.age / 1.1)
       c.translate(chip.x, chip.y + camY + BLOCK_H / 2)
       c.rotate(chip.spin * chip.age)
-      c.fillStyle = `hsl(${chip.hue % 360} 58% 56%)`
-      c.fillRect(-chip.w / 2, -BLOCK_H / 2, chip.w, BLOCK_H)
+      const chipGrad = c.createLinearGradient(0, -BLOCK_H / 2, 0, BLOCK_H / 2)
+      chipGrad.addColorStop(0, `hsl(${chip.hue % 360} 62% 66%)`)
+      chipGrad.addColorStop(1, `hsl(${chip.hue % 360} 52% 44%)`)
+      c.fillStyle = chipGrad
+      c.beginPath()
+      c.roundRect(-chip.w / 2, -BLOCK_H / 2, chip.w, BLOCK_H, 4)
+      c.fill()
       c.restore()
     }
 
@@ -168,7 +202,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.lineWidth = 4
       c.strokeRect(top.x - top.w / 2 - 4, topScreenY - 4, top.w + 8, BLOCK_H + 8)
       c.fillStyle = '#FFECB3'
-      c.font = 'bold 30px sans-serif'
+      c.font = font(30, true)
       c.textAlign = 'center'
       c.fillText(
         state.combo >= 2 ? `${t('st.perfect')} x${state.combo}` : t('st.perfect'),
@@ -179,23 +213,14 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     }
 
     // HUD: 점수 + 층수
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.1
-    c.beginPath()
-    c.roundRect(160, 24, 400, 130, 24)
-    c.fill()
-    c.restore()
-    c.textAlign = 'center'
-    c.fillStyle = 'rgb(255 255 255 / 0.5)'
-    c.font = '18px sans-serif'
-    c.fillText(t('hud.score'), 360, 56)
-    c.fillStyle = '#FFFFFF'
-    c.font = 'bold 48px sans-serif'
-    c.fillText(state.score.toLocaleString(), 360, 112)
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      sub: true,
+    })
     c.fillStyle = 'rgb(255 255 255 / 0.65)'
-    c.font = '20px sans-serif'
-    c.fillText(t('st.floor', { n: state.blocks.length }), 360, 144)
+    c.font = font(20)
+    c.fillText(t('st.floor', { n: state.blocks.length }), SCORE_PANEL.cx, SCORE_PANEL.subY)
   }
 
   shell.addCleanup(detachInput)

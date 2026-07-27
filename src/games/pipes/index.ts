@@ -6,6 +6,8 @@ import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import { clearPoints, createState, loadLevel, rotateTile, D, L, R, U } from './state'
+import { SCORE_PANEL, drawScorePanel, font } from '../ui'
+import { drawIconValue } from '../icons'
 
 // 화면 배치 (논리 720×1280)
 const GRID_X = 36
@@ -125,27 +127,27 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const clearing = state.phase === 'clearing'
 
     // HUD 카드: 점수 + 레벨 + 연결된 칸 수
-    c.textBaseline = 'alphabetic'
-    c.textAlign = 'center'
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.94
-    c.beginPath()
-    c.roundRect(120, 24, 480, 148, 24)
-    c.fill()
-    c.restore()
-    c.fillStyle = '#90CAF9'
-    c.font = '18px sans-serif'
-    c.fillText(t('hud.score'), 360, 56)
-    c.fillStyle = '#0D47A1'
-    c.font = 'bold 50px sans-serif'
-    c.fillText(state.score.toLocaleString(), 360, 110)
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      sub: true,
+      panelColor: 'rgb(255 255 255 / 0.94)',
+      labelColor: '#90CAF9',
+      valueColor: '#0D47A1',
+    })
     c.fillStyle = '#1565C0'
-    c.font = '24px sans-serif'
+    c.font = font(24)
     c.textAlign = 'left'
-    c.fillText(t('pp.level', { n: state.level }), 152, 150)
-    c.textAlign = 'right'
-    c.fillText(`${state.wetCount}/${size * size} 💧`, 568, 150)
+    c.fillText(t('pp.level', { n: state.level }), SCORE_PANEL.left, SCORE_PANEL.subY)
+    drawIconValue(
+      c,
+      'drop',
+      `${state.wetCount}/${size * size}`,
+      SCORE_PANEL.right,
+      SCORE_PANEL.subY - 8,
+      13,
+      'right',
+    )
     c.textAlign = 'center'
 
     // 남은 시간 바
@@ -164,7 +166,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fill()
     }
     c.fillStyle = '#FFFFFF'
-    c.font = 'bold 20px sans-serif'
+    c.font = font(20, true)
     c.textBaseline = 'middle'
     c.fillText(`${Math.ceil(state.timeLeft)}s`, BAR.x + BAR.w / 2, BAR.y + BAR.h / 2 + 1)
     c.textBaseline = 'alphabetic'
@@ -248,7 +250,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (popup) {
       c.save()
       c.globalAlpha = Math.min(1, 1.2 - popup.age)
-      c.font = 'bold 64px sans-serif'
+      c.font = font(64, true)
       c.textAlign = 'center'
       c.lineWidth = 8
       c.strokeStyle = '#FFFFFF'

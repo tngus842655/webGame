@@ -7,9 +7,10 @@ import type { GameModule } from '@/games/types'
 import GameGuide from '@/shared/GameGuide.vue'
 import { createGameContext } from '@/shared/gameContext'
 import { t, type TranslationKey } from '@/shared/i18n'
+import UiIcon from '@/shared/UiIcon.vue'
 import { bgmFor, startBgm, stopBgm } from '@/shared/music'
 import { startPlayTracking } from '@/shared/playSessions'
-import { getLocalBest } from '@/shared/scores'
+import { fetchMyStats, getLocalBest, syncLocalBests } from '@/shared/scores'
 import { startScoreGuard } from '@/shared/scoreGuard'
 
 const route = useRoute()
@@ -54,6 +55,11 @@ onMounted(async () => {
     return
   }
   titleKey.value = meta.titleKey
+  // 홈을 거치지 않고 바로 들어왔을 수도 있다. 서버 최고점을 맞춰두지 않으면
+  // 상단 칩과 게임오버의 신기록 판정이 이 기기 기록만 보고 잘못 나온다.
+  void fetchMyStats()
+    .then(syncLocalBests)
+    .catch(() => {})
   const mod = await meta.loader()
   // 로드 완료 전에 페이지를 떠났으면 mount하지 않는다
   if (disposed) return
@@ -86,16 +92,24 @@ onBeforeUnmount(() => {
 <template>
   <div class="play-page">
     <div ref="host" class="game-host"></div>
-    <button class="back-button" type="button" @click="router.push('/')">{{ t('common.back') }}</button>
-    <div v-if="bestLabel" class="best-chip" :class="{ record: isRecord }">{{ bestLabel }}</div>
-    <button
-      class="guide-button"
-      type="button"
-      :aria-label="t('guide.title')"
-      @click="openGuide"
-    >
-      ?
-    </button>
+    <div class="top-bar">
+      <button class="chip back-button" type="button" @click="router.push('/')">
+        <UiIcon name="back" />{{ t('common.back') }}
+      </button>
+      <div class="best-slot">
+        <div v-if="bestLabel" class="chip best-chip" :class="{ record: isRecord }">
+          {{ bestLabel }}
+        </div>
+      </div>
+      <button
+        class="chip guide-button"
+        type="button"
+        :aria-label="t('guide.title')"
+        @click="openGuide"
+      >
+        ?
+      </button>
+    </div>
 
     <GameGuide
       v-if="guideOpen && titleKey"
@@ -117,54 +131,85 @@ onBeforeUnmount(() => {
   inset: 0;
 }
 
-.back-button {
+/* 뒤로·최고기록·도움말을 한 줄로 묶는다. 예전에는 셋이 제각각 크기라
+   게임 화면 위에 흩어져 보였다. 캔버스를 덮으므로 줄 자체는 탭을 받지 않는다. */
+.top-bar {
   position: absolute;
-  top: calc(12px + env(safe-area-inset-top));
-  left: 12px;
-  padding: 8px 14px;
-  border: none;
-  border-radius: 20px;
-  background: rgb(255 255 255 / 0.85);
-  color: #5d4037;
-  font-size: 15px;
-  cursor: pointer;
+  top: calc(10px + env(safe-area-inset-top));
+  left: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
 }
 
-/* 게임 캔버스 위에 얹히므로 탭을 가로채지 않게 한다 */
-.best-chip {
-  position: absolute;
-  top: calc(16px + env(safe-area-inset-top));
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 5px 14px;
-  border-radius: 14px;
-  background: rgb(255 255 255 / 0.85);
-  color: #7d6a63;
-  font-size: 13px;
-  font-weight: bold;
+.chip {
+  display: flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 19px;
+  background: rgb(255 255 255 / 0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 2px 8px rgb(40 24 16 / 0.16);
+  color: #5d4037;
+  font-size: 14px;
+  font-weight: 700;
   white-space: nowrap;
-  pointer-events: none;
+  transition:
+    transform 0.1s ease,
+    background-color 0.1s ease;
+}
+
+/* 뒤로 버튼 길이가 언어마다 달라도 기록이 두 버튼 사이 한가운데에 오도록 */
+.best-slot {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  min-width: 0;
+}
+
+.back-button {
+  gap: 4px;
+  padding-left: 10px;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.back-button svg {
+  width: 17px;
+  height: 17px;
+}
+
+.back-button:active,
+.guide-button:active {
+  background: rgb(255 255 255 / 0.98);
+  transform: scale(0.95);
+}
+
+.best-chip {
+  overflow: hidden;
+  font-size: 13px;
+  color: #7d6a63;
+  text-overflow: ellipsis;
 }
 
 .best-chip.record {
   background: #ffca28;
   color: #5d4037;
+  box-shadow: 0 2px 10px rgb(245 166 0 / 0.45);
 }
 
 .guide-button {
-  position: absolute;
-  top: calc(12px + env(safe-area-inset-top));
-  right: 12px;
-  width: 36px;
-  height: 36px;
+  justify-content: center;
+  width: 38px;
   padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: rgb(255 255 255 / 0.85);
-  color: #5d4037;
   font-size: 18px;
-  font-weight: bold;
   line-height: 1;
   cursor: pointer;
+  pointer-events: auto;
 }
 </style>

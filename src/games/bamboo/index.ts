@@ -6,6 +6,7 @@ import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import { BAR_MAX, SEG_H, branchAt, climb, createState, reviveBelow, update } from './state'
+import { font } from '../ui'
 
 const STALK_W = 152
 const STALK_X = 360 - STALK_W / 2
@@ -200,15 +201,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     // HUD
     c.textAlign = 'center'
     c.fillStyle = '#FFFFFF'
-    c.font = 'bold 52px sans-serif'
+    c.font = font(52, true)
     c.fillText(state.score.toLocaleString(), 360, 92)
-    c.font = '20px sans-serif'
+    c.font = font(20)
     c.fillStyle = 'rgb(255 255 255 / 0.55)'
     c.fillText(t('bm.height', { n: state.height }), 360, 130)
 
     if (state.height < 3 && state.phase === 'playing') {
       c.fillStyle = 'rgb(255 255 255 / 0.6)'
-      c.font = '24px sans-serif'
+      c.font = font(24)
       c.fillText(t('bm.hint'), 360, 1200)
     }
   }

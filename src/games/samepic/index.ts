@@ -7,6 +7,7 @@ import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import { DISCS, DISC_R, GAUGE_MAX, createState, reviveWithTime, tapAt, update } from './state'
 import { SYMBOLS } from './symbols'
+import { font } from '../ui'
 
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
@@ -113,11 +114,11 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     // HUD: 점수·콤보 + 시간 게이지
     c.textAlign = 'center'
     c.fillStyle = '#FFFFFF'
-    c.font = 'bold 44px sans-serif'
+    c.font = font(44, true)
     c.fillText(state.score.toLocaleString(), 360, 62)
     if (state.combo >= 2) {
       c.fillStyle = '#FFD54F'
-      c.font = 'bold 28px sans-serif'
+      c.font = font(28, true)
       c.textAlign = 'left'
       c.fillText(`x${state.combo}`, 470, 60)
       c.textAlign = 'center'
@@ -136,7 +137,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     if (state.round <= 2) {
       c.fillStyle = 'rgb(255 255 255 / 0.5)'
-      c.font = '22px sans-serif'
+      c.font = font(22)
       c.fillText(t('sp.hint'), 360, 1242)
     }
   }
