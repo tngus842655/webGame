@@ -1,5 +1,5 @@
 import { ensureUserId } from './auth'
-import { supabase } from './supabase'
+import { getSupabase } from './supabase'
 
 // 플레이 시간 기록 — 인기 순위와 통계의 근거 데이터
 // 게임 코드는 건드리지 않고 플레이 화면 진입~이탈 시점만으로 측정한다.
@@ -19,7 +19,8 @@ interface Credentials {
 async function loadCredentials(): Promise<Credentials | null> {
   try {
     const userId = await ensureUserId()
-    const { data } = await supabase.auth.getSession()
+    const sb = await getSupabase()
+    const { data } = await sb.auth.getSession()
     const accessToken = data.session?.access_token
     if (!accessToken) return null
     return { userId, accessToken }
@@ -103,13 +104,15 @@ export interface GameStat {
 
 // 구간 전체의 이용자 수 — 게임별 인원은 서로 겹쳐서 더하거나 최댓값을 쓸 수 없다
 export async function fetchTotalPlayers(days: number): Promise<number> {
-  const { data, error } = await supabase.rpc('get_total_players', { p_days: days })
+  const sb = await getSupabase()
+  const { data, error } = await sb.rpc('get_total_players', { p_days: days })
   if (error) throw error
   return Number(data ?? 0)
 }
 
 export async function fetchGameStats(days: number): Promise<GameStat[]> {
-  const { data, error } = await supabase.rpc('get_game_stats', { p_days: days })
+  const sb = await getSupabase()
+  const { data, error } = await sb.rpc('get_game_stats', { p_days: days })
   if (error) throw error
   return (data ?? []).map((row: GameStat) => ({
     ...row,

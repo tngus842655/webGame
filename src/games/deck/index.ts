@@ -1,5 +1,5 @@
 import { t, type TranslationKey } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, playSfx, preloadSfx, vibrate } from '@/shared/sound'
+import { playDrop, playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -68,6 +68,7 @@ const CARD_W = 128
 const CARD_H = 184
 const END_BTN = { x: 520, y: 950, w: 180, h: 80 } as const
 const REWARD_Y = 480
+const DECK_BTN = { x: 16, y: 978, w: 132, h: 52 } as const
 const ENEMY_X = 360
 const ENEMY_Y = 356
 const HP_BAR_Y = 486
@@ -121,7 +122,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  preloadSfx('clear', 'gameover', 'hurt', 'merge', 'tap')
+  preloadSfx('clear', 'gameover', 'hurt', 'select', 'sword', 'tap', 'unlock')
   const popups: Popup[] = []
   let hitFlash = 0
   let enemyHit = 0 // 적이 맞아 흔들리는 정도
@@ -131,6 +132,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   let blockBreak = 0
   let hasPlayed = false
   let adContinueUsed = false
+  let deckOpen = false // 내 덱 펼쳐 보기
 
   const overlay = createGameOverOverlay(shell.wrapper, {
     adLabelKey: 'dk.ad',
@@ -161,9 +163,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   async function gameOver() {
     const prevBest = await ctx.getBestScore()
-    await ctx.submitScore(state.score)
+    void ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
-    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adContinueUsed)
+    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adContinueUsed, 'over.byHp')
   }
 
   const stepEffects = (dt: number) => {
@@ -190,7 +192,23 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const detachInput = attachInput(stage.canvas, {
     onDown(clientX, clientY) {
       const p = stage.toBoard(clientX, clientY)
+      // 덱을 펼쳐 둔 동안은 아무 데나 눌러 닫는다 — 뒤의 판이 눌리면 안 된다
+      if (deckOpen) {
+        deckOpen = false
+        playDrop()
+        return
+      }
       if (state.phase === 'player') {
+        if (
+          p.x >= DECK_BTN.x &&
+          p.x <= DECK_BTN.x + DECK_BTN.w &&
+          p.y >= DECK_BTN.y &&
+          p.y <= DECK_BTN.y + DECK_BTN.h
+        ) {
+          deckOpen = true
+          playSfx('select')
+          return
+        }
         if (
           p.x >= END_BTN.x &&
           p.x <= END_BTN.x + END_BTN.w &&
@@ -198,7 +216,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
           p.y <= END_BTN.y + END_BTN.h
         ) {
           endTurn(state)
-          playDrop()
+          playSfx('select')
           return
         }
         if (p.y >= HAND_Y - 30) {
@@ -243,7 +261,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
           const x = 60 + i * 212
           if (p.x >= x && p.x <= x + 188 && p.y >= REWARD_Y && p.y <= REWARD_Y + 250) {
             chooseReward(state, i)
-            playMerge(4)
+            playSfx('unlock')
             return
           }
         }
@@ -611,12 +629,28 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       )
     }
 
-    // 남은 덱·버린 더미 — 언제 다시 섞이는지 알 수 있다
+    // 남은 덱·버린 더미 — 언제 다시 섞이는지 알 수 있다.
+    // 왼쪽 것은 눌러서 덱 전체를 펼쳐 볼 수 있어 눌리는 물건처럼 테를 둘렀다
+    c.fillStyle = 'rgb(255 255 255 / 0.08)'
+    c.beginPath()
+    c.roundRect(DECK_BTN.x, DECK_BTN.y, DECK_BTN.w, DECK_BTN.h, 14)
+    c.fill()
+    c.strokeStyle = 'rgb(255 255 255 / 0.18)'
+    c.lineWidth = 2
+    c.stroke()
     c.font = font(20, true)
     c.textAlign = 'left'
     c.textBaseline = 'middle'
     c.fillStyle = 'rgb(255 255 255 / 0.55)'
     drawIconValue(c, 'card', String(state.draw.length), 30, 1006, 12, 'left')
+    // 눌러서 펼친다는 표시 — 카드 더미 오른쪽에 얇게 겹친 종이 두 장
+    c.strokeStyle = 'rgb(255 255 255 / 0.3)'
+    c.lineWidth = 2
+    for (let i = 0; i < 2; i++) {
+      c.beginPath()
+      c.roundRect(DECK_BTN.x + 96 + i * 8, 996 - i * 3, 14, 20 + i * 6, 3)
+      c.stroke()
+    }
     c.textAlign = 'right'
     drawIconValue(c, 'dice', String(state.discard.length), 690, 1006, 12, 'right')
     c.textAlign = 'center'
@@ -662,6 +696,44 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.arc(fx, HAND_Y - 26 - lift, 26 + lift * 0.4, 0, Math.PI * 2)
       c.fill()
       c.restore()
+    }
+
+    // 내 덱 펼쳐 보기 — 보상으로 무엇을 골랐는지, 지금 덱이 어떤 모양인지 확인한다
+    if (deckOpen) {
+      c.fillStyle = 'rgb(0 0 0 / 0.72)'
+      c.fillRect(0, 0, 720, 1280)
+      c.fillStyle = '#FFFFFF'
+      c.font = font(38, true)
+      c.textAlign = 'center'
+      c.fillText(t('dk.deck', { n: state.allCards.length }), 360, 330)
+
+      const kinds = (Object.keys(CARD_DEFS) as CardId[])
+        .map((id) => ({ id, n: state.allCards.filter((card) => card === id).length }))
+        .filter((k) => k.n > 0)
+      const cw = 150
+      const ch = 212
+      const cols = 4
+      for (let i = 0; i < kinds.length; i++) {
+        const x = 36 + (i % cols) * (cw + 12)
+        const y = 386 + Math.floor(i / cols) * (ch + 30)
+        drawCard(c, kinds[i].id, x, y, cw, ch, true)
+        // 몇 장 들었는지 — 카드 오른쪽 아래에 붙인 표
+        c.fillStyle = '#1B1327'
+        c.beginPath()
+        c.roundRect(x + cw - 52, y + ch - 26, 52, 34, 10)
+        c.fill()
+        c.fillStyle = '#FFD54F'
+        c.font = font(24, true)
+        c.textAlign = 'center'
+        c.textBaseline = 'middle'
+        c.fillText(`×${kinds[i].n}`, x + cw - 26, y + ch - 8)
+        c.textBaseline = 'alphabetic'
+      }
+
+      c.fillStyle = 'rgb(255 255 255 / 0.45)'
+      c.font = font(22)
+      c.textAlign = 'center'
+      c.fillText(t('common.tapClose'), 360, 1190)
     }
 
     // 보상 선택

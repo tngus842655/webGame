@@ -2,7 +2,7 @@
 // AI는 공격·수비 패턴 점수로 한 수를 고른다. 낮은 단은 일부러 실수하고,
 // 6단부터는 내 응수까지 읽는 2수 탐색을 하며 단이 오를수록 더 넓게 본다.
 
-export type Phase = 'playing' | 'aiThinking' | 'won' | 'lost' | 'over'
+export type Phase = 'intro' | 'playing' | 'aiThinking' | 'won' | 'lost' | 'over'
 export type Stone = 0 | 1 | 2 // 0 빈칸, 1 플레이어(흑), 2 AI(백)
 
 export const SIZE = 15
@@ -37,6 +37,37 @@ export interface OmokState {
   thinkTimer: number // AI 착수 지연 (생각하는 느낌)
   resultTimer: number // 승/패 연출 후 다음 판/게임오버
   history: number[] // 착수 순서 (무르기용)
+}
+
+// ── 이어하기 (localStorage) ─────────────────────────────────
+// 10단까지 40분 넘게 걸리는 판이라, 8단에서 지면 다음 판에 또 1단부터 둬야 했다.
+// 도달한 단과 '그 시점의 점수'를 함께 저장해 이어서 시작해도 점수가 부풀지 않는다.
+
+const SAVE_KEY = 'webgame:omok-progress'
+
+export interface OmokSave {
+  stage: number
+  score: number
+}
+
+export function loadProgress(): OmokSave | null {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as { stage?: number; score?: number }
+    if (typeof parsed.stage !== 'number' || typeof parsed.score !== 'number') return null
+    if (parsed.stage < 2 || parsed.stage > MAX_STAGE) return null
+    return { stage: parsed.stage, score: parsed.score }
+  } catch {
+    return null
+  }
+}
+
+// 더 멀리 간 기록만 남긴다 — 처음부터 다시 둬서 3단에 진다고 8단 기록이 지워지면 안 된다
+function saveProgress(stage: number, score: number) {
+  const prev = loadProgress()
+  if (prev && (prev.stage > stage || (prev.stage === stage && prev.score >= score))) return
+  localStorage.setItem(SAVE_KEY, JSON.stringify({ stage, score }))
 }
 
 export function createState(): OmokState {
@@ -213,6 +244,7 @@ export function playerMove(state: OmokState, index: number): MoveResult {
     state.lastBonus = Math.round(state.timeLeft) * TIME_BONUS_PER_SEC
     state.score = Math.min(1_000_000, state.score + stagePoints(state.stage) + state.lastBonus)
     if (state.stage >= MAX_STAGE) state.cleared = true
+    else saveProgress(state.stage + 1, state.score)
     state.phase = 'won'
     state.resultTimer = 2
     return 'win'

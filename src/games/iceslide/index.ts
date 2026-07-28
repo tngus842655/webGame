@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
+import { playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -14,6 +14,7 @@ import {
   addMoves,
   canUndo,
   createState,
+  restart,
   slide,
   undo,
   update,
@@ -23,7 +24,8 @@ import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 import { drawIconValue } from '../icons'
 
 const SWIPE_THRESHOLD = 40
-const UNDO_BTN = { x: 196, y: 1112, w: 328, h: 88 } as const
+const UNDO_BTN = { x: 44, y: 1112, w: 336, h: 88 } as const
+const RESTART_BTN = { x: 396, y: 1112, w: 280, h: 88 } as const
 const BOARD_W = COLS * CELL
 const BOARD_H = ROWS * CELL
 
@@ -91,7 +93,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  preloadSfx('clear', 'coin', 'gameover', 'ice-slide', 'impact', 'tap')
+  preloadSfx('clear', 'coin', 'gameover', 'ice-slide', 'impact', 'whoosh')
   const crystals: Crystal[] = []
   const starPops: Array<{ x: number; y: number; age: number }> = []
   // 방금 지나온 길 — 얼음 위에 자국이 잠깐 남는다
@@ -139,26 +141,35 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (!canUndo(state)) return
     const rewarded = await ctx.showRewardAd('iceslide-undo')
     if (shell.isDestroyed() || !rewarded) return
-    if (undo(state)) playDrop()
+    if (undo(state)) playSfx('whoosh', { rate: 0.8 })
   }
 
   const tapUndo = () => {
     if (!canUndo(state)) return
     if (state.freeUndo > 0) {
       state.freeUndo -= 1
-      if (undo(state)) playDrop()
+      if (undo(state)) playSfx('whoosh', { rate: 0.8 })
       return
     }
     if (ctx.isRewardAdReady()) void undoWithAd()
+  }
+
+  // 다시하기도 되돌리기 몫을 하나 쓴다 — 공짜로 무한히 접을 수 있으면 실수에 값이 없다
+  const tapRestart = () => {
+    if (state.phase !== 'playing' || state.freeUndo <= 0 || state.history.length === 0) return
+    if (!restart(state)) return
+    state.freeUndo -= 1
+    playSfx('whoosh', { rate: 0.62 })
+    vibrate(20)
   }
 
   async function gameOver() {
     playGameOver()
     vibrate(120)
     const prevBest = await ctx.getBestScore()
-    await ctx.submitScore(state.score)
+    void ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
-    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adMovesUsed)
+    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adMovesUsed, 'over.byMoves')
   }
 
   const pushCrystal = (x: number, y: number, vx: number, vy: number, life: number) => {
@@ -254,6 +265,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         p.y <= UNDO_BTN.y + UNDO_BTN.h
       ) {
         tapUndo()
+        return
+      }
+      if (
+        p.x >= RESTART_BTN.x &&
+        p.x <= RESTART_BTN.x + RESTART_BTN.w &&
+        p.y >= RESTART_BTN.y &&
+        p.y <= RESTART_BTN.y + RESTART_BTN.h
+      ) {
+        tapRestart()
         return
       }
       if (state.phase !== 'playing') return
@@ -644,6 +664,23 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         useAd ? t('ic.undoAd') : t('ic.undo', { n: state.freeUndo }),
         UNDO_BTN.x + UNDO_BTN.w / 2,
         UNDO_BTN.y + UNDO_BTN.h / 2 + 1,
+      )
+      c.textBaseline = 'alphabetic'
+    }
+
+    // 판 다시하기 — 되돌리기 몫이 남아 있고 한 수라도 뒀을 때만
+    if (undoReady && state.freeUndo > 0) {
+      c.fillStyle = 'rgb(255 255 255 / 0.16)'
+      c.beginPath()
+      c.roundRect(RESTART_BTN.x, RESTART_BTN.y, RESTART_BTN.w, RESTART_BTN.h, 22)
+      c.fill()
+      c.fillStyle = '#FFFFFF'
+      c.font = font(25, true)
+      c.textBaseline = 'middle'
+      c.fillText(
+        t('ic.restart'),
+        RESTART_BTN.x + RESTART_BTN.w / 2,
+        RESTART_BTN.y + RESTART_BTN.h / 2 + 1,
       )
       c.textBaseline = 'alphabetic'
     }

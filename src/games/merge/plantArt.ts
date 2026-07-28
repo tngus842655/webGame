@@ -286,5 +286,3 @@ const LEVELS: Draw[] = [
     }
   },
 ]
-
-export const PLANT_LEVELS = LEVELS.length

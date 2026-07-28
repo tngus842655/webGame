@@ -65,6 +65,7 @@ export interface SurvivorState {
   bullets: Bullet[]
   orbs: Orb[]
   spawnTimer: number
+  taken: Record<UpgradeOption['key'], number> // 지금까지 고른 업그레이드 횟수
   choices: UpgradeOption[]
   joystick: { baseX: number; baseY: number; dx: number; dy: number } | null
 }
@@ -96,6 +97,7 @@ export function createState(): SurvivorState {
     bullets: [],
     orbs: [],
     spawnTimer: 1,
+    taken: { damage: 0, firerate: 0, speed: 0, maxhp: 0 },
     choices: [],
     joystick: null,
   }
@@ -112,6 +114,7 @@ export function rollChoices(): UpgradeOption[] {
 
 export function applyUpgrade(state: SurvivorState, option: UpgradeOption) {
   const p = state.player
+  state.taken[option.key] += 1
   switch (option.key) {
     case 'damage':
       p.damage += 1

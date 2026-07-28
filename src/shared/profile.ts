@@ -1,5 +1,5 @@
 import { ensureUserId, fetchSocialName } from './auth'
-import { supabase } from './supabase'
+import { getSupabase } from './supabase'
 
 export interface MyProfile {
   nickname: string
@@ -9,7 +9,8 @@ export interface MyProfile {
 
 export async function fetchMyProfile(): Promise<MyProfile> {
   const id = await ensureUserId()
-  const { data, error } = await supabase
+  const sb = await getSupabase()
+  const { data, error } = await sb
     .from('profiles')
     .select('nickname, nickname_set')
     .eq('id', id)
@@ -20,7 +21,8 @@ export async function fetchMyProfile(): Promise<MyProfile> {
 
 export async function updateMyNickname(nickname: string): Promise<void> {
   const id = await ensureUserId()
-  const { error } = await supabase
+  const sb = await getSupabase()
+  const { error } = await sb
     .from('profiles')
     .update({ nickname, nickname_set: true })
     .eq('id', id)

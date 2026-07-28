@@ -1,5 +1,5 @@
 import { ensureUserId } from './auth'
-import { supabase } from './supabase'
+import { getSupabase } from './supabase'
 
 function bestKey(slug: string) {
   return `webgame:best:${slug}`
@@ -66,7 +66,8 @@ export async function saveScore(slug: string, score: number): Promise<void> {
   stashPendingScore(slug, safe)
   try {
     const userId = await ensureUserId()
-    const { error } = await supabase
+    const sb = await getSupabase()
+    const { error } = await sb
       .from('scores')
       .insert({ user_id: userId, game_slug: slug, score: safe })
     if (error) throw error
@@ -85,7 +86,8 @@ export interface MyGameStat {
 // 내 게임별 최고점·순위 (세션 없으면 익명 로그인 후 조회)
 export async function fetchMyStats(): Promise<MyGameStat[]> {
   await ensureUserId()
-  const { data, error } = await supabase.rpc('get_my_stats')
+  const sb = await getSupabase()
+  const { data, error } = await sb.rpc('get_my_stats')
   if (error) throw error
   return (data ?? []) as MyGameStat[]
 }
@@ -191,7 +193,8 @@ export function sortByPopularity<T extends { slug: string }>(games: readonly T[]
 
 export async function refreshPopularity(): Promise<void> {
   try {
-    const { data, error } = await supabase.rpc('get_game_popularity')
+    const sb = await getSupabase()
+    const { data, error } = await sb.rpc('get_game_popularity')
     if (error) return
     const rows = (data ?? []) as Array<{ game_slug: string; score: number }>
     localStorage.setItem(
@@ -217,7 +220,8 @@ export async function fetchLeaderboard(
 ): Promise<LeaderboardEntry[]> {
   const since =
     period === 'week' ? new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString() : null
-  const { data, error } = await supabase.rpc('get_leaderboard', {
+  const sb = await getSupabase()
+  const { data, error } = await sb.rpc('get_leaderboard', {
     p_game_slug: slug,
     p_since: since,
     p_limit: limit,

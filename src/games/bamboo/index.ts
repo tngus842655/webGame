@@ -82,9 +82,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     playGameOver()
     vibrate(120)
     const prevBest = await ctx.getBestScore()
-    await ctx.submitScore(state.score)
+    void ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
-    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adReviveUsed)
+    // 가지에 부딪힌 건 화면에 그대로 보인다 — 시간 초과만 따로 적어 준다
+    overlay.show(
+      state.score,
+      prevBest,
+      ctx.isRewardAdReady() && !adReviveUsed,
+      state.deathBy === 'time' ? 'over.byTime' : undefined,
+    )
   }
 
   const shedLeaves = (x: number, y: number, count: number) => {

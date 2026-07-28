@@ -22,6 +22,9 @@ import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 
 // 색마다 짝지은 표식. 배와 부두를 색으로만 이으면 색이 비슷하게 보이는 사람은
 // 손댈 수가 없다. 같은 표식을 배의 돛과 부두 등대에 함께 새겨 둔다.
+// 이만큼 끌어야 '새로 긋는다'로 본다. 그 아래는 그냥 짚은 것 = 항로 지우기.
+const DRAW_SLOP = 16
+
 type MarkKind = 0 | 1 | 2 | 3
 
 function drawMark(
@@ -104,6 +107,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const scraps: Scrap[] = []
   let dockRing = 0
   let dragging: Boat | null = null
+  let drewThisDrag = false // 집은 뒤 실제로 길을 그었는가 (안 그었으면 지우기)
+  let grabAt = { x: 0, y: 0 }
   let adClearUsed = false
 
   const overlay = createGameOverOverlay(shell.wrapper, {
@@ -135,7 +140,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     playGameOver()
     vibrate(120)
     const prevBest = await ctx.getBestScore()
-    await ctx.submitScore(state.score)
+    void ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
     overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adClearUsed)
   }
@@ -183,14 +188,29 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     onDown(clientX, clientY) {
       const p = stage.toBoard(clientX, clientY)
       dragging = grabBoat(state, p.x, p.y)
+      drewThisDrag = false
+      grabAt = p
       if (dragging) playSfx('tap')
     },
     onMove(clientX, clientY) {
       if (!dragging || state.phase !== 'playing') return
       const p = stage.toBoard(clientX, clientY)
+      // 손이 확실히 움직였을 때 옛 길을 버린다. 짚는 순간 버리면 손끝 떨림만으로도
+      // 애써 그은 길이 사라진다.
+      if (!drewThisDrag) {
+        if (Math.hypot(p.x - grabAt.x, p.y - grabAt.y) < DRAW_SLOP) return
+        drewThisDrag = true
+        dragging.path = []
+      }
       extendPath(dragging, p.x, p.y)
     },
     onUp() {
+      // 그냥 톡 짚고 뗐다 = 이 배의 항로를 지운다. 잘못 그은 길을 다시 그리지
+      // 않고 접을 수 있어야 한다 — 배는 지금 방향 그대로 흘러간다.
+      if (dragging && !drewThisDrag && dragging.path.length > 0) {
+        dragging.path = []
+        playSfx('water')
+      }
       dragging = null
     },
   })

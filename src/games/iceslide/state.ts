@@ -58,6 +58,7 @@ export interface IceState {
   facing: Dir
   slide: Slide | null
   history: Snapshot[]
+  start: Snapshot // 판을 받았을 때 모습 (다시하기 기준)
   freeUndo: number
   clearFlash: number
   clearGain: number
@@ -202,6 +203,7 @@ function loadLevel(state: IceState) {
   state.history = []
   state.freeUndo = FREE_UNDO
   state.moves = level.best + MOVE_SLACK
+  state.start = { px: level.px, py: level.py, stars: [...level.stars], moves: state.moves }
   state.phase = 'playing'
 }
 
@@ -219,6 +221,7 @@ export function createState(): IceState {
     facing: 'down',
     slide: null,
     history: [],
+    start: { px: 0, py: 0, stars: [], moves: 0 },
     freeUndo: FREE_UNDO,
     clearFlash: 0,
     clearGain: 0,
@@ -324,6 +327,19 @@ export function undo(state: IceState): boolean {
   state.stars = snap.stars
   state.starsLeft = snap.stars.filter(Boolean).length
   state.moves = snap.moves
+  return true
+}
+
+// 판을 받았던 그대로 되돌린다. 한 수씩 무르는 것으로는 대여섯 수 꼬인 판을
+// 접을 수 없어, 남은 횟수만 보며 지는 걸 기다려야 했다.
+export function restart(state: IceState): boolean {
+  if (state.phase !== 'playing' || state.history.length === 0) return false
+  state.px = state.start.px
+  state.py = state.start.py
+  state.stars = [...state.start.stars]
+  state.starsLeft = state.start.stars.filter(Boolean).length
+  state.moves = state.start.moves
+  state.history = []
   return true
 }
 

@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, playSfx, preloadSfx, vibrate } from '@/shared/sound'
+import { playDrop, playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -32,7 +32,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  preloadSfx('clear', 'gameover', 'merge', 'tap')
+  preloadSfx('clear', 'gameover', 'tap', 'unlock')
   let adEmptyUsed = false
 
   const overlay = createGameOverOverlay(shell.wrapper, {
@@ -54,7 +54,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (shell.isDestroyed() || !rewarded || state.phase !== 'over') return
     adEmptyUsed = true
     emptyFullestJar(state)
-    playMerge(4)
+    playSfx('unlock')
     overlay.hide()
   }
 
@@ -62,9 +62,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     playGameOver()
     vibrate(120)
     const prevBest = await ctx.getBestScore()
-    await ctx.submitScore(state.score)
+    void ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
-    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adEmptyUsed)
+    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adEmptyUsed, 'over.byStuck')
   }
 
   const detachInput = attachInput(stage.canvas, {

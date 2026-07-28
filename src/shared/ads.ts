@@ -48,10 +48,17 @@ class StubAdProvider implements AdProvider {
 
       const finish = (rewarded: boolean) => {
         clearInterval(timer)
+        window.removeEventListener('popstate', onBack)
         el.remove()
         this.showing = false
         resolve(rewarded)
       }
+
+      // 광고 화면은 body에 붙어 있어서 라우터가 페이지를 바꿔도 남는다.
+      // 뒤로 가기로 빠져나가면 화면을 덮은 채 굳어 버리므로 여기서 닫는다.
+      // (끝까지 안 봤으니 보상은 없다)
+      const onBack = () => finish(false)
+      window.addEventListener('popstate', onBack)
 
       const timer = setInterval(() => {
         remain -= 1

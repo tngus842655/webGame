@@ -167,8 +167,9 @@ async function load(name: SfxName) {
   for (const ext of EXTENSIONS) {
     try {
       const res = await fetch(`${import.meta.env.BASE_URL}sfx/${name}.${ext}`)
-      if (!res.ok) continue
-      // 없는 파일에 index.html이 돌아오는 배포도 있어서, 디코딩까지 돼야 있는 것으로 친다
+      // 없는 파일에 index.html을 돌려주는 배포(SPA 폴백)가 있다. 200이어도
+      // 소리가 아니면 넘어간다 — HTML을 디코딩하려 들면 콘솔만 지저분해진다.
+      if (!res.ok || !(res.headers.get('content-type') ?? '').includes('audio')) continue
       buffers.set(name, await ac.decodeAudioData(await res.arrayBuffer()))
       loading.delete(name)
       return

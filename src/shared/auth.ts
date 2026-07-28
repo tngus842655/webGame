@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import type { User } from '@supabase/supabase-js'
-import { supabase } from './supabase'
+import { getSupabase, whenSupabaseReady } from './supabase'
 
 export type SocialProvider = 'google' | 'kakao'
 
@@ -34,20 +34,24 @@ function clearLocalBestsIfUserChanged(nextId: string) {
   localStorage.setItem(LAST_USER_KEY, nextId)
 }
 
-supabase.auth.onAuthStateChange((_event, session) => {
-  cachedUserId = session?.user.id ?? null
-  // 연동(link)은 id가 그대로라 정리 대상이 아니다 — 다른 계정으로 갈아탄 경우에만 지워진다
-  if (cachedUserId) clearLocalBestsIfUserChanged(cachedUserId)
-  linkedProvider.value = readProvider(session?.user)
+// 클라이언트를 늦게 만들므로 구독도 그때 건다 — 만들어지기 전에는 바뀔 세션도 없다
+whenSupabaseReady((sb) => {
+  sb.auth.onAuthStateChange((_event, session) => {
+    cachedUserId = session?.user.id ?? null
+    // 연동(link)은 id가 그대로라 정리 대상이 아니다 — 다른 계정으로 갈아탄 경우에만 지워진다
+    if (cachedUserId) clearLocalBestsIfUserChanged(cachedUserId)
+    linkedProvider.value = readProvider(session?.user)
+  })
 })
 
 // 세션이 없으면 익명 로그인으로 부트스트랩 (DESIGN.md 6장 인증 흐름)
 export async function ensureUserId(): Promise<string> {
   if (cachedUserId) return cachedUserId
-  const { data } = await supabase.auth.getSession()
+  const sb = await getSupabase()
+  const { data } = await sb.auth.getSession()
   let session = data.session
   if (!session) {
-    const { data: anon, error } = await supabase.auth.signInAnonymously()
+    const { data: anon, error } = await sb.auth.signInAnonymously()
     if (error) throw error
     session = anon.session
   }
@@ -59,7 +63,8 @@ export async function ensureUserId(): Promise<string> {
 // 자동 로그인 없이 현재 세션만 조회 (랭킹에서 내 순위 강조용)
 export async function getCurrentUserId(): Promise<string | null> {
   if (cachedUserId) return cachedUserId
-  const { data } = await supabase.auth.getSession()
+  const sb = await getSupabase()
+  const { data } = await sb.auth.getSession()
   return data.session?.user.id ?? null
 }
 
@@ -67,7 +72,8 @@ export async function getCurrentUserId(): Promise<string | null> {
 export async function linkSocial(provider: SocialProvider): Promise<void> {
   await ensureUserId()
   sessionStorage.setItem(PENDING_KEY, provider)
-  const { error } = await supabase.auth.linkIdentity({
+  const sb = await getSupabase()
+  const { error } = await sb.auth.linkIdentity({
     provider,
     options: { redirectTo: `${location.origin}/settings` },
   })
@@ -80,7 +86,8 @@ export async function linkSocial(provider: SocialProvider): Promise<void> {
 // 이미 다른 기기에서 연동해둔 계정으로 로그인 — 그 계정의 기록을 그대로 이어받는다
 export async function signInSocial(provider: SocialProvider): Promise<void> {
   sessionStorage.removeItem(PENDING_KEY)
-  const { error } = await supabase.auth.signInWithOAuth({
+  const sb = await getSupabase()
+  const { error } = await sb.auth.signInWithOAuth({
     provider,
     options: { redirectTo: `${location.origin}/settings` },
   })
@@ -112,7 +119,8 @@ export function takeRedirectError(): RedirectError | null {
 
 // 연동된 소셜 계정의 표시 이름 (닉네임 자동 설정용). 서버에서 최신 identity도 함께 갱신한다
 export async function fetchSocialName(): Promise<string | null> {
-  const { data } = await supabase.auth.getUser()
+  const sb = await getSupabase()
+  const { data } = await sb.auth.getUser()
   linkedProvider.value = readProvider(data.user)
   if (!data.user || !linkedProvider.value) return null
   const meta = data.user.user_metadata ?? {}

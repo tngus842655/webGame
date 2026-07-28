@@ -8,6 +8,7 @@ import { CanvasStage } from '../stage'
 import {
   applyAiMove,
   createState,
+  loadProgress,
   playerMove,
   startStage,
   tickClock,
@@ -25,6 +26,8 @@ const BOARD_W = CELL * (SIZE - 1)
 const X0 = (720 - BOARD_W) / 2
 const Y0 = 300
 const UNDO_BTN = { x: 180, y: 1010, w: 360, h: 92 } as const
+const RESUME_BTN = { x: 140, y: 528, w: 440, h: 104 } as const
+const FRESH_BTN = { x: 140, y: 656, w: 440, h: 88 } as const
 
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
@@ -70,14 +73,23 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   let placeFx = 0 // 돌이 놓이며 내려앉는 연출
   let clock = 0 // 미리보기 표식을 흔드는 시계
   let adContinueUsed = false
+  // 지난 판에서 어디까지 갔는지 — 있으면 첫 화면에서 이어할지 묻는다
+  let saved = loadProgress()
+  if (saved) state.phase = 'intro'
+
+  const beginRun = () => {
+    Object.assign(state, createState())
+    saved = loadProgress()
+    if (saved) state.phase = 'intro'
+    undoUsed = false
+    adContinueUsed = false
+  }
 
   const overlay = createGameOverOverlay(shell.wrapper, {
     adLabelKey: 'om.ad',
     onRetry() {
       if (state.phase !== 'over') return
-      Object.assign(state, createState())
-      undoUsed = false
-      adContinueUsed = false
+      beginRun()
       overlay.hide()
     },
     onContinue() {
@@ -99,9 +111,20 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   async function gameOver() {
     const prevBest = await ctx.getBestScore()
-    await ctx.submitScore(state.score)
+    void ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
-    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adContinueUsed && !state.cleared)
+    // 진 이유는 판을 보면 알지만, 시간 초과는 판에 흔적이 남지 않는다
+    const reason = state.cleared
+      ? 'over.byClear'
+      : state.stage >= TIMED_FROM && state.timeLeft <= 0
+        ? 'over.byTime'
+        : undefined
+    overlay.show(
+      state.score,
+      prevBest,
+      ctx.isRewardAdReady() && !adContinueUsed && !state.cleared,
+      reason,
+    )
   }
 
   // 광고 보상: 마지막 한 수 무르기
@@ -130,6 +153,19 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const detachInput = attachInput(stage.canvas, {
     onDown(clientX, clientY) {
       const p = stage.toBoard(clientX, clientY)
+      if (state.phase === 'intro') {
+        const hit = (b: { x: number; y: number; w: number; h: number }) =>
+          p.x >= b.x && p.x <= b.x + b.w && p.y >= b.y && p.y <= b.y + b.h
+        if (saved && hit(RESUME_BTN)) {
+          state.score = saved.score
+          startStage(state, saved.stage)
+          playSfx('stone')
+        } else if (hit(FRESH_BTN)) {
+          state.phase = 'playing'
+          playSfx('stone')
+        }
+        return
+      }
       if (
         state.phase === 'playing' &&
         p.x >= UNDO_BTN.x &&
@@ -320,6 +356,40 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.font = font(28, true)
       c.textBaseline = 'middle'
       c.fillText(t('om.undo'), 360, UNDO_BTN.y + UNDO_BTN.h / 2 + 1)
+      c.textBaseline = 'alphabetic'
+    }
+
+    // 이어하기 물음 — 지난 판에서 올라간 단이 있을 때만 첫 화면에 뜬다
+    if (state.phase === 'intro' && saved) {
+      c.fillStyle = 'rgb(38 24 18 / 0.72)'
+      c.fillRect(0, 0, 720, 1280)
+      c.textAlign = 'center'
+      c.fillStyle = '#FFF8E1'
+      c.font = font(36, true)
+      c.fillText(t('om.resumeTitle'), 360, 470)
+
+      c.fillStyle = '#43A047'
+      c.beginPath()
+      c.roundRect(RESUME_BTN.x, RESUME_BTN.y, RESUME_BTN.w, RESUME_BTN.h, 26)
+      c.fill()
+      c.textBaseline = 'middle'
+      c.fillStyle = '#FFFFFF'
+      c.font = font(30, true)
+      c.fillText(t('om.resume', { n: saved.stage }), 360, RESUME_BTN.y + 42)
+      c.font = font(22)
+      c.fillStyle = 'rgb(255 255 255 / 0.8)'
+      c.fillText(`${t('hud.score')} ${saved.score.toLocaleString()}`, 360, RESUME_BTN.y + 76)
+
+      c.fillStyle = 'rgb(255 255 255 / 0.14)'
+      c.beginPath()
+      c.roundRect(FRESH_BTN.x, FRESH_BTN.y, FRESH_BTN.w, FRESH_BTN.h, 24)
+      c.fill()
+      c.strokeStyle = 'rgb(255 255 255 / 0.3)'
+      c.lineWidth = 2
+      c.stroke()
+      c.fillStyle = '#FFF8E1'
+      c.font = font(26, true)
+      c.fillText(t('om.fresh'), 360, FRESH_BTN.y + FRESH_BTN.h / 2 + 1)
       c.textBaseline = 'alphabetic'
     }
 

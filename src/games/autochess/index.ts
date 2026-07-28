@@ -10,6 +10,7 @@ import {
   buy,
   createState,
   dropUnit,
+  makeFoes,
   nextRound,
   startBattle,
   BOARD_SLOTS,
@@ -27,6 +28,7 @@ const SLOT = 112
 const SLOT_GAP = 10
 const BOARD_X = (720 - (SLOT * 3 + SLOT_GAP * 2)) / 2
 const BOARD_Y = 430
+const FOE_PANEL = { x: 36, y: 232, w: 648, h: 150 } as const
 const FIGHT_BTN = { x: 210, y: 730, w: 300, h: 92 } as const
 const SHOP_Y = 960
 const SHOP_W = 200
@@ -158,15 +160,16 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     state.round += 1
     state.gold += 5
     state.shop = state.shop.map(() => Math.floor(Math.random() * 4))
+    state.foes = makeFoes(state.round)
     state.phase = 'prep'
     overlay.hide()
   }
 
   async function gameOver() {
     const prevBest = await ctx.getBestScore()
-    await ctx.submitScore(state.score)
+    void ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
-    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adContinueUsed)
+    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adContinueUsed, 'over.byHp')
   }
 
   const burstDeath = (x: number, y: number, species: number) => {
@@ -260,7 +263,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         p.y <= FIGHT_BTN.y + FIGHT_BTN.h
       ) {
         if (startBattle(state)) {
-          playDrop()
+          playSfx('select')
           vibrate(15)
         }
         return
@@ -376,6 +379,29 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     drawIconValue(c, 'coin', String(state.gold), 500, 200, 15, 'left')
 
     if (state.phase === 'prep') {
+      // 이번 라운드에 붙을 상대. 몇 명이 어느 정도인지 보고 나서 살 것을 정한다
+      c.fillStyle = 'rgb(183 28 28 / 0.16)'
+      c.beginPath()
+      c.roundRect(FOE_PANEL.x, FOE_PANEL.y, FOE_PANEL.w, FOE_PANEL.h, 18)
+      c.fill()
+      c.strokeStyle = 'rgb(239 83 80 / 0.3)'
+      c.lineWidth = 2
+      c.stroke()
+      c.fillStyle = 'rgb(255 138 128 / 0.85)'
+      c.font = font(20, true)
+      c.textAlign = 'center'
+      c.fillText(t('ac.foes'), 360, FOE_PANEL.y + 28)
+      const x0 = 360 - ((state.foes.length - 1) * 100) / 2
+      for (let i = 0; i < state.foes.length; i++) {
+        const foe = state.foes[i]
+        const fx = x0 + i * 100
+        drawUnit(c, foe, fx, FOE_PANEL.y + 106, 22, 0, false, -1)
+        c.font = font(14, true)
+        c.fillStyle = 'rgb(255 255 255 / 0.8)'
+        drawIconValue(c, 'sword', String(foe.atk), fx - 24, FOE_PANEL.y + 130, 7)
+        drawIconValue(c, 'heart', String(foe.maxHp), fx + 24, FOE_PANEL.y + 130, 7)
+      }
+
       const mergeable = mergeableSlots()
       const glow = 0.5 + Math.sin(state.playTime * 4) * 0.5
       for (let i = 0; i < BOARD_SLOTS; i++) {
