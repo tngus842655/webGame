@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playDrop, playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { drawIcon } from '../icons'
 import { createGameOverOverlay } from '../overlay'
@@ -43,8 +43,8 @@ const JUDGE_STYLE: Record<Judge, { text: string; color: string }> = {
   good: { text: 'GOOD', color: '#55B9FF' },
   miss: { text: 'MISS', color: '#FF5252' },
 }
-// 정확할수록 높고 맑은 소리
-const JUDGE_TIER: Record<Judge, number> = { perfect: 7, great: 5, good: 3, miss: 0 }
+// 정확할수록 높고 맑게 — 같은 타격음의 음높이만 올린다
+const JUDGE_RATE: Record<Judge, number> = { perfect: 1.14, great: 1, good: 0.88, miss: 1 }
 
 interface Particle {
   x: number
@@ -99,7 +99,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
     const missed = update(state, dt)
     if (missed.length > 0) {
-      playDrop()
+      playSfx('rhythm-miss')
       vibrate(40)
       judgeFx = { judge: 'miss', age: 0 }
       damage = 1
@@ -122,6 +122,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('rhythm-hit', 'rhythm-miss', 'tap', 'clear', 'gameover')
   let adContinueUsed = false
 
   const particles: Particle[] = []
@@ -168,7 +169,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     // 체력이 남은 채 끝났다 = 곡을 완주했다. 실패와 같은 소리로 끝내면 억울하다.
     const cleared = state.health > 0
     if (cleared) {
-      playMerge(6)
+      playSfx('clear')
       vibrate([30, 60, 30])
     } else {
       playGameOver()
@@ -260,7 +261,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         playDrop()
         return
       }
-      playMerge(JUDGE_TIER[judge])
+      playSfx('rhythm-hit', { rate: JUDGE_RATE[judge] })
       rings.push({ lane, judge, age: 0 })
       judgeFx = { judge, age: 0 }
       comboPop = 1

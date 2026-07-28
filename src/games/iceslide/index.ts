@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playDrop, playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -60,7 +60,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const wasSliding = state.phase === 'sliding'
     const events = update(state, dt)
     if (events.stars > 0) {
-      playMerge(Math.min(6, 2 + events.stars))
+      playSfx('coin', { rate: 1 + Math.min(4, events.stars - 1) * 0.06 })
       vibrate(12)
       // 지나가며 주웠으므로 펭귄 자리에서 튀어오른다
       const sl = state.slide
@@ -70,10 +70,11 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       sparkle(px, py)
     }
     if (events.cleared) {
+      playSfx('clear')
       vibrate([20, 40, 30])
       clearGlow = 1
     } else if (events.stopped) {
-      playDrop()
+      playSfx('impact')
       bump = 1
       shake = 1
       // 부딪혀 멈춘 자리에서 얼음이 튄다
@@ -90,6 +91,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('ice-slide', 'impact', 'coin', 'clear', 'tap', 'gameover')
   const crystals: Crystal[] = []
   const starPops: Array<{ x: number; y: number; age: number }> = []
   // 방금 지나온 길 — 얼음 위에 자국이 잠깐 남는다
@@ -231,6 +233,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (Math.abs(dx) > Math.abs(dy)) dir = dx > 0 ? 'right' : 'left'
     else dir = dy > 0 ? 'down' : 'up'
     if (slide(state, dir)) {
+      playSfx('ice-slide')
       trail = { fromX: state.slide!.fromX, fromY: state.slide!.fromY, toX: state.px, toY: state.py }
       trailAge = 0
     } else {

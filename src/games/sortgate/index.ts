@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -61,7 +61,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const falling = state.piece
     const events = update(state, dt)
     if (events.missed) {
-      playDrop()
+      playSfx('fail')
       vibrate(80)
       shake = 1
       if (falling) splat(falling)
@@ -75,6 +75,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('pop', 'fail', 'gameover')
   const particles: Particle[] = []
   const popups: Array<{ x: number; y: number; gain: number; age: number }> = []
   const boxPop = { left: 0, right: 0 }
@@ -182,13 +183,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (correct === null || !piece) return
     const key = side === -1 ? 'left' : 'right'
     if (correct) {
-      playMerge(Math.min(6, 2 + Math.floor(state.streak / 3)))
+      playSfx('pop', { rate: Math.min(1.6, 1 + Math.floor(state.streak / 3) * 0.08) })
       vibrate(12)
       boxPop[key] = 1
       burstBox(side, toneOf(piece))
       popups.push({ x: BOX_X[key], y: BOX_Y - 96, gain: state.score - before, age: 0 })
     } else {
-      playDrop()
+      playSfx('fail')
       vibrate(90)
       shake = 1
     }

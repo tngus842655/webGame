@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -48,7 +48,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     state.playTime += dt
     const events = update(state, dt)
     if (events.missed) {
-      playDrop()
+      playSfx('fail')
       vibrate(70)
       missFlash = 1
       missMark = events.missedAt
@@ -62,6 +62,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('pop', 'whoosh', 'fail', 'gameover')
   const sparks: Spark[] = []
   // 이번 획에서 터뜨린 자리 — 이것들을 순서대로 이어야 '이었다'는 느낌이 난다
   let chain: Point[] = []
@@ -146,6 +147,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     onDown(clientX, clientY) {
       const p = stage.toBoard(clientX, clientY)
       startStroke(state, p.x, p.y)
+      playSfx('whoosh', { gain: 0.5 })
       chain = []
       chainFade = 0
     },
@@ -161,7 +163,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         burst(b.x, b.y)
       }
       const n = state.stroke?.cuts ?? 1
-      playMerge(Math.min(6, 2 + n))
+      // 이을수록 음이 올라간다 — 몇 개째인지 소리로 센다
+      playSfx('pop', { rate: Math.min(1.7, 1 + (n - 1) * 0.09) })
       vibrate(12)
       flash = Math.min(1, 0.25 + n * 0.18)
     },

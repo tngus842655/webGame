@@ -1,5 +1,5 @@
 import { t, type TranslationKey } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playDrop, playGameOver, playMerge, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -105,6 +105,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
           blockBreak = 1
         }
         if (result.damage > 0) {
+          playSfx('hurt')
           hitFlash = 1
           popups.push({ x: 130, y: 830, text: `-${result.damage}`, color: '#FF8A80', age: 0 })
         }
@@ -120,6 +121,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('sword', 'select', 'hurt', 'clear', 'tap', 'gameover')
   const popups: Popup[] = []
   let hitFlash = 0
   let enemyHit = 0 // 적이 맞아 흔들리는 정도
@@ -211,7 +213,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
             const result = playCard(state, i)
             if (result === 'none') return
             hasPlayed = true
-            playMerge(3)
+            playSfx(CARD_DEFS[id].dmg ? 'sword' : 'select')
             vibrate(15)
             // 무엇이 얼마나 일어났는지 숫자로 띄운다 — 카드 효과가 숫자로만 적혀 있어
             // 실제로 몇이 들어갔는지 볼 곳이 없었다
@@ -230,7 +232,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
               popups.push({ x: 110, y: 830, text: `+${healed}`, color: '#A5D6A7', age: 0 })
             }
             if (result === 'killed') {
-              playMerge(6)
+              playSfx('clear')
               vibrate([20, 40, 20])
             }
             return

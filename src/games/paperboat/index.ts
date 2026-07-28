@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playGameOver, playMerge, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -79,11 +79,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     state.playTime += dt
     const events = update(state, dt)
     if (events.docked > 0) {
+      // 새 부두가 열린 판이면 그것부터 알린다 (state가 dockFlash로 표시해 준다)
+      if (state.dockFlash > 0) playSfx('unlock')
+      playSfx('water')
       playMerge(Math.min(6, 2 + state.combo))
       vibrate(12)
       dockRing = 1
     }
     if (events.crashed) {
+      playSfx('impact')
       vibrate([40, 60, 80])
       if (state.crash) burstScraps(state.crash.x, state.crash.y)
     }
@@ -96,6 +100,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('water', 'impact', 'tap', 'merge', 'unlock', 'gameover')
   const scraps: Scrap[] = []
   let dockRing = 0
   let dragging: Boat | null = null
@@ -178,7 +183,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     onDown(clientX, clientY) {
       const p = stage.toBoard(clientX, clientY)
       dragging = grabBoat(state, p.x, p.y)
-      if (dragging) playDrop()
+      if (dragging) playSfx('tap')
     },
     onMove(clientX, clientY) {
       if (!dragging || state.phase !== 'playing') return

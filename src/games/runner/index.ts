@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -38,6 +38,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (state.phase === 'playing') {
       const result = update(state, dt)
       if (result.landed) {
+        playSfx('impact', { gain: 0.5 })
         landFx = 1
         puffDust(6, 0.7)
       }
@@ -45,7 +46,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         burstCoin(spot.x, spot.y)
         popups.push({ x: spot.x, y: spot.y, age: 0 })
       }
-      if (result.coinsTaken > 0) playMerge(2)
+      if (result.coinsTaken > 0) playSfx('coin')
       if (result.died) void gameOver()
     }
     stepEffects(dt)
@@ -53,6 +54,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('coin', 'impact', 'whoosh', 'gameover')
   let adContinueUsed = false
 
   // 착지 눌림(1 → 0으로 잦아든다)과 도약 늘어남
@@ -159,7 +161,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       state.vy = JUMP_V
       state.jumpsLeft -= 1
       jumpFx = 1
-      playDrop()
+      playSfx('whoosh')
     },
     onMove() {},
     onUp() {},

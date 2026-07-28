@@ -1,5 +1,5 @@
 import { t, type TranslationKey } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playDrop, playGameOver, playMerge, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -90,15 +90,19 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         const species = attackers[hit.from]?.species ?? 0
         if (isRanged(species)) {
           shots.push({ x: ax, y: ay, tx: dx, ty: dy, age: 0, life: 0.22, species })
+          playSfx('shoot', { gain: 0.6 })
+        } else {
+          playSfx('sword', { gain: 0.6 })
         }
         popups.push({ x: dx, y: dy - 30, text: `-${hit.damage}`, color: '#FF8A80', age: 0 })
         if (hit.died) {
+          playSfx('explode')
           burstDeath(dx, dy, defenders[hit.index]?.species ?? 0)
           vibrate(20)
         }
       }
       if (events.ended) {
-        if (state.won) playMerge(6)
+        if (state.won) playSfx('clear')
         else {
           playGameOver()
           vibrate(80)
@@ -115,6 +119,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('sword', 'shoot', 'explode', 'select', 'clear', 'merge', 'gameover')
   const hitFlash = new Map<string, number>()
   const lunge = new Map<string, number>()
   const shots: Shot[] = []
@@ -264,7 +269,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         const i = Math.floor((p.x - 40) / (SHOP_W + 20))
         if (i >= 0 && i < 3 && p.x >= 40 + i * (SHOP_W + 20) && p.x <= 40 + i * (SHOP_W + 20) + SHOP_W) {
           if (buy(state, i)) {
-            playDrop()
+            playSfx('select')
             vibrate(10)
           }
         }

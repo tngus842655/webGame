@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playGameOver, playMerge, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -41,13 +41,14 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (events.kills.length > 0) {
       playMerge(Math.min(6, 2 + Math.floor(state.streak / 5)))
       vibrate(15)
+      playSfx('explode')
       for (const k of events.kills) {
         burstKill(k.x, k.y)
         popups.push({ x: k.x, y: k.y, gain: k.gain, age: 0 })
       }
     }
     if (events.leaked) {
-      playDrop()
+      playSfx('hurt')
       vibrate(80)
       leakFlash = 1
       shake = 1
@@ -64,6 +65,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('shoot', 'explode', 'hurt', 'merge', 'gameover')
   const particles: Particle[] = []
   const popups: Array<{ x: number; y: number; gain: number; age: number }> = []
   let leakFlash = 0
@@ -187,7 +189,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const detachInput = attachInput(stage.canvas, {
     onDown() {
       if (!fire(state)) return
-      playDrop()
+      playSfx('shoot')
       recoil = 1
       hasFired = true
     },

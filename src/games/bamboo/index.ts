@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, vibrate } from '@/shared/sound'
+import { playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -45,6 +45,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('whoosh', 'impact', 'gameover')
   const leaves: Leaf[] = []
   // 붙어 있는 쪽을 부드럽게 옮긴다 (-1 ↔ 1). 순간이동하면 오른 게 아니라 깜빡인 것처럼 보인다.
   let sideAnim = -1
@@ -127,14 +128,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       const p = stage.toBoard(clientX, clientY)
       const result = climb(state, p.x < 360 ? -1 : 1)
       if (result === 'up') {
-        playDrop()
+        // 한 마디 올라갈수록 음이 조금씩 올라간다
+        playSfx('whoosh', { rate: 1 + Math.min(12, state.height) * 0.02 })
         reach = 1
         rush = 1
         armPhase = 1 - armPhase
         shedLeaves(360, segY(state.height) + SEG_H, 2)
       } else if (result === 'hit') {
         // 부딪힌 소리는 둔탁해야 한다 (예전엔 합성 성공음이 울렸다)
-        playDrop()
+        playSfx('impact')
         vibrate(90)
         shedLeaves(360, segY(state.height + 1), 7)
       }

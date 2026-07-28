@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playDrop, playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -48,7 +48,11 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       if (state.overTimer <= 0) void gameOver()
     }
     if (reveal.row >= 0) {
+      // 칸이 하나씩 열릴 때마다 뒤집히는 소리
+      const before = Math.floor(reveal.t / REVEAL_STEP)
       reveal.t += dt
+      const after = Math.floor(reveal.t / REVEAL_STEP)
+      if (after > before && after < WORD_LEN) playSfx('flip', { rate: 0.95 + after * 0.03 })
       if (reveal.t > REVEAL_STEP * (WORD_LEN - 1) + REVEAL_TURN) reveal.row = -1
     }
     shakeRow = Math.max(0, shakeRow - dt * 3.2)
@@ -56,6 +60,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('flip', 'clear', 'fail', 'tap', 'gameover')
   let toast: { text: string; age: number; life: number } | null = null
   // 제출한 줄이 한 칸씩 뒤집히며 결과를 연다 — 이 게임에서 가장 중요한 순간이다
   let reveal = { row: -1, t: 0 }
@@ -130,20 +135,18 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (result === 'none') {
       // 여섯 칸을 다 못 채웠거나 없는 단어 — 아무 반응이 없으면 고장으로 보인다
       shakeRow = 1
-      playDrop()
+      playSfx('fail')
       vibrate(40)
       return
     }
     reveal = { row: rowIndex, t: 0 }
     if (result === 'won') {
       lastPoints = state.score - prevScore
-      playMerge(6)
+      playSfx('clear')
       vibrate([20, 40, 20])
     } else if (result === 'lost') {
       vibrate(80)
       showToast(t('wd.answer', { word: state.word.hangul }), 2.2)
-    } else {
-      playMerge(2)
     }
   }
 

@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playGameOver, playMerge, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -40,7 +40,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     }
     if (state.phase === 'aiThinking' && state.thinkTimer <= 0) {
       const result = applyAiMove(state)
-      playDrop()
+      playSfx('stone', { rate: 0.94 })
       placeFx = 1
       if (result === 'win') {
         vibrate(80)
@@ -64,6 +64,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('stone', 'merge', 'gameover')
   let undoUsed = false // 판당 1회 광고 무르기
   let aiming: number | null = null // 손가락이 겨누고 있는 교차점 (떼면 확정)
   let placeFx = 0 // 돌이 놓이며 내려앉는 연출
@@ -155,7 +156,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       if (at === null || state.phase !== 'playing') return
       const result = playerMove(state, at)
       if (result === 'invalid') return
-      playDrop()
+      playSfx('stone')
       vibrate(10)
       placeFx = 1
       if (result === 'win') {
