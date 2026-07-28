@@ -62,12 +62,12 @@ C:\Android\Sdk\cmdline-tools\latest\bin\sdkmanager.bat --licenses
 
 ## 4. 프로젝트 만들기
 
-저장소 바깥에 작업 폴더를 하나 판다. (예: `C:\twa\minigame30`)
+저장소 바깥에 작업 폴더를 하나 판다. (예: `C:\Workspace\MiniGame30-TWA`)
 **저장소 안에 만들면 안 된다** — keystore가 git에 딸려 올라간다.
 
 ```powershell
-mkdir C:\twa\minigame30
-cd C:\twa\minigame30
+mkdir C:\Workspace\MiniGame30-TWA
+cd C:\Workspace\MiniGame30-TWA
 bubblewrap init --manifest https://web-game-ecru.vercel.app/manifest.webmanifest
 ```
 
@@ -124,7 +124,7 @@ bubblewrap init --manifest https://web-game-ecru.vercel.app/manifest.webmanifest
 ## 6. 빌드
 
 ```powershell
-cd C:\twa\minigame30
+cd C:\Workspace\MiniGame30-TWA
 bubblewrap build
 ```
 
@@ -174,13 +174,32 @@ C:\Android\Sdk\platform-tools\adb.exe install -r app-release-signed.apk
 그래픽 이미지와 스크린샷은 직접 준비해 주세요. 스크린샷은 폰에서 게임 몇 개를
 실행해 찍으면 되고, 그래픽 이미지는 필요하면 따로 요청 주시면 시안을 잡겠습니다.
 
-## 8. 비공개 테스트에 업로드
+## 8. 업로드 — 내부 테스트 먼저, 비공개 테스트는 그 다음
 
-**테스트 및 출시 → 테스트 → 비공개 테스트** → 새 버전 만들기
+트랙이 세 개인데 **역할이 다르다. 순서를 지켜야 시간을 아낀다.**
 
-1. `app-release-bundle.aab` 업로드
+| 트랙 | 심사 | 12명·14일 인정 | 용도 |
+| --- | --- | --- | --- |
+| 내부 테스트 | 거의 없음 (수 분) | **안 됨** | 앱이 제대로 도는지 빨리 확인 |
+| 비공개 테스트 | 있음 (수 시간~며칠) | **됨** | 여기서 14일 시계가 돈다 |
+| 프로덕션 | 있음 | — | 정식 출시 |
+
+### 8-1. 내부 테스트로 먼저 확인
+
+**테스트 및 출시 → 테스트 → 내부 테스트** → 새 버전 만들기
+
+1. `app-release.aab` 업로드
 2. **Play 앱 서명**은 기본값 그대로 사용 (동의)
 3. 출시명/출시 노트 작성 후 검토 → 출시 시작
+4. 테스터 목록에 내 계정을 넣고 옵트인 링크로 설치해 확인
+
+여기서 9단계(assetlinks)까지 마쳐 주소창이 사라지는 것까지 보고 넘어간다.
+잘못된 빌드로 비공개 테스트를 시작하면 14일을 날린다.
+
+### 8-2. 확인 끝나면 비공개 테스트로
+
+**테스트 및 출시 → 테스트 → 비공개 테스트** → 같은 AAB를 올린다.
+여기부터 10단계의 12명·14일이 적용된다.
 
 ## 9. assetlinks.json 채우기 (주소창 없애기)
 
@@ -239,7 +258,7 @@ JSON이 그대로 보여야 한다. 앱을 지웠다 다시 설치하면 주소�
 앱 껍데기 자체(아이콘, 이름, targetSdk 등)를 고칠 때만:
 
 ```powershell
-cd C:\twa\minigame30
+cd C:\Workspace\MiniGame30-TWA
 ```
 
 `twa-manifest.json`에서 두 값을 올린다.
