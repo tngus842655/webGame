@@ -7,7 +7,7 @@ import {
   stashPendingScore,
   updateLocalBest,
 } from './scores'
-import { supabase } from './supabase'
+import { getSupabase } from './supabase'
 
 // 진행 중 점수 보존 — 게임오버 전에 나가도 기록이 남게 한다.
 // 게임 코드는 현재 점수를 돌려주기만 하고(GameModule.currentScore), 저장 시점은 여기서 정한다.
@@ -28,7 +28,8 @@ interface Credentials {
 async function loadCredentials(): Promise<Credentials | null> {
   try {
     const userId = await ensureUserId()
-    const { data } = await supabase.auth.getSession()
+    const sb = await getSupabase()
+    const { data } = await sb.auth.getSession()
     const accessToken = data.session?.access_token
     if (!accessToken) return null
     return { userId, accessToken }

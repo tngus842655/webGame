@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { getCurrentUserId } from './auth'
 import { cacheGameFlags } from './scores'
-import { supabase } from './supabase'
+import { getSupabase } from './supabase'
 
 // 관리자 판별은 DB의 admin_emails 표에 등록된 이메일로만 이루어진다.
 // 여기서 하는 일은 "관리자 메뉴를 보여줄지" 정하는 것뿐이고, 실제 권한은
@@ -18,7 +18,8 @@ export async function refreshAdmin(): Promise<boolean> {
     isAdmin.value = false
     return false
   }
-  const { data, error } = await supabase.rpc('is_admin')
+  const sb = await getSupabase()
+  const { data, error } = await sb.rpc('is_admin')
   isAdmin.value = !error && data === true
   checked = true
   return isAdmin.value
@@ -56,7 +57,8 @@ export interface GameFlag {
 }
 
 export async function fetchGameFlags(): Promise<GameFlag[]> {
-  const { data, error } = await supabase
+  const sb = await getSupabase()
+  const { data, error } = await sb
     .from('game_flags')
     .select('slug, featured, hidden, sort_order, trashed_at')
   if (error) throw error
@@ -79,7 +81,8 @@ export async function fetchGameFlags(): Promise<GameFlag[]> {
 
 // 관리자만 통과한다 (RLS가 막는다)
 export async function saveGameFlag(flag: GameFlag): Promise<void> {
-  const { error } = await supabase.from('game_flags').upsert({
+  const sb = await getSupabase()
+  const { error } = await sb.from('game_flags').upsert({
     slug: flag.slug,
     featured: flag.featured,
     hidden: flag.hidden,
