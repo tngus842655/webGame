@@ -217,7 +217,8 @@ export function update(state: BoatState, dt: number): TickEvents {
   return events
 }
 
-// 배를 집으면 그리던 항로는 버리고 새로 긋는다
+// 손끝에 가장 가까운 배를 집는다. 항로는 아직 건드리지 않는다 —
+// 스치듯 짚기만 해도 애써 그은 길이 사라지면 억울하다.
 export function grabBoat(state: BoatState, x: number, y: number): Boat | null {
   if (state.phase !== 'playing') return null
   let best: Boat | null = null
@@ -229,7 +230,6 @@ export function grabBoat(state: BoatState, x: number, y: number): Boat | null {
       bestDist = d
     }
   }
-  if (best) best.path = []
   return best
 }
 

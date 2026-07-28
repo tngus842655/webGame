@@ -9,6 +9,7 @@ import { CanvasStage } from '../stage'
 import {
   ARENA,
   PLAYER_R,
+  UPGRADE_POOL,
   createState,
   applyUpgrade,
   scoreOf,
@@ -297,6 +298,28 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fillStyle = '#FFFFFF'
       c.font = font(40, true)
       c.fillText(t('sv.levelup'), 360, 352)
+
+      // 지금까지 쌓은 것 — 다음 하나를 무엇으로 채울지는 이걸 봐야 정할 수 있다
+      c.fillStyle = 'rgb(255 248 225 / 0.7)'
+      c.font = font(20)
+      c.fillText(t('sv.taken'), 360, 216)
+      for (let i = 0; i < UPGRADE_POOL.length; i++) {
+        const key = UPGRADE_POOL[i].key
+        const n = state.taken[key]
+        const ux = 360 + (i - (UPGRADE_POOL.length - 1) / 2) * 128
+        c.save()
+        c.globalAlpha = n > 0 ? 1 : 0.24
+        c.translate(ux, 262)
+        c.scale(0.62, 0.62)
+        drawUpgradeIcon(c, key, 0, 0)
+        c.restore()
+        c.save()
+        c.globalAlpha = n > 0 ? 1 : 0.24
+        c.fillStyle = '#FFF8E1'
+        c.font = font(22, true)
+        c.fillText(`×${n}`, ux, 306)
+        c.restore()
+      }
       for (let i = 0; i < CARD_RECTS.length && i < state.choices.length; i++) {
         const r = CARD_RECTS[i]
         const choice = state.choices[i]
