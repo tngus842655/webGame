@@ -121,10 +121,11 @@ export function createState(): CometState {
 
 export interface TickEvents {
   missed: boolean
+  missedAt: Point | null // 놓친 자리 — 어디서 흘려보냈는지 화면에 남겨야 한다
 }
 
 export function update(state: CometState, dt: number): TickEvents {
-  const events: TickEvents = { missed: false }
+  const events: TickEvents = { missed: false, missedAt: null }
 
   for (let i = state.bursts.length - 1; i >= 0; i--) {
     state.bursts[i].age += dt
@@ -157,6 +158,7 @@ export function update(state: CometState, dt: number): TickEvents {
       state.comets.splice(i, 1)
       state.misses += 1
       events.missed = true
+      events.missedAt = { x: comet.x, y: comet.y }
     }
   }
 
