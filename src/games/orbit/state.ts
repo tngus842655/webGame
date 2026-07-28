@@ -65,7 +65,8 @@ export function createState(): OrbitState {
 }
 
 export interface TickEvents {
-  kills: Array<{ x: number; y: number }> // 격추 위치 (파편 연출용)
+  // 격추 위치와 그때 받은 점수 (파편·점수 팝업 연출용)
+  kills: Array<{ x: number; y: number; gain: number }>
   leaked: boolean
   missed: boolean // 탄이 화면 밖으로 (스트릭 초기화)
 }
@@ -123,8 +124,9 @@ export function update(state: OrbitState, dt: number): TickEvents {
       if (enemy.hp <= 0) {
         state.enemies.splice(j, 1)
         state.streak += 1
-        state.score = Math.min(1_000_000, state.score + 10 + Math.min(state.streak, 20) * 2)
-        events.kills.push({ x: ex, y: ey })
+        const gain = 10 + Math.min(state.streak, 20) * 2
+        state.score = Math.min(1_000_000, state.score + gain)
+        events.kills.push({ x: ex, y: ey, gain })
       }
       break
     }

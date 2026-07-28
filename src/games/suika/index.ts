@@ -1,4 +1,4 @@
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playDrop, playGameOver, playMerge, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { createGameShell, defineGame } from '../shell'
@@ -34,6 +34,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const renderer = new SuikaRenderer(shell.wrapper)
   const world = new SuikaWorld()
   const state = createState()
+  preloadSfx('gameover', 'merge', 'tap')
 
   world.onMerge = (e) => {
     state.score += e.gained

@@ -1,4 +1,4 @@
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -21,6 +21,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const renderer = new BBRenderer(shell.wrapper)
   const state = createState()
+  preloadSfx('gameover', 'pop', 'select')
   let adSwapUsed = false
   let drag: DragState | null = null
 
@@ -87,13 +88,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       const result = placePiece(state, current.trayIndex, col, row)
       if (!result) return
 
-      playDrop()
+      playSfx('select')
       const { w, h } = pieceSize(piece)
       const cx = LAYOUT.boardX + (col + w / 2) * LAYOUT.cell
       const cy = LAYOUT.boardY + (row + h / 2) * LAYOUT.cell
       state.popups.push({ x: cx, y: cy - 20, text: `+${result.gained}`, age: 0 })
       if (result.linesCleared > 0) {
-        playMerge(1 + result.linesCleared)
+        playSfx('pop', { rate: 1 + Math.min(3, result.linesCleared - 1) * 0.12 })
         vibrate(15)
         for (const cell of result.clearedCells) state.clearFx.push({ ...cell, age: 0 })
       }

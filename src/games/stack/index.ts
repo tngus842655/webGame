@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playGameOver, playMerge, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -32,6 +32,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('gameover', 'impact', 'merge')
   let adReviveUsed = false
 
   // 밤하늘 별 — 카메라보다 천천히 흘러 높이감을 만든다
@@ -83,7 +84,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         playMerge(Math.min(6, 2 + state.combo))
         vibrate(12)
       } else {
-        playDrop()
+        playSfx('impact')
       }
     },
     onMove() {},

@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playDrop, playGameOver, playMerge, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createClearBonus } from '../clearBonus'
 import { createGameOverOverlay } from '../overlay'
@@ -24,7 +24,7 @@ import {
   stageSeconds,
   update,
 } from './state'
-import { font } from '../ui'
+import { drawScorePanel, font } from '../ui'
 import { drawIcon } from '../icons'
 
 const REVIVE_SECONDS = 60
@@ -33,7 +33,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
     const events = update(state, dt)
     if (events.timeUp) void gameOver()
-    if (events.nextStage) playMerge(4)
+    if (events.nextStage) playSfx('clear')
     genShake = Math.max(0, genShake - dt)
     for (let i = popups.length - 1; i >= 0; i--) {
       popups[i].age += dt
@@ -43,6 +43,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, LAYOUT.width, LAYOUT.height)
   const state = createState()
+  preloadSfx('clear', 'gameover', 'merge', 'tap')
   const popups: Array<{ x: number; y: number; age: number }> = []
   let adReviveUsed = false
   const bonus = createClearBonus(shell, ctx, 'merge-clear')
@@ -176,10 +177,14 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.font = font(34, true)
     c.fillText(String(state.stage), 105, 88)
 
-    card(196, 24, 244, 80)
-    c.fillStyle = '#5D4037'
-    c.font = font(42, true)
-    c.fillText(state.score.toLocaleString(), 318, 80)
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      compact: true,
+      panelColor: 'rgb(255 255 255 / 0.75)',
+      labelColor: '#A1887F',
+      valueColor: '#5D4037',
+    })
 
     const goal = stageGoal(state.stage)
     card(456, 24, 234, 80)
@@ -193,7 +198,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const ratio = Math.max(0, Math.min(1, state.timeLeft / total))
     const barX = 45
     const barW = 630
-    const barY = 122
+    const barY = 156
     const barH = 30
     c.save()
     c.fillStyle = 'rgb(93 64 55 / 0.15)'

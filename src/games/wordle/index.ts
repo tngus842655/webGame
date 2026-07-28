@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playDrop, playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -12,7 +12,7 @@ import {
   WORD_LEN,
   type CellStatus,
 } from './state'
-import { font } from '../ui'
+import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 import { drawIcon } from '../icons'
 
 // 화면 배치 (논리 720×1280)
@@ -26,8 +26,12 @@ const KEY_Y = 916
 const KEY_H = 76
 const KEY_GAP = 10
 const KEY_W = 90
+const SHARE_BTN = { x: 588, y: 96, w: 120, h: 56 } as const
 
 const STATUS_COLORS: Record<CellStatus, string> = { g: '#6AAA64', y: '#C9B458', x: '#787C7E' }
+// 한 칸이 뒤집히는 시간과 칸 사이 시차
+const REVEAL_TURN = 0.34
+const REVEAL_STEP = 0.13
 
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
@@ -43,11 +47,24 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       state.overTimer -= dt
       if (state.overTimer <= 0) void gameOver()
     }
+    if (reveal.row >= 0) {
+      // 칸이 하나씩 열릴 때마다 뒤집히는 소리
+      const before = Math.floor(reveal.t / REVEAL_STEP)
+      reveal.t += dt
+      const after = Math.floor(reveal.t / REVEAL_STEP)
+      if (after > before && after < WORD_LEN) playSfx('flip', { rate: 0.95 + after * 0.03 })
+      if (reveal.t > REVEAL_STEP * (WORD_LEN - 1) + REVEAL_TURN) reveal.row = -1
+    }
+    shakeRow = Math.max(0, shakeRow - dt * 3.2)
     draw()
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('clear', 'fail', 'flip', 'gameover', 'tap')
   let toast: { text: string; age: number; life: number } | null = null
+  // 제출한 줄이 한 칸씩 뒤집히며 결과를 연다 — 이 게임에서 가장 중요한 순간이다
+  let reveal = { row: -1, t: 0 }
+  let shakeRow = 0
   let lastPoints = 0
   let adContinueUsed = false
 
@@ -113,17 +130,23 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   const submit = () => {
     const prevScore = state.score
+    const rowIndex = state.rows.length
     const result = submitGuess(state)
-    if (result === 'none') return
+    if (result === 'none') {
+      // 여섯 칸을 다 못 채웠거나 없는 단어 — 아무 반응이 없으면 고장으로 보인다
+      shakeRow = 1
+      playSfx('fail')
+      vibrate(40)
+      return
+    }
+    reveal = { row: rowIndex, t: 0 }
     if (result === 'won') {
       lastPoints = state.score - prevScore
-      playMerge(6)
+      playSfx('clear')
       vibrate([20, 40, 20])
     } else if (result === 'lost') {
       vibrate(80)
       showToast(t('wd.answer', { word: state.word.hangul }), 2.2)
-    } else {
-      playMerge(2)
     }
   }
 
@@ -131,7 +154,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     onDown(clientX, clientY) {
       const p = stage.toBoard(clientX, clientY)
       // 공유 버튼 (데일리 결과가 있을 때)
-      if (state.dailyShare && p.x >= 560 && p.x <= 700 && p.y >= 96 && p.y <= 156) {
+      if (
+        state.dailyShare &&
+        p.x >= SHARE_BTN.x &&
+        p.x <= SHARE_BTN.x + SHARE_BTN.w &&
+        p.y >= SHARE_BTN.y &&
+        p.y <= SHARE_BTN.y + SHARE_BTN.h
+      ) {
         shareResult()
         return
       }
@@ -174,8 +203,16 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     rowY: number,
     jamo: string | null,
     status: CellStatus | null,
+    flip = 1,
   ) => {
     const x = GRID_X + col * (CELL + GAP)
+    // 뒤집히는 중에는 세로로 납작해진다 (flip 1 = 평소)
+    if (flip !== 1) {
+      c.save()
+      c.translate(0, rowY + CELL / 2)
+      c.scale(1, Math.max(0.04, flip))
+      c.translate(0, -(rowY + CELL / 2))
+    }
     if (status) {
       c.fillStyle = STATUS_COLORS[status]
       c.beginPath()
@@ -198,6 +235,16 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fillText(jamo, x + CELL / 2, rowY + CELL / 2 + 2)
       c.textBaseline = 'alphabetic'
     }
+    if (flip !== 1) c.restore()
+  }
+
+  // 뒤집히는 줄의 col번째 칸 상태 — 절반을 넘어야 결과 색이 드러난다
+  const revealOf = (row: number, col: number): { flip: number; open: boolean } => {
+    if (reveal.row !== row) return { flip: 1, open: true }
+    const k = (reveal.t - col * REVEAL_STEP) / REVEAL_TURN
+    if (k <= 0) return { flip: 1, open: false }
+    if (k >= 1) return { flip: 1, open: true }
+    return { flip: Math.abs(Math.cos(k * Math.PI)), open: k >= 0.5 }
   }
 
   const draw = () => {
@@ -205,27 +252,32 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // 상단: 라벨 + 스트릭 + 점수 + 공유
     c.textAlign = 'left'
-    c.fillStyle = '#455A64'
-    c.font = font(28, true)
     const d = new Date()
     const label = state.daily
       ? t('sd.daily', { date: `${d.getMonth() + 1}/${d.getDate()}` })
       : t('sd.practice', { n: state.practiceCount })
-    c.fillText(`${label} · ${t('sd.streak', { n: state.streak })}`, 24, 64)
-    c.textAlign = 'right'
-    c.fillStyle = '#263238'
-    c.font = font(40, true)
-    c.fillText(state.score.toLocaleString(), 696, 66)
+    // 밝은 판 위라 흰 판에 어두운 글씨를 쓴다 (공통 점수판 규격)
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      sub: true,
+      panelColor: 'rgb(255 255 255 / 0.92)',
+      labelColor: '#B0BEC5',
+      valueColor: '#263238',
+    })
     c.textAlign = 'center'
+    c.fillStyle = '#78909C'
+    c.font = font(20, true)
+    c.fillText(`${label} · ${t('sd.streak', { n: state.streak })}`, SCORE_PANEL.cx, SCORE_PANEL.subY)
     if (state.dailyShare) {
       c.fillStyle = '#455A64'
       c.beginPath()
-      c.roundRect(560, 96, 140, 60, 16)
+      c.roundRect(SHARE_BTN.x, SHARE_BTN.y, SHARE_BTN.w, SHARE_BTN.h, 16)
       c.fill()
       c.fillStyle = '#FFFFFF'
-      c.font = font(26, true)
+      c.font = font(24, true)
       c.textBaseline = 'middle'
-      c.fillText(t('wd.share'), 630, 128)
+      c.fillText(t('wd.share'), SHARE_BTN.x + SHARE_BTN.w / 2, SHARE_BTN.y + SHARE_BTN.h / 2)
       c.textBaseline = 'alphabetic'
     }
 
@@ -234,12 +286,17 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       const y = GRID_Y + row * ROW_H
       if (row < state.rows.length) {
         for (let col = 0; col < WORD_LEN; col++) {
-          drawCell(c, col, y, state.rows[row][col], state.results[row][col])
+          const rv = revealOf(row, col)
+          drawCell(c, col, y, state.rows[row][col], rv.open ? state.results[row][col] : null, rv.flip)
         }
       } else if (row === state.rows.length && state.phase === 'playing') {
+        // 낼 수 없는 줄은 좌우로 흔들린다
+        c.save()
+        if (shakeRow > 0) c.translate(Math.sin(shakeRow * 34) * 12 * shakeRow, 0)
         for (let col = 0; col < WORD_LEN; col++) {
           drawCell(c, col, y, state.current[col] ?? null, null)
         }
+        c.restore()
       } else {
         for (let col = 0; col < WORD_LEN; col++) drawCell(c, col, y, null, null)
       }

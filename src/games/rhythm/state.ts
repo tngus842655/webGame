@@ -44,6 +44,14 @@ const windowFor = (bpm: number) => HIT_WINDOW * Math.min(1, BASE_BPM / bpm)
 // 계수를 낮추고 천장을 올려 2분 부근까지 계속 조여든다.
 const bpmAt = (bar: number) => Math.min(190, 105 + bar * 1.2)
 
+// 곡 전체 길이(초). 마디마다 BPM이 달라 합으로 구한다 — generateBar가 genTime을
+// 늘리는 식과 같은 식이어야 한다. 진행 막대가 이 값을 기준으로 찬다.
+export const SONG_LENGTH = (() => {
+  let end = 2 // createState의 genTime = 첫 마디까지의 준비 시간
+  for (let bar = 0; bar < SONG_BARS; bar++) end += (60 / bpmAt(bar)) * 4
+  return end
+})()
+
 // 마디 하나를 생성 — 8비트 슬롯, 진행할수록 약박 채움과 동시 노트가 늘어난다
 function generateBar(state: RhythmState) {
   const bar = state.bar
@@ -122,10 +130,11 @@ function applyJudge(state: RhythmState, note: Note, judge: Judge) {
   }
 }
 
-// 판정선을 지나친 노트를 miss 처리. 지나간 miss 노트를 돌려준다
-export function update(state: RhythmState, dt: number): Judge[] {
-  const results: Judge[] = []
-  if (state.phase !== 'playing') return results
+// 판정선을 지나친 노트를 miss 처리. 놓친 노트의 레인 번호를 돌려준다
+// (어느 줄을 놓쳤는지 알아야 그 줄에 미스 연출을 붙일 수 있다)
+export function update(state: RhythmState, dt: number): number[] {
+  const missedLanes: number[] = []
+  if (state.phase !== 'playing') return missedLanes
   state.time += dt
   ensureNotes(state)
   // 지나간 노트가 무한히 쌓이지 않게 잘라낸다
@@ -141,7 +150,7 @@ export function update(state: RhythmState, dt: number): Judge[] {
     }
     if (note.time + note.window >= state.time) break
     applyJudge(state, note, 'miss')
-    results.push('miss')
+    missedLanes.push(note.lane)
     state.nextIndex += 1
   }
   // 마지막 노트까지 지나가면 곡이 끝난다
@@ -149,7 +158,7 @@ export function update(state: RhythmState, dt: number): Judge[] {
     state.phase = 'over'
     state.overTimer = 0.8
   }
-  return results
+  return missedLanes
 }
 
 // 레인 탭: 판정 창 안에서 가장 가까운 노트를 판정한다

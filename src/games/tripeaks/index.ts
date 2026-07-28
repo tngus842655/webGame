@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playDrop, playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -50,6 +50,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('flip', 'gameover', 'tap')
   let flights: Flight[] = []
   let adContinueUsed = false
 
@@ -103,7 +104,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     state.waste.push({ rank: card.rank, suit: card.suit })
     state.streak += 1
     addScore(20 * state.streak)
-    playMerge(Math.min(state.streak, 8))
+    playSfx('flip', { rate: Math.min(1.5, 1 + Math.min(state.streak, 8) * 0.06) })
     if (card.row === 0) {
       // 봉우리 하나 완전 제거
       addScore(200)

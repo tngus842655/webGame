@@ -131,8 +131,17 @@ export function startBattle(state: ACState): boolean {
   return true
 }
 
+// 누가 누구를 얼마나 때렸는지 — 때린 쪽 모션과 날아가는 탄, 피해 숫자에 다 쓰인다
+export interface BattleHit {
+  mine: boolean // 맞은 쪽이 내 유닛인가
+  index: number // 맞은 유닛 자리
+  from: number // 때린 유닛 자리 (반대 진영)
+  damage: number
+  died: boolean
+}
+
 export interface BattleEvents {
-  hits: Array<{ mine: boolean; index: number }> // 맞은 쪽 표시용
+  hits: BattleHit[]
   ended: boolean
 }
 
@@ -142,7 +151,8 @@ export function battleTick(state: ACState, dt: number): BattleEvents {
   state.battleTime += dt
 
   const act = (attackers: Unit[], defenders: Unit[], attackerIsMine: boolean) => {
-    for (const unit of attackers) {
+    for (let i = 0; i < attackers.length; i++) {
+      const unit = attackers[i]
       if (unit.hp <= 0) continue
       unit.cd -= dt
       if (unit.cd > 0) continue
@@ -151,7 +161,13 @@ export function battleTick(state: ACState, dt: number): BattleEvents {
       const target = alive[Math.floor(Math.random() * alive.length)]
       target.hp -= unit.atk
       unit.cd = 1 / unit.spd
-      events.hits.push({ mine: !attackerIsMine, index: defenders.indexOf(target) })
+      events.hits.push({
+        mine: !attackerIsMine,
+        index: defenders.indexOf(target),
+        from: i,
+        damage: unit.atk,
+        died: target.hp <= 0,
+      })
     }
   }
   act(state.mine, state.foes, true)

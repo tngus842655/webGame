@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playDrop, playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createClearBonus } from '../clearBonus'
 import { createGameOverOverlay } from '../overlay'
@@ -51,6 +51,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('clear', 'gameover', 'pop', 'tap')
   let drag: { mode: Mode; markValue: CellState; last: number } | null = null
   let popup: { text: string; age: number } | null = null
   let lostHeart: { index: number; age: number } | null = null
@@ -101,7 +102,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const tryFill = (row: number, col: number) => {
     const result = applyFill(state, row, col)
     if (result === 'filled') {
-      playMerge(3)
+      playSfx('pop', { gain: 0.7 })
       if (state.remaining === 0) void onPuzzleClear()
     } else if (result === 'miss') {
       drag = null // 오답이면 드래그 종료
@@ -118,7 +119,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   const onPuzzleClear = async () => {
     let points = puzzlePoints(state.size) + state.lives * 100
-    playMerge(6)
+    playSfx('clear')
     vibrate(30)
     state.phase = 'clearing'
     state.clearTimer = 1.4

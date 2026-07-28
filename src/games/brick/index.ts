@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -22,6 +22,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const renderer = new BrickRenderer(shell.wrapper)
   const state = createState()
+  preloadSfx('gameover', 'impact', 'select', 'shoot')
   let adContinueUsed = false
   let aimingActive = false
 
@@ -85,7 +86,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       if (buttonIndex >= 0) {
         const def = UPGRADES[buttonIndex]
         if (tryPurchase(state, def)) {
-          playMerge(3)
+          playSfx('select')
           const rect = BUTTON_RECTS[buttonIndex]
           state.popups.push({
             x: rect.x + rect.w / 2,
@@ -111,7 +112,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       state.toLaunch = state.run.ballLevel
       state.launchTimer = 0
       state.phase = 'flying'
-      playDrop()
+      playSfx('shoot')
     },
   })
 
@@ -126,7 +127,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const r = brickRect(brick.col, brick.row)
     state.flashes.push({ x: r.x, y: r.y, w: r.w, h: r.h, age: 0 })
     state.popups.push({ x: r.x + r.w / 2, y: r.y + r.h / 2, text: `+${Math.ceil(brick.maxHp / 7)}`, age: 0 })
-    playMerge(2)
+    playSfx('impact', { gain: 0.55 })
     vibrate(10)
   }
 

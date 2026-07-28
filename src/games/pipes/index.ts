@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playDrop, playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -52,6 +52,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('clear', 'gameover', 'tap', 'water')
   const angleOff = new Array<number>(49).fill(0) // 타일별 표시 각도 오프셋(도)
   let popup: { text: string; age: number } | null = null
   let adContinueUsed = false
@@ -105,12 +106,12 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       angleOff[i] -= 90
       playDrop()
       vibrate(10)
-      if (state.wetCount > prevWet) playMerge(2)
+      if (state.wetCount > prevWet) playSfx('water', { gain: 0.7 })
       if (result === 'solved') {
         const points = clearPoints(state)
         state.score = Math.min(1_000_000, state.score + points)
         popup = { text: `+${points}`, age: 0 }
-        playMerge(6)
+        playSfx('clear')
         vibrate(30)
         state.phase = 'clearing'
         state.clearTimer = 1.4

@@ -1,12 +1,12 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import { BUBBLE_R, createState, reviveAtLevel, tapAt, update, type Bubble } from './state'
-import { font } from '../ui'
+import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 import { drawIconRow } from '../icons'
 
 function createSession(host: HTMLElement, ctx: GameContext) {
@@ -21,6 +21,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('clear', 'fail', 'gameover', 'pop')
   let adReviveUsed = false
 
   const overlay = createGameOverOverlay(shell.wrapper, {
@@ -59,13 +60,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       const p = stage.toBoard(clientX, clientY)
       const result = tapAt(state, p.x, p.y)
       if (result === 'correct') {
-        playMerge(Math.min(6, state.next))
+        playSfx('pop', { rate: Math.min(1.6, 1 + state.next * 0.05) })
         vibrate(10)
       } else if (result === 'clear') {
-        playMerge(7)
+        playSfx('clear')
         vibrate([15, 40, 25])
       } else if (result === 'wrong') {
-        playDrop()
+        playSfx('fail')
         vibrate(110)
       }
     },
@@ -94,16 +95,27 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.arc(b.x, b.y, BUBBLE_R, 0, Math.PI * 2)
     if (b.wrong) c.fillStyle = 'rgb(239 83 80 / 0.85)'
     else if (showNumber) c.fillStyle = '#4FC3F7'
-    else c.fillStyle = 'rgb(255 255 255 / 0.12)'
+    else c.fillStyle = 'rgb(255 255 255 / 0.17)'
     c.fill()
-    c.lineWidth = state.phase === 'penalty' && isNext ? 6 : 3
+    c.lineWidth = state.phase === 'penalty' && isNext ? 7 : 3
     c.strokeStyle =
       state.phase === 'penalty' && isNext
         ? '#66BB6A'
         : showNumber
-          ? 'rgb(255 255 255 / 0.55)'
-          : 'rgb(255 255 255 / 0.3)'
+          ? 'rgb(255 255 255 / 0.6)'
+          : 'rgb(255 255 255 / 0.42)'
     c.stroke()
+    // 다음에 눌러야 할 자리는 벌칙 동안 맥동해서 눈에 먼저 들어온다
+    if (state.phase === 'penalty' && isNext) {
+      c.save()
+      c.globalAlpha = 0.3 + 0.35 * Math.sin(state.playTime * 8)
+      c.strokeStyle = '#66BB6A'
+      c.lineWidth = 5
+      c.beginPath()
+      c.arc(b.x, b.y, BUBBLE_R + 12, 0, Math.PI * 2)
+      c.stroke()
+      c.restore()
+    }
 
     // 물방울 광택
     if (showNumber || b.wrong) {
@@ -169,21 +181,26 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fillText(`+${state.gain}`, 360, 240)
     }
 
-    // HUD: 점수 + 단계 + 하트
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.1
-    c.beginPath()
-    c.roundRect(160, 24, 400, 130, 24)
-    c.fill()
-    c.restore()
-    c.fillStyle = 'rgb(255 255 255 / 0.5)'
-    c.font = font(18)
-    c.fillText(`${t('hud.score')} · ${t('fn.level', { n: state.level })}`, 360, 56)
-    c.fillStyle = '#FFFFFF'
-    c.font = font(48, true)
-    c.fillText(state.score.toLocaleString(), 360, 112)
-    drawIconRow(c, 'heart', 360, 138, 13, state.hearts, Math.max(3, state.hearts))
+    // 틀린 순간 화면 테두리가 붉어진다 — 숫자만 붉어지면 눈이 그쪽에 없을 때 놓친다
+    if (state.phase === 'penalty') {
+      const vignette = c.createRadialGradient(360, 640, 260, 360, 640, 800)
+      vignette.addColorStop(0, 'rgb(239 83 80 / 0)')
+      vignette.addColorStop(1, 'rgb(239 83 80 / 0.34)')
+      c.fillStyle = vignette
+      c.fillRect(0, 0, 720, 1280)
+    }
+
+    // HUD: 점수 + 단계 + 하트 (공통 점수판 규격)
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      sub: true,
+    })
+    c.font = font(20)
+    c.textAlign = 'center'
+    c.fillStyle = 'rgb(255 255 255 / 0.6)'
+    c.fillText(t('fn.level', { n: state.level }), SCORE_PANEL.cx, SCORE_PANEL.subY)
+    drawIconRow(c, 'heart', SCORE_PANEL.cx, 190, 14, state.hearts, Math.max(3, state.hearts))
   }
 
   shell.addCleanup(detachInput)

@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playDrop, playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createClearBonus } from '../clearBonus'
 import { createGameOverOverlay } from '../overlay'
@@ -51,6 +51,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('clear', 'gameover', 'select', 'tap')
   let popup: { text: string; age: number } | null = null
   let lostHeart: { index: number; age: number } | null = null
   let adContinueUsed = false
@@ -94,7 +95,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     // 스트릭은 출석 표시일 뿐 점수에는 넣지 않는다 —
     // 지난 날들의 기록이 오늘 점수에 얹히면 순위표가 실력을 재지 못한다
     if (state.daily) state.streak = recordDailyClear().streak
-    playMerge(6)
+    playSfx('clear')
     vibrate(30)
     state.phase = 'clearing'
     state.clearTimer = 1.6
@@ -108,7 +109,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const tryPlace = (digit: number) => {
     const result = placeDigit(state, digit)
     if (result === 'placed') {
-      playMerge(3)
+      playSfx('select')
       if (state.remaining === 0) void onPuzzleClear()
     } else if (result === 'miss') {
       vibrate(60)

@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playDrop, playGameOver, playMerge, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createClearBonus } from '../clearBonus'
 import { createGameOverOverlay } from '../overlay'
@@ -35,7 +35,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       leakFlash = 0.4
     }
     if (events.waveCleared) {
-      playMerge(4)
+      playSfx('clear')
       // 웨이브마다 물으면 성가시므로 보스 웨이브(5의 배수)를 넘겼을 때만
       const cleared = state.wave - 1
       if (cleared % 5 === 0) void offerWaveBonus(cleared)
@@ -45,6 +45,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   let state = createState()
+  preloadSfx('clear', 'gameover', 'merge', 'select', 'tap')
   let drag: { from: number; x: number; y: number } | null = null
   let leakFlash = 0
   let btnShake = 0
@@ -116,7 +117,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         p.y <= SUMMON_BTN.y + SUMMON_BTN.h
       ) {
         if (summon(state) !== null) {
-          playDrop()
+          playSfx('select')
           vibrate(15)
         } else {
           btnShake = 0.3
