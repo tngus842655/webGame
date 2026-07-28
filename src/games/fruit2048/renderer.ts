@@ -1,8 +1,9 @@
+import { t } from '@/shared/i18n'
 import { CanvasStage } from '../stage'
 import { LAYOUT, SIZE, cellPos } from './config'
 import { drawTile } from './tileArt'
 import type { F2State } from './state'
-import { font } from '../ui'
+import { drawScorePanel } from '../ui'
 
 export class F2Renderer {
   private readonly stage: CanvasStage
@@ -112,16 +113,14 @@ export class F2Renderer {
   private drawHud(state: F2State) {
     const { c } = this
     c.textAlign = 'center'
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.75
-    c.beginPath()
-    c.roundRect(230, 60, 260, 96, 26)
-    c.fill()
-    c.restore()
-    c.fillStyle = '#5D4037'
-    c.font = font(58, true)
-    c.fillText(state.score.toLocaleString(), 360, 132)
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      compact: true,
+      panelColor: 'rgb(255 255 255 / 0.78)',
+      labelColor: '#BCAAA4',
+      valueColor: '#5D4037',
+    })
   }
 
   // 텍스트 없는 조작 안내: 좌우로 스와이프하는 표식

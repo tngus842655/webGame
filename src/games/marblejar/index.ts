@@ -6,7 +6,7 @@ import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import { CAP, COLORS, JARS, createState, emptyFullestJar, isMixed, place, update } from './state'
-import { font } from '../ui'
+import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 
 const JAR_W = 130
 const JAR_GAP = 40
@@ -192,16 +192,18 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     }
 
     // HUD
-    c.fillStyle = '#FFFFFF'
-    c.font = font(46, true)
-    c.fillText(state.score.toLocaleString(), 360, 74)
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      sub: true,
+    })
     c.font = font(22)
-    c.fillStyle = 'rgb(255 255 255 / 0.55)'
-    c.fillText(t('mj.colors', { n: state.colors }), 360, 116)
+    c.fillStyle = 'rgb(255 255 255 / 0.6)'
+    c.fillText(t('mj.colors', { n: state.colors }), SCORE_PANEL.cx, SCORE_PANEL.subY)
 
     // 나올 수 있는 색을 늘어놓는다 — 통 수보다 많다는 것이 한눈에 보여야 한다
     const paletteX = 360 - ((state.colors - 1) * 46) / 2
-    for (let i = 0; i < state.colors; i++) drawMarble(paletteX + i * 46, 168, i, 15)
+    for (let i = 0; i < state.colors; i++) drawMarble(paletteX + i * 46, 214, i, 15)
   }
 
   shell.addCleanup(detachInput)

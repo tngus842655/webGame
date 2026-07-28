@@ -1,3 +1,4 @@
+import { t } from '@/shared/i18n'
 import { CanvasStage } from '../stage'
 import { drawBlock, drawEmptyCell } from './blockArt'
 import { GRID, LAYOUT } from './config'
@@ -11,7 +12,7 @@ import {
   type BBState,
   type Piece,
 } from './state'
-import { font } from '../ui'
+import { drawScorePanel, font } from '../ui'
 
 export interface DragState {
   trayIndex: number
@@ -225,16 +226,14 @@ export class BBRenderer {
     const { c } = this
     c.textAlign = 'center'
 
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.75
-    c.beginPath()
-    c.roundRect(230, 40, 260, 96, 26)
-    c.fill()
-    c.restore()
-    c.fillStyle = '#5D4037'
-    c.font = font(58, true)
-    c.fillText(state.score.toLocaleString(), 360, 112)
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      compact: true,
+      panelColor: 'rgb(255 255 255 / 0.78)',
+      labelColor: '#BCAAA4',
+      valueColor: '#5D4037',
+    })
 
     // 연속 클리어 배지 (숫자만 — 언어 무관)
     if (state.streak >= 2) {

@@ -1,9 +1,10 @@
+import { t } from '@/shared/i18n'
 import { CanvasStage } from '../stage'
 import { BOARD, TIERS } from './config'
 import { drawFruit } from '../fruitArt'
 import { POP_DURATION, POPUP_DURATION, SPARK_DURATION, type SuikaState } from './state'
 import type { SuikaWorld } from './world'
-import { font } from '../ui'
+import { drawScorePanel, font } from '../ui'
 
 const JAR_RADIUS = 62
 const DANGER_BAND = 120 // 위험 경고 그라데이션 높이
@@ -284,16 +285,14 @@ export class SuikaRenderer {
 
     // 점수 (숫자만 크게)
     c.textAlign = 'center'
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.75
-    c.beginPath()
-    c.roundRect(230, 34, 260, 96, 26)
-    c.fill()
-    c.restore()
-    c.fillStyle = '#5D4037'
-    c.font = font(58, true)
-    c.fillText(state.score.toLocaleString(), 360, 106)
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      compact: true,
+      panelColor: 'rgb(255 255 255 / 0.78)',
+      labelColor: '#BCAAA4',
+      valueColor: '#5D4037',
+    })
 
     // 다음 과일 (라벨 대신 작은 점 3개로 표현)
     c.save()

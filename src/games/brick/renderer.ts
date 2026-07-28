@@ -9,7 +9,7 @@ import {
   upgradeLevel,
   type BrickState,
 } from './state'
-import { font } from '../ui'
+import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 
 export class BrickRenderer {
   private readonly stage: CanvasStage
@@ -195,21 +195,20 @@ export class BrickRenderer {
     const { c } = this
     c.textAlign = 'center'
 
-    c.save()
-    c.fillStyle = '#FFFFFF'
-    c.globalAlpha = 0.75
-    c.beginPath()
-    c.roundRect(250, 26, 220, 88, 24)
-    c.fill()
-    c.restore()
-    c.fillStyle = '#5D4037'
-    c.font = font(48, true)
-    c.fillText(state.score.toLocaleString(), 360, 86)
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      sub: true,
+      compact: true,
+      panelColor: 'rgb(255 255 255 / 0.78)',
+      labelColor: '#BCAAA4',
+      valueColor: '#5D4037',
+    })
 
     // 웨이브
-    c.fillStyle = '#BCAAA4'
+    c.fillStyle = '#A1887F'
     c.font = font(20)
-    c.fillText(t('brick.wave', { n: state.wave }), 360, 136)
+    c.fillText(t('brick.wave', { n: state.wave }), SCORE_PANEL.cx, SCORE_PANEL.subY)
 
     // 골드
     c.save()
