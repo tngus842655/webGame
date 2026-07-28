@@ -76,8 +76,8 @@ bubblewrap init --manifest https://web-game-ecru.vercel.app/manifest.webmanifest
 | 질문 | 넣을 값 |
 | --- | --- |
 | Domain | `web-game-ecru.vercel.app` |
-| Application name | `미니게임30` |
-| Short name | `미니게임30` |
+| Application name | `MiniGame30` |
+| Short name | `MiniGame30` |
 | Application ID (패키지) | `com.minigame30.app` |
 | Display mode | `standalone` |
 | Orientation | `portrait` |
@@ -88,6 +88,10 @@ bubblewrap init --manifest https://web-game-ecru.vercel.app/manifest.webmanifest
 
 끝나면 `twa-manifest.json`이 생긴다. 나중에 설정을 바꿀 땐 이 파일을 고치고
 `bubblewrap update`를 돌리면 된다.
+
+> `bubblewrap init`은 앱 이름을 `manifest.webmanifest`에서 끌어오므로 `미니게임30`이 기본값으로
+> 뜬다. 스토어 기본 언어가 영어라 **`MiniGame30`으로 덮어쓴다.** 런처에 뜨는 이름은 언어별로
+> 나뉘지 않고 빌드 시점에 하나로 고정돼서, 한글로 두면 해외 사용자 홈 화면에도 한글이 뜬다.
 
 ### targetSdk 확인
 
