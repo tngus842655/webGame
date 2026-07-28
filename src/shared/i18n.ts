@@ -304,7 +304,6 @@ const en = {
   'mj.ad': '▶ Watch ad to empty one jar',
   'game.bamboo': 'Bamboo Climb',
   'bm.height': '{n} joints up',
-  'bm.hint': 'Tap the side with no branch',
   'bm.ad': '▶ Watch ad to refill time and continue',
 }
 
@@ -571,7 +570,6 @@ const ko: typeof en = {
   'mj.ad': '▶ 광고 보고 통 하나 비우기',
   'game.bamboo': '대나무 타기',
   'bm.height': '{n}마디',
-  'bm.hint': '가지가 없는 쪽을 탭하세요',
   'bm.ad': '▶ 광고 보고 시간 채워 이어하기',
 }
 
@@ -808,7 +806,6 @@ const ja: CoreDict = {
   'mj.ad': '▶ 広告を見て筒を1本空ける',
   'game.bamboo': '竹のぼり',
   'bm.height': '{n}節',
-  'bm.hint': '枝がない側をタップ',
   'bm.ad': '▶ 広告を見て時間を満たして続ける',
 }
 
@@ -1042,7 +1039,6 @@ const zhCN: CoreDict = {
   'mj.ad': '▶ 看广告清空一个筒',
   'game.bamboo': '爬竹子',
   'bm.height': '第{n}节',
-  'bm.hint': '点没有竹枝的那一侧',
   'bm.ad': '▶ 看广告补满时间继续',
 }
 
@@ -1276,7 +1272,6 @@ const es: CoreDict = {
   'mj.ad': '▶ Ver anuncio y vaciar un tarro',
   'game.bamboo': 'Trepa el Bambú',
   'bm.height': '{n} nudos',
-  'bm.hint': 'Toca el lado sin rama',
   'bm.ad': '▶ Ver anuncio, rellenar tiempo y seguir',
 }
 
@@ -1510,7 +1505,6 @@ const ptBR: CoreDict = {
   'mj.ad': '▶ Ver anúncio e esvaziar um pote',
   'game.bamboo': 'Sobe no Bambu',
   'bm.height': '{n} nós',
-  'bm.hint': 'Toque no lado sem galho',
   'bm.ad': '▶ Ver anúncio, encher o tempo e continuar',
 }
 
@@ -1744,7 +1738,6 @@ const fr: CoreDict = {
   'mj.ad': '▶ Pub pour vider un bocal',
   'game.bamboo': 'Grimpe au Bambou',
   'bm.height': '{n} nœuds',
-  'bm.hint': 'Touche le côté sans branche',
   'bm.ad': '▶ Pub pour refaire le plein de temps',
 }
 
@@ -1978,7 +1971,6 @@ const de: CoreDict = {
   'mj.ad': '▶ Werbung ansehen: ein Glas leeren',
   'game.bamboo': 'Bambus-Klettern',
   'bm.height': '{n} Knoten',
-  'bm.hint': 'Tippe die Seite ohne Ast an',
   'bm.ad': '▶ Werbung ansehen: Zeit auffüllen',
 }
 
@@ -2212,7 +2204,6 @@ const ru: CoreDict = {
   'mj.ad': '▶ Реклама: опустошить одну банку',
   'game.bamboo': 'Вверх по бамбуку',
   'bm.height': 'Колен: {n}',
-  'bm.hint': 'Нажимайте сторону без ветки',
   'bm.ad': '▶ Реклама: пополнить время и продолжить',
 }
 
@@ -2446,7 +2437,6 @@ const id: CoreDict = {
   'mj.ad': '▶ Tonton iklan untuk kosongkan satu tabung',
   'game.bamboo': 'Panjat Bambu',
   'bm.height': '{n} ruas',
-  'bm.hint': 'Ketuk sisi yang tidak ada dahannya',
   'bm.ad': '▶ Tonton iklan, isi waktu, lanjut',
 }
 
@@ -2680,7 +2670,6 @@ const vi: CoreDict = {
   'mj.ad': '▶ Xem quảng cáo để dốc một ống',
   'game.bamboo': 'Leo Tre',
   'bm.height': '{n} đốt',
-  'bm.hint': 'Chạm phía không có cành',
   'bm.ad': '▶ Xem quảng cáo để đầy thời gian và tiếp tục',
 }
 
@@ -2914,7 +2903,6 @@ const th: CoreDict = {
   'mj.ad': '▶ ดูโฆษณาเพื่อเทกระบอกหนึ่งใบ',
   'game.bamboo': 'ปีนไผ่',
   'bm.height': '{n} ปล้อง',
-  'bm.hint': 'แตะฝั่งที่ไม่มีกิ่ง',
   'bm.ad': '▶ ดูโฆษณาเพื่อเติมเวลาและไปต่อ',
 }
 
@@ -3148,7 +3136,6 @@ const tr: CoreDict = {
   'mj.ad': '▶ Reklam izle, bir kavanozu boşalt',
   'game.bamboo': 'Bambuya Tırman',
   'bm.height': '{n} boğum',
-  'bm.hint': 'Dalı olmayan tarafa dokun',
   'bm.ad': '▶ Reklam izle, süreyi doldur, devam et',
 }
 
