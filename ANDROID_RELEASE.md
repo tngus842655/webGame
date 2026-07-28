@@ -98,14 +98,28 @@ bubblewrap init --manifest https://web-game-ecru.vercel.app/manifest.webmanifest
 **2026년 8월 31일부터 신규 앱은 API 36(Android 16) 이상을 타깃해야 한다.**
 지금 올리면 심사 통과 시점이 아슬아슬하니 처음부터 36으로 맞추고 간다.
 
-`twa-manifest.json`을 열어 확인한다.
+**Bubblewrap이 찍어내는 기본값은 35다.** `app/build.gradle`을 열어 두 군데를 고친다.
 
-```json
-"targetSdkVersion": 36
+```gradle
+compileSdkVersion 36
+targetSdkVersion 36
 ```
 
-값이 없거나 36보다 낮으면 36으로 고치고 `bubblewrap update`를 돌린다.
-그래도 안 잡히면 생성된 `app/build.gradle`의 `targetSdkVersion`을 직접 고친다.
+`targetSdk`는 `compileSdk`를 넘을 수 없어서 둘 다 올려야 하고, 그러려면
+`platforms;android-36`이 설치돼 있어야 한다. 없으면:
+
+```powershell
+C:\Android\Sdk\cmdline-tools\latest\bin\sdkmanager.bat "platforms;android-36"
+```
+
+`minSdkVersion`은 건드리지 않는다.
+
+> `app/build.gradle`은 `bubblewrap init`이 템플릿에서 새로 찍어내는 파일이다.
+> **다른 TWA 프로젝트에서 이미 고쳤더라도 새 프로젝트에는 반영되지 않는다.**
+> 프로젝트를 새로 만들 때마다 이 단계를 다시 밟아야 한다.
+
+안드로이드 16(API 36)은 edge-to-edge 표시를 강제한다. TWA는 크롬이 그리므로 대체로
+문제없지만, 실기기 설치 때 상하단이 시스템 바에 가리지 않는지 확인할 것.
 
 ## 5. 서명 키 (제일 중요)
 
