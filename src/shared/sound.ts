@@ -154,22 +154,31 @@ const buffers = new Map<SfxName, AudioBuffer | null>()
 const loading = new Set<SfxName>()
 const lastAt = new Map<SfxName, number>()
 
+// mp3를 먼저 찾고 없으면 wav. 기본 소리는 합성해 구운 wav가 들어 있고
+// (tools/gen-sfx.py), 같은 이름의 mp3를 넣으면 그쪽이 이긴다.
+const EXTENSIONS = ['mp3', 'wav']
+
 async function load(name: SfxName) {
   if (loading.has(name) || buffers.has(name)) return
   const ac = ensureCtx()
   // 소리를 꺼 둔 동안은 받지 않는다 (다시 켜면 그때 받는다)
   if (!ac) return
   loading.add(name)
-  try {
-    const res = await fetch(`${import.meta.env.BASE_URL}sfx/${name}.mp3`)
-    if (!res.ok) throw new Error(String(res.status))
-    buffers.set(name, await ac.decodeAudioData(await res.arrayBuffer()))
-  } catch {
-    // 파일이 아직 없다. 신스로 내고 다시 찾지 않는다.
-    buffers.set(name, null)
-  } finally {
-    loading.delete(name)
+  for (const ext of EXTENSIONS) {
+    try {
+      const res = await fetch(`${import.meta.env.BASE_URL}sfx/${name}.${ext}`)
+      if (!res.ok) continue
+      // 없는 파일에 index.html이 돌아오는 배포도 있어서, 디코딩까지 돼야 있는 것으로 친다
+      buffers.set(name, await ac.decodeAudioData(await res.arrayBuffer()))
+      loading.delete(name)
+      return
+    } catch {
+      // 다음 확장자로
+    }
   }
+  // 둘 다 없다. 신스로 내고 다시 찾지 않는다.
+  buffers.set(name, null)
+  loading.delete(name)
 }
 
 // 게임을 열 때 그 게임이 쓸 소리를 미리 받아 둔다 (첫 소리만 신스로 나가지 않게)

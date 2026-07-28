@@ -1,79 +1,106 @@
-# 효과음 파일 요청서
+# 효과음
 
-> 넣을 곳: **`public/sfx/<이름>.mp3`** (BGM은 `public/bgm/`에 이미 있다)
-> 파일이 없으면 지금까지 쓰던 신스 소리가 대신 난다 — 있는 것부터 하나씩 넣으면 된다.
-> 이름을 정확히 맞춰야 코드가 찾는다. 21개 전부가 코드에서 실제로 불린다.
+## 지금 상태
 
-## 파일 규격
+**소리 21개가 이미 들어 있다.** `public/sfx/*.wav` — 녹음이 아니라 파형을 직접
+합성해 구운 것이다 (`tools/gen-sfx.py`). 아무것도 받아 오지 않아도 게임은
+제 소리를 낸다.
+
+녹음 파일을 쓰지 않은 이유는 두 가지다.
+
+- 이 앱은 그림도 전부 벡터로 그린다. 여기저기서 모은 녹음 21개를 섞으면
+  게임마다 소리의 결이 달라진다. 파형을 만들면 21개가 한 악기에서 나온 것처럼
+  들린다 (sfxr 계열 게임들이 쓰는 방법).
+- 무료 음원 사이트에서 받아 오려면 라이선스를 하나씩 확인해야 하고,
+  CC0가 아닌 것을 섞으면 나중에 앱 안에 크레딧 화면을 만들어야 한다.
+
+소리를 고치고 싶으면 `tools/gen-sfx.py`의 값을 바꾸고 다시 돌린다.
+
+```
+python3 tools/gen-sfx.py
+```
+
+## 진짜 녹음으로 바꾸고 싶을 때
+
+같은 이름의 **`.mp3`를 `public/sfx/`에 넣으면 그쪽이 이긴다.** wav는 지우지
+않아도 된다 (코드가 mp3를 먼저 찾는다). 21개 전부를 바꿀 필요도 없고, 마음에
+안 드는 것만 하나씩 갈아끼우면 된다.
+
+바꿀 만한 순서는 이렇다. 위쪽일수록 효과가 크다.
+
+1. `rhythm-hit` — 리듬 탭 손맛의 90%가 이 소리다
+2. `tap` — 전 게임에서 가장 많이 들린다
+3. `stone` — 오목은 돌 놓는 소리가 전부다
+4. `clear` / `gameover` — 판이 끝나는 순간의 인상
+5. 나머지
+
+### 규격
 
 | 항목 | 값 |
 |---|---|
-| 형식 | mp3 (128kbps 이상) |
-| 채널 | 모노 권장 (파일이 절반이 된다) |
-| 길이 | 표에 적은 길이. **앞뒤 무음은 잘라낼 것** — 앞에 0.05초만 있어도 탭이 굼떠 보인다 |
-| 크기 | 하나당 50KB 아래 |
+| 형식 | mp3 (128kbps 이상) · 모노 권장 |
+| 길이 | 아래 표의 길이. **앞뒤 무음은 잘라낼 것** — 앞에 0.05초만 있어도 탭이 굼떠 보인다 |
 | 음량 | 정규화만 되어 있으면 된다. 게임별 크기는 `src/shared/sound.ts`의 `gain`에서 맞춘다 |
+| 라이선스 | **CC0(퍼블릭 도메인)만.** 출처 표기 의무가 있는 것을 쓰면 크레딧 화면이 필요해진다 |
 
-**라이선스는 CC0(퍼블릭 도메인)만 받는다.** 출처 표기 의무가 있는 것을 쓰면
-나중에 앱 안에 크레딧 화면을 만들어야 한다.
+### 받을 만한 곳
 
-## 받을 만한 곳
-
-| 사이트 | 특징 |
-|---|---|
-| https://kenney.nl/assets/tag:audio | **여기부터 보면 된다.** 전부 CC0, 게임용으로 이미 다듬어져 있음. 아래 표의 "추천"은 대부분 여기 것 |
-| https://pixabay.com/sound-effects/ | 무료·상업 이용 가능, 검색어로 찾기 좋다 |
-| https://freesound.org | 양이 가장 많다. 검색 후 **License 필터를 CC0으로** 걸 것 |
-
-Kenney 팩은 zip 하나에 수십 개가 들어 있다. 받아서 마음에 드는 것을 골라
-**이름만 바꿔서** `public/sfx/`에 넣으면 된다.
+- https://kenney.nl/assets/tag:audio — 전부 CC0, 게임용으로 이미 다듬어져 있다. 여기부터 보면 된다
+- https://pixabay.com/sound-effects/ — 무료·상업 이용 가능
+- https://freesound.org — 양이 가장 많다. **License 필터를 CC0으로** 걸 것
 
 ---
 
-## 1. 공통 소리 12개 — 여러 게임이 나눠 쓴다
+## 소리 21개
 
-가장 많이 들리는 소리들이라 이 12개만 넣어도 30개 게임 전체가 달라진다.
+지금 들어 있는 wav가 어떤 소리인지, 바꾼다면 무엇으로 바꿔야 하는지.
+"측정값"은 구워진 파일을 분석한 것이다 (무게중심 주파수 = 밝기).
 
-| 파일명 | 어떤 느낌 | 길이 | 쓰는 곳 | 추천 |
+### 공통 12개 — 여러 게임이 나눠 쓴다
+
+| 이름 | 어떤 소리 | 길이 | 측정값 | 바꾼다면 |
 |---|---|---|---|---|
-| `tap.mp3` | 손끝으로 톡 건드리는 소리. **아주 짧고 부드럽게.** 하루에 수천 번 들릴 소리라 조금만 날카로워도 금방 피곤해진다 | 0.05–0.1초 | 전 게임의 탭·놓기 | Kenney *Interface Sounds* → `click_001` / *UI Audio* 계열 |
-| `merge.mp3` | 두 개가 합쳐지며 나는 맑은 "팅". 기분 좋은 종·마림바 계열 | 0.15–0.3초 | 수박·2048·머지 가든·오토 배틀 합성 | Kenney *Digital Audio* → `powerUp` 계열 / freesound "marimba note" |
-| `gameover.mp3` | 힘이 빠지며 내려가는 3음. 무섭기보다 아쉬운 느낌 | 0.8–1.5초 | 전 게임 종료 | Kenney *Music Jingles* → `jingles_NES/PIZZA` 중 하강 계열 |
-| `pop.mp3` | 물방울이 톡 터지는 소리. `tap`보다 둥글고 울림이 조금 있다 | 0.08–0.15초 | 매치3·별똥별·분류 반장·블록 제거 | freesound "bubble pop" (CC0) / Kenney *Digital Audio* |
-| `clear.mp3` | 짧은 팡파레. **1.2초를 넘기지 말 것** — 다음 판이 바로 시작된다 | 0.8–1.2초 | 판 클리어·스테이지 성공·전투 승리 | Kenney *Music Jingles* → `jingles_STEEL16` 같은 상승 계열 |
-| `fail.mp3` | 낮고 짧은 "붕". 오답 부저. 너무 크면 게임을 관두게 된다 | 0.15–0.3초 | 오답·놓침 | Kenney *UI Audio* → `error` 계열 |
-| `hurt.mp3` | 둔탁하게 맞는 "퍽". 살짝 낮은 타격 | 0.2–0.3초 | 피격·생명 감소 | Kenney *Impact Sounds* → `impactPunch` 계열 |
-| `coin.mp3` | 동전 "챠링". 밝고 짧게 | 0.2–0.4초 | 코인·별 획득 | Kenney *Casino Audio* → `chipsHandle` / freesound "coin pickup" |
-| `whoosh.mp3` | 바람이 스치는 "휙". **날카롭지 않게** — 빠르게 반복된다 | 0.15–0.25초 | 점프·스와이프·획 긋기·대나무 오르기 | freesound "whoosh short" (CC0) |
-| `impact.mp3` | 나무나 돌에 부딪히는 "탁". 울림 없이 딱 끊기게 | 0.1–0.2초 | 착지·충돌·부딪혀 멈춤 | Kenney *Impact Sounds* → `impactWood` 계열 |
-| `unlock.mp3` | 새로 열리는 상승 2음 "띠링" | 0.3–0.5초 | 새 부두 개방·레벨업 | Kenney *UI Audio* → `confirmation` 계열 |
-| `select.mp3` | 또렷한 "딸깍". `tap`보다 단단하고 확실한 느낌 (결정했다는 소리) | 0.06–0.12초 | 카드·유닛·업그레이드 선택 | Kenney *Interface Sounds* → `switch` / `click_002` |
+| `tap` | 손끝으로 톡. 짧고 둥글게 — 하루에 수천 번 들릴 소리라 날이 서면 안 된다 | 90ms | 573Hz | Kenney *Interface Sounds* → `click_001` |
+| `merge` | 두 개가 합쳐지는 맑은 "팅". 마림바 배음 4개 | 340ms | 962Hz | Kenney *Digital Audio* → `powerUp` 계열 |
+| `gameover` | 내려앉는 세 음 (G–D♯–G). 무섭기보다 아쉽게 | 1050ms | 1103Hz | Kenney *Music Jingles* 하강 계열 |
+| `pop` | 물방울 터지듯 음이 위로 튄다 | 130ms | 1502Hz | freesound "bubble pop" |
+| `clear` | 오르는 네 음 (C–E–G–C) | 950ms | 1896Hz | Kenney *Music Jingles* → `jingles_STEEL16` |
+| `fail` | 낮은 부저. 크면 게임을 관두게 된다 | 260ms | 644Hz | Kenney *UI Audio* → `error` 계열 |
+| `hurt` | 퍽 — 저음 덩어리에 짧은 파열음 | 300ms | 878Hz | Kenney *Impact Sounds* → `impactPunch` |
+| `coin` | 두 음 아르페지오 (B→E). 아케이드 동전의 기본형 | 340ms | 7629Hz | Kenney *Casino Audio* → `chipsHandle` |
+| `whoosh` | 스치는 바람. 필터가 열렸다 닫힌다 | 240ms | 3058Hz | freesound "whoosh short" |
+| `impact` | 나무에 부딪히는 탁. 울림 없이 딱 끊긴다 | 150ms | 1020Hz | Kenney *Impact Sounds* → `impactWood` |
+| `unlock` | 열리는 두 음 (D→A) | 460ms | 1205Hz | Kenney *UI Audio* → `confirmation` |
+| `select` | 결정했다는 딸깍. `tap`보다 단단하다 | 70ms | 6772Hz | Kenney *Interface Sounds* → `switch` |
 
-## 2. 게임 고유 소리 9개 — 그 게임의 정체가 되는 것
+### 게임 고유 9개
 
-| 파일명 | 게임 | 어떤 느낌 | 길이 | 추천 |
-|---|---|---|---|---|
-| `rhythm-hit.mp3` | 리듬 탭 | **가장 중요한 파일.** 노트를 정확히 친 순간의 짧고 맑은 타격음. 리듬게임 손맛의 90%가 이 소리다. 1초에 8번까지 울리므로 **울림(리버브)이 길면 안 된다.** 클로즈드 하이햇이나 림샷 계열 | 0.05–0.12초 | freesound "hi hat closed" / "rimshot" (CC0), 또는 드럼 샘플팩의 클랩 |
-| `rhythm-miss.mp3` | 리듬 탭 | 놓쳤을 때의 짧은 "삑". 김빠지는 느낌 | 0.15–0.25초 | freesound "buzzer short" |
-| `shoot.mp3` | 궤도 슈팅 · 오토 배틀(궁수·마법사) | 짧은 레이저 발사음. 0.15초에 한 번씩 연사되므로 **꼬리가 길면 뭉친다** | 0.08–0.15초 | Kenney *Sci-Fi Sounds* → `laserSmall` 계열 |
-| `explode.mp3` | 궤도 슈팅 · 오토 배틀 | 작은 폭발. 화면을 흔들 만큼은 아니고 "펑" 정도 | 0.3–0.5초 | Kenney *Sci-Fi Sounds* → `explosionCrunch` 계열 |
-| `sword.mp3` | 카드 배틀 · 오토 배틀 | 칼이 베고 지나가는 "쉭–착". 금속성 | 0.2–0.35초 | freesound "sword swing" (CC0) |
-| `stone.mp3` | 오목 | 바둑돌을 판에 놓는 "딱". **나무판 위 돌 소리** — 이게 오목의 전부다 | 0.08–0.15초 | freesound "go stone" / "wood block hit" (CC0) |
-| `ice-slide.mp3` | 펭귄 미끄럼 | 얼음 위를 스르륵 미끄러지는 소리. 끝이 자연스럽게 잦아들게 | 0.3–0.5초 | freesound "ice slide" / "sliding whoosh" |
-| `water.mp3` | 종이배 뱃길 | 배가 부두에 닿을 때 나는 잔잔한 물소리. 첨벙보다 **찰랑** | 0.2–0.4초 | freesound "water lap gentle" (CC0) |
-| `flip.mp3` | 한글 워들 | 타일이 뒤집히는 "탁". 종이나 나무 느낌, 아주 짧게 (6칸이 0.13초 간격으로 연달아 울린다) | 0.05–0.1초 | freesound "card flip" (CC0) |
+| 이름 | 게임 | 어떤 소리 | 길이 | 측정값 | 바꾼다면 |
+|---|---|---|---|---|---|
+| `rhythm-hit` | 리듬 탭 | 클로즈드 하이햇. 1초에 여덟 번까지 울리므로 **울림이 있으면 안 된다** | 100ms | 11829Hz | freesound "hi hat closed" / "rimshot" |
+| `rhythm-miss` | 리듬 탭 | 김빠지는 삑 | 200ms | 825Hz | freesound "buzzer short" |
+| `shoot` | 궤도 슈팅 · 오토 배틀 | 짧은 레이저. 0.15초마다 연사되므로 꼬리가 길면 뭉친다 | 130ms | 3806Hz | Kenney *Sci-Fi Sounds* → `laserSmall` |
+| `explode` | 궤도 슈팅 · 오토 배틀 | 펑 — 화면을 흔들 만큼은 아니게 | 460ms | 2700Hz | Kenney *Sci-Fi Sounds* → `explosionCrunch` |
+| `sword` | 카드 배틀 · 오토 배틀 | 쉭 하고 지나간 뒤 금속이 운다 | 320ms | 4232Hz | freesound "sword swing" |
+| `stone` | 오목 | 나무판 위 바둑돌. 마르고 단단하게 | 140ms | 1634Hz | freesound "go stone" / "wood block hit" |
+| `ice-slide` | 펭귄 미끄럼 | 필터가 올라가며 스르륵 | 440ms | 4668Hz | freesound "ice slide" |
+| `water` | 종이배 뱃길 | 첨벙보다 찰랑. 물방울에 잔물결이 두 번 | 380ms | 487Hz | freesound "water lap gentle" |
+| `flip` | 한글 워들 | 종이 한 장 넘어가는 탁. 여섯 칸이 연달아 울린다 | 80ms | 5175Hz | freesound "card flip" |
 
 ---
 
-## 넣은 뒤 확인
+## 코드 쪽에서 해 둔 것
 
-1. `public/sfx/`에 파일을 넣는다
-2. 새로고침하고 게임을 연다 — 그 게임이 쓰는 소리를 미리 받아 둔다
-3. 소리가 안 바뀌면 파일명 오타이거나 mp3로 디코딩이 안 되는 경우다.
-   둘 중 어느 쪽이든 예전 신스 소리로 돌아가므로 앱이 깨지지는 않는다
+- **연쇄는 음이 올라간다.** 파일 하나로 처리한다 — 별똥별은 이을수록, 워들은
+  칸이 열릴수록, 대나무는 오를수록, 리듬 탭은 퍼펙트일수록(1.14배).
+- **오목은 AI 수를 0.94배로 낮춰** 내 수와 소리로 구분된다.
+- 같은 소리가 20ms 안에 겹치면 건너뛴다 (한 프레임에 여러 번 울리면 뭉쳐서 커진다).
+- 게임을 열 때 그 게임이 쓸 소리를 미리 받아 둔다.
+- mp3·wav 둘 다 없으면 예전 신스 소리로 돌아간다. 어느 쪽이든 앱은 깨지지 않는다.
 
-## 나중에 손볼 것
+## 나중에 볼 것
 
-- **BGM**은 지금 `action`·`puzzle`·`sim` 세 곡으로 30개 게임을 나눠 쓴다.
+- **BGM**은 `action`·`puzzle`·`sim` 세 곡으로 30개 게임을 나눠 쓴다 (`public/bgm/`, 2.9MB).
   분위기가 안 맞는 게임이 생기면 그때 곡을 늘린다 (`src/shared/music.ts`의 `bgmFor`).
-- 소리 크기는 파일을 넣어 보고 `src/shared/sound.ts`의 `gain` 값으로 맞춘다.
+- 소리 크기는 실제로 들어 보고 `src/shared/sound.ts`의 `gain` 값으로 맞춘다.
+  지금 값은 파형 분석으로 잡은 것이라 귀로 들으면 다를 수 있다.
