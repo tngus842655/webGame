@@ -155,24 +155,30 @@ export function endTurn(state: DeckState) {
   state.enemyTimer = 0.9
 }
 
-export type EnemyResult = 'attacked' | 'playerDied'
+export interface EnemyResult {
+  died: boolean
+  damage: number // 실제로 깎인 체력
+  blocked: number // 방어로 막아낸 양 (막은 보람을 화면에 보여주려면 필요하다)
+}
 
 // 적 행동 실행 후 다음 플레이어 턴 준비
 export function resolveEnemyTurn(state: DeckState): EnemyResult {
-  const damage = Math.max(0, intentDamage(state) - state.block)
+  const intent = intentDamage(state)
+  const damage = Math.max(0, intent - state.block)
+  const blocked = Math.min(intent, state.block)
   state.hp -= damage
   state.enemy.turn += 1
   if (state.hp <= 0) {
     state.hp = 0
     state.phase = 'over'
     state.overTimer = 0.9
-    return 'playerDied'
+    return { died: true, damage, blocked }
   }
   state.block = 0
   state.energy = MAX_ENERGY
   drawCards(state, HAND_SIZE)
   state.phase = 'player'
-  return 'attacked'
+  return { died: false, damage, blocked }
 }
 
 // 보상 선택 (null = 건너뛰기) 후 다음 스테이지.
