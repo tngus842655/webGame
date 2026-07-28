@@ -24,6 +24,11 @@ const BTN_H = 190
 const APPROACH_TIME = 1.43
 const NOTE_SPEED = (HIT_Y - FIELD_TOP) / APPROACH_TIME
 const NOTE_H = 40
+// 낙하 속도는 사람마다 편한 값이 다르다. 느리면 읽기 쉽고 빠르면 겹친 노트가
+// 벌어져 오히려 치기 쉽다 — 고른 값은 다음 판에도 남는다.
+const SPEED_KEY = 'webgame:rhythm-speed'
+const SPEED_STEPS = [0.8, 1, 1.3, 1.6]
+const SPEED_CHIP = { x: 572, y: 172, w: 124, h: 44 } as const
 const PRESS_TIME = 0.15
 const JUDGE_LIFE = 0.55
 const RING_LIFE = 0.45
@@ -43,8 +48,25 @@ const JUDGE_STYLE: Record<Judge, { text: string; color: string }> = {
   good: { text: 'GOOD', color: '#55B9FF' },
   miss: { text: 'MISS', color: '#FF5252' },
 }
+// 결과 팝업은 밝은 종이 위라 무대용 색을 그대로 쓰면 노랑·하늘색이 날아간다
+const JUDGE_TALLY_COLOR: Record<Judge, string> = {
+  perfect: '#E08A00',
+  great: '#2E9E52',
+  good: '#1E7FC4',
+  miss: '#D93A3A',
+}
 // 정확할수록 높고 맑게 — 같은 타격음의 음높이만 올린다
 const JUDGE_RATE: Record<Judge, number> = { perfect: 1.14, great: 1, good: 0.88, miss: 1 }
+
+function loadSpeedIndex(): number {
+  try {
+    const raw = Number(localStorage.getItem(SPEED_KEY))
+    if (Number.isInteger(raw) && raw >= 0 && raw < SPEED_STEPS.length) return raw
+  } catch {
+    // 저장이 막힌 브라우저 — 기본 속도로 논다
+  }
+  return 1
+}
 
 interface Particle {
   x: number
@@ -124,6 +146,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const state = createState()
   preloadSfx('clear', 'gameover', 'rhythm-hit', 'rhythm-miss', 'tap')
   let adContinueUsed = false
+  let speedIndex = loadSpeedIndex()
+  const noteSpeed = () => NOTE_SPEED * SPEED_STEPS[speedIndex]
 
   const particles: Particle[] = []
   const rings: Array<{ lane: number; judge: Judge; age: number }> = []
@@ -179,11 +203,17 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     void ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
     // 완주한 판에서 체력을 채워봐야 남은 노트가 없다 — 이어하기를 걸지 않는다
+    // 어디서 흘렸는지는 판정 수를 봐야 안다 — 다음 판에 무엇을 고칠지가 여기서 나온다
     overlay.show(
       state.score,
       prevBest,
       ctx.isRewardAdReady() && !adContinueUsed && !cleared,
       cleared ? 'over.byClear' : 'over.byHp',
+      (['perfect', 'great', 'good', 'miss'] as Judge[]).map((judge) => ({
+        label: JUDGE_STYLE[judge].text,
+        value: String(state.counts[judge]),
+        color: JUDGE_TALLY_COLOR[judge],
+      })),
     )
   }
 
@@ -257,6 +287,17 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     onDown(clientX, clientY) {
       if (state.phase !== 'playing') return
       const p = stage.toBoard(clientX, clientY)
+      if (
+        p.x >= SPEED_CHIP.x &&
+        p.x <= SPEED_CHIP.x + SPEED_CHIP.w &&
+        p.y >= SPEED_CHIP.y &&
+        p.y <= SPEED_CHIP.y + SPEED_CHIP.h
+      ) {
+        speedIndex = (speedIndex + 1) % SPEED_STEPS.length
+        localStorage.setItem(SPEED_KEY, String(speedIndex))
+        playDrop()
+        return
+      }
       if (p.y < HIT_Y - 200) return
       const lane = Math.floor((p.x - LANE_X) / LANE_W)
       if (lane < 0 || lane >= LANES) return
@@ -310,7 +351,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.clip()
 
     const period = 220
-    const offset = ((state.time * NOTE_SPEED) % period) - period
+    const offset = ((state.time * noteSpeed()) % period) - period
     c.strokeStyle = 'rgb(255 255 255 / 0.055)'
     c.lineWidth = 2
     for (let y = FIELD_TOP + offset; y < HIT_Y; y += period) {
@@ -400,7 +441,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.clip()
     for (const note of state.notes) {
       if (note.hit) continue
-      const y = HIT_Y - (note.time - state.time) * NOTE_SPEED
+      const y = HIT_Y - (note.time - state.time) * noteSpeed()
       if (y < FIELD_TOP - NOTE_H || y > HIT_Y + 90) continue
       drawNote(c, note.lane, y)
     }
@@ -632,6 +673,23 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fill()
       c.restore()
     }
+
+    // 노트 속도 — 눌러서 바꾼다
+    c.fillStyle = 'rgb(255 255 255 / 0.08)'
+    c.beginPath()
+    c.roundRect(SPEED_CHIP.x, SPEED_CHIP.y, SPEED_CHIP.w, SPEED_CHIP.h, 14)
+    c.fill()
+    c.strokeStyle = 'rgb(179 157 219 / 0.45)'
+    c.lineWidth = 2
+    c.stroke()
+    const chipCx = SPEED_CHIP.x + SPEED_CHIP.w / 2
+    c.textAlign = 'center'
+    c.fillStyle = 'rgb(255 255 255 / 0.42)'
+    c.font = font(13)
+    c.fillText(t('rt.speed'), chipCx, SPEED_CHIP.y + 17)
+    c.fillStyle = '#B39DDB'
+    c.font = font(22, true)
+    c.fillText(`×${SPEED_STEPS[speedIndex].toFixed(1)}`, chipCx, SPEED_CHIP.y + 38)
 
     // 곡이 얼마나 남았는지 — 끝이 있는 판이라 남은 길이가 보여야 한다
     const progress = Math.min(1, state.time / SONG_LENGTH)

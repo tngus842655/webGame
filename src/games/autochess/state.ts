@@ -65,7 +65,7 @@ export function createState(): ACState {
     board: new Array<Unit | null>(BOARD_SLOTS).fill(null),
     shop: rollShop(),
     mine: [],
-    foes: [],
+    foes: makeFoes(1),
     battleTime: 0,
     won: false,
     lostLives: 0,
@@ -110,8 +110,9 @@ export function dropUnit(state: ACState, from: number, to: number): DropResult {
   return 'swapped'
 }
 
-// 라운드 n 적 부대: 수·레벨·스탯이 점진 상승
-function makeFoes(round: number): Unit[] {
+// 라운드 n 적 부대: 수·레벨·스탯이 점진 상승.
+// 준비 단계에서 미리 보여 줘야 하므로 라운드가 시작될 때 뽑아 둔다
+export function makeFoes(round: number): Unit[] {
   const count = Math.min(BOARD_SLOTS, 2 + Math.floor((round - 1) / 2))
   const level = 1 + Math.floor(round / 5)
   const scale = 1.12 ** (round - 1) / 2.2 ** (level - 1) // 레벨 반영분 제외한 미세 성장
@@ -125,7 +126,6 @@ export function startBattle(state: ACState): boolean {
   const mine = state.board.filter((u) => u !== null).map((u) => makeUnit(u.species, u.level))
   if (mine.length === 0) return false
   state.mine = mine
-  state.foes = makeFoes(state.round)
   state.battleTime = 0
   state.phase = 'battle'
   return true
@@ -203,6 +203,7 @@ export function nextRound(state: ACState): boolean {
   // 수입: 기본 5 + 이자(골드 10당 1, 최대 5)
   state.gold += 5 + Math.min(5, Math.floor(state.gold / 10))
   state.shop = rollShop()
+  state.foes = makeFoes(state.round)
   state.phase = 'prep'
   return false
 }

@@ -112,6 +112,37 @@
   color: #a98d7d;
 }
 
+/* 점수 아래 부가 기록 한 줄 (판정 분포 등). 점수보다 뒤에 읽히도록 작게. */
+.gui-stats {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgb(154 124 100 / 0.18);
+}
+
+.gui-stats > div {
+  flex: 1;
+}
+
+.gui-stat-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #bda695;
+}
+
+.gui-stat-value {
+  display: block;
+  margin-top: 2px;
+  font-size: 20px;
+  font-weight: 800;
+  color: #4a3a2f;
+  font-variant-numeric: tabular-nums;
+}
+
 /* 버튼 생김새는 main.css의 .btn을 그대로 쓰고, 시트 안 간격만 여기서 준다 */
 .gui-sheet .btn {
   margin-top: 12px;

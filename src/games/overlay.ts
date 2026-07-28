@@ -11,6 +11,13 @@ export interface GameOverOverlayOptions {
   onContinue?(): void
 }
 
+// 점수 아래에 붙는 부가 기록 (판정 분포처럼 게임마다 다른 것)
+export interface GameOverStat {
+  label: string
+  value: string
+  color?: string
+}
+
 export interface GameOverOverlay {
   // reasonKey = 왜 끝났는지 (over.by*). 끝나는 길이 하나뿐인 게임은 생략한다 —
   // 뻔한 것을 굳이 적으면 팝업만 길어진다.
@@ -19,6 +26,7 @@ export interface GameOverOverlay {
     prevBest: number | null,
     canContinue: boolean,
     reasonKey?: TranslationKey,
+    stats?: GameOverStat[],
   ): void
   hide(): void
 }
@@ -35,6 +43,7 @@ export function createGameOverOverlay(
      <p data-label class="gui-label"></p>
      <p data-score class="gui-score">0</p>
      <p data-best class="gui-sub"></p>
+     <div data-stats class="gui-stats"></div>
      ${opts.adLabelKey ? '<button data-ad class="btn btn--go" type="button"></button>' : ''}
      <button data-retry class="btn btn--amber" type="button"></button>`,
   )
@@ -50,7 +59,7 @@ export function createGameOverOverlay(
   }
 
   return {
-    show(score, prevBest, canContinue, reasonKey) {
+    show(score, prevBest, canContinue, reasonKey, stats) {
       stopCount()
       // 판이 끝났으니 곡도 접는다 (다시하기·이어하기로 팝업을 닫으면 돌아온다)
       duckBgm()
@@ -71,6 +80,24 @@ export function createGameOverOverlay(
       // 신기록이면 배지가 알려주므로 아랫줄은 방금 깬 기록을 그대로 보여준다
       set('[data-best]', prevBest === null ? '' : t('over.bestScore', { n: prevBest.toLocaleString() }))
       set('[data-retry]', t('over.retry'))
+
+      const statsEl = sheet.find('[data-stats]')
+      if (statsEl) {
+        statsEl.replaceChildren(
+          ...(stats ?? []).map((stat) => {
+            const cell = document.createElement('div')
+            const label = cell.appendChild(document.createElement('span'))
+            label.className = 'gui-stat-label'
+            label.textContent = stat.label
+            const value = cell.appendChild(document.createElement('strong'))
+            value.className = 'gui-stat-value'
+            value.textContent = stat.value
+            if (stat.color) value.style.color = stat.color
+            return cell
+          }),
+        )
+        statsEl.style.display = stats?.length ? '' : 'none'
+      }
 
       const adBtn = sheet.find<HTMLButtonElement>('[data-ad]')
       if (adBtn && opts.adLabelKey) {
