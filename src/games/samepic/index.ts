@@ -150,6 +150,28 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       }
     }
 
+    // 두 그림을 잇는 실 — 고리만 두 개 켜지면 '두 개가 빛난다'로만 읽힌다.
+    // 선이 있어야 '이 둘이 같은 그림'이라는 말이 된다.
+    if (teaching) {
+      const ends = DISCS.map((disc, d) => {
+        const p = state.discs[d].find((s) => s.sym === state.answer)
+        return p ? { x: disc.x + p.x, y: disc.y + p.y } : null
+      })
+      if (ends[0] && ends[1]) {
+        c.save()
+        c.globalAlpha = 0.2 + 0.16 * Math.sin(state.playTime * 3)
+        c.strokeStyle = '#7E57C2'
+        c.lineWidth = 4
+        c.setLineDash([10, 12])
+        c.lineDashOffset = -state.playTime * 30
+        c.beginPath()
+        c.moveTo(ends[0].x, ends[0].y)
+        c.lineTo(ends[1].x, ends[1].y)
+        c.stroke()
+        c.restore()
+      }
+    }
+
     if (state.wrongFlash > 0 && state.wrongAt) {
       c.save()
       c.globalAlpha = state.wrongFlash / 0.4
@@ -209,12 +231,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.restore()
     }
 
-    if (state.round <= 2) {
-      c.textAlign = 'center'
-      c.fillStyle = 'rgb(255 255 255 / 0.55)'
-      c.font = font(22)
-      c.fillText(t('sp.hint'), 360, 1248)
-    }
   }
 
   shell.addCleanup(detachInput)

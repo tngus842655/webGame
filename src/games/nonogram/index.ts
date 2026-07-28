@@ -53,6 +53,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const state = createState()
   preloadSfx('clear', 'gameover', 'pop', 'tap')
   let drag: { mode: Mode; markValue: CellState; last: number } | null = null
+  // 지금 손끝이 짚고 있는 칸. 10×10에서 칸이 51px이라 손가락이 칸을 통째로 가린다 —
+  // 줄 띠와 힌트 강조가 손 밖으로 삐져나와야 어디를 칠하는지 보인다.
+  let aim: { row: number; col: number } | null = null
   let popup: { text: string; age: number } | null = null
   let lostHeart: { index: number; age: number } | null = null
   let adContinueUsed = false
@@ -147,6 +150,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       }
       const hit = cellAt(p.x, p.y)
       if (!hit) return
+      aim = hit
       if (state.mode === 'fill') {
         drag = { mode: 'fill', markValue: 0, last: hit.row * state.size + hit.col }
         tryFill(hit.row, hit.col)
@@ -162,6 +166,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       const p = stage.toBoard(clientX, clientY)
       const hit = cellAt(p.x, p.y)
       if (!hit) return
+      aim = hit
       const key = hit.row * state.size + hit.col
       if (key === drag.last) return
       drag.last = key
@@ -178,6 +183,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     },
     onUp() {
       drag = null
+      aim = null
     },
   })
 
@@ -220,6 +226,14 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.fillStyle = '#FFFFFF'
     c.fillRect(GRID_X, GRID_Y, GRID_W, GRID_W)
 
+    // 짚고 있는 줄에 띠를 깐다 — 손가락 위아래로 삐져나와 어느 줄인지 알려 준다
+    const spot = clearing ? null : aim
+    if (spot) {
+      c.fillStyle = 'rgb(92 107 192 / 0.12)'
+      c.fillRect(GRID_X, GRID_Y + spot.row * cell, GRID_W, cell)
+      c.fillRect(GRID_X + spot.col * cell, GRID_Y, cell, GRID_W)
+    }
+
     // 셀: 칠함 / X 표시 (완성 연출 중에는 그림만 남긴다)
     for (let row = 0; row < size; row++) {
       for (let col = 0; col < size; col++) {
@@ -260,7 +274,22 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         c.stroke()
       }
 
-      // 힌트 숫자 (완성한 줄은 회색 처리)
+      // 짚고 있는 칸 — 손끝이 덮어도 테두리 모서리는 보인다
+      if (spot) {
+        c.strokeStyle = '#FF6F00'
+        c.lineWidth = 4
+        c.beginPath()
+        c.roundRect(
+          GRID_X + spot.col * cell + 1,
+          GRID_Y + spot.row * cell + 1,
+          cell - 2,
+          cell - 2,
+          5,
+        )
+        c.stroke()
+      }
+
+      // 힌트 숫자 (완성한 줄은 회색 처리, 짚고 있는 줄은 주황)
       const hintSize = size === 5 ? 40 : size === 8 ? 32 : 27
       const gap = hintSize + 6
       c.font = font(hintSize, true)
@@ -268,7 +297,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.textBaseline = 'middle'
       for (let col = 0; col < size; col++) {
         const hints = state.colHints[col]
-        c.fillStyle = state.colDone[col] ? '#B4BAD9' : '#1A237E'
+        c.fillStyle =
+          spot?.col === col ? '#FF6F00' : state.colDone[col] ? '#B4BAD9' : '#1A237E'
         const cx = GRID_X + col * cell + cell / 2
         hints.forEach((n, i) => {
           c.fillText(String(n), cx, GRID_Y - 10 - gap / 2 - (hints.length - 1 - i) * gap)
@@ -276,7 +306,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       }
       for (let row = 0; row < size; row++) {
         const hints = state.rowHints[row]
-        c.fillStyle = state.rowDone[row] ? '#B4BAD9' : '#1A237E'
+        c.fillStyle =
+          spot?.row === row ? '#FF6F00' : state.rowDone[row] ? '#B4BAD9' : '#1A237E'
         const cy = GRID_Y + row * cell + cell / 2
         hints.forEach((n, i) => {
           c.fillText(String(n), GRID_X - 10 - gap / 2 - (hints.length - 1 - i) * gap, cy)
