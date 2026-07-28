@@ -1,5 +1,5 @@
 import { t, type TranslationKey } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, playSfx, preloadSfx, vibrate } from '@/shared/sound'
+import { playDrop, playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -121,7 +121,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  preloadSfx('clear', 'gameover', 'hurt', 'merge', 'tap')
+  preloadSfx('clear', 'gameover', 'hurt', 'select', 'sword', 'tap', 'unlock')
   const popups: Popup[] = []
   let hitFlash = 0
   let enemyHit = 0 // 적이 맞아 흔들리는 정도
@@ -198,7 +198,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
           p.y <= END_BTN.y + END_BTN.h
         ) {
           endTurn(state)
-          playDrop()
+          playSfx('select')
           return
         }
         if (p.y >= HAND_Y - 30) {
@@ -243,7 +243,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
           const x = 60 + i * 212
           if (p.x >= x && p.x <= x + 188 && p.y >= REWARD_Y && p.y <= REWARD_Y + 250) {
             chooseReward(state, i)
-            playMerge(4)
+            playSfx('unlock')
             return
           }
         }

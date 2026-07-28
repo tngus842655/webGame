@@ -260,7 +260,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         p.y <= FIGHT_BTN.y + FIGHT_BTN.h
       ) {
         if (startBattle(state)) {
-          playDrop()
+          playSfx('select')
           vibrate(15)
         }
         return

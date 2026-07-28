@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
+import { playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -91,7 +91,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  preloadSfx('clear', 'coin', 'gameover', 'ice-slide', 'impact', 'tap')
+  preloadSfx('clear', 'coin', 'gameover', 'ice-slide', 'impact', 'whoosh')
   const crystals: Crystal[] = []
   const starPops: Array<{ x: number; y: number; age: number }> = []
   // 방금 지나온 길 — 얼음 위에 자국이 잠깐 남는다
@@ -139,14 +139,14 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (!canUndo(state)) return
     const rewarded = await ctx.showRewardAd('iceslide-undo')
     if (shell.isDestroyed() || !rewarded) return
-    if (undo(state)) playDrop()
+    if (undo(state)) playSfx('whoosh', { rate: 0.8 })
   }
 
   const tapUndo = () => {
     if (!canUndo(state)) return
     if (state.freeUndo > 0) {
       state.freeUndo -= 1
-      if (undo(state)) playDrop()
+      if (undo(state)) playSfx('whoosh', { rate: 0.8 })
       return
     }
     if (ctx.isRewardAdReady()) void undoWithAd()

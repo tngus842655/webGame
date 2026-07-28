@@ -2082,7 +2082,3 @@ const TABLES: Record<Locale, Record<string, Guide>> = {
 export function guideFor(slug: string): Guide | null {
   return TABLES[locale.value][slug] ?? en[slug] ?? null
 }
-
-// 게임 추가 시 가이드 누락을 잡기 위한 검사용
-export const GUIDE_SLUGS = Object.keys(ko)
-export const GUIDE_TABLES = TABLES
