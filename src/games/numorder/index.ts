@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playDrop, playGameOver, playMerge, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -38,6 +38,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('clear', 'fail', 'gameover', 'merge', 'tap')
   // 놓은 카드가 칸으로 날아간다 — 어디에 들어갔는지 눈이 따라가게
   let fly: { value: number; slot: number; t: number } | null = null
   let adClearUsed = false
@@ -86,10 +87,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       const result = place(state, index)
       if (result === 'rejected') {
         // 왜 안 되는지는 테두리가 말해준다 — 소리도 같이 짚어 준다
-        playDrop()
+        playSfx('fail')
         vibrate(40)
       } else if (result === 'cleared') {
-        playMerge(6)
+        playSfx('clear')
         vibrate([20, 40, 30])
         fly = { value: card, slot: index, t: 0 }
       } else if (result) {

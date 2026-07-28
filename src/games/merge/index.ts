@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playDrop, playGameOver, playMerge, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createClearBonus } from '../clearBonus'
 import { createGameOverOverlay } from '../overlay'
@@ -33,7 +33,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
     const events = update(state, dt)
     if (events.timeUp) void gameOver()
-    if (events.nextStage) playMerge(4)
+    if (events.nextStage) playSfx('clear')
     genShake = Math.max(0, genShake - dt)
     for (let i = popups.length - 1; i >= 0; i--) {
       popups[i].age += dt
@@ -43,6 +43,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, LAYOUT.width, LAYOUT.height)
   const state = createState()
+  preloadSfx('clear', 'gameover', 'merge', 'tap')
   const popups: Array<{ x: number; y: number; age: number }> = []
   let adReviveUsed = false
   const bonus = createClearBonus(shell, ctx, 'merge-clear')

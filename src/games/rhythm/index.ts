@@ -122,7 +122,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  preloadSfx('rhythm-hit', 'rhythm-miss', 'tap', 'clear', 'gameover')
+  preloadSfx('clear', 'gameover', 'rhythm-hit', 'rhythm-miss', 'tap')
   let adContinueUsed = false
 
   const particles: Particle[] = []

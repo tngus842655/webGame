@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, vibrate } from '@/shared/sound'
+import { playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -14,7 +14,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (state.phase === 'playing') {
       const result = update(state, dt)
       if (result.grazed) {
-        playDrop()
+        playSfx('whoosh', { gain: 0.6 })
         grazeFlash = 0.5
       }
       if (result.died) void gameOver()
@@ -24,6 +24,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('gameover', 'whoosh')
   let adContinueUsed = false
   let grazeFlash = 0 // 스침 보너스 표시 잔상
 

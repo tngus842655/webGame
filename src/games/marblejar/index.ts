@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playDrop, playGameOver, playMerge, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -32,6 +32,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('clear', 'gameover', 'merge', 'tap')
   let adEmptyUsed = false
 
   const overlay = createGameOverOverlay(shell.wrapper, {
@@ -77,7 +78,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         if (p.x < x - 18 || p.x > x + JAR_W + 18) continue
         const result = place(state, i)
         if (result === 'cleared') {
-          playMerge(6)
+          playSfx('clear')
           vibrate([15, 35, 25])
         } else if (result === 'rejected') {
           vibrate(40)

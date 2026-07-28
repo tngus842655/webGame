@@ -65,7 +65,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  preloadSfx('shoot', 'explode', 'hurt', 'merge', 'gameover')
+  preloadSfx('explode', 'gameover', 'hurt', 'merge', 'shoot')
   const particles: Particle[] = []
   const popups: Array<{ x: number; y: number; gain: number; age: number }> = []
   let leakFlash = 0

@@ -45,7 +45,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  preloadSfx('whoosh', 'impact', 'gameover')
+  preloadSfx('gameover', 'impact', 'whoosh')
   const leaves: Leaf[] = []
   // 붙어 있는 쪽을 부드럽게 옮긴다 (-1 ↔ 1). 순간이동하면 오른 게 아니라 깜빡인 것처럼 보인다.
   let sideAnim = -1

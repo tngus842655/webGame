@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -103,9 +103,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
     if (state.phase === 'playing') {
       const result = update(state, dt)
-      if (result.killed > 0) playMerge(2)
+      if (result.killed > 0) playSfx('pop', { gain: 0.7 })
       if (result.hurt) {
-        playDrop()
+        playSfx('hurt')
         vibrate(40)
       }
       if (result.leveledUp) vibrate(20)
@@ -115,6 +115,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('gameover', 'hurt', 'pop', 'unlock')
   let adReviveUsed = false
 
   const overlay = createGameOverOverlay(shell.wrapper, {
@@ -164,7 +165,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
             applyUpgrade(state, state.choices[i])
             state.choices = []
             state.phase = 'playing'
-            playMerge(4)
+            playSfx('unlock')
             return
           }
         }

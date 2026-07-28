@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -26,6 +26,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('fail', 'gameover', 'pop')
   const pops: Array<{ x: number; y: number; gain: number; age: number }> = []
   let shake = 0
   let adReviveUsed = false
@@ -67,12 +68,12 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       const before = state.score
       const result = tapAt(state, p.x, p.y)
       if (result === 'correct') {
-        playMerge(Math.min(6, 2 + Math.floor(state.combo / 3)))
+        playSfx('pop', { rate: Math.min(1.6, 1 + Math.floor(state.combo / 3) * 0.08) })
         vibrate(12)
         // 연속 보너스가 붙는데 이번에 얼마를 받았는지 볼 곳이 없었다
         pops.push({ x: p.x, y: p.y, gain: state.score - before, age: 0 })
       } else if (result === 'wrong') {
-        playDrop()
+        playSfx('fail')
         vibrate(90)
         shake = 1
       }

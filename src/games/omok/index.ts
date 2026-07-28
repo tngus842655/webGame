@@ -64,7 +64,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  preloadSfx('stone', 'merge', 'gameover')
+  preloadSfx('gameover', 'merge', 'stone')
   let undoUsed = false // 판당 1회 광고 무르기
   let aiming: number | null = null // 손가락이 겨누고 있는 교차점 (떼면 확정)
   let placeFx = 0 // 돌이 놓이며 내려앉는 연출

@@ -62,7 +62,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  preloadSfx('pop', 'whoosh', 'fail', 'gameover')
+  preloadSfx('fail', 'gameover', 'pop', 'whoosh')
   const sparks: Spark[] = []
   // 이번 획에서 터뜨린 자리 — 이것들을 순서대로 이어야 '이었다'는 느낌이 난다
   let chain: Point[] = []

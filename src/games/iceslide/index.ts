@@ -91,7 +91,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  preloadSfx('ice-slide', 'impact', 'coin', 'clear', 'tap', 'gameover')
+  preloadSfx('clear', 'coin', 'gameover', 'ice-slide', 'impact', 'tap')
   const crystals: Crystal[] = []
   const starPops: Array<{ x: number; y: number; age: number }> = []
   // 방금 지나온 길 — 얼음 위에 자국이 잠깐 남는다

@@ -54,7 +54,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  preloadSfx('coin', 'impact', 'whoosh', 'gameover')
+  preloadSfx('coin', 'gameover', 'impact', 'whoosh')
   let adContinueUsed = false
 
   // 착지 눌림(1 → 0으로 잦아든다)과 도약 늘어남

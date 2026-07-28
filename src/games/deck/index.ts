@@ -121,7 +121,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  preloadSfx('sword', 'select', 'hurt', 'clear', 'tap', 'gameover')
+  preloadSfx('clear', 'gameover', 'hurt', 'merge', 'tap')
   const popups: Popup[] = []
   let hitFlash = 0
   let enemyHit = 0 // 적이 맞아 흔들리는 정도

@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playDrop, playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -37,9 +37,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
     state.playTime += dt
     const events = step(state, dt)
-    if (events.jumped) playDrop()
+    if (events.jumped) playSfx('whoosh')
     if (events.landed) {
-      playMerge(1)
+      playSfx('impact', { gain: 0.7 })
       vibrate(10)
     }
     if (events.bounced) vibrate(10)
@@ -51,6 +51,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('gameover', 'impact', 'tap', 'whoosh')
   let adContinueUsed = false
 
   const overlay = createGameOverOverlay(shell.wrapper, {

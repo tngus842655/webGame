@@ -100,7 +100,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  preloadSfx('water', 'impact', 'tap', 'merge', 'unlock', 'gameover')
+  preloadSfx('gameover', 'impact', 'merge', 'tap', 'unlock', 'water')
   const scraps: Scrap[] = []
   let dockRing = 0
   let dragging: Boat | null = null

@@ -1,4 +1,4 @@
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playGameOver, playMerge, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -15,6 +15,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const renderer = new F2Renderer(shell.wrapper)
   const state = createState()
+  preloadSfx('gameover', 'merge', 'whoosh')
   let adUndoUsed = false
   let swipeStart: { x: number; y: number } | null = null
 
@@ -71,7 +72,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     const result = move(state, dir)
     if (!result.moved) return
-    playDrop()
+    playSfx('whoosh')
     if (result.gained > 0) {
       playMerge(result.maxMergedTier)
       vibrate(10)

@@ -60,7 +60,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  preloadSfx('flip', 'clear', 'fail', 'tap', 'gameover')
+  preloadSfx('clear', 'fail', 'flip', 'gameover', 'tap')
   let toast: { text: string; age: number; life: number } | null = null
   // 제출한 줄이 한 칸씩 뒤집히며 결과를 연다 — 이 게임에서 가장 중요한 순간이다
   let reveal = { row: -1, t: 0 }

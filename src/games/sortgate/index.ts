@@ -75,7 +75,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  preloadSfx('pop', 'fail', 'gameover')
+  preloadSfx('fail', 'gameover', 'pop')
   const particles: Particle[] = []
   const popups: Array<{ x: number; y: number; gain: number; age: number }> = []
   const boxPop = { left: 0, right: 0 }

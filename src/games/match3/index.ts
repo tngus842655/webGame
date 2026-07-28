@@ -1,5 +1,5 @@
 import { t } from '@/shared/i18n'
-import { playDrop, playGameOver, playMerge, vibrate } from '@/shared/sound'
+import { playDrop, playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
@@ -113,6 +113,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  preloadSfx('gameover', 'pop', 'tap')
   let adContinueUsed = false
   let showHint = true // 첫 스왑 전까지 제스처 힌트 표시
   let dragFrom: { pos: Pos; x: number; y: number; done: boolean } | null = null
@@ -181,7 +182,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     state.popups.push({ x: cx / matches.size, y: cy / matches.size - 20, text: `+${gained}`, age: 0 })
     addScore(state, gained)
     applyGravity(state.grid)
-    playMerge(state.chain)
+    playSfx('pop', { rate: Math.min(1.7, 1 + Math.max(0, state.chain - 1) * 0.1) })
     vibrate(20)
   }
 

@@ -119,7 +119,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  preloadSfx('sword', 'shoot', 'explode', 'select', 'clear', 'merge', 'gameover')
+  preloadSfx('clear', 'explode', 'gameover', 'merge', 'select', 'shoot', 'sword', 'tap')
   const hitFlash = new Map<string, number>()
   const lunge = new Map<string, number>()
   const shots: Shot[] = []
