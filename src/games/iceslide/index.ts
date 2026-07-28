@@ -19,35 +19,93 @@ import {
   update,
   type Dir,
 } from './state'
-import { font } from '../ui'
+import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 import { drawIconValue } from '../icons'
 
 const SWIPE_THRESHOLD = 40
 const UNDO_BTN = { x: 196, y: 1112, w: 328, h: 88 } as const
+const BOARD_W = COLS * CELL
+const BOARD_H = ROWS * CELL
 
 const centerX = (cx: number) => X0 + cx * CELL + CELL / 2
 const centerY = (cy: number) => Y0 + cy * CELL + CELL / 2
 
+// 얼음의 금과 눈밭의 굴곡 — 판마다 같은 무늬를 쓰려고 모듈을 읽을 때 한 번만 만든다
+const CRACKS = Array.from({ length: 14 }, () => {
+  const x = X0 + Math.random() * BOARD_W
+  const y = Y0 + Math.random() * BOARD_H
+  const a = Math.random() * Math.PI
+  const len = 30 + Math.random() * 70
+  return { x, y, dx: Math.cos(a) * len, dy: Math.sin(a) * len, bend: (Math.random() - 0.5) * 26 }
+})
+const BERGS = Array.from({ length: 6 }, (_, i) => ({
+  x: 40 + i * 128 + (i % 2) * 40,
+  w: 90 + (i % 3) * 46,
+  h: 42 + (i % 4) * 22,
+}))
+
+interface Crystal {
+  x: number
+  y: number
+  vx: number
+  vy: number
+  age: number
+  life: number
+  r: number
+}
+
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
     state.playTime += dt
+    const wasSliding = state.phase === 'sliding'
     const events = update(state, dt)
     if (events.stars > 0) {
       playMerge(Math.min(6, 2 + events.stars))
       vibrate(12)
+      // 지나가며 주웠으므로 펭귄 자리에서 튀어오른다
+      const sl = state.slide
+      const px = sl ? lerpX(sl.fromX, sl.toX, ease(sl.t)) : centerX(state.px)
+      const py = sl ? lerpY(sl.fromY, sl.toY, ease(sl.t)) : centerY(state.py)
+      for (let i = 0; i < events.stars; i++) starPops.push({ x: px, y: py, age: 0 })
+      sparkle(px, py)
     }
-    if (events.cleared) vibrate([20, 40, 30])
-    else if (events.stopped) playDrop()
+    if (events.cleared) {
+      vibrate([20, 40, 30])
+      clearGlow = 1
+    } else if (events.stopped) {
+      playDrop()
+      bump = 1
+      shake = 1
+      // 부딪혀 멈춘 자리에서 얼음이 튄다
+      crash(centerX(state.px), centerY(state.py))
+    }
+    if (wasSliding) trailAge = 0
+    else trailAge = Math.min(1, trailAge + dt * 1.1)
     if (state.phase === 'over' && state.overTimer > 0) {
       state.overTimer -= dt
       if (state.overTimer <= 0) void gameOver()
     }
+    stepEffects(dt)
     draw()
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
+  const crystals: Crystal[] = []
+  const starPops: Array<{ x: number; y: number; age: number }> = []
+  // 방금 지나온 길 — 얼음 위에 자국이 잠깐 남는다
+  let trail: { fromX: number; fromY: number; toX: number; toY: number } | null = null
+  let trailAge = 1
+  let bump = 0
+  let shake = 0
+  let clearGlow = 0
+  let blocked = 0 // 벽에 붙어 못 움직인 방향 표시
+  let blockedDir: Dir = 'down'
   let swipeStart: { x: number; y: number } | null = null
   let adMovesUsed = false
+
+  const ease = (t: number) => 1 - (1 - t) * (1 - t)
+  const lerpX = (a: number, b: number, k: number) => centerX(a) + (centerX(b) - centerX(a)) * k
+  const lerpY = (a: number, b: number, k: number) => centerY(a) + (centerY(b) - centerY(a)) * k
 
   const overlay = createGameOverOverlay(shell.wrapper, {
     adLabelKey: 'ic.ad',
@@ -55,6 +113,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       if (state.phase !== 'over') return
       adMovesUsed = false
       Object.assign(state, createState())
+      crystals.length = 0
+      starPops.length = 0
+      trail = null
       overlay.hide()
     },
     onContinue() {
@@ -98,6 +159,67 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adMovesUsed)
   }
 
+  const pushCrystal = (x: number, y: number, vx: number, vy: number, life: number) => {
+    crystals.push({ x, y, vx, vy, age: 0, life, r: 2 + Math.random() * 5 })
+  }
+
+  const crash = (x: number, y: number) => {
+    for (let i = 0; i < 14; i++) {
+      const a = Math.random() * Math.PI * 2
+      const v = 90 + Math.random() * 230
+      pushCrystal(x, y, Math.cos(a) * v, Math.sin(a) * v, 0.45)
+    }
+  }
+
+  const sparkle = (x: number, y: number) => {
+    for (let i = 0; i < 8; i++) {
+      const a = Math.random() * Math.PI * 2
+      const v = 70 + Math.random() * 160
+      pushCrystal(x, y, Math.cos(a) * v, Math.sin(a) * v - 60, 0.5)
+    }
+  }
+
+  const stepEffects = (dt: number) => {
+    bump = Math.max(0, bump - dt * 4)
+    shake = Math.max(0, shake - dt * 5)
+    clearGlow = Math.max(0, clearGlow - dt * 1.4)
+    blocked = Math.max(0, blocked - dt * 3)
+    // 미끄러지는 동안 뒤로 얼음 가루가 뿌려진다
+    const sl = state.slide
+    if (sl && sl.t < 1) {
+      const k = ease(sl.t)
+      const x = lerpX(sl.fromX, sl.toX, k)
+      const y = lerpY(sl.fromY, sl.toY, k)
+      const dx = Math.sign(sl.toX - sl.fromX)
+      const dy = Math.sign(sl.toY - sl.fromY)
+      for (let i = 0; i < 2; i++) {
+        pushCrystal(
+          x - dx * 22 + (Math.random() - 0.5) * 20,
+          y - dy * 22 + (Math.random() - 0.5) * 20,
+          -dx * (60 + Math.random() * 120) + (Math.random() - 0.5) * 90,
+          -dy * (60 + Math.random() * 120) + (Math.random() - 0.5) * 90,
+          0.4,
+        )
+      }
+    }
+    for (let i = crystals.length - 1; i >= 0; i--) {
+      const p = crystals[i]
+      p.age += dt
+      if (p.age >= p.life) {
+        crystals.splice(i, 1)
+        continue
+      }
+      p.x += p.vx * dt
+      p.y += p.vy * dt
+      p.vx *= 1 - dt * 3
+      p.vy *= 1 - dt * 3
+    }
+    for (let i = starPops.length - 1; i >= 0; i--) {
+      starPops[i].age += dt
+      if (starPops[i].age > 0.8) starPops.splice(i, 1)
+    }
+  }
+
   const trySwipe = (clientX: number, clientY: number) => {
     if (!swipeStart || state.phase !== 'playing') return
     const p = stage.toBoard(clientX, clientY)
@@ -108,7 +230,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     let dir: Dir
     if (Math.abs(dx) > Math.abs(dy)) dir = dx > 0 ? 'right' : 'left'
     else dir = dy > 0 ? 'down' : 'up'
-    if (!slide(state, dir)) vibrate(30)
+    if (slide(state, dir)) {
+      trail = { fromX: state.slide!.fromX, fromY: state.slide!.fromY, toX: state.px, toY: state.py }
+      trailAge = 0
+    } else {
+      // 그쪽은 막혀 있다 — 진동만으로는 왜 안 갔는지 모른다
+      vibrate(30)
+      blocked = 1
+      blockedDir = dir
+    }
   }
 
   const detachInput = attachInput(stage.canvas, {
@@ -133,126 +263,368 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     },
   })
 
-  const drawStar = (cx: number, cy: number, r: number) => {
+  const drawStar = (cx: number, cy: number, r: number, spin: number) => {
     const c = stage.c
+    c.save()
+    c.translate(cx, cy)
+    c.rotate(spin)
+    c.fillStyle = 'rgb(0 0 0 / 0.16)'
+    c.beginPath()
+    c.ellipse(2, r * 0.9, r * 0.7, r * 0.24, 0, 0, Math.PI * 2)
+    c.fill()
     c.beginPath()
     for (let i = 0; i < 10; i++) {
       const a = -Math.PI / 2 + (i * Math.PI) / 5
       const rad = i % 2 === 0 ? r : r * 0.44
-      const x = cx + Math.cos(a) * rad
-      const y = cy + Math.sin(a) * rad
+      const x = Math.cos(a) * rad
+      const y = Math.sin(a) * rad
       if (i === 0) c.moveTo(x, y)
       else c.lineTo(x, y)
     }
     c.closePath()
-    c.fillStyle = '#FFCA28'
+    const grad = c.createLinearGradient(-r, -r, r, r)
+    grad.addColorStop(0, '#FFF3C4')
+    grad.addColorStop(0.5, '#FFCA28')
+    grad.addColorStop(1, '#F57F17')
+    c.fillStyle = grad
     c.fill()
-    c.strokeStyle = '#F9A825'
+    c.strokeStyle = '#E08C00'
     c.lineWidth = 2
     c.stroke()
+    c.fillStyle = 'rgb(255 255 255 / 0.75)'
+    c.beginPath()
+    c.moveTo(0, -r * 0.86)
+    c.lineTo(r * 0.2, -r * 0.24)
+    c.lineTo(0, -r * 0.1)
+    c.lineTo(-r * 0.2, -r * 0.24)
+    c.closePath()
+    c.fill()
+    c.restore()
   }
 
-  const drawPenguin = (x: number, y: number) => {
+  // 눈 덮인 바위 — 둥근 사각형 하나였던 것을 깎인 면이 있는 돌덩이로
+  const drawRock = (px: number, py: number) => {
     const c = stage.c
-    const [dx, dy] = state.facing === 'left' ? [-1, 0] : state.facing === 'right' ? [1, 0] : [0, state.facing === 'up' ? -0.6 : 0.6]
-    c.fillStyle = '#263238'
+    const x = px + CELL / 2
+    const y = py + CELL / 2
+    const r = CELL * 0.4
+    c.save()
+    c.fillStyle = 'rgb(40 70 90 / 0.25)'
     c.beginPath()
-    c.arc(x, y, 31, 0, Math.PI * 2)
+    c.ellipse(x, y + r * 0.78, r * 0.94, r * 0.28, 0, 0, Math.PI * 2)
     c.fill()
+
+    const body = c.createLinearGradient(x - r, y - r, x + r, y + r)
+    body.addColorStop(0, '#8FA3AF')
+    body.addColorStop(0.55, '#61798A')
+    body.addColorStop(1, '#3E5361')
+    c.fillStyle = body
+    c.beginPath()
+    c.moveTo(x - r, y + r * 0.62)
+    c.lineTo(x - r * 0.82, y - r * 0.26)
+    c.lineTo(x - r * 0.28, y - r * 0.82)
+    c.lineTo(x + r * 0.5, y - r * 0.7)
+    c.lineTo(x + r, y + r * 0.1)
+    c.lineTo(x + r * 0.72, y + r * 0.7)
+    c.closePath()
+    c.fill()
+
+    // 위에 쌓인 눈
+    c.fillStyle = '#F4FAFD'
+    c.beginPath()
+    c.moveTo(x - r * 0.82, y - r * 0.26)
+    c.lineTo(x - r * 0.28, y - r * 0.82)
+    c.lineTo(x + r * 0.5, y - r * 0.7)
+    c.lineTo(x + r * 0.66, y - r * 0.34)
+    c.quadraticCurveTo(x, y - r * 0.06, x - r * 0.82, y - r * 0.26)
+    c.closePath()
+    c.fill()
+    // 갈라진 금
+    c.strokeStyle = 'rgb(30 45 55 / 0.35)'
+    c.lineWidth = 2.5
+    c.lineCap = 'round'
+    c.beginPath()
+    c.moveTo(x + r * 0.16, y - r * 0.06)
+    c.lineTo(x + r * 0.34, y + r * 0.34)
+    c.stroke()
+    c.restore()
+  }
+
+  // 펭귄 — 미끄러지는 동안은 배를 깔고 눕는다
+  const drawPenguin = (x: number, y: number, sliding: boolean) => {
+    const c = stage.c
+    const facing = state.facing
+    const [dx, dy] =
+      facing === 'left' ? [-1, 0] : facing === 'right' ? [1, 0] : [0, facing === 'up' ? -0.6 : 0.6]
+
+    c.save()
+    c.fillStyle = 'rgb(40 70 90 / 0.22)'
+    c.beginPath()
+    c.ellipse(x, y + 30, 30, 10, 0, 0, Math.PI * 2)
+    c.fill()
+    c.translate(x, y)
+    // 부딪힌 순간 납작해졌다가 돌아온다
+    if (bump > 0) c.scale(1 + bump * 0.16, 1 - bump * 0.14)
+    // 미끄러지는 동안은 진행 방향으로 몸이 늘어난다
+    if (sliding) {
+      const stretch = Math.abs(dx) > Math.abs(dy) ? [1.16, 0.9] : [0.9, 1.16]
+      c.scale(stretch[0], stretch[1])
+    }
+
+    // 날개 — 미끄러질 때는 뒤로 젖혀진다
+    c.fillStyle = '#1B262C'
+    for (const side of [-1, 1]) {
+      c.save()
+      c.rotate(sliding ? -side * dx * 0.5 : 0)
+      c.beginPath()
+      c.ellipse(side * 27, sliding ? 4 : 8, 9, 19, side * 0.35, 0, Math.PI * 2)
+      c.fill()
+      c.restore()
+    }
+    // 몸통
+    const body = c.createLinearGradient(-26, -30, 26, 30)
+    body.addColorStop(0, '#3C4C56')
+    body.addColorStop(0.5, '#263238')
+    body.addColorStop(1, '#141D22')
+    c.fillStyle = body
+    c.beginPath()
+    c.arc(0, 0, 31, 0, Math.PI * 2)
+    c.fill()
+    // 배
     c.fillStyle = '#FFFFFF'
     c.beginPath()
-    c.ellipse(x + dx * 6, y + dy * 5 + 4, 18, 21, 0, 0, Math.PI * 2)
+    c.ellipse(dx * 6, dy * 5 + 4, 18, 21, 0, 0, Math.PI * 2)
     c.fill()
+    // 발
+    c.fillStyle = '#EF6C00'
+    for (const side of [-1, 1]) {
+      c.beginPath()
+      c.ellipse(side * 11, 29, 8, 5, side * 0.3, 0, Math.PI * 2)
+      c.fill()
+    }
     // 부리는 보는 쪽으로
     c.fillStyle = '#FB8C00'
     c.beginPath()
-    c.moveTo(x + dx * 30, y + dy * 26)
-    c.lineTo(x + dx * 14 - dy * 9, y + dy * 14 - dx * 9)
-    c.lineTo(x + dx * 14 + dy * 9, y + dy * 14 + dx * 9)
+    c.moveTo(dx * 30, dy * 26)
+    c.lineTo(dx * 14 - dy * 9, dy * 14 - dx * 9)
+    c.lineTo(dx * 14 + dy * 9, dy * 14 + dx * 9)
     c.closePath()
     c.fill()
+    // 눈
     c.fillStyle = '#FFFFFF'
     c.beginPath()
-    c.arc(x - 9, y - 12, 6.5, 0, Math.PI * 2)
-    c.arc(x + 9, y - 12, 6.5, 0, Math.PI * 2)
+    c.arc(-9, -12, 6.5, 0, Math.PI * 2)
+    c.arc(9, -12, 6.5, 0, Math.PI * 2)
     c.fill()
     c.fillStyle = '#0D1B22'
     c.beginPath()
-    c.arc(x - 9 + dx * 2, y - 12 + dy * 2, 3.2, 0, Math.PI * 2)
-    c.arc(x + 9 + dx * 2, y - 12 + dy * 2, 3.2, 0, Math.PI * 2)
+    c.arc(-9 + dx * 2, -12 + dy * 2, 3.2, 0, Math.PI * 2)
+    c.arc(9 + dx * 2, -12 + dy * 2, 3.2, 0, Math.PI * 2)
+    c.fill()
+    c.restore()
+  }
+
+  const drawBackdrop = (c: CanvasRenderingContext2D) => {
+    const sky = c.createLinearGradient(0, 0, 0, 1280)
+    sky.addColorStop(0, '#0A2334')
+    sky.addColorStop(0.35, '#154257')
+    sky.addColorStop(1, '#0C2F42')
+    c.fillStyle = sky
+    c.fillRect(0, 0, 720, 1280)
+    // 오로라
+    c.save()
+    const aurora = c.createLinearGradient(0, 60, 0, 250)
+    aurora.addColorStop(0, 'rgb(80 220 190 / 0)')
+    aurora.addColorStop(0.5, 'rgb(90 230 180 / 0.14)')
+    aurora.addColorStop(1, 'rgb(120 160 255 / 0)')
+    c.fillStyle = aurora
+    c.beginPath()
+    c.moveTo(0, 90)
+    for (let x = 0; x <= 720; x += 40) {
+      c.lineTo(x, 120 + Math.sin(x / 110 + state.playTime * 0.5) * 26)
+    }
+    c.lineTo(720, 250)
+    c.lineTo(0, 250)
+    c.closePath()
+    c.fill()
+    c.restore()
+    // 멀리 늘어선 빙산
+    c.fillStyle = 'rgb(190 225 240 / 0.16)'
+    for (const b of BERGS) {
+      c.beginPath()
+      c.moveTo(b.x - b.w / 2, Y0 - 14)
+      c.lineTo(b.x, Y0 - 14 - b.h)
+      c.lineTo(b.x + b.w / 2, Y0 - 14)
+      c.closePath()
+      c.fill()
+    }
+    // 얼음판이 놓인 눈밭
+    c.fillStyle = '#E8F4F9'
+    c.beginPath()
+    c.roundRect(X0 - 16, Y0 - 16, BOARD_W + 32, BOARD_H + 32, 24)
     c.fill()
   }
 
-  const draw = () => {
-    const c = stage.begin('#0B2A3A', '#123C51')
-
-    // 얼음판
+  const drawIce = (c: CanvasRenderingContext2D) => {
     for (let y = 0; y < ROWS; y++) {
       for (let x = 0; x < COLS; x++) {
         const px = X0 + x * CELL
         const py = Y0 + y * CELL
-        c.fillStyle = (x + y) % 2 === 0 ? '#D9EEF7' : '#CBE6F2'
+        c.fillStyle = (x + y) % 2 === 0 ? '#DCF0F8' : '#C7E4F1'
         c.fillRect(px, py, CELL, CELL)
-        c.strokeStyle = 'rgb(255 255 255 / 0.55)'
-        c.lineWidth = 1
-        c.strokeRect(px + 0.5, py + 0.5, CELL - 1, CELL - 1)
       }
     }
+    c.save()
+    c.beginPath()
+    c.rect(X0, Y0, BOARD_W, BOARD_H)
+    c.clip()
+    // 얼음의 금
+    c.strokeStyle = 'rgb(255 255 255 / 0.7)'
+    c.lineWidth = 2
+    c.lineCap = 'round'
+    for (const k of CRACKS) {
+      c.beginPath()
+      c.moveTo(k.x, k.y)
+      c.quadraticCurveTo(k.x + k.dx / 2 + k.bend, k.y + k.dy / 2 - k.bend, k.x + k.dx, k.y + k.dy)
+      c.stroke()
+    }
+    // 비스듬히 지나는 광택
+    const gloss = c.createLinearGradient(X0, Y0, X0 + BOARD_W, Y0 + BOARD_H)
+    gloss.addColorStop(0, 'rgb(255 255 255 / 0.22)')
+    gloss.addColorStop(0.4, 'rgb(255 255 255 / 0)')
+    gloss.addColorStop(0.75, 'rgb(255 255 255 / 0.16)')
+    gloss.addColorStop(1, 'rgb(255 255 255 / 0)')
+    c.fillStyle = gloss
+    c.fillRect(X0, Y0, BOARD_W, BOARD_H)
+
+    // 방금 지나온 자국
+    if (trail && trailAge < 1) {
+      c.save()
+      c.globalAlpha = (1 - trailAge) * 0.55
+      c.strokeStyle = '#FFFFFF'
+      c.lineWidth = 34
+      c.lineCap = 'round'
+      c.beginPath()
+      c.moveTo(centerX(trail.fromX), centerY(trail.fromY))
+      c.lineTo(centerX(trail.toX), centerY(trail.toY))
+      c.stroke()
+      c.restore()
+    }
+    c.restore()
+
+    // 칸 선은 옅게 — 칸 세기가 이 게임의 계산이라 지우지는 않는다
+    c.strokeStyle = 'rgb(255 255 255 / 0.5)'
+    c.lineWidth = 1
+    for (let y = 0; y < ROWS; y++) {
+      for (let x = 0; x < COLS; x++) {
+        c.strokeRect(X0 + x * CELL + 0.5, Y0 + y * CELL + 0.5, CELL - 1, CELL - 1)
+      }
+    }
+    // 판 테두리 — 얼음 덩어리의 두께
+    c.strokeStyle = 'rgb(120 170 195 / 0.6)'
+    c.lineWidth = 4
+    c.strokeRect(X0, Y0, BOARD_W, BOARD_H)
+  }
+
+  const draw = () => {
+    const c = stage.begin('#071A26', '#0B2A3A')
+    drawBackdrop(c)
+
+    c.save()
+    if (shake > 0) c.translate((Math.random() - 0.5) * 10 * shake, (Math.random() - 0.5) * 10 * shake)
+
+    drawIce(c)
 
     for (let y = 0; y < ROWS; y++) {
       for (let x = 0; x < COLS; x++) {
         const i = y * COLS + x
         const px = X0 + x * CELL
         const py = Y0 + y * CELL
-        if (state.rocks[i]) {
-          c.fillStyle = '#607D8B'
-          c.beginPath()
-          c.roundRect(px + 7, py + 9, CELL - 14, CELL - 16, 12)
-          c.fill()
-          c.fillStyle = '#90A4AE'
-          c.beginPath()
-          c.roundRect(px + 13, py + 14, CELL - 26, 12, 6)
-          c.fill()
-        } else if (state.stars[i]) {
-          drawStar(px + CELL / 2, py + CELL / 2, 26)
+        if (state.rocks[i]) drawRock(px, py)
+        else if (state.stars[i]) {
+          const bobY = Math.sin(state.playTime * 2.4 + i) * 3
+          drawStar(px + CELL / 2, py + CELL / 2 + bobY, 26, Math.sin(state.playTime * 1.2 + i) * 0.2)
         }
       }
     }
 
-    // 펭귄 — 미끄러지는 동안은 칸 사이를 보간해 그린다
-    let pxPos = centerX(state.px)
-    let pyPos = centerY(state.py)
-    const sl = state.slide
-    if (sl) {
-      const e = 1 - (1 - sl.t) * (1 - sl.t)
-      pxPos = centerX(sl.fromX) + (centerX(sl.toX) - centerX(sl.fromX)) * e
-      pyPos = centerY(sl.fromY) + (centerY(sl.toY) - centerY(sl.fromY)) * e
+    // 얼음 가루
+    for (const p of crystals) {
+      const k = p.age / p.life
+      c.globalAlpha = (1 - k) * 0.9
+      c.fillStyle = '#FFFFFF'
+      c.beginPath()
+      c.arc(p.x, p.y, p.r * (1 - k * 0.4), 0, Math.PI * 2)
+      c.fill()
     }
-    drawPenguin(pxPos, pyPos)
+    c.globalAlpha = 1
 
-    // HUD
+    const sl = state.slide
+    const pxPos = sl ? lerpX(sl.fromX, sl.toX, ease(sl.t)) : centerX(state.px)
+    const pyPos = sl ? lerpY(sl.fromY, sl.toY, ease(sl.t)) : centerY(state.py)
+    drawPenguin(pxPos, pyPos, sl !== null)
+
+    // 그쪽은 막혀 있다는 표시
+    if (blocked > 0) {
+      const [bx, by] =
+        blockedDir === 'left'
+          ? [-1, 0]
+          : blockedDir === 'right'
+            ? [1, 0]
+            : [0, blockedDir === 'up' ? -1 : 1]
+      c.save()
+      c.globalAlpha = blocked * 0.8
+      c.strokeStyle = '#EF5350'
+      c.lineWidth = 7
+      c.lineCap = 'round'
+      c.beginPath()
+      c.moveTo(pxPos + bx * 40 - by * 18, pyPos + by * 40 - bx * 18)
+      c.lineTo(pxPos + bx * 40 + by * 18, pyPos + by * 40 + bx * 18)
+      c.stroke()
+      c.restore()
+    }
+
+    // 주운 별
     c.textAlign = 'center'
-    c.fillStyle = '#FFFFFF'
-    c.font = font(44, true)
-    c.fillText(state.score.toLocaleString(), 360, 66)
-    c.font = font(22)
+    c.font = font(26, true)
+    for (const p of starPops) {
+      const k = p.age / 0.8
+      c.save()
+      c.globalAlpha = 1 - k * k
+      c.lineJoin = 'round'
+      c.lineWidth = 6
+      c.strokeStyle = 'rgb(7 26 38 / 0.8)'
+      c.strokeText('+50', p.x, p.y - 34 - k * 40)
+      c.fillStyle = '#FFD54F'
+      c.fillText('+50', p.x, p.y - 34 - k * 40)
+      c.restore()
+    }
+    c.restore()
+
+    if (clearGlow > 0) {
+      c.fillStyle = `rgb(255 250 220 / ${clearGlow * 0.3})`
+      c.fillRect(0, 0, 720, 1280)
+    }
+
+    // HUD — 판이 y 250부터라 공통 점수판이 그대로 들어간다
+    drawScorePanel(c, {
+      label: t('hud.score'),
+      value: state.score.toLocaleString(),
+      sub: true,
+    })
+    c.font = font(20)
+    c.textAlign = 'center'
     c.fillStyle = 'rgb(255 255 255 / 0.6)'
-    c.fillText(t('ic.level', { n: state.level }), 360, 104)
+    c.fillText(t('ic.level', { n: state.level }), SCORE_PANEL.cx, SCORE_PANEL.subY)
 
     // 남은 이동이 곧 수명이라 크게 보여 준다
     c.textAlign = 'left'
     c.fillStyle = state.moves <= 3 ? '#FF8A65' : '#FFFFFF'
     c.font = font(30, true)
-    c.fillText(t('ic.moves', { n: state.moves }), 30, 200)
+    c.fillText(t('ic.moves', { n: state.moves }), 30, 214)
     c.fillStyle = '#FFCA28'
-    drawIconValue(c, 'star', String(state.starsLeft), 690, 190, 15, 'right')
+    drawIconValue(c, 'star', String(state.starsLeft), 690, 204, 15, 'right')
     c.textAlign = 'center'
-
-    if (state.level === 1 && state.history.length === 0) {
-      c.fillStyle = 'rgb(255 255 255 / 0.5)'
-      c.font = font(22)
-      c.fillText(t('ic.hint'), 360, 148)
-    }
 
     // 되돌리기 버튼 (공짜가 남았으면 회색, 다 쓰면 광고 버튼)
     const undoReady = canUndo(state)
@@ -273,6 +645,29 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.textBaseline = 'alphabetic'
     }
 
+    // 글자 없는 조작 안내 — 첫 판에서 아직 한 번도 안 밀었으면 손끝이 쓸어 보인다
+    if (state.level === 1 && state.history.length === 0 && state.phase === 'playing') {
+      const k = (state.playTime % 1.8) / 1.8
+      const run = Math.min(1, k / 0.66)
+      const sx = pxPos + 54
+      const c0 = { x: sx, y: pyPos }
+      const tip = { x: sx + run * 120, y: pyPos }
+      c.save()
+      c.globalAlpha = k > 0.85 ? (1 - k) / 0.15 : 0.7
+      c.strokeStyle = '#4DD0E1'
+      c.lineWidth = 7
+      c.lineCap = 'round'
+      c.beginPath()
+      c.moveTo(c0.x, c0.y)
+      c.lineTo(tip.x, tip.y)
+      c.stroke()
+      c.fillStyle = 'rgb(224 247 250 / 0.9)'
+      c.beginPath()
+      c.arc(tip.x, tip.y, 15, 0, Math.PI * 2)
+      c.fill()
+      c.restore()
+    }
+
     if (state.clearFlash > 0) {
       c.save()
       c.globalAlpha = Math.min(1, state.clearFlash / 0.4)
@@ -280,6 +675,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fillRect(0, 600, 720, 120)
       c.fillStyle = '#FFD54F'
       c.font = font(40, true)
+      c.textAlign = 'center'
       c.fillText(t('ic.clear', { n: state.clearGain }), 360, 676)
       c.restore()
     }
