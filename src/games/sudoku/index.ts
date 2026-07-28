@@ -12,6 +12,7 @@ import {
   loadPractice,
   placeDigit,
   recordDailyClear,
+  toggleNote,
 } from './state'
 import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 import { drawIcon } from '../icons'
@@ -22,6 +23,7 @@ const GRID_Y = 240
 const CELL = 72
 const GRID_W = CELL * 9
 const PAD = { y: 952, h: 116, w: 68, gap: 4, x: 38 } as const
+const MEMO = { x: 246, y: 1096, w: 228, h: 80 } as const
 
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
@@ -107,6 +109,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   }
 
   const tryPlace = (digit: number) => {
+    if (state.memo) {
+      if (toggleNote(state, digit)) playSfx('tap', { rate: 1.3 })
+      return
+    }
     const result = placeDigit(state, digit)
     if (result === 'placed') {
       playSfx('select')
@@ -127,6 +133,17 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     onDown(clientX, clientY) {
       if (state.phase !== 'playing') return
       const p = stage.toBoard(clientX, clientY)
+      // 메모 전환
+      if (
+        p.x >= MEMO.x &&
+        p.x <= MEMO.x + MEMO.w &&
+        p.y >= MEMO.y &&
+        p.y <= MEMO.y + MEMO.h
+      ) {
+        state.memo = !state.memo
+        playSfx('select')
+        return
+      }
       // 숫자 패드
       if (p.y >= PAD.y && p.y <= PAD.y + PAD.h) {
         const idx = Math.floor((p.x - PAD.x) / (PAD.w + PAD.gap))
@@ -227,10 +244,29 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       }
     }
 
-    // 숫자
-    c.font = font(44, true)
+    // 메모 — 칸 안에 3×3으로 작게. 지금 고른 숫자와 같은 메모는 진하게 보여
+    // 어디에 후보가 남았는지 한눈에 찾게 한다
     c.textAlign = 'center'
     c.textBaseline = 'middle'
+    c.font = font(20)
+    for (let i = 0; i < 81; i++) {
+      const marks = state.notes[i]
+      if (marks === 0 || state.cells[i] !== 0) continue
+      const bx = GRID_X + (i % 9) * CELL
+      const by = GRID_Y + Math.floor(i / 9) * CELL
+      for (let d = 1; d <= 9; d++) {
+        if (!(marks & (1 << d))) continue
+        c.fillStyle = selDigit === d ? '#00796B' : '#9AA9B2'
+        c.fillText(
+          String(d),
+          bx + ((d - 1) % 3) * (CELL / 3) + CELL / 6,
+          by + Math.floor((d - 1) / 3) * (CELL / 3) + CELL / 6,
+        )
+      }
+    }
+
+    // 숫자
+    c.font = font(44, true)
     for (let i = 0; i < 81; i++) {
       const d = state.cells[i]
       if (d === 0) continue
@@ -283,7 +319,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.roundRect(x, PAD.y, PAD.w, PAD.h, 16)
       c.fill()
       c.stroke()
-      c.fillStyle = '#00695C'
+      // 메모 모드에서는 패드 숫자도 메모 색으로 — 지금 누르면 뭐가 되는지 보인다
+      c.fillStyle = state.memo ? '#9AA9B2' : '#00695C'
       c.font = font(44, true)
       c.textAlign = 'center'
       c.fillText(String(d), x + PAD.w / 2, PAD.y + 58)
@@ -292,6 +329,24 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fillText(String(left), x + PAD.w / 2, PAD.y + 94)
       c.restore()
     }
+
+    // 메모 전환 버튼 — 켜져 있으면 색이 반전된다
+    c.fillStyle = state.memo ? '#00796B' : '#FFFFFF'
+    c.strokeStyle = '#00796B'
+    c.lineWidth = 3
+    c.beginPath()
+    c.roundRect(MEMO.x, MEMO.y, MEMO.w, MEMO.h, 20)
+    c.fill()
+    c.stroke()
+    // 연필로 적어 둔 후보를 흉내 낸 작은 숫자 세 개
+    c.textAlign = 'center'
+    c.fillStyle = state.memo ? 'rgb(255 255 255 / 0.7)' : '#9AA9B2'
+    c.font = font(19)
+    c.fillText('1 2 3', MEMO.x + 48, MEMO.y + 34)
+    c.fillText('4 5 6', MEMO.x + 48, MEMO.y + 56)
+    c.fillStyle = state.memo ? '#FFFFFF' : '#00695C'
+    c.font = font(30, true)
+    c.fillText(t('sd.memo'), MEMO.x + 148, MEMO.y + 52)
   }
 
   shell.addCleanup(detachInput)

@@ -12,6 +12,8 @@ export interface SudokuState {
   streak: number // 데일리 연속 클리어 일수 (표시용)
   givens: boolean[] // 81
   cells: number[] // 81, 0 = 빈칸
+  notes: number[] // 81, 메모한 숫자의 비트마스크 (1 << d)
+  memo: boolean // 숫자 패드가 메모를 적는 모드인지
   solution: number[] // 81
   selected: number // -1 = 선택 없음
   counts: number[] // [1..9] 아직 채워야 할 개수
@@ -225,6 +227,7 @@ export function dailySeed(): number {
 function applyPuzzle(state: SudokuState, puzzle: number[], solution: number[]) {
   state.givens = puzzle.map((d) => d !== 0)
   state.cells = puzzle.slice()
+  state.notes = new Array<number>(81).fill(0)
   state.solution = solution
   state.selected = -1
   state.counts = new Array<number>(10).fill(0)
@@ -267,6 +270,8 @@ export function createState(): SudokuState {
     streak: currentStreak(),
     givens: [],
     cells: [],
+    notes: [],
+    memo: false,
     solution: [],
     selected: -1,
     counts: [],
@@ -289,11 +294,29 @@ export function placeDigit(state: SudokuState, digit: number): PlaceResult {
   if (i < 0 || state.cells[i] !== 0 || state.counts[digit] <= 0) return 'none'
   if (state.solution[i] === digit) {
     state.cells[i] = digit
+    state.notes[i] = 0
     state.counts[digit]--
     state.remaining--
+    // 같은 줄·같은 박스에 적어 둔 같은 숫자 메모는 이제 틀린 메모다. 손으로 지우게
+    // 두면 메모를 쓸수록 손이 더 바빠진다
+    const bit = 1 << digit
+    const r = Math.floor(i / 9)
+    const c = i % 9
+    const b = boxOf(i)
+    for (let k = 0; k < 81; k++) {
+      if (Math.floor(k / 9) === r || k % 9 === c || boxOf(k) === b) state.notes[k] &= ~bit
+    }
     return 'placed'
   }
   return 'miss'
+}
+
+// 메모 모드에서 선택한 빈칸에 숫자를 적었다 지웠다 한다
+export function toggleNote(state: SudokuState, digit: number): boolean {
+  const i = state.selected
+  if (i < 0 || state.cells[i] !== 0 || state.counts[digit] <= 0) return false
+  state.notes[i] ^= 1 << digit
+  return true
 }
 
 // 퍼즐 클리어 점수: 기본 + 남은 생명 + 시간 보너스
