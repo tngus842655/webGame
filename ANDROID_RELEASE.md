@@ -128,10 +128,23 @@ cd C:\Workspace\MiniGame30-TWA
 bubblewrap build
 ```
 
-키스토어 비밀번호를 묻는다. 끝나면 두 파일이 나온다.
+키스토어 비밀번호를 묻는다. 끝나면 프로젝트 루트에 두 파일이 나온다.
 
 - `app-release-bundle.aab` ← **Play Console에 올릴 파일**
 - `app-release-signed.apk` ← 내 폰에 직접 설치해서 미리 확인용
+
+`bubblewrap init`이 만들어 준 건 결국 평범한 gradle 프로젝트라, 익숙한 방식으로
+빌드해도 결과는 같다. 이 경우 나오는 위치가 다르니 헷갈리지 말 것.
+
+```powershell
+gradlew.bat clean
+gradlew.bat bundleRelease
+```
+
+→ `app\build\outputs\bundle\release\app-release.aab`
+
+단 `bubblewrap build`와 달리 gradle 직접 빌드는 `twa-manifest.json` 변경을
+반영하지 않는다. 설정을 고쳤으면 `bubblewrap update`를 먼저 돌려야 한다.
 
 폰에서 먼저 확인해 보려면 (USB 디버깅 켠 상태에서):
 
@@ -188,7 +201,7 @@ C:\Android\Sdk\platform-tools\adb.exe install -r app-release-signed.apk
 
 **테스트 및 출시 → 테스트 → 내부 테스트** → 새 버전 만들기
 
-1. `app-release.aab` 업로드
+1. 6단계에서 나온 `.aab` 업로드
 2. **Play 앱 서명**은 기본값 그대로 사용 (동의)
 3. 출시명/출시 노트 작성 후 검토 → 출시 시작
 4. 테스터 목록에 내 계정을 넣고 옵트인 링크로 설치해 확인
