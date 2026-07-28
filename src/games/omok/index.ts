@@ -29,6 +29,8 @@ const UNDO_BTN = { x: 180, y: 1010, w: 360, h: 92 } as const
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
     state.thinkTimer -= dt
+    clock += dt
+    placeFx = Math.max(0, placeFx - dt * 4)
     // 제한 시간이 붙는 단(6단~)에서 내 차례일 때만 시계가 간다
     if (state.phase === 'playing' && tickClock(state, dt)) {
       state.phase = 'lost'
@@ -39,6 +41,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (state.phase === 'aiThinking' && state.thinkTimer <= 0) {
       const result = applyAiMove(state)
       playDrop()
+      placeFx = 1
       if (result === 'win') {
         vibrate(80)
         playGameOver()
@@ -62,6 +65,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
   let undoUsed = false // 판당 1회 광고 무르기
+  let aiming: number | null = null // 손가락이 겨누고 있는 교차점 (떼면 확정)
+  let placeFx = 0 // 돌이 놓이며 내려앉는 연출
+  let clock = 0 // 미리보기 표식을 흔드는 시계
   let adContinueUsed = false
 
   const overlay = createGameOverOverlay(shell.wrapper, {
@@ -108,6 +114,18 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     }
   }
 
+  // 교차점 간격이 44px(손끝의 절반)이라 누르는 즉시 두면 옆자리에 놓이기 쉽다.
+  // 눌러서 미리 보고, 손을 떼면 그 자리에 둔다 — 손가락을 끌어 자리를 고칠 수 있다.
+  const pointAt = (x: number, y: number): number | null => {
+    const col = Math.round((x - X0) / CELL)
+    const row = Math.round((y - Y0) / CELL)
+    if (col < 0 || row < 0 || col >= SIZE || row >= SIZE) return null
+    // 판 밖으로 크게 벗어난 곳은 받지 않는다
+    if (Math.abs(x - (X0 + col * CELL)) > CELL * 0.85) return null
+    if (Math.abs(y - (Y0 + row * CELL)) > CELL * 0.85) return null
+    return row * SIZE + col
+  }
+
   const detachInput = attachInput(stage.canvas, {
     onDown(clientX, clientY) {
       const p = stage.toBoard(clientX, clientY)
@@ -122,23 +140,29 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         return
       }
       if (state.phase !== 'playing') return
-      const col = Math.round((p.x - X0) / CELL)
-      const row = Math.round((p.y - Y0) / CELL)
-      if (col < 0 || row < 0 || col >= SIZE || row >= SIZE) return
-      // 교차점에서 너무 먼 탭은 무시 (오조작 방지)
-      if (Math.abs(p.x - (X0 + col * CELL)) > CELL * 0.45) return
-      if (Math.abs(p.y - (Y0 + row * CELL)) > CELL * 0.45) return
-      const result = playerMove(state, row * SIZE + col)
+      const at = pointAt(p.x, p.y)
+      if (at !== null && state.board[at] === 0) aiming = at
+    },
+    onMove(clientX, clientY) {
+      if (aiming === null || state.phase !== 'playing') return
+      const p = stage.toBoard(clientX, clientY)
+      const at = pointAt(p.x, p.y)
+      if (at !== null && state.board[at] === 0) aiming = at
+    },
+    onUp() {
+      const at = aiming
+      aiming = null
+      if (at === null || state.phase !== 'playing') return
+      const result = playerMove(state, at)
       if (result === 'invalid') return
       playDrop()
       vibrate(10)
+      placeFx = 1
       if (result === 'win') {
         playMerge(6)
         vibrate([30, 60, 30])
       }
     },
-    onMove() {},
-    onUp() {},
   })
 
   const drawStone = (c: CanvasRenderingContext2D, x: number, y: number, black: boolean) => {
@@ -228,10 +252,47 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       const y = Y0 + Math.floor(i / SIZE) * CELL
       drawStone(c, x, y, stone === 1)
     }
+    // 겨누고 있는 자리 — 손을 떼면 여기 놓인다. 십자선이 있어야 옆칸과 헷갈리지 않는다.
+    if (aiming !== null) {
+      const x = X0 + (aiming % SIZE) * CELL
+      const y = Y0 + Math.floor(aiming / SIZE) * CELL
+      c.save()
+      c.strokeStyle = 'rgb(229 57 53 / 0.55)'
+      c.lineWidth = 2
+      c.setLineDash([6, 6])
+      c.beginPath()
+      c.moveTo(X0, y)
+      c.lineTo(X0 + BOARD_W, y)
+      c.moveTo(x, Y0)
+      c.lineTo(x, Y0 + BOARD_W)
+      c.stroke()
+      c.setLineDash([])
+      c.globalAlpha = 0.55
+      drawStone(c, x, y, true)
+      c.globalAlpha = 1
+      c.strokeStyle = '#E53935'
+      c.lineWidth = 3
+      c.beginPath()
+      c.arc(x, y, 23 + Math.sin(clock * 6) * 2, 0, Math.PI * 2)
+      c.stroke()
+      c.restore()
+    }
+
     // 마지막 수 표시
     if (state.lastMove >= 0 && state.board[state.lastMove] !== 0) {
       const x = X0 + (state.lastMove % SIZE) * CELL
       const y = Y0 + Math.floor(state.lastMove / SIZE) * CELL
+      // 방금 놓인 돌 주위로 파문이 퍼진다 — AI가 어디에 뒀는지 눈이 바로 찾는다
+      if (placeFx > 0) {
+        c.save()
+        c.globalAlpha = placeFx * 0.7
+        c.strokeStyle = '#E53935'
+        c.lineWidth = 4 * placeFx
+        c.beginPath()
+        c.arc(x, y, 19 + (1 - placeFx) * 30, 0, Math.PI * 2)
+        c.stroke()
+        c.restore()
+      }
       c.fillStyle = '#E53935'
       c.beginPath()
       c.arc(x, y, 5, 0, Math.PI * 2)
