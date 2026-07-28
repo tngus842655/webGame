@@ -143,6 +143,16 @@ gradlew.bat bundleRelease
 
 → `app\build\outputs\bundle\release\app-release.aab`
 
+단 **처음 한 번은 `local.properties`를 만들어 줘야 한다.** SDK 경로는
+`~/.bubblewrap/config.json`에 있는데 gradle을 직접 부르면 그걸 안 읽어서
+`SDK location not found`로 죽는다.
+
+```powershell
+echo sdk.dir=C:/Android/Sdk > local.properties
+```
+
+경로 구분자는 `/`로 쓴다. `\`는 .properties 파일에서 이스케이프 문자라 헷갈린다.
+
 단 `bubblewrap build`와 달리 gradle 직접 빌드는 `twa-manifest.json` 변경을
 반영하지 않는다. 설정을 고쳤으면 `bubblewrap update`를 먼저 돌려야 한다.
 
@@ -299,6 +309,7 @@ bubblewrap build
 
 | 증상 | 원인 / 해결 |
 | --- | --- |
+| `gradlew`가 `SDK location not found`로 죽음 | `local.properties`가 없다. 6단계 참고 |
 | `bubblewrap build`가 라이선스에서 멈춤 | `sdkmanager.bat --licenses` 실행 후 전부 `y` |
 | `JAVA_HOME` 관련 오류 | `bubblewrap updateConfig --jdkPath`로 JDK 17 경로 재지정 |
 | 앱 위에 주소창이 계속 뜸 | assetlinks.json 미배포 / 지문 불일치 / 패키지 이름 불일치. 앱 재설치 후 재확인 |
