@@ -176,7 +176,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       vibrate(120)
     }
     const prevBest = await ctx.getBestScore()
-    await ctx.submitScore(state.score)
+    void ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
     // 완주한 판에서 체력을 채워봐야 남은 노트가 없다 — 이어하기를 걸지 않는다
     overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adContinueUsed && !cleared)

@@ -150,7 +150,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     vibrate(120)
     const score = scoreOf(state)
     const prevBest = await ctx.getBestScore()
-    await ctx.submitScore(score)
+    void ctx.submitScore(score)
     if (shell.isDestroyed() || state.phase !== 'over') return
     overlay.show(score, prevBest, ctx.isRewardAdReady() && !adReviveUsed)
   }

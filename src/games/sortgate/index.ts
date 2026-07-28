@@ -111,7 +111,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     playGameOver()
     vibrate(120)
     const prevBest = await ctx.getBestScore()
-    await ctx.submitScore(state.score)
+    void ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
     overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adReviveUsed)
   }

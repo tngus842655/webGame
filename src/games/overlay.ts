@@ -1,4 +1,5 @@
 import { t, type TranslationKey } from '@/shared/i18n'
+import { duckBgmForResult, resumeBgmAfterResult } from '@/shared/music'
 import { countUp, createSheet } from './ui'
 
 // 게임 공통 게임오버 오버레이 (점수·최고 기록·광고 이어하기·다시하기)
@@ -43,6 +44,8 @@ export function createGameOverOverlay(
   return {
     show(score, prevBest, canContinue) {
       stopCount()
+      // 판이 끝났으니 곡도 접는다 (다시하기·이어하기로 팝업을 닫으면 돌아온다)
+      duckBgmForResult()
       const isRecord = prevBest === null || score > prevBest
 
       const badge = sheet.find('[data-badge]')
@@ -69,6 +72,7 @@ export function createGameOverOverlay(
     hide() {
       stopCount()
       sheet.close()
+      resumeBgmAfterResult()
     },
   }
 }

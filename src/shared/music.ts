@@ -8,6 +8,7 @@ const VOLUME = 0.3
 let audio: HTMLAudioElement | null = null
 let track = ''
 let gestureRetry: (() => void) | null = null
+let fadeId = 0
 
 export function isMusicEnabled(): boolean {
   return localStorage.getItem(KEY) !== 'off'
@@ -25,7 +26,14 @@ function clearGestureRetry() {
   gestureRetry = null
 }
 
+function clearFade() {
+  if (!fadeId) return
+  clearInterval(fadeId)
+  fadeId = 0
+}
+
 function stopAudio() {
+  clearFade()
   audio?.pause()
   audio = null
   clearGestureRetry()
@@ -33,6 +41,7 @@ function stopAudio() {
 
 function play() {
   if (!track || !isMusicEnabled()) return
+  clearFade()
   audio ??= new Audio(`${import.meta.env.BASE_URL}bgm/${track}.mp3`)
   audio.loop = true
   audio.volume = VOLUME
@@ -59,6 +68,37 @@ export function startBgm(next: string) {
 export function stopBgm() {
   track = ''
   stopAudio()
+}
+
+// 판이 끝나면 곡을 접는다 — 결과 팝업 뒤에서 경쾌한 곡이 계속 흐르면
+// 방금 끝났다는 게 전달되지 않는다. 곡은 멈춘 자리에 세워 두고,
+// 다시 시작하면 이어서 튼다 (처음부터 다시 틀면 판마다 앞부분만 듣게 된다).
+const FADE_STEP = 40
+
+function fade(to: number, ms: number, onDone?: () => void) {
+  const target = audio
+  if (!target) return
+  clearFade()
+  const delta = ((to - target.volume) * FADE_STEP) / ms
+  fadeId = window.setInterval(() => {
+    const next = target.volume + delta
+    const done = delta < 0 ? next <= to : next >= to
+    target.volume = Math.max(0, Math.min(VOLUME, done ? to : next))
+    if (!done) return
+    clearFade()
+    onDone?.()
+  }, FADE_STEP)
+}
+
+export function duckBgmForResult() {
+  if (!audio || audio.paused) return
+  fade(0, 500, () => audio?.pause())
+}
+
+export function resumeBgmAfterResult() {
+  if (!track || !isMusicEnabled() || !audio) return
+  void audio.play().catch(() => {})
+  fade(VOLUME, 400)
 }
 
 // 게임마다 곡을 만들 수는 없으니 분위기 셋으로 묶는다.
