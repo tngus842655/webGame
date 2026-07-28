@@ -85,7 +85,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const prevBest = await ctx.getBestScore()
     void ctx.submitScore(score)
     if (shell.isDestroyed() || state.phase !== 'over') return
-    overlay.show(score, prevBest, ctx.isRewardAdReady() && !adContinueUsed)
+    overlay.show(score, prevBest, ctx.isRewardAdReady() && !adContinueUsed, 'over.byTime')
   }
 
   const detachInput = attachInput(stage.canvas, {

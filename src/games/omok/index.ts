@@ -101,7 +101,14 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const prevBest = await ctx.getBestScore()
     void ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
-    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adContinueUsed && !state.cleared)
+    // 진 이유는 판을 보면 알지만, 시간 초과는 판에 흔적이 남지 않는다
+    const reason = state.cleared ? 'over.byClear' : state.timeLeft <= 0 ? 'over.byTime' : undefined
+    overlay.show(
+      state.score,
+      prevBest,
+      ctx.isRewardAdReady() && !adContinueUsed && !state.cleared,
+      reason,
+    )
   }
 
   // 광고 보상: 마지막 한 수 무르기

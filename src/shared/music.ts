@@ -70,9 +70,9 @@ export function stopBgm() {
   stopAudio()
 }
 
-// 판이 끝나면 곡을 접는다 — 결과 팝업 뒤에서 경쾌한 곡이 계속 흐르면
-// 방금 끝났다는 게 전달되지 않는다. 곡은 멈춘 자리에 세워 두고,
-// 다시 시작하면 이어서 튼다 (처음부터 다시 틀면 판마다 앞부분만 듣게 된다).
+// 판이 끝났거나 멈췄을 때 곡을 접는다 — 결과 팝업이나 멈춤 화면 뒤에서
+// 경쾌한 곡이 계속 흐르면 멈췄다는 게 전달되지 않는다. 곡은 멈춘 자리에
+// 세워 두고 다시 시작하면 이어서 튼다 (처음부터 틀면 판마다 앞부분만 듣게 된다).
 const FADE_STEP = 40
 
 function fade(to: number, ms: number, onDone?: () => void) {
@@ -90,12 +90,12 @@ function fade(to: number, ms: number, onDone?: () => void) {
   }, FADE_STEP)
 }
 
-export function duckBgmForResult() {
+export function duckBgm() {
   if (!audio || audio.paused) return
   fade(0, 500, () => audio?.pause())
 }
 
-export function resumeBgmAfterResult() {
+export function resumeBgm() {
   if (!track || !isMusicEnabled() || !audio) return
   void audio.play().catch(() => {})
   fade(VOLUME, 400)

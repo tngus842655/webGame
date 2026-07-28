@@ -1,5 +1,5 @@
 import { t, type TranslationKey } from '@/shared/i18n'
-import { duckBgmForResult, resumeBgmAfterResult } from '@/shared/music'
+import { duckBgm, resumeBgm } from '@/shared/music'
 import { countUp, createSheet } from './ui'
 
 // 게임 공통 게임오버 오버레이 (점수·최고 기록·광고 이어하기·다시하기)
@@ -12,7 +12,14 @@ export interface GameOverOverlayOptions {
 }
 
 export interface GameOverOverlay {
-  show(score: number, prevBest: number | null, canContinue: boolean): void
+  // reasonKey = 왜 끝났는지 (over.by*). 끝나는 길이 하나뿐인 게임은 생략한다 —
+  // 뻔한 것을 굳이 적으면 팝업만 길어진다.
+  show(
+    score: number,
+    prevBest: number | null,
+    canContinue: boolean,
+    reasonKey?: TranslationKey,
+  ): void
   hide(): void
 }
 
@@ -24,6 +31,7 @@ export function createGameOverOverlay(
     parent,
     `<div data-badge class="gui-badge"></div>
      <p data-title class="gui-title"></p>
+     <p data-reason class="gui-reason"></p>
      <p data-label class="gui-label"></p>
      <p data-score class="gui-score">0</p>
      <p data-best class="gui-sub"></p>
@@ -42,10 +50,10 @@ export function createGameOverOverlay(
   }
 
   return {
-    show(score, prevBest, canContinue) {
+    show(score, prevBest, canContinue, reasonKey) {
       stopCount()
       // 판이 끝났으니 곡도 접는다 (다시하기·이어하기로 팝업을 닫으면 돌아온다)
-      duckBgmForResult()
+      duckBgm()
       const isRecord = prevBest === null || score > prevBest
 
       const badge = sheet.find('[data-badge]')
@@ -54,6 +62,11 @@ export function createGameOverOverlay(
         badge.style.display = isRecord ? '' : 'none'
       }
       set('[data-title]', t('over.title'))
+      const reason = sheet.find('[data-reason]')
+      if (reason) {
+        reason.textContent = reasonKey ? t(reasonKey) : ''
+        reason.style.display = reasonKey ? '' : 'none'
+      }
       set('[data-label]', t('hud.score'))
       // 신기록이면 배지가 알려주므로 아랫줄은 방금 깬 기록을 그대로 보여준다
       set('[data-best]', prevBest === null ? '' : t('over.bestScore', { n: prevBest.toLocaleString() }))
@@ -72,7 +85,7 @@ export function createGameOverOverlay(
     hide() {
       stopCount()
       sheet.close()
-      resumeBgmAfterResult()
+      resumeBgm()
     },
   }
 }

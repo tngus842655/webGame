@@ -111,7 +111,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const prevBest = await ctx.getBestScore()
     void ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
-    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adContinueUsed)
+    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adContinueUsed, 'over.byLives')
   }
 
   const push = (p: Partial<Particle> & { x: number; y: number; color: string }) => {

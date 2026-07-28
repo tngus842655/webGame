@@ -179,7 +179,12 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     void ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
     // 완주한 판에서 체력을 채워봐야 남은 노트가 없다 — 이어하기를 걸지 않는다
-    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adContinueUsed && !cleared)
+    overlay.show(
+      state.score,
+      prevBest,
+      ctx.isRewardAdReady() && !adContinueUsed && !cleared,
+      cleared ? 'over.byClear' : 'over.byHp',
+    )
   }
 
   // 판정선에서 튀는 불꽃 — 정확할수록 많고 밝다

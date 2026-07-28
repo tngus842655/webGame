@@ -52,6 +52,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       state.score,
       prevBest,
       ctx.isRewardAdReady() && !adUndoUsed && state.prevGrid !== null,
+          'over.byStuck',
     )
   }
 

@@ -67,6 +67,14 @@
   color: #7a6053;
 }
 
+/* 왜 끝났는지 — 제목 바로 아래 한 줄. 점수보다 앞서 읽히면 안 되니 작고 옅게. */
+.gui-reason {
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #a98d7d;
+}
+
 .gui-label {
   margin-top: 14px;
   font-size: 12px;

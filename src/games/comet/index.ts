@@ -102,7 +102,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const prevBest = await ctx.getBestScore()
     void ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
-    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adResetUsed)
+    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adResetUsed, 'over.byLives')
   }
 
   const burst = (x: number, y: number) => {

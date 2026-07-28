@@ -158,7 +158,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const prevBest = await ctx.getBestScore()
     void ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
-    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adMovesUsed)
+    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adMovesUsed, 'over.byMoves')
   }
 
   const pushCrystal = (x: number, y: number, vx: number, vy: number, life: number) => {

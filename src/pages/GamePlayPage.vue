@@ -8,7 +8,7 @@ import GameGuide from '@/shared/GameGuide.vue'
 import { createGameContext } from '@/shared/gameContext'
 import { t, type TranslationKey } from '@/shared/i18n'
 import UiIcon from '@/shared/UiIcon.vue'
-import { bgmFor, startBgm, stopBgm } from '@/shared/music'
+import { bgmFor, duckBgm, resumeBgm, startBgm, stopBgm } from '@/shared/music'
 import { startPlayTracking } from '@/shared/playSessions'
 import { fetchMyStats, getLocalBest, syncLocalBests } from '@/shared/scores'
 import { startScoreGuard } from '@/shared/scoreGuard'
@@ -19,6 +19,12 @@ const host = ref<HTMLDivElement | null>(null)
 const slug = String(route.params.slug)
 const titleKey = ref<TranslationKey | null>(null)
 const guideOpen = ref(false)
+
+// 일시정지 — 실시간 게임은 전화 한 통에 판이 날아간다.
+// 화면을 벗어나면 자동으로 멈추고, 돌아올 때는 곧바로 재개하지 않고 셋을 센다.
+const paused = ref(false)
+const countdown = ref(0)
+let countdownId = 0
 
 // 플레이 중 최고 기록 표시 — 넘어서는 순간이 "한 판 더"의 방아쇠라 실시간으로 보여준다
 const best = ref<number | null>(null)
@@ -48,6 +54,45 @@ function closeGuide() {
   resumeRunningGame()
 }
 
+function stopCountdown() {
+  if (!countdownId) return
+  clearInterval(countdownId)
+  countdownId = 0
+  countdown.value = 0
+}
+
+function pauseGame() {
+  // 카운트다운 도중이면 그 카운트다운을 접고 다시 멈춤 상태로 돌아간다
+  if (countdownId) {
+    stopCountdown()
+    return
+  }
+  if (paused.value) return
+  paused.value = true
+  pauseRunningGame()
+  duckBgm()
+}
+
+// 셋을 세고 재개한다 — 돌아오자마자 죽어 있으면 억울하다
+function resumeGame() {
+  if (!paused.value || countdownId) return
+  paused.value = false
+  countdown.value = 3
+  countdownId = window.setInterval(() => {
+    countdown.value -= 1
+    if (countdown.value > 0) return
+    stopCountdown()
+    resumeRunningGame()
+  }, 700)
+  resumeBgm()
+}
+
+// 화면을 벗어나면 (전화·알림·홈으로 나감) 자동으로 멈춘다.
+// 셸도 백그라운드에서 루프를 세우지만, 돌아오는 순간 바로 이어져서 손쓸 새가 없었다.
+function onVisibility() {
+  if (document.hidden) pauseGame()
+}
+
 onMounted(async () => {
   const meta = GAMES.find((g) => g.slug === slug)
   if (!meta || !host.value) {
@@ -68,6 +113,7 @@ onMounted(async () => {
   stopTracking = startPlayTracking(slug)
   stopScoreGuard = startScoreGuard(slug, () => game?.currentScore() ?? null)
   startBgm(bgmFor(slug))
+  document.addEventListener('visibilitychange', onVisibility)
   // 최고 기록은 게임오버 제출 때 갱신되므로 현재 점수와 함께 다시 읽는다
   pollId = window.setInterval(() => {
     best.value = getLocalBest(slug)
@@ -78,6 +124,8 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   disposed = true
   clearInterval(pollId)
+  stopCountdown()
+  document.removeEventListener('visibilitychange', onVisibility)
   stopBgm()
   // 게임을 정리하기 전에 마지막 점수를 읽어야 한다
   stopScoreGuard?.()
@@ -102,7 +150,15 @@ onBeforeUnmount(() => {
         </div>
       </div>
       <button
-        class="chip guide-button"
+        class="chip icon-button"
+        type="button"
+        :aria-label="t('pause.title')"
+        @click="pauseGame"
+      >
+        <span class="pause-glyph"></span>
+      </button>
+      <button
+        class="chip icon-button"
         type="button"
         :aria-label="t('guide.title')"
         @click="openGuide"
@@ -110,6 +166,20 @@ onBeforeUnmount(() => {
         ?
       </button>
     </div>
+
+    <!-- 멈춤 화면 -->
+    <div v-if="paused" class="pause-scrim">
+      <div class="pause-sheet">
+        <p class="pause-title">{{ t('pause.title') }}</p>
+        <button class="btn btn--go" type="button" @click="resumeGame">{{ t('pause.resume') }}</button>
+        <button class="btn btn--ghost" type="button" @click="router.push('/')">
+          {{ t('pause.quit') }}
+        </button>
+      </div>
+    </div>
+
+    <!-- 재개 카운트다운 (숫자뿐이라 언어를 타지 않는다) -->
+    <div v-if="countdown > 0" class="countdown">{{ countdown }}</div>
 
     <GameGuide
       v-if="guideOpen && titleKey"
@@ -185,7 +255,7 @@ onBeforeUnmount(() => {
 }
 
 .back-button:active,
-.guide-button:active {
+.icon-button:active {
   background: rgb(255 255 255 / 0.98);
   transform: scale(0.95);
 }
@@ -203,7 +273,7 @@ onBeforeUnmount(() => {
   box-shadow: 0 2px 10px rgb(245 166 0 / 0.45);
 }
 
-.guide-button {
+.icon-button {
   justify-content: center;
   width: 38px;
   padding: 0;
@@ -211,5 +281,86 @@ onBeforeUnmount(() => {
   line-height: 1;
   cursor: pointer;
   pointer-events: auto;
+}
+
+/* 멈춤 표시는 글자가 아니라 두 줄로 그린다 (기기마다 글꼴이 달라도 같아 보인다) */
+.pause-glyph {
+  display: block;
+  width: 12px;
+  height: 14px;
+  border-left: 4px solid #5d4037;
+  border-right: 4px solid #5d4037;
+}
+
+.pause-scrim {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(26 17 12 / 0.58);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  animation: pause-fade 0.16s ease-out;
+}
+
+.pause-sheet {
+  width: min(300px, 100%);
+  padding: 26px 22px 20px;
+  border-radius: 28px;
+  background: linear-gradient(#fffdfa, #fff0da);
+  box-shadow:
+    0 22px 52px rgb(22 11 4 / 0.4),
+    inset 0 2px 0 #fff;
+  text-align: center;
+}
+
+.pause-title {
+  margin-bottom: 6px;
+  font-size: 19px;
+  font-weight: 800;
+  color: #7a6053;
+}
+
+.pause-sheet .btn {
+  margin-top: 12px;
+}
+
+.pause-sheet .btn--ghost {
+  margin-top: 6px;
+}
+
+.countdown {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgb(26 17 12 / 0.32);
+  color: #fff;
+  font-size: 96px;
+  font-weight: 800;
+  text-shadow: 0 4px 18px rgb(0 0 0 / 0.5);
+  pointer-events: none;
+  animation: countdown-pop 0.7s ease-out;
+}
+
+@keyframes pause-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes countdown-pop {
+  from {
+    transform: scale(1.5);
+    opacity: 0.2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pause-scrim,
+  .countdown {
+    animation: none;
+  }
 }
 </style>

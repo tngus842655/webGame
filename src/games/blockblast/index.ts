@@ -55,7 +55,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const prevBest = await ctx.getBestScore()
     void ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
-    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adSwapUsed)
+    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adSwapUsed, 'over.byStuck')
   }
 
   const hitTray = (x: number, y: number): number => {
