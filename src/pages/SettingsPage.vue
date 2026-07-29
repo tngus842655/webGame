@@ -259,6 +259,7 @@ function onLangChange() {
 
     <footer class="settings-footer">
       <RouterLink to="/privacy">{{ t('privacy.title') }}</RouterLink>
+      <RouterLink to="/account-deletion">계정 삭제</RouterLink>
     </footer>
   </div>
 </template>
@@ -574,9 +575,11 @@ function onLangChange() {
 }
 
 .settings-footer {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
   margin-top: 18px;
   padding-bottom: 16px;
-  text-align: center;
 }
 
 .settings-footer a {
