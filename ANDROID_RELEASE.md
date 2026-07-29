@@ -202,6 +202,32 @@ C:\Android\Sdk\platform-tools\adb.exe install -r app-release-signed.apk
 - 데이터 보안 (Supabase에 계정/기록을 저장하므로 수집 항목을 정직하게 기재)
 - 개인정보처리방침 URL — **웹에 공개된 주소가 하나 필요하다**
 
+### 앱 콘텐츠에 실제로 넣은 답 (2026-07-29)
+
+| 항목 | 답 |
+| --- | --- |
+| 개인정보처리방침 URL | `https://web-game-ecru.vercel.app/privacy` |
+| 계정 삭제 URL | `https://web-game-ecru.vercel.app/account-deletion` |
+| 로그인 세부정보 (앱에 제한된 부분) | **아니요** — 로그인 없이 전부 플레이된다. 관리자 화면은 UI에 노출되지 않으므로 심사 대상이 아니다 |
+| 콘텐츠 등급 1페이지 6문항 | 전부 **아니요** — 채팅·위치 공유 기능이 코드에 없다 |
+| 대상 연령 | 13~15 / 16~17 / 18세 이상 |
+| 데이터 보안 — 계정 생성 방법 | **OAuth만**. SNS에서 이름이 넘어오는 것은 계정 생성 방법이 아니라 수집 데이터다 |
+| 데이터 보안 — 수집 항목 | 이름, 이메일 주소, 사용자 ID, 앱 상호작용. 전부 수집함 / 공유 안 함 / 목적은 앱 기능 |
+| 데이터 보안 — 위치 | 체크 안 함. `navigator.geolocation` 호출이 없다 |
+| 데이터 보안 — 사진 | 체크 안 함. 개인정보처리방침에 프로필 사진이 적혀 있지만 실제로 저장하는 코드·컬럼이 없다 |
+
+> Play Games Sidekick("게임에 추가하세요" 배너)은 **하지 않아도 된다.** Play Games Services
+> 위에 얹히는 기능인데 우리는 랭킹을 Supabase로 직접 굴리고 PGS를 쓰지 않는다.
+> TWA 껍데기에는 네이티브 SDK를 넣을 자리도 없다. 출시 요건과 무관한 권장 사항이다.
+
+### 회원 탈퇴
+
+계정 삭제 URL이 필수라서 `/account-deletion` 페이지에 실제 탈퇴 버튼을 붙였다.
+`profiles → auth.users`, `scores`/`play_sessions` → `profiles`로 cascade가 걸려 있어
+`delete_my_account()`가 `auth.users` 한 줄만 지우면 딸린 기록이 함께 사라진다.
+마이그레이션은 `supabase/migrations/20260731000000_delete_account.sql`이고
+**2026-07-29에 운영 DB에 적용 완료**했다.
+
 ### 스토어 등록정보에 필요한 이미지
 
 | 항목 | 규격 | 현재 상태 |
