@@ -1,6 +1,6 @@
 {
-  "name": "미니게임30",
-  "short_name": "미니게임30",
+  "name": "MiniGame30",
+  "short_name": "MiniGame30",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
@@ -8,13 +8,13 @@
   "theme_color": "#FFF8E1",
   "icons": [
     {
-      "src": "/icon/icon-192-v1.png",
+      "src": "/icon/icon-eng-192-v1.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon/icon-512-v1.png",
+      "src": "/icon/icon-eng-512-v1.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
