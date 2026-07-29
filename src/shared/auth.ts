@@ -60,6 +60,21 @@ export async function ensureUserId(): Promise<string> {
   return cachedUserId
 }
 
+// 회원 탈퇴. 지우는 일은 전부 delete_my_account()가 하고, 여기서는 흔적만 정리한다
+// (세션을 끊지 않으면 이미 없는 계정의 토큰으로 요청이 나간다).
+export async function deleteMyAccount(): Promise<void> {
+  const sb = await getSupabase()
+  const { error } = await sb.rpc('delete_my_account')
+  if (error) throw error
+  await sb.auth.signOut()
+  cachedUserId = null
+  linkedProvider.value = null
+  localStorage.removeItem(LAST_USER_KEY)
+  for (const key of Object.keys(localStorage)) {
+    if (key.startsWith('webgame:best:')) localStorage.removeItem(key)
+  }
+}
+
 // 자동 로그인 없이 현재 세션만 조회 (랭킹에서 내 순위 강조용)
 export async function getCurrentUserId(): Promise<string | null> {
   if (cachedUserId) return cachedUserId
