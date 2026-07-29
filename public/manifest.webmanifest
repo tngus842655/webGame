@@ -1,6 +1,6 @@
 {
-  "name": "미니게임30",
-  "short_name": "미니게임30",
+  "name": "MiniGame30",
+  "short_name": "MiniGame30",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
