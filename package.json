@@ -5,11 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:toss": "granite dev",
     "build": "vue-tsc --noEmit && vite build",
+    "build:toss": "ait build",
+    "deploy:toss": "ait deploy",
     "typecheck": "vue-tsc --noEmit",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@apps-in-toss/web-framework": "^2.10.8",
     "@supabase/supabase-js": "^2.110.8",
     "matter-js": "^0.20.0",
     "vue": "^3.5.13",

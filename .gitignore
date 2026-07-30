@@ -3,3 +3,7 @@ dist/
 .vite/
 *.local
 .DS_Store
+
+# 앱인토스 빌드 중간 산출물과 앱 번들
+.granite/
+*.ait
