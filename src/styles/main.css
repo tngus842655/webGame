@@ -2,6 +2,11 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  /* 더블탭 확대를 끈다. 켜져 있으면 게임 중 두 번 두드릴 때 화면이 두드린 쪽으로
+     끌려가면서 반대쪽이 잘린다 (앱인토스 웹뷰와 사파리 '홈 화면에 추가' 둘 다).
+     body에만 걸어봤더니 듣지 않았다 — iOS는 두드린 요소 자신의 값만 보는 경우가
+     있어서 전체에 건다. 핀치 확대는 그대로 남는다. */
+  touch-action: manipulation;
 }
 
 html,
@@ -22,11 +27,6 @@ body {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
-  /* 더블탭 확대를 끈다. 켜져 있으면 게임 중 두 번 두드릴 때 화면이 두드린 쪽으로
-     끌려가면서 반대쪽이 잘린다 (앱인토스 웹뷰와 사파리 '홈 화면에 추가' 둘 다).
-     touch-action은 조상 값과 교집합을 취하므로 여기 한 번이면 안쪽까지 덮인다.
-     핀치 확대는 그대로 남는다. */
-  touch-action: manipulation;
 }
 
 /* 닉네임처럼 직접 입력하는 곳은 다시 켠다 */

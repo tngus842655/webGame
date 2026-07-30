@@ -2,16 +2,26 @@
 // 홈과 휴지통이 함께 쓰는 게임 카드.
 // 두 화면은 어느 칸에 놓이느냐만 다르고 순위는 하나를 나눠 쓴다 — 휴지통에 있던
 // 게임이 다시 올라오면 그 자리에서 바로 메달이 붙어야 하므로 카드를 하나로 둔다.
+import { useRouter } from 'vue-router'
 import GameIcon from './GameIcon.vue'
 import { t, type TranslationKey } from './i18n'
 
-defineProps<{
+const props = defineProps<{
   slug: string
   titleKey: TranslationKey
   rank: number | null
   // 최고 기록·내 순위 — 문구는 화면마다 달라서 밖에서 넘겨받는다
   label: string
 }>()
+
+// RouterLink(<a>)였을 때는 카드를 길게 누르면 웹뷰가 링크 주소를 띄웠다.
+// contextmenu를 막아도 그대로여서 — 웹뷰가 웹 이벤트를 거치지 않고 네이티브에서
+// 처리한다 — 링크 자체를 없앤다. 새 탭으로 열기는 잃지만 모바일 전용 화면이라 쓸 일이 없다.
+const router = useRouter()
+
+function open() {
+  void router.push(`/play/${props.slug}`)
+}
 
 // 1~3위만 메달로 꾸민다
 function rankClass(rank: number): string {
@@ -20,12 +30,12 @@ function rankClass(rank: number): string {
 </script>
 
 <template>
-  <RouterLink class="game-card" :to="`/play/${slug}`">
+  <button type="button" class="game-card" @click="open">
     <span v-if="rank !== null" class="rank" :class="rankClass(rank)">{{ rank }}</span>
     <span class="thumb"><GameIcon :slug="slug" /></span>
     <strong>{{ t(titleKey) }}</strong>
     <small>{{ label }}</small>
-  </RouterLink>
+  </button>
 </template>
 
 <style scoped>
@@ -35,9 +45,12 @@ function rankClass(rank: number): string {
   flex-direction: column;
   align-items: center;
   gap: 3px;
+  width: 100%;
   padding: 12px 6px 10px;
+  border: none;
   background: #fff;
   border-radius: 16px;
+  cursor: pointer;
   box-shadow:
     0 1px 2px rgb(93 64 55 / 0.06),
     0 4px 12px rgb(93 64 55 / 0.09);

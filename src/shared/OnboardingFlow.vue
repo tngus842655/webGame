@@ -2,7 +2,7 @@
 // 첫 실행 온보딩 — 언어 → 기존 회원 유무 → 닉네임 순으로 물어본다.
 // 이 흐름을 마치기 전까지는 계정을 만들지 않는다. 사이트만 열고 나간 사람까지
 // 익명 계정이 쌓이던 문제와, 무작위 '게스트-xxxx' 닉네임이 랭킹에 나가던 문제를 함께 없앤다.
-import { computed, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { LOCALES, locale, setLocale, t, type Locale } from './i18n'
 import { ensureUserId, signInSocial, type SocialProvider } from './auth'
 import { updateMyNickname } from './profile'
@@ -40,6 +40,20 @@ async function signIn(provider: SocialProvider) {
     error.value = t('onboard.failed')
   }
 }
+
+// 소셜 로그인 창을 로그인하지 않고 닫고 돌아온 경우를 푼다.
+// 브라우저는 리다이렉트로 페이지가 통째로 다시 뜨지만, 웹뷰·인앱브라우저는
+// 로그인 창을 위에 얹었다 치울 뿐이라 이 화면이 busy가 켜진 채 살아남는다.
+// 그러면 '아니요, 처음이에요'까지 잠겨서 온보딩을 아예 빠져나갈 수 없다.
+// 닉네임을 저장하는 중에 앱을 잠깐 나갔다 온 경우까지 풀리면 안 되므로 이 걸음에서만 푼다.
+function unlockOnReturn() {
+  if (step.value === 'account' && document.visibilityState === 'visible') {
+    busy.value = false
+  }
+}
+
+onMounted(() => document.addEventListener('visibilitychange', unlockOnReturn))
+onUnmounted(() => document.removeEventListener('visibilitychange', unlockOnReturn))
 
 async function start() {
   const name = nickname.value.trim()
