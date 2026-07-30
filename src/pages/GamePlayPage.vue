@@ -193,7 +193,11 @@ onBeforeUnmount(() => {
 <style scoped>
 .play-page {
   position: relative;
-  height: 100dvh;
+  /* .app-shell이 이미 위아래로 safe-area 만큼 패딩을 넣는다. 여기서 100dvh를
+     그대로 쓰면 그 패딩만큼 넘쳐서 페이지가 세로로 스크롤된다 — 게임 중 더블탭하면
+     화면이 딱 그만큼 밀리던 원인이다. 브라우저는 inset이 0이라 드러나지 않고
+     웹뷰와 '홈 화면에 추가'에서만 나타났다. */
+  height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
 }
 
 .game-host {
