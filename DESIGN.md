@@ -15,6 +15,7 @@
 | i18n | 자체 경량 구현 (`shared/i18n.ts`) | 13개 언어, 게임 내부는 ko/en 완역 + en 폴백 |
 | 사운드 | WebAudio 신스 (`shared/sound.ts`) | 오디오 에셋 0개 |
 | 운영 배포 | Vercel (`main`) | main 반영은 사용자가 직접 수행 |
+| 앱 패키징 | Capacitor (안드로이드) / 앱인토스 | 둘 다 웹 빌드를 앱 안에 넣는다 (`ANDROID_RELEASE.md`) |
 | 타입 검증 | `npm run typecheck` (vue-tsc) | 커밋 전 통과 필수 |
 
 ### 환경 변수 (`.env.local`, 배포 대시보드)
@@ -52,7 +53,8 @@ src/
 │  ├─ profile.ts            # 닉네임 조회·수정, 소셜 닉네임 자동 적용
 │  ├─ scores.ts             # 점수 제출·랭킹·인기도 조회 (+localStorage 병행)
 │  ├─ playSessions.ts       # 플레이 시간 기록 (인기 순위·통계 근거)
-│  ├─ ads.ts                # 리워드 광고 추상화 (H5 Games Ads / 개발용 스텁 / 미노출)
+│  ├─ ads.ts                # 리워드 광고 추상화 (H5 Games Ads / AdMob / 개발용 스텁)
+│  ├─ native.ts             # 안드로이드 앱(Capacitor) 전용 — 딥링크 로그인, 뒤로가기, 스플래시
 │  ├─ music.ts             # BGM 재생 (public/bgm/*.mp3, 파일 없으면 무음)
 │  └─ i18n.ts / sound.ts / GameIcon.vue / AccountPrompt.vue / devNotes.ts
 └─ styles/
@@ -107,9 +109,12 @@ src/
 
 ### 리워드 광고
 
-- `ads.ts`가 매체를 감싼다. `VITE_ADSENSE_CLIENT`가 있으면 H5 Games Ads(AdSense
-  Ad Placement API), 없으면 5초 카운트다운 가짜 광고를 쓴다 — 실제 매체를 붙이기
+- `ads.ts`가 매체를 감싼다. 웹·앱인토스는 `VITE_ADSENSE_CLIENT`가 있으면 H5 Games
+  Ads(AdSense Ad Placement API), 안드로이드 앱은 `VITE_ADMOB_REWARD_ID`가 있으면
+  AdMob, 둘 다 없으면 5초 카운트다운 가짜 광고를 쓴다 — 실제 매체를 붙이기
   전에도 배포본에서 버튼·보상 흐름을 그대로 확인하기 위해서다.
+- 앱에서 매체가 갈리는 이유는 정책이다. AdSense는 웹사이트용 상품이라 앱 웹뷰 안에서
+  게재하면 프로그램 정책 위반이고, 앱에서 쓸 수 있는 구글 매체는 AdMob 쪽이다.
 - 노출 지점은 두 가지. **실패 쪽**은 게임오버 오버레이의 이어하기(대부분의 게임),
   **성공 쪽**은 `clearBonus.ts`의 점수 2배(스도쿠·네모로직·디펜스·머지 가든).
   한 판이 10분 넘게 가는 게임은 실패가 잘 나지 않아 성공 쪽이 유일한 접점이다.
@@ -244,6 +249,3 @@ src/
 ## 6. 확장 지점 (미구현)
 
 - **재화·상점**: 광고와 세트로 도입 시점에 설계
-- **PWA/앱화**: 정적 SPA라 언제든 추가 가능. 안드로이드는 PWABuilder(TWA)로 포장한다 —
-  TWA는 크롬이 사이트를 그대로 띄우는 구조라 네이티브 SDK(AdMob)를 부를 수 없어서
-  광고는 웹·앱 공통으로 도는 H5 Games Ads를 쓴다.

@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import type { User } from '@supabase/supabase-js'
 import { getSupabase, whenSupabaseReady } from './supabase'
+import { AUTH_CALLBACK, closeAuthTab, isNative, openAuthTab, watchAuthTab } from './native'
 
 export type SocialProvider = 'google' | 'kakao'
 
@@ -83,30 +84,53 @@ export async function getCurrentUserId(): Promise<string | null> {
   return data.session?.user.id ?? null
 }
 
+// 로그인 창을 어디로 보내고 어디로 돌려받을지.
+// 웹은 페이지가 통째로 리다이렉트되어 /settings로 돌아오고,
+// 네이티브는 커스텀 탭에서 로그인한 뒤 딥링크로 앱이 다시 열린다.
+function oauthOptions() {
+  return {
+    redirectTo: isNative ? AUTH_CALLBACK : `${location.origin}/settings`,
+    // 네이티브에서는 supabase가 웹뷰를 로그인 페이지로 보내면 안 된다.
+    // 주소만 받아서 커스텀 탭으로 연다 (구글이 웹뷰 안 OAuth를 거부한다)
+    skipBrowserRedirect: isNative,
+  }
+}
+
+// 커스텀 탭에서 돌아오기를 기다리는 쪽. 웹에서는 쓰이지 않는다
+let pending: { done: (ok: boolean) => void; fail: (reason: unknown) => void } | null = null
+
+// 웹은 위에서 이미 페이지가 넘어갔으므로 이 아래로 내려오지 않는다.
+// 네이티브만 로그인 창을 열고, 딥링크가 돌아와 세션 교환까지 끝나야 반환된다.
+// 반환값 = 로그인이 실제로 끝났는가 (그냥 닫고 나왔으면 false).
+async function awaitOAuth(url: string | null): Promise<boolean> {
+  if (!isNative) return false
+  if (!url) throw new Error('로그인 주소를 받지 못했습니다')
+  return new Promise<boolean>((resolve, reject) => {
+    pending = { done: resolve, fail: reject }
+    void openAuthTab(url)
+  })
+}
+
 // 지금 쓰던 계정에 소셜 identity를 붙인다 — user_id가 그대로라 점수·랭킹이 유지된다
-export async function linkSocial(provider: SocialProvider): Promise<void> {
+export async function linkSocial(provider: SocialProvider): Promise<boolean> {
   await ensureUserId()
   sessionStorage.setItem(PENDING_KEY, provider)
   const sb = await getSupabase()
-  const { error } = await sb.auth.linkIdentity({
-    provider,
-    options: { redirectTo: `${location.origin}/settings` },
-  })
+  const { data, error } = await sb.auth.linkIdentity({ provider, options: oauthOptions() })
   if (error) {
     sessionStorage.removeItem(PENDING_KEY)
     throw error
   }
+  return awaitOAuth(data.url)
 }
 
 // 이미 다른 기기에서 연동해둔 계정으로 로그인 — 그 계정의 기록을 그대로 이어받는다
-export async function signInSocial(provider: SocialProvider): Promise<void> {
+export async function signInSocial(provider: SocialProvider): Promise<boolean> {
   sessionStorage.removeItem(PENDING_KEY)
   const sb = await getSupabase()
-  const { error } = await sb.auth.signInWithOAuth({
-    provider,
-    options: { redirectTo: `${location.origin}/settings` },
-  })
+  const { data, error } = await sb.auth.signInWithOAuth({ provider, options: oauthOptions() })
   if (error) throw error
+  return awaitOAuth(data.url)
 }
 
 export interface RedirectError {
@@ -115,21 +139,84 @@ export interface RedirectError {
   alreadyLinked: boolean
 }
 
-// OAuth 리다이렉트가 실패로 돌아온 경우를 한 번만 읽고 주소창을 정리한다
-export function takeRedirectError(): RedirectError | null {
-  const query = new URLSearchParams(location.search)
-  const hash = new URLSearchParams(location.hash.replace(/^#/, ''))
-  const provider = sessionStorage.getItem(PENDING_KEY) as SocialProvider | null
-  sessionStorage.removeItem(PENDING_KEY)
-
+function parseRedirectError(
+  query: URLSearchParams,
+  hash: URLSearchParams,
+  provider: SocialProvider | null,
+): RedirectError | null {
   if (!query.get('error') && !hash.get('error')) return null
   const code = query.get('error_code') ?? hash.get('error_code') ?? ''
   const description = query.get('error_description') ?? hash.get('error_description') ?? ''
-  history.replaceState(null, '', location.pathname)
   return {
     provider,
     alreadyLinked: code === 'identity_already_exists' || /already/i.test(description),
   }
+}
+
+// 네이티브는 실패도 딥링크로 온다 — 화면이 읽어 갈 때까지 여기 들고 있는다
+let deepLinkError: RedirectError | null = null
+
+// OAuth가 실패로 돌아온 경우를 한 번만 읽는다. 웹은 주소창도 같이 정리한다
+export function takeRedirectError(): RedirectError | null {
+  const provider = sessionStorage.getItem(PENDING_KEY) as SocialProvider | null
+  sessionStorage.removeItem(PENDING_KEY)
+
+  if (isNative) {
+    const failed = deepLinkError
+    deepLinkError = null
+    return failed
+  }
+
+  const query = new URLSearchParams(location.search)
+  const hash = new URLSearchParams(location.hash.replace(/^#/, ''))
+  const failed = parseRedirectError(query, hash, provider)
+  if (failed) history.replaceState(null, '', location.pathname)
+  return failed
+}
+
+// 커스텀 탭에서 돌아온 주소를 푼다. 성공이면 세션을 만들고, 실패면 웹과 같은 모양으로
+// 남겨 둔다 — 화면 쪽은 takeRedirectError 한 벌로 두 플랫폼을 다 본다.
+async function completeOAuth(url: string): Promise<boolean> {
+  const parsed = new URL(url)
+  const query = new URLSearchParams(parsed.search)
+  const hash = new URLSearchParams(parsed.hash.replace(/^#/, ''))
+
+  const code = query.get('code')
+  if (code) {
+    const sb = await getSupabase()
+    const { error } = await sb.auth.exchangeCodeForSession(code)
+    if (error) throw error
+    return true
+  }
+
+  deepLinkError = parseRedirectError(
+    query,
+    hash,
+    sessionStorage.getItem(PENDING_KEY) as SocialProvider | null,
+  )
+  return false
+}
+
+if (isNative) {
+  void watchAuthTab({
+    onCallback: (url) => {
+      if (!url.startsWith(AUTH_CALLBACK)) return
+      // 탭을 닫으면 browserFinished가 뒤따라 온다. 취소로 오인하지 않게 먼저 걷어낸다
+      const waiting = pending
+      pending = null
+      void closeAuthTab()
+      void completeOAuth(url).then(
+        (ok) => waiting?.done(ok),
+        (reason) => waiting?.fail(reason),
+      )
+    },
+    onClosed: () => {
+      // 콜백 없이 닫혔다 = 로그인 창을 그냥 닫고 나왔다. 실패가 아니므로 조용히 되돌린다
+      const waiting = pending
+      pending = null
+      waiting?.done(false)
+    },
+  })
 }
 
 // 연동된 소셜 계정의 표시 이름 (닉네임 자동 설정용). 서버에서 최신 identity도 함께 갱신한다

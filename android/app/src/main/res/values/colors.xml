@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- manifest.webmanifest의 background_color / theme_color와 같은 값. 스플래시에서
+         웹뷰로 넘어갈 때 색이 한 번 튀지 않게 맞춰 둔 것이라 따로 바꾸지 말 것. -->
+    <color name="splashBackground">#FFF8E1</color>
+</resources>

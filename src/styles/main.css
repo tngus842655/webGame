@@ -41,8 +41,11 @@ textarea {
   margin: 0 auto;
   min-height: 100dvh;
   background: linear-gradient(#fff8e1, #ffe0b2);
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
+  /* 네이티브 앱에서는 Capacitor가 실제 인셋을 --safe-area-inset-*로 넣어준다.
+     웹뷰 버전이 낮아 env()를 못 믿는 기기에서는 0을 넣고 네이티브 쪽에서 여백을
+     주므로, 변수를 먼저 보고 없을 때만 env()로 떨어져야 이중 계산이 안 난다. */
+  padding-top: var(--safe-area-inset-top, env(safe-area-inset-top));
+  padding-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom));
 }
 
 a {
