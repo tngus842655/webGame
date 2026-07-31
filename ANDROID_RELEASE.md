@@ -133,18 +133,21 @@ TWA는 그 자체가 크롬이라 이 문제가 없었다. 앱에서 로그인�
 앱 웹뷰에서 게재하면 프로그램 정책 위반이고 게시자 계정이 제재 대상이 된다.
 웹과 앱인토스는 지금까지대로 AdSense, 안드로이드 앱만 AdMob으로 간다.
 
-**지금은 구글이 공개한 테스트 ID가 박혀 있다.** 실제 광고를 켜려면 두 군데를 같이 바꾼다.
+**지금은 광고가 꺼져 있다.** `VITE_ADMOB_REWARD_ID`가 비어 있으면 5초 카운트다운 스텁으로
+떨어지고, 매니페스트의 AdMob 앱 ID도 구글이 공개한 테스트 ID가 박혀 있다.
 
-| 곳 | 값 |
+### 광고를 실제로 켤 때
+
+SDK가 링크되어 있는 것만으로 `AD_ID` 권한이 AAB에 병합되므로, 지금은 매니페스트에서
+`tools:node="remove"`로 빼 두고 Console 선언도 아니요로 맞춰 놨다.
+켤 때는 **네 군데를 한 번에** 바꿔야 한다. 하나만 빠지면 권한과 선언이 어긋나 차단된다.
+
+| 곳 | 할 일 |
 | --- | --- |
-| `android/app/src/main/AndroidManifest.xml`의 `APPLICATION_ID` | AdMob 앱 ID (`ca-app-pub-…~…`) |
+| `AndroidManifest.xml`의 `APPLICATION_ID` | AdMob 앱 ID (`ca-app-pub-…~…`)로 교체 |
+| `AndroidManifest.xml`의 `AD_ID` `tools:node="remove"` | 그 `<uses-permission>` 블록을 지운다 |
 | `.env.local`의 `VITE_ADMOB_REWARD_ID` | 리워드 광고 단위 ID (`ca-app-pub-…/…`) |
-
-`VITE_ADMOB_REWARD_ID`가 비어 있으면 5초 카운트다운 스텁으로 떨어진다. 앱은 정상 동작한다.
-
-> 실제 광고를 켜는 순간 AAB에 `AD_ID` 권한이 붙는다.
-> Play Console의 '광고 ID 사용'을 **예**로 바꾸고 데이터 보안도 같이 갱신해야 한다.
-> 안 바꾸면 권한과 답변이 어긋나 앱이 차단된다. `PLAY_CONSOLE.md` 참고.
+| Play Console | '광고 ID 사용' → 예, 데이터 보안·개인정보처리방침 갱신 (`PLAY_CONSOLE.md`) |
 
 ---
 
