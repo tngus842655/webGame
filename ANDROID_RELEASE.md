@@ -57,7 +57,30 @@ C:\Android\Sdk\platform-tools\adb.exe install -r app\build\outputs\apk\debug\app
 ## 최초 1회 세팅
 
 1. **JDK 21** — [Adoptium Temurin 21](https://adoptium.net/temurin/releases/?version=21).
-   Capacitor 8이 요구하는 버전이다. TWA 때 쓰던 JDK 17로는 빌드가 안 된다
+   Capacitor 8이 요구하는 버전이다. TWA 때 쓰던 JDK 17로는 빌드가 안 된다.
+   설치 화면의 **"Set JAVA_HOME variable"을 직접 켜야 한다** — 기본으로 꺼져 있다.
+   17을 지울 필요는 없고 나란히 깔린다
+
+설치한 뒤 **새 터미널**에서 확인한다. 열어 둔 창은 예전 값을 그대로 들고 있다.
+
+```powershell
+java -version        # 21.x
+echo $env:JAVA_HOME  # ...\jdk-21...
+```
+
+`JAVA_HOME`이 비었거나 17을 가리키면 `gradlew.bat`이 17로 돌아 빌드가 깨진다. 직접 잡으려면:
+
+```powershell
+[Environment]::SetEnvironmentVariable('JAVA_HOME', 'C:\Program Files\Eclipse Adoptium\jdk-21...', 'User')
+```
+
+다른 프로젝트 때문에 JAVA_HOME을 17로 둬야 한다면, 대신
+`%USERPROFILE%\.gradle\gradle.properties`에 `org.gradle.java.home=...jdk-21...`을 넣으면
+이 프로젝트만 21로 간다. 저장소 안의 `android/gradle.properties`는 커밋되는 파일이니
+내 PC 경로를 넣지 말 것.
+
+Android Studio로 빌드한다면 Studio가 들고 다니는 JDK를 쓰므로 위 설정과 무관하다.
+`File → Settings → Build, Execution, Deployment → Build Tools → Gradle`의 Gradle JDK가 21이면 된다.
 2. **Android SDK** — 기존 `C:\Android\Sdk`를 그대로 쓴다. `platforms;android-36`이 필요하다
 
 ```powershell
