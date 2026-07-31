@@ -162,6 +162,7 @@ TWA는 주소창을 없애려고 이 파일이 필요했다. Capacitor는 웹사
 | --- | --- |
 | `gradlew`가 `SDK location not found`로 죽음 | `android/local.properties`가 없다. `echo sdk.dir=C:/Android/Sdk > android\local.properties` (구분자는 `/`) |
 | 빌드가 JDK 버전으로 죽음 | JDK 21이어야 한다. Android Studio의 `File → Settings → Build Tools → Gradle`에서 Gradle JDK 확인 |
+| `cap sync`가 `dist must contain an index.html`로 죽음 | 웹 빌드가 없다. `dist`는 gitignore라 clone 직후엔 아예 없다. `cap sync`를 따로 부르지 말고 `npm run build:android` |
 | 앱은 새로 깔았는데 게임이 예전 그대로 | `cap sync`를 안 했다. gradle 말고 `npm run build:android`부터 |
 | 로그인 창이 닫히고 아무 일도 안 일어남 | 위 "소셜 로그인" 표의 세 값이 어긋났다. Supabase Redirect URLs부터 확인 |
 | 광고 버튼을 누르면 앱이 죽음 | 매니페스트의 AdMob 앱 ID가 실제 값이 아니다 |
