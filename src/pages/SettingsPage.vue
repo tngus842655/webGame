@@ -38,9 +38,9 @@ function resetBusy() {
   busy.value = null
 }
 
-onMounted(async () => {
-  window.addEventListener('pageshow', resetBusy)
-
+// 웹에서는 소셜 화면에서 리다이렉트로 돌아올 때 이 화면이 통째로 다시 뜨므로 onMounted가 곧 이 일이다.
+// 네이티브는 로그인 창(커스텀 탭)만 닫히고 화면이 그대로 살아 있어서, 돌아온 뒤 직접 한 번 더 부른다.
+async function readAccountState() {
   const failed = takeRedirectError()
   if (failed) {
     if (failed.alreadyLinked && failed.provider) existingAccount.value = failed.provider
@@ -60,6 +60,21 @@ onMounted(async () => {
   } catch {
     message.value = t('settings.loadFailed')
   }
+}
+
+// 로그인이 끝나고 돌아온 뒤의 뒷정리. 그냥 닫고 나왔으면(done=false) 화면을 건드리지 않는다
+async function afterSocial(done: boolean) {
+  busy.value = null
+  if (done) {
+    switching.value = false
+    existingAccount.value = null
+  }
+  await readAccountState()
+}
+
+onMounted(async () => {
+  window.addEventListener('pageshow', resetBusy)
+  await readAccountState()
 })
 
 onUnmounted(() => window.removeEventListener('pageshow', resetBusy))
@@ -77,7 +92,8 @@ async function link(provider: SocialProvider) {
   busy.value = provider
   accountError.value = ''
   try {
-    await linkSocial(provider)
+    // 웹은 여기서 페이지가 넘어가 아래 줄이 실행되지 않는다
+    await afterSocial(await linkSocial(provider))
   } catch {
     busy.value = null
     accountError.value = t('account.failed')
@@ -89,7 +105,7 @@ async function signIn(provider: SocialProvider) {
   busy.value = provider
   accountError.value = ''
   try {
-    await signInSocial(provider)
+    await afterSocial(await signInSocial(provider))
   } catch {
     busy.value = null
     accountError.value = t('account.failed')

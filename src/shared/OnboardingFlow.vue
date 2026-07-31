@@ -32,9 +32,15 @@ async function signIn(provider: SocialProvider) {
   busy.value = true
   error.value = ''
   try {
-    // 소셜 로그인은 리다이렉트로 나갔다 돌아온다 — 돌아온 뒤엔 이미 계정이 있으므로
-    // 온보딩을 마친 것으로 본다 (아래 finish에서 플래그를 남긴다)
-    await signInSocial(provider)
+    // 웹은 리다이렉트로 나갔다 돌아온다 — 페이지가 다시 뜨면 AppLayout이 세션을 보고
+    // 온보딩을 마친 것으로 처리하므로 아래 줄은 실행되지 않는다.
+    // 네이티브는 로그인 창만 닫히고 이 화면이 살아 있어서 여기서 직접 끝낸다.
+    if (await signInSocial(provider)) {
+      await flushPendingScores().catch(() => {})
+      emit('done')
+      return
+    }
+    busy.value = false
   } catch {
     busy.value = false
     error.value = t('onboard.failed')

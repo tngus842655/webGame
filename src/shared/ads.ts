@@ -1,7 +1,10 @@
 import { t } from './i18n'
+import { isNative } from './native'
 
 // 리워드 광고 추상화. 게임은 이 인터페이스만 알면 되고, 실제 매체는 Provider 구현으로 갈아끼운다.
-// VITE_ADSENSE_CLIENT가 있으면 H5 Games Ads, 없으면 5초 카운트다운 가짜 광고(스텁)를 쓴다.
+// 웹·앱인토스는 VITE_ADSENSE_CLIENT가 있으면 H5 Games Ads,
+// 안드로이드 앱은 VITE_ADMOB_REWARD_ID가 있으면 AdMob,
+// 둘 다 없으면 5초 카운트다운 가짜 광고(스텁)를 쓴다.
 
 export interface AdProvider {
   isReady(): boolean
@@ -79,7 +82,7 @@ class StubAdProvider implements AdProvider {
   }
 }
 
-// H5 Games Ads (AdSense Ad Placement API) — 웹과 안드로이드 패키징(TWA) 양쪽에서 같은 코드로 돈다.
+// H5 Games Ads (AdSense Ad Placement API) — 웹과 앱인토스에서 쓴다. 안드로이드 앱은 AdMob 쪽.
 // adBreak/adConfig는 adsbygoogle 큐에 객체를 넣는 방식이라 스크립트 로드 전에 호출해도 쌓였다가 처리된다.
 type AdBreakStatus =
   | 'viewed'
@@ -152,7 +155,67 @@ class H5GamesAdProvider implements AdProvider {
   }
 }
 
+// AdMob 리워드 광고 — 안드로이드 앱 전용.
+// H5 Games Ads(AdSense)는 웹사이트용 상품이라 앱 웹뷰 안에서 게재하면 프로그램 정책 위반이고,
+// 게시자 계정이 제재 대상이 된다. 앱에서 쓸 수 있는 구글 매체는 AdMob 쪽이다.
+class AdMobProvider implements AdProvider {
+  private showing = false
+  private sdk: Promise<typeof import('@capacitor-community/admob')> | null = null
+
+  constructor(private readonly adId: string) {}
+
+  // 광고를 처음 부를 때 받아 온다 — 게임만 하고 버튼을 안 누르는 사람도 많다
+  private load() {
+    if (!this.sdk) {
+      this.sdk = import('@capacitor-community/admob').then(async (mod) => {
+        await mod.AdMob.initialize()
+        return mod
+      })
+    }
+    return this.sdk
+  }
+
+  isReady() {
+    return !this.showing
+  }
+
+  async show(_placement: string): Promise<boolean> {
+    if (this.showing) return true
+    this.showing = true
+    try {
+      const { AdMob, RewardAdPluginEvents } = await this.load()
+      try {
+        await AdMob.prepareRewardVideoAd({ adId: this.adId })
+      } catch {
+        // 재고가 없거나 로드에 실패했다 = 매체 사정이니 기회를 뺏지 않는다
+        return true
+      }
+
+      let rewarded = false
+      const earned = await AdMob.addListener(RewardAdPluginEvents.Rewarded, () => {
+        rewarded = true
+      })
+      try {
+        // 사용자가 중간에 닫으면 여기서 튄다 — 그때는 rewarded가 false로 남는다
+        await AdMob.showRewardVideoAd()
+      } catch {
+        /* 닫혔거나 표시에 실패했다. 판단은 rewarded가 한다 */
+      } finally {
+        await earned.remove()
+      }
+      return rewarded
+    } finally {
+      this.showing = false
+    }
+  }
+}
+
 function createProvider(): AdProvider {
+  if (isNative) {
+    const adId = import.meta.env.VITE_ADMOB_REWARD_ID as string | undefined
+    return adId ? new AdMobProvider(adId) : new StubAdProvider()
+  }
+
   const client = import.meta.env.VITE_ADSENSE_CLIENT as string | undefined
   if (client) return new H5GamesAdProvider(client)
   // 아직 실제 매체를 붙이지 않았다 — 가짜 광고로 보상 흐름을 그대로 돌린다.

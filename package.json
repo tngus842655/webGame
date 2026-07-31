@@ -9,17 +9,27 @@
     "build": "vue-tsc --noEmit && vite build",
     "build:toss": "ait build",
     "deploy:toss": "ait deploy",
+    "build:android": "npm run build && cap sync android",
+    "open:android": "cap open android",
     "typecheck": "vue-tsc --noEmit",
     "preview": "vite preview"
   },
   "dependencies": {
     "@apps-in-toss/web-framework": "^2.10.8",
+    "@capacitor-community/admob": "^8.0.0",
+    "@capacitor/android": "^8.4.2",
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/browser": "^8.0.4",
+    "@capacitor/core": "^8.4.2",
+    "@capacitor/splash-screen": "^8.0.2",
     "@supabase/supabase-js": "^2.110.8",
     "matter-js": "^0.20.0",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^8.4.2",
     "@types/matter-js": "^0.20.2",
     "@vitejs/plugin-vue": "^6.0.0",
     "typescript": "^5.8.0",

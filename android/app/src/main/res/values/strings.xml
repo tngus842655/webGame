@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">MiniGame30</string>
+    <string name="title_activity_main">MiniGame30</string>
+    <string name="package_name">com.minigame30.app</string>
+    <string name="custom_url_scheme">com.minigame30.app</string>
+</resources>
