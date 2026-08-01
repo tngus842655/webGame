@@ -21,7 +21,7 @@
 | `20260730000000_stats_players.sql` | `get_total_players()` | ✅ |
 | `20260731000000_delete_account.sql` | `delete_my_account()` — 회원 탈퇴 | ✅ 2026-07-29 |
 | `20260801000000_feedback.sql` | `feedback` 테이블 — 의견 접수, 분당 3회 제한 | ✅ 2026-08-01 |
-| `20260801100000_feedback_delete.sql` | `feedback` 삭제 정책 (관리자만) | ⬜ **미적용** |
+| `20260801100000_feedback_delete.sql` | `feedback` 삭제 정책 (관리자만) | ✅ 2026-08-01 |
 
 ## 테이블
 
