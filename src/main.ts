@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import AppLayout from './app/AppLayout.vue'
 import { router } from './app/router'
 import { loadLocale, locale } from './shared/i18n'
+import { checkAppUpdate } from './shared/appUpdate'
 import { exitApp, startNativeShell } from './shared/native'
 // 첫 적용은 index.html이 하고, 이 import는 그 뒤를 잇는다 — 설정 화면을 한 번도
 // 열지 않아도 '시스템'을 고른 사람이 폰 설정을 바꾸면 바로 따라가야 한다.
@@ -34,4 +35,6 @@ void loadLocale(locale.value).then(() => {
   createApp(AppLayout).use(router).mount('#app')
   // 스플래시는 첫 화면을 그린 뒤에 내린다 — 먼저 내리면 흰 화면이 한 번 스친다
   void startNativeShell(goBack)
+  // 스토어에 새 버전이 있으면 Play가 알린다 (안드로이드 앱에서만, 웹은 그냥 지나간다)
+  void checkAppUpdate()
 })
