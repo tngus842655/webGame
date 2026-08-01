@@ -14,12 +14,3 @@ import { isDarkTheme } from '@/shared/theme'
 export function ground(light: string, dark: string): string {
   return isDarkTheme() ? dark : light
 }
-
-// 밝은 판을 쓰던 게임들이 캔버스 위 글자·안내에 함께 쓰는 값.
-// 허브의 --ink-* 와 같은 색이라 게임과 허브가 따로 놀지 않는다.
-export const INK = {
-  panel: 'rgb(24 19 16 / 0.8)',
-  label: '#8F7D74',
-  value: '#E5D8D0',
-  hint: '#B9A69C',
-} as const
