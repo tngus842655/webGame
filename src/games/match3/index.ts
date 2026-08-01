@@ -33,6 +33,39 @@ import {
   type Pos,
 } from './state'
 import { SCORE_PANEL, drawScorePanel, font } from '../ui'
+import { isDarkTheme } from '@/shared/theme'
+
+// 이 게임은 원래도 짙은 보라 판이라 라이트에서 이미 어둡다. 다크에서는 앱의
+// 다른 화면과 밝기를 맞추기 위해 한 단계만 더 내린다. 보석 색(GEMS)은 그대로다.
+const SCENE = {
+  light: {
+    outer: '#241C3B',
+    board: '#2A2144',
+    skyTop: '#3D3161',
+    skyLow: '#2A2144',
+    panel: 'rgb(255 255 255 / 0.92)',
+    label: '#A99BD0',
+    value: '#4A3580',
+    info: '#8A7BB5',
+    urgent: '#C62838',
+  },
+  dark: {
+    outer: '#181330',
+    board: '#1E1838',
+    skyTop: '#2C2350',
+    skyLow: '#1E1838',
+    panel: 'rgb(18 14 34 / 0.86)',
+    label: '#9C8FC6',
+    value: '#EDE6FF',
+    info: '#9C8FC6',
+    urgent: '#FF7A88',
+  },
+} as const
+
+function scene() {
+  return isDarkTheme() ? SCENE.dark : SCENE.light
+}
+
 
 // 보석 도형 패스 (중심 기준, stroke lineJoin=round로 모서리를 둥글린다)
 function traceGem(c: CanvasRenderingContext2D, shape: GemShape) {
@@ -299,10 +332,11 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
 
   const draw = () => {
-    const c = stage.begin('#241C3B', '#2A2144')
+    const s = scene()
+    const c = stage.begin(s.outer, s.board)
     const bg = c.createLinearGradient(0, 0, 0, 1280)
-    bg.addColorStop(0, '#3D3161')
-    bg.addColorStop(1, '#2A2144')
+    bg.addColorStop(0, s.skyTop)
+    bg.addColorStop(1, s.skyLow)
     c.fillStyle = bg
     c.fillRect(0, 0, 720, 1280)
 
@@ -311,11 +345,11 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       label: t('hud.score'),
       value: state.score.toLocaleString(),
       sub: true,
-      panelColor: 'rgb(255 255 255 / 0.92)',
-      labelColor: '#A99BD0',
-      valueColor: '#4A3580',
+      panelColor: s.panel,
+      labelColor: s.label,
+      valueColor: s.value,
     })
-    c.fillStyle = state.moves <= 5 ? '#C62838' : '#8A7BB5'
+    c.fillStyle = state.moves <= 5 ? s.urgent : s.info
     c.font = font(21)
     const info = `${t('m3.level', { n: state.level })} · ${t('m3.goal', { n: state.goal.toLocaleString() })} · ${t('m3.moves', { n: state.moves })}`
     c.fillText(info, SCORE_PANEL.cx, SCORE_PANEL.subY)

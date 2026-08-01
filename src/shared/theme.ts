@@ -29,9 +29,18 @@ function readMode(): ThemeMode {
 
 export const themeMode = ref<ThemeMode>(readMode())
 
+// 캔버스는 CSS 변수를 못 읽으므로 게임은 이 값을 보고 판 색을 고른다.
+// 게임은 매 프레임 다시 그리니 테마를 바꾼 순간 바로 반영된다 (i18n과 같다).
+let dark = false
+
+export function isDarkTheme(): boolean {
+  return dark
+}
+
 function apply() {
   const mode = themeMode.value
   const theme = mode === 'system' ? (darkQuery.matches ? 'dark' : 'light') : mode
+  dark = theme === 'dark'
   document.documentElement.dataset.theme = theme
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', BAR_COLOR[theme])
 }
