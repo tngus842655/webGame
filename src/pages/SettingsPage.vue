@@ -301,7 +301,7 @@ function onLangChange() {
     <footer class="settings-footer">
       <RouterLink to="/terms">{{ t('terms.title') }}</RouterLink>
       <RouterLink to="/privacy">{{ t('privacy.title') }}</RouterLink>
-      <RouterLink to="/account-deletion">계정 삭제</RouterLink>
+      <RouterLink to="/account-deletion">{{ t('del.button') }}</RouterLink>
     </footer>
   </div>
 </template>
