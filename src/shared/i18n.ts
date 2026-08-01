@@ -204,6 +204,7 @@ const en = {
   'over.bestScore': 'Best {n}',
   'over.newRecord': 'New record!',
   'over.retry': 'Retry',
+  'over.tapResume': 'Tap anywhere when you\'re ready',
   'over.byTime': 'Time\'s up',
   'over.byLives': 'Out of lives',
   'over.byHp': 'You were defeated',

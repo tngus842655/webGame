@@ -3,6 +3,7 @@ import { playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
+import { createResumeGate } from '../resumeGate'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import {
@@ -87,6 +88,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     },
   })
 
+  // 오버레이보다 뒤에 붙어야 그 위를 덮는다
+  const gate = createResumeGate(shell)
+
   async function continueWithAd() {
     if (state.phase !== 'over' || adResetUsed) return
     const rewarded = await ctx.showRewardAd('comet-reset-miss')
@@ -94,6 +98,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     adResetUsed = true
     resetMisses(state)
     overlay.hide()
+    await gate.wait()
   }
 
   async function gameOver() {

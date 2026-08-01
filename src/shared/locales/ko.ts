@@ -162,6 +162,7 @@ const dict: FullDict = {
   'over.bestScore': '최고 기록 {n}',
   'over.newRecord': '신기록!',
   'over.retry': '다시하기',
+  'over.tapResume': '준비되면 화면을 탭하세요',
   'over.byTime': '시간이 다 됐습니다',
   'over.byLives': '기회를 다 썼습니다',
   'over.byHp': '체력이 다했습니다',

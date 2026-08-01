@@ -4,6 +4,7 @@ import type { GameContext } from '../types'
 import { drawIcon } from '../icons'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
+import { createResumeGate } from '../resumeGate'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import { LANES, SONG_LENGTH, createState, tapLane, update, type Judge } from './state'
@@ -178,6 +179,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     },
   })
 
+  // 오버레이보다 뒤에 붙어야 그 위를 덮는다
+  const gate = createResumeGate(shell)
+
   // 광고 보상: 체력을 회복하고 같은 곡을 이어서 (판당 1회)
   async function continueWithAd() {
     if (state.phase !== 'over' || adContinueUsed) return
@@ -187,6 +191,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     state.health = 60
     state.phase = 'playing'
     overlay.hide()
+    await gate.wait()
   }
 
   async function finishRun() {

@@ -3,6 +3,7 @@ import { playGameOver, playMerge, playSfx, preloadSfx, vibrate } from '@/shared/
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
+import { createResumeGate } from '../resumeGate'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import {
@@ -55,6 +56,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     },
   })
 
+  // 오버레이보다 뒤에 붙어야 그 위를 덮는다
+  const gate = createResumeGate(shell)
+
   // 광고 보상: 폭을 처음의 절반까지 되돌려 무너진 자리에서 이어한다 (판당 1회)
   async function continueWithAd() {
     if (state.phase !== 'over' || adReviveUsed) return
@@ -63,6 +67,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     adReviveUsed = true
     reviveWithHalfWidth(state)
     overlay.hide()
+    await gate.wait()
   }
 
   async function gameOver() {

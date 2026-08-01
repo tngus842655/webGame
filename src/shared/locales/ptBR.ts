@@ -112,6 +112,7 @@ const dict: CoreDict = {
   'over.bestScore': 'Melhor marca {n}',
   'over.newRecord': 'Novo recorde!',
   'over.retry': 'Tentar de novo',
+  'over.tapResume': 'Toque na tela quando estiver pronto',
   'over.byTime': 'O tempo acabou',
   'over.byLives': 'Você ficou sem vidas',
   'over.byHp': 'Você foi derrotado',
