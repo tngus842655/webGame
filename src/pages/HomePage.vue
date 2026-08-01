@@ -384,12 +384,12 @@ onBeforeUnmount(() => {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  color: #8d6e63;
+  color: var(--ink-muted);
   transition: background-color 0.12s ease;
 }
 
 .home-header a:active {
-  background: rgb(93 64 55 / 0.1);
+  background: var(--press);
 }
 
 .home-header svg {
@@ -445,8 +445,8 @@ onBeforeUnmount(() => {
 
 .panel {
   padding: 14px 0;
-  border-color: #e7dcd6;
-  background: rgb(255 255 255 / 0.5);
+  border-color: var(--line);
+  background: var(--surface-soft);
 }
 
 .pad {
@@ -455,12 +455,12 @@ onBeforeUnmount(() => {
 
 .recent {
   padding: 22px 0 14px;
-  border-color: #dfd2ce;
-  background: rgb(255 255 255 / 0.42);
+  border-color: var(--line);
+  background: var(--surface-soft);
 }
 
 .recent h2 {
-  background: #9c8175;
+  background: var(--ink-muted);
   box-shadow: 0 2px 6px rgb(141 110 99 / 0.3);
 }
 
@@ -477,7 +477,7 @@ onBeforeUnmount(() => {
   font-size: 13px;
   line-height: 1.6;
   text-align: center;
-  color: #a1887f;
+  color: var(--ink-faint);
   word-break: keep-all;
 }
 
@@ -488,7 +488,7 @@ onBeforeUnmount(() => {
   margin-bottom: 8px;
   padding: 4px;
   border-radius: 17px;
-  background: rgb(141 110 99 / 0.11);
+  background: var(--line-soft);
 }
 
 /* 셋으로 똑같이 잘라 나누면 "더 많은 게임"만 자리가 모자라 잘렸다.
@@ -504,7 +504,7 @@ onBeforeUnmount(() => {
   border: none;
   border-radius: 13px;
   background: none;
-  color: #9d8579;
+  color: var(--ink-faint);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -537,11 +537,9 @@ onBeforeUnmount(() => {
 }
 
 .tabs button[aria-selected='true'] {
-  background: #fff;
-  color: #5d4037;
-  box-shadow:
-    0 1px 2px rgb(93 64 55 / 0.1),
-    0 3px 8px rgb(93 64 55 / 0.08);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-card);
 }
 
 /* ── 좌우로 흐르는 카드 ────────────────────────────── */
@@ -582,20 +580,16 @@ onBeforeUnmount(() => {
   padding: 15px 9px 13px;
   border: none;
   border-radius: 20px;
-  background: #fff;
+  background: var(--surface);
   text-align: center;
   cursor: pointer;
-  box-shadow:
-    0 1px 2px rgb(93 64 55 / 0.07),
-    0 5px 14px rgb(93 64 55 / 0.11);
+  box-shadow: var(--shadow-raise);
   transition: box-shadow 0.18s ease;
 }
 
 /* 가운데만 바닥에서 확실히 떠 있게 — 크기 차이만으로는 앞뒤가 덜 읽힌다 */
 .is-center .cf-card {
-  box-shadow:
-    0 2px 4px rgb(93 64 55 / 0.1),
-    0 14px 30px rgb(93 64 55 / 0.24);
+  box-shadow: var(--shadow-lift);
 }
 
 .cf-card .rank {
@@ -608,8 +602,8 @@ onBeforeUnmount(() => {
   height: 21px;
   padding: 0 5px;
   border-radius: 999px;
-  background: #f3eeec;
-  color: #a1887f;
+  background: var(--line-soft);
+  color: var(--ink-faint);
   font-size: 12px;
   font-weight: bold;
   line-height: 1;
@@ -631,7 +625,7 @@ onBeforeUnmount(() => {
   font-weight: 700;
   line-height: 1.25;
   letter-spacing: -0.015em;
-  color: #4e342e;
+  color: var(--ink);
   word-break: keep-all;
 }
 
@@ -645,7 +639,7 @@ onBeforeUnmount(() => {
   min-height: 15px;
   white-space: nowrap;
   text-overflow: ellipsis;
-  color: #b3a099;
+  color: var(--ink-faint);
 }
 
 .cf-foot {
@@ -728,8 +722,8 @@ onBeforeUnmount(() => {
   height: 48px;
   padding: 3px;
   border-radius: 15px;
-  background: #fff;
-  box-shadow: 0 2px 7px rgb(93 64 55 / 0.13);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
 }
 
 .recent-name {
@@ -737,7 +731,7 @@ onBeforeUnmount(() => {
   font-weight: 600;
   line-height: 1.3;
   letter-spacing: -0.02em;
-  color: #8d6e63;
+  color: var(--ink-muted);
   word-break: keep-all;
 }
 
@@ -746,15 +740,15 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: space-between;
   padding: 14px 14px 14px 16px;
-  background: rgb(255 255 255 / 0.6);
+  background: var(--surface-soft);
   border-radius: 16px;
   font-size: 14px;
   font-weight: 700;
-  color: #8d6e63;
+  color: var(--ink-muted);
 }
 
 .trash-entry:active {
-  background: rgb(255 255 255 / 0.9);
+  background: var(--surface);
 }
 
 .trash-label,
@@ -766,7 +760,7 @@ onBeforeUnmount(() => {
 
 .trash-entry .count {
   gap: 2px;
-  color: #bcaaa4;
+  color: var(--ink-faint);
 }
 
 .trash-label svg {
@@ -777,5 +771,18 @@ onBeforeUnmount(() => {
 .trash-entry .count svg {
   width: 16px;
   height: 16px;
+}
+
+/* TOP3 칸의 금빛 바탕과 아래 칸의 반투명 흰 판은 어두운 화면에서 혼자 밝게 뜬다.
+   결은 그대로 두고 명도만 내린다 — 게임 썸네일 받침은 아이콘이 밝은 바탕에
+   맞춰 그려져 있어 두 테마에서 그대로 둔다. */
+[data-theme='dark'] .top3 {
+  border-color: #7a5a22;
+  background:
+    radial-gradient(130% 80% at 50% -25%, rgb(255 213 130 / 0.12), rgb(255 255 255 / 0) 62%),
+    linear-gradient(158deg, #3a2c17, #2c2114);
+  box-shadow:
+    inset 0 1px 0 rgb(255 213 130 / 0.14),
+    0 6px 18px rgb(0 0 0 / 0.4);
 }
 </style>

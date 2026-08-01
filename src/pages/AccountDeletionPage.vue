@@ -125,11 +125,11 @@ async function remove() {
 .effective {
   margin-top: 4px;
   font-size: 12.5px;
-  color: #bcaaa4;
+  color: var(--ink-faint);
 }
 
 .card {
-  background: #fff;
+  background: var(--surface);
   border-radius: 16px;
   padding: 18px 16px;
 }
@@ -147,7 +147,7 @@ async function remove() {
 .card li {
   font-size: 13.5px;
   line-height: 1.6;
-  color: #5d4037;
+  color: var(--ink-body);
   word-break: keep-all;
 }
 
@@ -162,11 +162,11 @@ async function remove() {
 .note {
   margin-top: 6px;
   font-size: 12.5px;
-  color: #8d6e63;
+  color: var(--ink-muted);
 }
 
 .error {
-  color: #c62828;
+  color: var(--danger);
 }
 
 .contact {
@@ -177,7 +177,7 @@ async function remove() {
 .danger {
   margin-top: 18px;
   padding-top: 16px;
-  border-top: 1px solid #efebe9;
+  border-top: 1px solid var(--line-soft);
 }
 
 .confirm-ask {
@@ -208,12 +208,12 @@ async function remove() {
 }
 
 .danger-btn:disabled {
-  background: #d7ccc8;
+  background: var(--line);
   cursor: default;
 }
 
 .ghost-btn {
-  background: #efebe9;
-  color: #5d4037;
+  background: var(--line-soft);
+  color: var(--ink-body);
 }
 </style>

@@ -7,12 +7,20 @@ import {
   takeRedirectError,
   type SocialProvider,
 } from '@/shared/auth'
-import { LOCALES, locale, setLocale, t, type Locale } from '@/shared/i18n'
+import { LOCALES, locale, setLocale, t, type Locale, type TranslationKey } from '@/shared/i18n'
 import { adoptSocialNickname, fetchMyProfile, updateMyNickname } from '@/shared/profile'
 import { isMusicEnabled, setMusicEnabled } from '@/shared/music'
 import { isSoundEnabled, setSoundEnabled } from '@/shared/sound'
+import { setThemeMode, themeMode, type ThemeMode } from '@/shared/theme'
 import SocialLogo from '@/shared/SocialLogo.vue'
 import UiIcon from '@/shared/UiIcon.vue'
+
+// 셋뿐이라 목록을 열 것 없이 나란히 놓는다
+const THEME_OPTIONS: Array<{ mode: ThemeMode; labelKey: TranslationKey }> = [
+  { mode: 'light', labelKey: 'settings.themeLight' },
+  { mode: 'dark', labelKey: 'settings.themeDark' },
+  { mode: 'system', labelKey: 'settings.themeSystem' },
+]
 
 const nickname = ref('')
 const loaded = ref(false)
@@ -256,6 +264,23 @@ function onLangChange() {
     </section>
 
     <section class="section">
+      <h2>{{ t('settings.theme') }}</h2>
+      <div class="theme-row" role="group" :aria-label="t('settings.theme')">
+        <button
+          v-for="option in THEME_OPTIONS"
+          :key="option.mode"
+          type="button"
+          class="theme-btn"
+          :class="{ on: themeMode === option.mode }"
+          :aria-pressed="themeMode === option.mode"
+          @click="setThemeMode(option.mode)"
+        >
+          {{ t(option.labelKey) }}
+        </button>
+      </div>
+    </section>
+
+    <section class="section">
       <h2>{{ t('settings.language') }}</h2>
       <!-- 목록은 OS가 띄우게 두고(13개라 자체 목록은 화면을 다 먹는다) 닫힌 모습만 앱에 맞춘다 -->
       <div class="lang-field">
@@ -296,15 +321,15 @@ function onLangChange() {
   font-size: 21px;
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: #4e342e;
+  color: var(--ink);
 }
 
 .section {
-  background: #fff;
+  background: var(--surface);
   border-radius: 18px;
   padding: 16px;
   margin-bottom: 12px;
-  box-shadow: 0 1px 4px rgb(93 64 55 / 0.06);
+  box-shadow: var(--shadow-card);
 }
 
 .section h2 {
@@ -312,7 +337,7 @@ function onLangChange() {
   font-size: 13px;
   font-weight: 800;
   letter-spacing: 0.04em;
-  color: #b09a8c;
+  color: var(--ink-faint);
 }
 
 .social-row {
@@ -360,7 +385,7 @@ function onLangChange() {
 .linked {
   font-size: 15px;
   font-weight: 600;
-  color: #5d4037;
+  color: var(--ink-body);
 }
 
 /* 계정 전환·취소 — 자주 쓰지 않는 동작이라 버튼 대신 옅은 링크로 둔다 */
@@ -371,7 +396,7 @@ function onLangChange() {
   background: none;
   font: inherit;
   font-size: 13px;
-  color: #a1887f;
+  color: var(--ink-faint);
   text-decoration: underline;
   cursor: pointer;
 }
@@ -389,10 +414,10 @@ function onLangChange() {
   padding: 10px 12px;
   margin-bottom: 10px;
   border-radius: 12px;
-  background: #fff8e1;
+  background: var(--surface-tint);
   font-size: 13px;
   line-height: 1.5;
-  color: #6d4c41;
+  color: var(--ink-body);
   word-break: keep-all;
 }
 
@@ -400,15 +425,15 @@ function onLangChange() {
   padding: 14px;
   margin-bottom: 12px;
   border-radius: 14px;
-  background: #fff8e1;
+  background: var(--surface-tint);
   font-size: 14px;
   line-height: 1.45;
-  color: #5d4037;
+  color: var(--ink-body);
 }
 
 .restore .warn {
   margin-top: 6px;
-  color: #c62828;
+  color: var(--danger);
 }
 
 .restore .btn {
@@ -426,11 +451,11 @@ function onLangChange() {
   padding: 14px 42px 14px 15px;
   border: none;
   border-radius: 14px;
-  box-shadow: inset 0 0 0 1.5px #e2d8d2;
-  background: #fff;
+  box-shadow: inset 0 0 0 1.5px var(--line);
+  background: var(--surface);
   font: inherit;
   font-weight: 600;
-  color: #4e342e;
+  color: var(--ink);
   appearance: none;
   -webkit-appearance: none;
   cursor: pointer;
@@ -442,7 +467,7 @@ function onLangChange() {
   right: 15px;
   width: 15px;
   height: 15px;
-  color: #bcaaa4;
+  color: var(--ink-faint);
   transform: translateY(-50%) rotate(90deg);
   pointer-events: none;
 }
@@ -463,10 +488,11 @@ function onLangChange() {
   padding: 13px 54px 13px 15px;
   border: none;
   border-radius: 14px;
-  box-shadow: inset 0 0 0 1.5px #e2d8d2;
+  box-shadow: inset 0 0 0 1.5px var(--line);
+  background: var(--surface);
   font: inherit;
   font-weight: 600;
-  color: #4e342e;
+  color: var(--ink);
 }
 
 .nick-field input:focus {
@@ -481,12 +507,12 @@ function onLangChange() {
   transform: translateY(-50%);
   font-size: 12px;
   font-weight: 700;
-  color: #a1887f;
+  color: var(--ink-faint);
   pointer-events: none;
 }
 
 .counter.short {
-  color: #d7ccc8;
+  color: var(--line);
 }
 
 /* 기본 체크박스를 스위치로 — 켜짐/꺼짐이 한눈에 보이고 과녁도 줄 전체가 된다 */
@@ -498,12 +524,12 @@ function onLangChange() {
   padding: 11px 2px;
   font-size: 15px;
   font-weight: 600;
-  color: #5d4037;
+  color: var(--ink-body);
   cursor: pointer;
 }
 
 .toggle + .toggle {
-  border-top: 1px solid #f5efeb;
+  border-top: 1px solid var(--line-soft);
 }
 
 .toggle input {
@@ -519,7 +545,7 @@ function onLangChange() {
   width: 48px;
   height: 28px;
   border-radius: 999px;
-  background: #ded4cf;
+  background: var(--line);
   transition: background-color 0.18s ease;
 }
 
@@ -554,17 +580,17 @@ function onLangChange() {
   align-items: center;
   justify-content: space-between;
   padding: 16px;
-  background: #fff;
+  background: var(--surface);
   border-radius: 18px;
   margin-bottom: 12px;
-  box-shadow: 0 1px 4px rgb(93 64 55 / 0.06);
+  box-shadow: var(--shadow-card);
   font-size: 15px;
   font-weight: 700;
-  color: #4e342e;
+  color: var(--ink);
 }
 
 .menu-link:active {
-  background: #fffaf2;
+  background: var(--surface-press);
 }
 
 .menu-link .arrow {
@@ -572,14 +598,14 @@ function onLangChange() {
   place-items: center;
   width: 18px;
   height: 18px;
-  color: #cbbcb5;
+  color: var(--ink-faint);
 }
 
 .hint {
   margin-top: 10px;
   font-size: 13px;
   line-height: 1.45;
-  color: #bcaaa4;
+  color: var(--ink-faint);
   word-break: keep-all;
 }
 
@@ -587,7 +613,39 @@ function onLangChange() {
   padding: 6px 2px 0;
   font-size: 14px;
   font-weight: 600;
-  color: #5d4037;
+  color: var(--ink-body);
+}
+
+/* 고른 것만 판 위로 올린다 — 홈의 탭과 같은 결 */
+.theme-row {
+  display: flex;
+  gap: 3px;
+  padding: 4px;
+  border-radius: 16px;
+  background: var(--line-soft);
+}
+
+.theme-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 11px 6px;
+  border: none;
+  border-radius: 12px;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-faint);
+  cursor: pointer;
+  transition:
+    background-color 0.14s ease,
+    color 0.14s ease;
+}
+
+.theme-btn.on {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-card);
 }
 
 .settings-footer {
@@ -600,7 +658,7 @@ function onLangChange() {
 
 .settings-footer a {
   font-size: 12px;
-  color: #bcaaa4;
+  color: var(--ink-faint);
   text-decoration: underline;
 }
 </style>

@@ -170,7 +170,7 @@ async function start() {
   align-items: center;
   justify-content: center;
   padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
-  background: linear-gradient(#fff8e1, #ffe0b2);
+  background: linear-gradient(var(--bg-top), var(--bg-bottom));
 }
 
 .card {
@@ -190,7 +190,7 @@ async function start() {
   font-size: 15px;
   font-weight: 800;
   letter-spacing: 0.04em;
-  color: #c0a695;
+  color: var(--ink-faint);
 }
 
 /* 세 걸음 중 어디까지 왔는지 */
@@ -205,7 +205,7 @@ async function start() {
   width: 7px;
   height: 7px;
   border-radius: 999px;
-  background: rgb(141 110 99 / 0.22);
+  background: var(--line);
   transition:
     width 0.2s ease,
     background-color 0.2s ease;
@@ -220,13 +220,13 @@ h2 {
   font-size: 23px;
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: #4e342e;
+  color: var(--ink);
 }
 
 .body {
   font-size: 14px;
   line-height: 1.55;
-  color: #8d6e63;
+  color: var(--ink-muted);
   word-break: keep-all;
 }
 
@@ -247,9 +247,9 @@ h2 {
   padding: 13px 8px;
   border: 2px solid transparent;
   border-radius: 14px;
-  background: #fff;
-  box-shadow: 0 1px 3px rgb(93 64 55 / 0.07);
-  color: #5d4037;
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  color: var(--ink-body);
   font-size: 15px;
   cursor: pointer;
   transition: transform 0.1s ease;
@@ -320,10 +320,10 @@ h2 {
 .nick {
   width: 100%;
   padding: 15px 62px 15px 18px;
-  border: 2px solid #e2d8d2;
+  border: 2px solid var(--line);
   border-radius: 16px;
-  background: #fff;
-  color: #4e342e;
+  background: var(--surface);
+  color: var(--ink);
   font-size: 17px;
   font-weight: 600;
   text-align: center;
@@ -341,18 +341,23 @@ h2 {
   transform: translateY(-50%);
   font-size: 12px;
   font-weight: 700;
-  color: #a1887f;
+  color: var(--ink-faint);
   pointer-events: none;
 }
 
 .counter.short {
-  color: #d7ccc8;
+  color: var(--line);
 }
 
 .error {
   font-size: 13px;
   font-weight: 600;
-  color: #c62828;
+  color: var(--danger);
+}
+
+[data-theme='dark'] .lang.on {
+  background: rgb(67 160 71 / 0.22);
+  color: #8fd694;
 }
 
 button:disabled {

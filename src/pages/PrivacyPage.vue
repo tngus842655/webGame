@@ -90,11 +90,11 @@ const CONTACT_EMAIL = 'tngus842655@gmail.com'
 .effective {
   margin-top: 4px;
   font-size: 12.5px;
-  color: #bcaaa4;
+  color: var(--ink-faint);
 }
 
 .card {
-  background: #fff;
+  background: var(--surface);
   border-radius: 16px;
   padding: 18px 16px;
 }
@@ -112,7 +112,7 @@ const CONTACT_EMAIL = 'tngus842655@gmail.com'
 .card li {
   font-size: 13.5px;
   line-height: 1.6;
-  color: #5d4037;
+  color: var(--ink-body);
   word-break: keep-all;
 }
 
@@ -127,7 +127,7 @@ const CONTACT_EMAIL = 'tngus842655@gmail.com'
 .note {
   margin-top: 6px;
   font-size: 12.5px;
-  color: #8d6e63;
+  color: var(--ink-muted);
 }
 
 .contact {

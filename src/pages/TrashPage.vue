@@ -59,14 +59,14 @@ const cards = trashedGames(GAMES).map((game) => ({
   margin-bottom: 16px;
   font-size: 13px;
   line-height: 1.5;
-  color: #bcaaa4;
+  color: var(--ink-faint);
   word-break: keep-all;
 }
 
 .notice {
   padding: 40px 0;
   text-align: center;
-  color: #8d6e63;
+  color: var(--ink-muted);
 }
 
 /* 홈과 같은 이유로 minmax(0, …) — 1fr은 min-content 아래로 줄지 않아

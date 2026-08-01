@@ -54,7 +54,7 @@ const notes = computed(() => [...DEV_NOTES].sort((a, b) => b.date.localeCompare(
   text-align: center;
   font-size: 14px;
   line-height: 1.6;
-  color: #a1887f;
+  color: var(--ink-faint);
   word-break: keep-all;
 }
 
@@ -72,7 +72,7 @@ const notes = computed(() => [...DEV_NOTES].sort((a, b) => b.date.localeCompare(
   top: 8px;
   bottom: 8px;
   width: 2px;
-  background: rgb(141 110 99 / 0.22);
+  background: var(--line);
 }
 
 .entry {
@@ -88,14 +88,14 @@ const notes = computed(() => [...DEV_NOTES].sort((a, b) => b.date.localeCompare(
   height: 12px;
   border-radius: 50%;
   background: #43a047;
-  box-shadow: 0 0 0 3px #fff8e1;
+  box-shadow: 0 0 0 3px var(--bg-top);
 }
 
 .card {
-  background: #fff;
+  background: var(--surface);
   border-radius: 16px;
   padding: 14px 16px;
-  box-shadow: 0 2px 8px rgb(93 64 55 / 0.07);
+  box-shadow: var(--shadow-card);
 }
 
 .meta {
@@ -104,7 +104,7 @@ const notes = computed(() => [...DEV_NOTES].sort((a, b) => b.date.localeCompare(
 
 .meta time {
   font-size: 12px;
-  color: #bcaaa4;
+  color: var(--ink-faint);
 }
 
 .meta h2 {
@@ -124,7 +124,7 @@ const notes = computed(() => [...DEV_NOTES].sort((a, b) => b.date.localeCompare(
   padding-left: 12px;
   font-size: 13.5px;
   line-height: 1.5;
-  color: #6d5750;
+  color: var(--ink-body);
 }
 
 .card li::before {
@@ -135,6 +135,6 @@ const notes = computed(() => [...DEV_NOTES].sort((a, b) => b.date.localeCompare(
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #d7ccc8;
+  background: var(--line);
 }
 </style>

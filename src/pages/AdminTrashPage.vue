@@ -150,20 +150,20 @@ function trashedOn(iso: string): string {
   margin-bottom: 12px;
   font-size: 13px;
   line-height: 1.5;
-  color: #bcaaa4;
+  color: var(--ink-faint);
   word-break: keep-all;
 }
 
 .error {
   margin-bottom: 10px;
   font-size: 13px;
-  color: #c62828;
+  color: var(--danger);
 }
 
 .notice {
   padding: 40px 0;
   text-align: center;
-  color: #8d6e63;
+  color: var(--ink-muted);
 }
 
 /* 코드에서 지워도 되는 게임이 쌓였다는 신호 */
@@ -171,10 +171,10 @@ function trashedOn(iso: string): string {
   padding: 10px 12px;
   margin-bottom: 10px;
   border-radius: 10px;
-  background: #fff8e1;
+  background: var(--surface-tint);
   font-size: 13px;
   line-height: 1.5;
-  color: #6d4c41;
+  color: var(--ink-body);
   word-break: keep-all;
 }
 
@@ -190,7 +190,7 @@ function trashedOn(iso: string): string {
   align-items: center;
   gap: 12px;
   padding: 12px 14px;
-  background: #fff;
+  background: var(--surface);
   border-radius: 14px;
 }
 
@@ -219,13 +219,13 @@ function trashedOn(iso: string): string {
 
 .info strong {
   font-size: 14px;
-  color: #8d6e63;
+  color: var(--ink-muted);
 }
 
 .rank {
   flex: none;
   font-size: 11px;
-  color: #bcaaa4;
+  color: var(--ink-faint);
 }
 
 .meta {
@@ -234,7 +234,7 @@ function trashedOn(iso: string): string {
   gap: 4px 10px;
   margin-top: 3px;
   font-size: 11px;
-  color: #bcaaa4;
+  color: var(--ink-faint);
 }
 
 .meta .over {
@@ -248,7 +248,7 @@ function trashedOn(iso: string): string {
   gap: 5px;
   margin-top: 6px;
   font-size: 12px;
-  color: #8d6e63;
+  color: var(--ink-muted);
 }
 
 .hide input {
@@ -271,7 +271,7 @@ function trashedOn(iso: string): string {
 }
 
 .restore:disabled {
-  background: #d7ccc8;
+  background: var(--line);
   cursor: default;
 }
 </style>

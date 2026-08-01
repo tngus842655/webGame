@@ -60,12 +60,10 @@ function rankClass(rank: number): string {
   width: 100%;
   padding: 12px 6px 10px;
   border: none;
-  background: #fff;
+  background: var(--surface);
   border-radius: 16px;
   cursor: pointer;
-  box-shadow:
-    0 1px 2px rgb(93 64 55 / 0.06),
-    0 4px 12px rgb(93 64 55 / 0.09);
+  box-shadow: var(--shadow-raise);
   text-align: center;
   transition:
     transform 0.1s ease,
@@ -89,8 +87,8 @@ function rankClass(rank: number): string {
   height: 21px;
   padding: 0 5px;
   border-radius: 999px;
-  background: #f3eeec;
-  color: #a1887f;
+  background: var(--line-soft);
+  color: var(--ink-faint);
   font-size: 12px;
   font-weight: bold;
   line-height: 1;
@@ -134,7 +132,7 @@ strong {
   font-weight: 700;
   line-height: 1.25;
   letter-spacing: -0.01em;
-  color: #4e342e;
+  color: var(--ink);
   word-break: keep-all;
 }
 
@@ -148,6 +146,6 @@ small {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  color: #b3a099;
+  color: var(--ink-faint);
 }
 </style>

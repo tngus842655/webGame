@@ -61,15 +61,15 @@ onMounted(() => {
   align-items: center;
   gap: 12px;
   padding: 11px 12px 11px 14px;
-  background: #fff;
+  background: var(--surface);
   border-radius: 14px;
-  box-shadow: 0 1px 4px rgb(93 64 55 / 0.07);
+  box-shadow: var(--shadow-card);
   transition: transform 0.1s ease;
 }
 
 .row:active {
   transform: scale(0.985);
-  background: #fffaf2;
+  background: var(--surface-press);
 }
 
 .thumb {
@@ -81,7 +81,7 @@ onMounted(() => {
 .title {
   flex: 1;
   font-weight: 700;
-  color: #4e342e;
+  color: var(--ink);
 }
 
 .arrow {
@@ -89,6 +89,6 @@ onMounted(() => {
   place-items: center;
   width: 20px;
   height: 20px;
-  color: #cbbcb5;
+  color: var(--ink-faint);
 }
 </style>

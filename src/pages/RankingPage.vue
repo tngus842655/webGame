@@ -92,21 +92,21 @@ watch(period, load)
   padding: 10px 0;
   border: none;
   border-radius: 12px;
-  background: #fff;
-  color: #bcaaa4;
+  background: var(--surface);
+  color: var(--ink-faint);
   cursor: pointer;
 }
 
 .tabs button.active {
-  background: #8d6e63;
-  color: #fff;
+  background: var(--ink-muted);
+  color: var(--surface);
   font-weight: bold;
 }
 
 .notice {
   padding: 40px 0;
   text-align: center;
-  color: #8d6e63;
+  color: var(--ink-muted);
 }
 
 .board {
@@ -121,7 +121,7 @@ watch(period, load)
   align-items: center;
   gap: 12px;
   padding: 12px 14px;
-  background: #fff;
+  background: var(--surface);
   border-radius: 12px;
 }
 
@@ -132,7 +132,7 @@ watch(period, load)
 .rank {
   width: 28px;
   font-weight: bold;
-  color: #8d6e63;
+  color: var(--ink-muted);
   text-align: center;
 }
 

@@ -38,7 +38,7 @@ const starred = computed(() => isFavorite(props.slug))
   padding: 0;
   border: none;
   background: none;
-  color: #e0d5d0;
+  color: var(--line);
   cursor: pointer;
   transition:
     color 0.12s ease,

@@ -233,7 +233,7 @@ onBeforeUnmount(() => {
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   box-shadow: 0 2px 8px rgb(40 24 16 / 0.16);
-  color: #5d4037;
+  color: var(--ink-body);
   font-size: 14px;
   font-weight: 700;
   white-space: nowrap;
@@ -271,7 +271,7 @@ onBeforeUnmount(() => {
 .best-chip {
   overflow: hidden;
   font-size: 13px;
-  color: #7d6a63;
+  color: var(--ink-faint);
   text-overflow: ellipsis;
 }
 
@@ -327,7 +327,7 @@ onBeforeUnmount(() => {
   margin-bottom: 6px;
   font-size: 19px;
   font-weight: 800;
-  color: #7a6053;
+  color: var(--ink-muted);
 }
 
 .pause-sheet .btn {
@@ -350,6 +350,26 @@ onBeforeUnmount(() => {
   text-shadow: 0 4px 18px rgb(0 0 0 / 0.5);
   pointer-events: none;
   animation: countdown-pop 0.7s ease-out;
+}
+
+[data-theme='dark'] .chip {
+  background: rgb(38 31 27 / 0.86);
+}
+
+[data-theme='dark'] .back-button:active,
+[data-theme='dark'] .icon-button:active {
+  background: rgb(38 31 27 / 0.98);
+}
+
+[data-theme='dark'] .pause-glyph {
+  border-color: var(--ink-body);
+}
+
+[data-theme='dark'] .pause-sheet {
+  background: linear-gradient(#332a26, #2a221e);
+  box-shadow:
+    0 22px 52px rgb(0 0 0 / 0.6),
+    inset 0 2px 0 rgb(255 255 255 / 0.06);
 }
 
 @keyframes pause-fade {

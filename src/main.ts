@@ -3,6 +3,9 @@ import AppLayout from './app/AppLayout.vue'
 import { router } from './app/router'
 import { loadLocale, locale } from './shared/i18n'
 import { exitApp, startNativeShell } from './shared/native'
+// 첫 적용은 index.html이 하고, 이 import는 그 뒤를 잇는다 — 설정 화면을 한 번도
+// 열지 않아도 '시스템'을 고른 사람이 폰 설정을 바꾸면 바로 따라가야 한다.
+import './shared/theme'
 import './styles/main.css'
 
 // 게임 카드는 <a>라서 길게 누르면 웹뷰가 링크 주소를 띄운다. body의
