@@ -3,6 +3,7 @@
 // 두 화면은 어느 칸에 놓이느냐만 다르고 순위는 하나를 나눠 쓴다 — 휴지통에 있던
 // 게임이 다시 올라오면 그 자리에서 바로 메달이 붙어야 하므로 카드를 하나로 둔다.
 import { useRouter } from 'vue-router'
+import FavoriteButton from './FavoriteButton.vue'
 import GameIcon from './GameIcon.vue'
 import { t, type TranslationKey } from './i18n'
 
@@ -12,6 +13,9 @@ const props = defineProps<{
   rank: number | null
   // 최고 기록·내 순위 — 문구는 화면마다 달라서 밖에서 넘겨받는다
   label: string
+  // 홈에서만 별을 붙인다. 휴지통 게임은 즐겨찾기 칸(주 목록 기준)에 올라오지
+  // 못하므로, 눌러도 아무 데도 안 나타나는 별을 보여주지 않는다.
+  favoritable?: boolean
 }>()
 
 // RouterLink(<a>)였을 때는 카드를 길게 누르면 웹뷰가 링크 주소를 띄웠다.
@@ -30,15 +34,23 @@ function rankClass(rank: number): string {
 </script>
 
 <template>
-  <button type="button" class="game-card" @click="open">
-    <span v-if="rank !== null" class="rank" :class="rankClass(rank)">{{ rank }}</span>
-    <span class="thumb"><GameIcon :slug="slug" /></span>
-    <strong>{{ t(titleKey) }}</strong>
-    <small>{{ label }}</small>
-  </button>
+  <!-- 별은 카드 버튼 안에 넣을 수 없다 (버튼 안의 버튼). 겹쳐 두고 과녁만 나눈다. -->
+  <div class="game-slot">
+    <button type="button" class="game-card" @click="open">
+      <span v-if="rank !== null" class="rank" :class="rankClass(rank)">{{ rank }}</span>
+      <span class="thumb"><GameIcon :slug="slug" /></span>
+      <strong>{{ t(titleKey) }}</strong>
+      <small>{{ label }}</small>
+    </button>
+    <FavoriteButton v-if="favoritable" :slug="slug" />
+  </div>
 </template>
 
 <style scoped>
+.game-slot {
+  position: relative;
+}
+
 .game-card {
   position: relative;
   display: flex;
