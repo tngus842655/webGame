@@ -2,7 +2,14 @@
 // 운영자 전용 — 사용자가 보낸 의견을 최신순으로 읽는다.
 // 답변 기능은 없다. 여기서 하는 일은 읽고 다음 커밋에 반영할지 판단하는 것까지다.
 import { onMounted, ref } from 'vue'
-import { fetchFeedback, FEEDBACK_KINDS, type FeedbackItem } from '@/shared/feedback'
+import {
+  feedbackSeenAt,
+  fetchFeedback,
+  FEEDBACK_KINDS,
+  markFeedbackSeen,
+  unreadFeedback,
+  type FeedbackItem,
+} from '@/shared/feedback'
 import { locale, t, type TranslationKey } from '@/shared/i18n'
 import UiIcon from '@/shared/UiIcon.vue'
 
@@ -14,9 +21,21 @@ const KIND_LABELS = new Map<string, TranslationKey>(
   FEEDBACK_KINDS.map((option) => [option.kind, option.labelKey]),
 )
 
+// 들어오자마자 읽은 것으로 처리하므로, 표시 기준은 그 전에 붙잡아 둔다.
+// 그러지 않으면 이번에 온 새 글에 표시가 하나도 안 붙는다.
+let seenBefore = 0
+
+function isNew(item: FeedbackItem): boolean {
+  return new Date(item.createdAt).getTime() > seenBefore
+}
+
 onMounted(async () => {
+  const seen = feedbackSeenAt()
+  seenBefore = seen ? new Date(seen).getTime() : 0
   try {
     items.value = await fetchFeedback()
+    markFeedbackSeen(items.value[0]?.createdAt)
+    unreadFeedback.value = 0
   } catch {
     failed.value = true
   } finally {
@@ -47,8 +66,9 @@ function when(iso: string): string {
     <p v-else-if="failed" class="notice">{{ t('admin.feedbackFailed') }}</p>
     <p v-else-if="items.length === 0" class="notice">{{ t('admin.feedbackEmpty') }}</p>
     <ul v-else class="list">
-      <li v-for="item in items" :key="item.id" class="card">
+      <li v-for="item in items" :key="item.id" class="card" :class="{ unread: isNew(item) }">
         <div class="head">
+          <span v-if="isNew(item)" class="dot" :aria-label="t('admin.feedbackNew')" />
           <span class="badge" :class="item.kind">{{ t(KIND_LABELS.get(item.kind)!) }}</span>
           <span class="who">{{ item.nickname }}</span>
           <time>{{ when(item.createdAt) }}</time>
@@ -99,6 +119,19 @@ function when(iso: string): string {
   padding: 14px 16px;
   background: var(--surface);
   border-radius: 14px;
+}
+
+/* 아직 안 읽은 것 — 왼쪽 띠로 목록을 훑을 때 걸리게 하고, 점은 그 줄에서 확인한다 */
+.card.unread {
+  box-shadow: inset 3px 0 0 #e53935;
+}
+
+.dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #e53935;
 }
 
 .head {

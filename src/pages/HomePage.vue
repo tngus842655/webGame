@@ -29,6 +29,7 @@ import {
   type MyGameStat,
 } from '@/shared/scores'
 import { ensureAdminChecked, fetchGameFlags, isAdmin } from '@/shared/admin'
+import { refreshUnreadFeedback, unreadFeedback } from '@/shared/feedback'
 
 const router = useRouter()
 
@@ -249,7 +250,9 @@ onMounted(async () => {
   // 이때만 응답을 기다렸다 목록을 세운다.
   const firstRun = !hasCachedFlags()
   const flags = fetchGameFlags().catch(() => {})
-  void ensureAdminChecked()
+  void ensureAdminChecked().then((ok) => {
+    if (ok) void refreshUnreadFeedback()
+  })
   const [, , myStats] = await Promise.all([
     flags,
     refreshPopularity(),
@@ -286,8 +289,10 @@ onBeforeUnmount(() => {
   <div class="home">
     <nav class="home-header">
       <RouterLink to="/ranking" :aria-label="t('home.ranking')"><UiIcon name="trophy" /></RouterLink>
-      <RouterLink v-if="isAdmin" to="/admin" :aria-label="t('admin.title')">
+      <RouterLink v-if="isAdmin" class="admin-link" to="/admin" :aria-label="t('admin.title')">
         <UiIcon name="wrench" />
+        <!-- 새 의견이 왔다는 것을 앱을 열자마자 알아야 한다 -->
+        <span v-if="unreadFeedback > 0" class="dot" :aria-label="t('admin.feedbackNew')" />
       </RouterLink>
       <RouterLink to="/settings" :aria-label="t('settings.title')"><UiIcon name="gear" /></RouterLink>
     </nav>
@@ -439,6 +444,22 @@ onBeforeUnmount(() => {
 
 .home-header a:active {
   background: var(--press);
+}
+
+.admin-link {
+  position: relative;
+}
+
+/* 아이콘 오른쪽 위에 걸친다. 바탕색 테두리를 둘러 아이콘 선과 붙어 보이지 않게 */
+.admin-link .dot {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #e53935;
+  box-shadow: 0 0 0 2px var(--bg-top);
 }
 
 .home-header svg {

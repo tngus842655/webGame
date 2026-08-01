@@ -12,6 +12,7 @@ import {
   TOP_KEEP,
   type GameFlag,
 } from '@/shared/admin'
+import { refreshUnreadFeedback, unreadFeedback } from '@/shared/feedback'
 import { popularityRanks } from '@/shared/scores'
 import UiIcon from '@/shared/UiIcon.vue'
 
@@ -32,6 +33,7 @@ const rows = computed(() => all.value.filter((row) => !row.flag.trashedAt))
 const trashedCount = computed(() => all.value.length - rows.value.length)
 
 onMounted(async () => {
+  void refreshUnreadFeedback()
   try {
     const bySlug = new Map((await fetchGameFlags()).map((flag) => [flag.slug, flag]))
     const ranks = popularityRanks(GAMES)
@@ -128,7 +130,10 @@ async function moveToTrash() {
 
     <RouterLink class="menu-link" to="/admin/feedback">
       <span class="menu-label"><UiIcon name="message" />{{ t('admin.feedback') }}</span>
-      <span class="count"><UiIcon name="chevron" /></span>
+      <span class="count">
+        <span v-if="unreadFeedback > 0" class="new">{{ unreadFeedback }}</span>
+        <UiIcon name="chevron" />
+      </span>
     </RouterLink>
 
     <p class="hint">{{ t('admin.hint') }}</p>
@@ -244,6 +249,19 @@ async function moveToTrash() {
 .count {
   color: var(--ink-faint);
   font-weight: normal;
+}
+
+/* 새로 온 의견 수 — 휴지통 개수와 달리 그냥 지나쳐선 안 되는 값이다 */
+.new {
+  min-width: 20px;
+  margin-right: 4px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #e53935;
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
 }
 
 .hint {
