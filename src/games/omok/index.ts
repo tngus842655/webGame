@@ -19,6 +19,7 @@ import {
 } from './state'
 import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 import { drawIconValue } from '../icons'
+import { ground } from '../scene'
 
 // 화면 배치 (논리 720×1280): 교차점 방식 바둑판
 const CELL = 44
@@ -218,18 +219,18 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   }
 
   const draw = () => {
-    const c = stage.begin('#4E342E', '#D7A86E')
+    const c = stage.begin(ground('#4E342E', '#1A100B'), ground('#D7A86E', '#4A331F'))
 
     // HUD: 점수(연승 기반) + 연승 수
     drawScorePanel(c, {
       label: t('hud.score'),
       value: state.score.toLocaleString(),
       sub: true,
-      panelColor: 'rgb(255 255 255 / 0.94)',
-      labelColor: '#BCAAA4',
-      valueColor: '#4E342E',
+      panelColor: ground('rgb(255 255 255 / 0.94)', 'rgb(22 14 9 / 0.86)'),
+      labelColor: ground('#BCAAA4', '#8F7D74'),
+      valueColor: ground('#4E342E', '#E5D8D0'),
     })
-    c.fillStyle = '#8D6E63'
+    c.fillStyle = ground('#8D6E63', '#B9A69C')
     c.font = font(24, true)
     c.fillText(t('om.stage', { n: state.stage, m: MAX_STAGE }), SCORE_PANEL.cx, SCORE_PANEL.subY)
     // 제한 시간이 있는 단은 남은 시간을 크게 보여준다 (10초 아래면 빨갛게)
@@ -257,11 +258,11 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     else if (state.phase === 'aiThinking') c.fillText(t('om.think'), 360, 232)
 
     // 바둑판
-    c.fillStyle = '#E8BB77'
+    c.fillStyle = ground('#E8BB77', '#5A3F27')
     c.beginPath()
     c.roundRect(X0 - 26, Y0 - 26, BOARD_W + 52, BOARD_W + 52, 14)
     c.fill()
-    c.strokeStyle = '#6D4C41'
+    c.strokeStyle = ground('#6D4C41', '#8A6A4E')
     c.lineWidth = 1.6
     c.beginPath()
     for (let i = 0; i < SIZE; i++) {
@@ -272,7 +273,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     }
     c.stroke()
     // 화점
-    c.fillStyle = '#6D4C41'
+    c.fillStyle = ground('#6D4C41', '#8A6A4E')
     for (const gx of [3, 7, 11]) {
       for (const gy of [3, 7, 11]) {
         c.beginPath()

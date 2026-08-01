@@ -16,6 +16,7 @@ import {
   update,
 } from './state'
 import { drawScorePanel, font } from '../ui'
+import { ground } from '../scene'
 
 function drawHeart(c: CanvasRenderingContext2D, x: number, y: number, r: number, filled: boolean) {
   c.save()
@@ -196,12 +197,12 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
 
   const draw = () => {
-    const c = stage.begin('#D8C4A6', '#FFF8E1')
+    const c = stage.begin(ground('#D8C4A6', '#171310'), ground('#FFF8E1', '#221B16'))
 
     // 아레나 바닥
     const floor = c.createLinearGradient(0, ARENA.top, 0, ARENA.bottom)
-    floor.addColorStop(0, '#FFF3D6')
-    floor.addColorStop(1, '#F3E0BC')
+    floor.addColorStop(0, ground('#FFF3D6', '#2A2119'))
+    floor.addColorStop(1, ground('#F3E0BC', '#171310'))
     c.fillStyle = floor
     c.beginPath()
     c.roundRect(ARENA.left, ARENA.top, ARENA.right - ARENA.left, ARENA.bottom - ARENA.top, 22)
@@ -211,7 +212,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.beginPath()
     c.roundRect(ARENA.left, ARENA.top, ARENA.right - ARENA.left, ARENA.bottom - ARENA.top, 22)
     c.clip()
-    c.strokeStyle = 'rgb(141 110 99 / 0.09)'
+    c.strokeStyle = ground('rgb(141 110 99 / 0.09)', 'rgb(255 255 255 / 0.045)')
     c.lineWidth = 2
     for (let gx = ARENA.left; gx <= ARENA.right; gx += 80) {
       c.beginPath(); c.moveTo(gx, ARENA.top); c.lineTo(gx, ARENA.bottom); c.stroke()
@@ -220,7 +221,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.beginPath(); c.moveTo(ARENA.left, gy); c.lineTo(ARENA.right, gy); c.stroke()
     }
     c.restore()
-    c.strokeStyle = 'rgb(141 110 99 / 0.35)'
+    c.strokeStyle = ground('rgb(141 110 99 / 0.35)', 'rgb(255 255 255 / 0.16)')
     c.lineWidth = 5
     c.beginPath()
     c.roundRect(ARENA.left, ARENA.top, ARENA.right - ARENA.left, ARENA.bottom - ARENA.top, 22)
@@ -243,9 +244,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       label: t('sv.kills', { k: state.kills, lv: state.level }),
       value: t('sv.time', { n: Math.floor(state.time) }),
       compact: true,
-      panelColor: 'rgb(255 255 255 / 0.72)',
-      labelColor: '#BCAAA4',
-      valueColor: '#5D4037',
+      panelColor: ground('rgb(255 255 255 / 0.72)', 'rgb(255 255 255 / 0.08)'),
+      labelColor: ground('#BCAAA4', '#8F7D74'),
+      valueColor: ground('#5D4037', '#E5D8D0'),
     })
 
     // 체력 하트
@@ -255,7 +256,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // 경험치 바
     c.save()
-    c.fillStyle = 'rgb(141 110 99 / 0.2)'
+    c.fillStyle = ground('rgb(141 110 99 / 0.2)', 'rgb(255 255 255 / 0.1)')
     c.beginPath()
     c.roundRect(ARENA.left, 132, ARENA.right - ARENA.left, 12, 6)
     c.fill()
@@ -272,7 +273,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (state.joystick) {
       c.save()
       c.globalAlpha = 0.28
-      c.fillStyle = '#5D4037'
+      c.fillStyle = ground('#5D4037', '#E5D8D0')
       c.beginPath()
       c.arc(state.joystick.baseX, state.joystick.baseY, 72, 0, Math.PI * 2)
       c.fill()
@@ -315,7 +316,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         c.restore()
         c.save()
         c.globalAlpha = n > 0 ? 1 : 0.24
-        c.fillStyle = '#FFF8E1'
+        c.fillStyle = ground('#FFF8E1', '#221B16')
         c.font = font(22, true)
         c.fillText(`×${n}`, ux, 306)
         c.restore()
@@ -328,20 +329,20 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         c.beginPath()
         c.roundRect(r.x, r.y + 6, r.w, r.h, 20)
         c.fill()
-        c.fillStyle = '#FFF8E1'
+        c.fillStyle = ground('#FFF8E1', '#221B16')
         c.beginPath()
         c.roundRect(r.x, r.y, r.w, r.h, 20)
         c.fill()
-        c.strokeStyle = '#8D6E63'
+        c.strokeStyle = ground('#8D6E63', '#B9A69C')
         c.lineWidth = 3
         c.stroke()
         c.restore()
         drawUpgradeIcon(c, choice.key, r.x + 62, r.y + r.h / 2)
         c.textAlign = 'left'
-        c.fillStyle = '#5D4037'
+        c.fillStyle = ground('#5D4037', '#E5D8D0')
         c.font = font(32, true)
         c.fillText(t(choice.label), r.x + 116, r.y + 56)
-        c.fillStyle = '#8D6E63'
+        c.fillStyle = ground('#8D6E63', '#B9A69C')
         c.font = font(21)
         c.fillText(t(choice.desc), r.x + 116, r.y + 94)
         c.textAlign = 'center'
@@ -355,7 +356,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       const by = 1130
       c.save()
       c.globalAlpha = 0.3
-      c.fillStyle = '#5D4037'
+      c.fillStyle = ground('#5D4037', '#E5D8D0')
       c.beginPath()
       c.arc(bx, by, 60, 0, Math.PI * 2)
       c.fill()

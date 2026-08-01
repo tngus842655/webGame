@@ -17,6 +17,7 @@ import {
 } from './state'
 import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 import { drawIcon } from '../icons'
+import { ground } from '../scene'
 
 // 화면 배치 (논리 720×1280): 좌측·상단 힌트 영역 ~170px, 그리드는 정사각
 const GRID_X = 190
@@ -188,7 +189,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
 
   const draw = () => {
-    const c = stage.begin('#5C6BC0', '#E8EAF6')
+    const c = stage.begin(ground('#5C6BC0', '#141726'), ground('#E8EAF6', '#1D2136'))
     const size = state.size
     const cell = GRID_W / size
     const clearing = state.phase === 'clearing'
@@ -198,11 +199,11 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       label: t('hud.score'),
       value: state.score.toLocaleString(),
       sub: true,
-      panelColor: 'rgb(255 255 255 / 0.92)',
-      labelColor: '#9FA8DA',
-      valueColor: '#283593',
+      panelColor: ground('rgb(255 255 255 / 0.92)', 'rgb(16 18 34 / 0.86)'),
+      labelColor: ground('#9FA8DA', '#8A93C4'),
+      valueColor: ground('#283593', '#D6DBFF'),
     })
-    c.fillStyle = '#5C6BC0'
+    c.fillStyle = ground('#5C6BC0', '#9AA3D8')
     c.font = font(24)
     c.textAlign = 'left'
     c.fillText(t('no.puzzle', { n: state.level }), SCORE_PANEL.left, SCORE_PANEL.subY)

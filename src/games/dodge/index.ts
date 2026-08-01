@@ -8,6 +8,7 @@ import { CanvasStage } from '../stage'
 import { drawHazard, drawRunner } from './sprites'
 import { FIELD, GRAZE_POINTS, PLAYER_R, PLAYER_Y, createState, scoreOf, update } from './state'
 import { drawScorePanel, font } from '../ui'
+import { ground } from '../scene'
 
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
@@ -79,20 +80,20 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
 
   const draw = () => {
-    const c = stage.begin('#8B98A6', '#ECEFF1')
+    const c = stage.begin(ground('#8B98A6', '#141A20'), ground('#ECEFF1', '#1C242B'))
 
     // 어두워지는 하늘
     const sky = c.createLinearGradient(0, 0, 0, 1280)
-    sky.addColorStop(0, '#C5CED6')
-    sky.addColorStop(0.6, '#E4E9ED')
-    sky.addColorStop(1, '#F5F7F8')
+    sky.addColorStop(0, ground('#C5CED6', '#1B242B'))
+    sky.addColorStop(0.6, ground('#E4E9ED', '#222C33'))
+    sky.addColorStop(1, ground('#F5F7F8', '#2A343C'))
     c.fillStyle = sky
     c.fillRect(0, 0, 720, 1280)
 
     // 바닥
-    c.fillStyle = '#B0BEC5'
+    c.fillStyle = ground('#B0BEC5', '#2E3A42')
     c.fillRect(0, PLAYER_Y + 52, 720, 1280 - PLAYER_Y - 52)
-    c.fillStyle = '#90A4AE'
+    c.fillStyle = ground('#90A4AE', '#26313A')
     c.fillRect(0, PLAYER_Y + 52, 720, 8)
 
     // 낙하물
@@ -112,9 +113,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       label: t('hud.score'),
       value: scoreOf(state).toLocaleString(),
       compact: true,
-      panelColor: 'rgb(255 255 255 / 0.8)',
-      labelColor: '#A6B4BC',
-      valueColor: '#37474F',
+      panelColor: ground('rgb(255 255 255 / 0.8)', 'rgb(14 18 22 / 0.84)'),
+      labelColor: ground('#A6B4BC', '#7D8A92'),
+      valueColor: ground('#37474F', '#DDE5EA'),
     })
 
     // 스침 보너스 — 아슬아슬하게 피할수록 점수가 붙는다는 걸 그 자리에서 알려준다
@@ -132,13 +133,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       const hx = 360 + Math.sin(state.time * 2) * 150
       c.save()
       c.globalAlpha = 0.4
-      c.strokeStyle = '#37474F'
+      c.strokeStyle = ground('#37474F', '#8FA0AA')
       c.lineWidth = 3
       c.beginPath()
       c.arc(hx, PLAYER_Y - 130, 26, 0, Math.PI * 2)
       c.stroke()
       c.globalAlpha = 0.6
-      c.fillStyle = '#37474F'
+      c.fillStyle = ground('#37474F', '#8FA0AA')
       c.beginPath()
       c.arc(hx, PLAYER_Y - 130, 14, 0, Math.PI * 2)
       c.fill()
