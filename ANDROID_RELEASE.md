@@ -193,3 +193,16 @@ TWA는 주소창을 없애려고 이 파일이 필요했다. Capacitor는 웹사
 | 업로드 시 "이미 사용된 버전 코드" | `versionCode`를 더 큰 값으로 올리고 재빌드. Console에서는 못 고친다 |
 | 업로드 시 서명 키 불일치 | `keystore.properties`가 TWA 때 쓰던 키를 가리키는지 확인 |
 | 앱 이름·아이콘이 안 바뀜 | 매니페스트가 아니라 `android/app/src/main/res`를 본다. 아이콘은 `node tools/android-assets.mjs`로 다시 만든다 |
+
+
+## 안드로이드 빌드시 (.aab 파일 생성)
+bash 에서 확인 (프로젝트 경로)
+npm run build
+npx cap sync android
+
+cmd에서
+프로젝트 경로로 들어가서 (cd C:\Workspace\webGame\android)
+gradlew.bat clean
+
+아래 실행하기전에 버전올리기 (C:\Workspace\webGame\android\app - build.gradle)
+gradlew.bat bundleRelease
