@@ -10,6 +10,17 @@
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
     <meta name="theme-color" content="#FFF8E1" />
+    <!-- 테마는 첫 칠 이전에 정해야 다크로 들어갈 때 밝은 화면이 한 번 스치지 않는다.
+         번들은 defer라 여기까지 못 온다 — 저장소 키는 shared/theme.ts와 같아야 한다. -->
+    <script>
+      ;(function () {
+        var saved = localStorage.getItem('webgame:theme')
+        var dark =
+          saved === 'dark' ||
+          (saved !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches)
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+      })()
+    </script>
     <link rel="icon" type="image/png" href="/icon/icon-eng-192-v1.png" />
     <link rel="apple-touch-icon" href="/icon/icon-eng-192-v1.png" />
     <link rel="manifest" href="/manifest.webmanifest" />

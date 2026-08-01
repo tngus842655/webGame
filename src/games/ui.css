@@ -152,6 +152,44 @@
   margin-top: 6px;
 }
 
+/* 게임오버 시트는 캔버스가 아니라 그 위에 뜨는 앱 껍데기라 테마를 따른다.
+   멈춤 화면(GamePlayPage)과 같은 결이어야 한 게임 안에서 어긋나 보이지 않는다.
+   신기록 배지와 획득 점수의 금빛은 두 테마 공통이다 — 어두운 바탕에서도 읽힌다. */
+[data-theme='dark'] .gui-sheet {
+  background: linear-gradient(#332a26, #2a221e);
+  box-shadow:
+    0 26px 60px rgb(0 0 0 / 0.62),
+    inset 0 2px 0 rgb(255 255 255 / 0.06);
+}
+
+[data-theme='dark'] .gui-scrim {
+  color: var(--ink-body);
+}
+
+[data-theme='dark'] .gui-title,
+[data-theme='dark'] .gui-sub,
+[data-theme='dark'] .gui-reason {
+  color: var(--ink-muted);
+}
+
+[data-theme='dark'] .gui-label,
+[data-theme='dark'] .gui-stat-label {
+  color: var(--ink-faint);
+}
+
+[data-theme='dark'] .gui-score,
+[data-theme='dark'] .gui-stat-value {
+  color: var(--ink);
+}
+
+[data-theme='dark'] .gui-gain {
+  text-shadow: 0 2px 0 rgb(0 0 0 / 0.35);
+}
+
+[data-theme='dark'] .gui-stats {
+  border-top-color: rgb(255 255 255 / 0.1);
+}
+
 @keyframes gui-fade {
   from {
     opacity: 0;

@@ -14,6 +14,7 @@ import {
 } from './state'
 import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 import { drawIcon } from '../icons'
+import { ground } from '../scene'
 
 // 화면 배치 (논리 720×1280)
 const CELL = 84
@@ -248,7 +249,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   }
 
   const draw = () => {
-    const c = stage.begin('#263238', '#ECEFF1')
+    const c = stage.begin(ground('#263238', '#15191B'), ground('#ECEFF1', '#1E2427'))
 
     // 상단: 라벨 + 스트릭 + 점수 + 공유
     c.textAlign = 'left'
@@ -261,9 +262,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       label: t('hud.score'),
       value: state.score.toLocaleString(),
       sub: true,
-      panelColor: 'rgb(255 255 255 / 0.92)',
-      labelColor: '#B0BEC5',
-      valueColor: '#263238',
+      panelColor: ground('rgb(255 255 255 / 0.92)', 'rgb(14 18 20 / 0.86)'),
+      labelColor: ground('#B0BEC5', '#7F8B90'),
+      valueColor: ground('#263238', '#E2E8EA'),
     })
     c.textAlign = 'center'
     c.fillStyle = '#78909C'

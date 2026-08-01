@@ -16,6 +16,7 @@ import {
 } from './state'
 import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 import { drawIcon } from '../icons'
+import { ground } from '../scene'
 
 // 화면 배치 (논리 720×1280)
 const GRID_X = 36
@@ -163,7 +164,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
 
   const draw = () => {
-    const c = stage.begin('#00796B', '#E0F2F1')
+    const c = stage.begin(ground('#00796B', '#08211E'), ground('#E0F2F1', '#0F2E29'))
     const clearing = state.phase === 'clearing'
     const sel = state.selected
     const selDigit = sel >= 0 ? state.cells[sel] : 0
@@ -173,11 +174,11 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       label: t('hud.score'),
       value: state.score.toLocaleString(),
       sub: true,
-      panelColor: 'rgb(255 255 255 / 0.94)',
-      labelColor: '#80CBC4',
-      valueColor: '#004D40',
+      panelColor: ground('rgb(255 255 255 / 0.94)', 'rgb(6 24 22 / 0.86)'),
+      labelColor: ground('#80CBC4', '#6E9E98'),
+      valueColor: ground('#004D40', '#CFEAE5'),
     })
-    c.fillStyle = '#00796B'
+    c.fillStyle = ground('#00796B', '#7FBDB4')
     c.font = font(24)
     c.textAlign = 'left'
     const now = new Date()

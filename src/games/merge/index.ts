@@ -26,6 +26,7 @@ import {
 } from './state'
 import { drawScorePanel, font } from '../ui'
 import { drawIcon } from '../icons'
+import { ground } from '../scene'
 
 const REVIVE_SECONDS = 60
 
@@ -149,11 +150,11 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
 
   const draw = () => {
-    const c = stage.begin('#D9C3A0', '#FFF8E1')
+    const c = stage.begin(ground('#D9C3A0', '#171310'), ground('#FFF8E1', '#221B16'))
     const sky = c.createLinearGradient(0, 0, 0, LAYOUT.height)
-    sky.addColorStop(0, '#FFF4DA')
-    sky.addColorStop(0.5, '#FFF8E1')
-    sky.addColorStop(1, '#EFE0C0')
+    sky.addColorStop(0, ground('#FFF4DA', '#2A2119'))
+    sky.addColorStop(0.5, ground('#FFF8E1', '#221B16'))
+    sky.addColorStop(1, ground('#EFE0C0', '#171310'))
     c.fillStyle = sky
     c.fillRect(0, 0, LAYOUT.width, LAYOUT.height)
 
@@ -170,10 +171,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     // HUD: 스테이지 · 점수 · 황금 화분 진행
     c.textAlign = 'center'
     card(30, 24, 150, 80)
-    c.fillStyle = '#A1887F'
+    c.fillStyle = ground('#A1887F', '#8F7D74')
     c.font = font(18)
     c.fillText(t('merge.stageLabel'), 105, 50)
-    c.fillStyle = '#5D4037'
+    c.fillStyle = ground('#5D4037', '#E5D8D0')
     c.font = font(34, true)
     c.fillText(String(state.stage), 105, 88)
 
@@ -181,15 +182,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       label: t('hud.score'),
       value: state.score.toLocaleString(),
       compact: true,
-      panelColor: 'rgb(255 255 255 / 0.75)',
-      labelColor: '#A1887F',
-      valueColor: '#5D4037',
+      panelColor: ground('rgb(255 255 255 / 0.75)', 'rgb(255 255 255 / 0.08)'),
+      labelColor: ground('#A1887F', '#8F7D74'),
+      valueColor: ground('#5D4037', '#E5D8D0'),
     })
 
     const goal = stageGoal(state.stage)
     card(456, 24, 234, 80)
     drawPlant(c, 496, 66, 26, MAX_LEVEL)
-    c.fillStyle = '#5D4037'
+    c.fillStyle = ground('#5D4037', '#E5D8D0')
     c.font = font(34, true)
     c.fillText(`${state.goldMade} / ${goal}`, 600, 78)
 
@@ -201,7 +202,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const barY = 156
     const barH = 30
     c.save()
-    c.fillStyle = 'rgb(93 64 55 / 0.15)'
+    c.fillStyle = ground('rgb(93 64 55 / 0.15)', 'rgb(255 255 255 / 0.1)')
     c.beginPath()
     c.roundRect(barX, barY, barW, barH, 15)
     c.fill()
@@ -228,11 +229,11 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const boardW = COLS * LAYOUT.cell
     const boardH = ROWS * LAYOUT.cell
     c.save()
-    c.fillStyle = 'rgb(255 255 255 / 0.45)'
+    c.fillStyle = ground('rgb(255 255 255 / 0.45)', 'rgb(255 255 255 / 0.08)')
     c.beginPath()
     c.roundRect(LAYOUT.boardX - 10, LAYOUT.boardY - 10, boardW + 20, boardH + 20, 22)
     c.fill()
-    c.strokeStyle = 'rgb(141 110 99 / 0.28)'
+    c.strokeStyle = ground('rgb(141 110 99 / 0.28)', 'rgb(255 255 255 / 0.14)')
     c.lineWidth = 3
     c.stroke()
     c.restore()
@@ -242,7 +243,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       for (let col = 0; col < COLS; col++) {
         const idx = row * COLS + col
         const [px, py] = cellPos(col, row)
-        c.fillStyle = 'rgb(93 64 55 / 0.07)'
+        c.fillStyle = ground('rgb(93 64 55 / 0.07)', 'rgb(255 255 255 / 0.07)')
         c.beginPath()
         c.roundRect(px, py, cellSize, cellSize, 14)
         c.fill()
@@ -286,7 +287,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const roomLeft = hasEmptyCell(state)
     if (!roomLeft && state.phase === 'playing') {
       c.textAlign = 'center'
-      c.fillStyle = '#8D6E63'
+      c.fillStyle = ground('#8D6E63', '#B9A69C')
       c.font = font(26, true)
       c.fillText(t('merge.full'), 360, 176)
     }

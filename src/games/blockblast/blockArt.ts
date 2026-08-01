@@ -1,3 +1,4 @@
+import { isDarkTheme } from '@/shared/theme'
 import { COLORS, type BlockColor } from './config'
 
 // 블록 벡터 아트 — 입체감 있는 캔디 블록. 셀 하나를 정사각 영역(px, py, size)에 그린다.
@@ -75,7 +76,8 @@ export function drawEmptyCell(
   const w = size - gap * 2
   const r = w * 0.22
 
-  c.fillStyle = 'rgb(93 64 55 / 0.09)'
+  // 어두운 판 위에서는 갈색 그늘이 보이지 않아 밝은 쪽으로 뒤집는다
+  c.fillStyle = isDarkTheme() ? 'rgb(255 255 255 / 0.07)' : 'rgb(93 64 55 / 0.09)'
   c.beginPath()
   c.roundRect(x, y, w, w, r)
   c.fill()

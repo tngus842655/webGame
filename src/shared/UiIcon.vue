@@ -13,6 +13,13 @@ defineProps<{
     | 'target'
     | 'tap'
     | 'star'
+    | 'star-fill'
+    | 'flame'
+    | 'sparkle'
+    | 'gamepad'
+    | 'clock'
+    | 'dice'
+    | 'play'
     | 'check'
 }>()
 </script>
@@ -78,6 +85,53 @@ defineProps<{
       <path d="M13 10.4a1.8 1.8 0 0 1 3.6 0v1a1.8 1.8 0 0 1 3.5.6c0 4.6-2 8.4-6 8.4-3.4 0-5.1-2-6.4-4.4l-2.3-4a1.8 1.8 0 0 1 3-2z" />
     </g>
 
+    <!-- 즐겨찾기가 켜진 상태 — 같은 별을 속만 채운다 -->
+    <path
+      v-else-if="name === 'star-fill'"
+      fill="currentColor"
+      stroke="none"
+      d="M12 3.4l2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.8l-5.3 2.8 1.1-5.9L3.5 9.6l5.9-.8z"
+    />
+
+    <!-- 칸 제목표에 들어가는 것들은 12px 남짓으로 줄어든다.
+         선으로 그리면 그 크기에서 뭉개져서 면으로 채운다. -->
+    <path
+      v-else-if="name === 'flame'"
+      fill="currentColor"
+      stroke="none"
+      d="M12 2.2c4.2 3.6 6.4 6.6 6.4 9.8a6.4 6.4 0 0 1-12.8 0c0-3.2 2.2-6.2 6.4-9.8z"
+    />
+
+    <g v-else-if="name === 'sparkle'" fill="currentColor" stroke="none">
+      <path d="M10.6 2.4 12.3 7.6 17.5 9.3 12.3 11 10.6 16.2 8.9 11 3.7 9.3 8.9 7.6z" />
+      <path d="M17.4 13.6 18.3 16.4 21.1 17.3 18.3 18.2 17.4 21 16.5 18.2 13.7 17.3 16.5 16.4z" />
+    </g>
+
+    <g v-else-if="name === 'gamepad'">
+      <path
+        d="M8.3 7.6h7.4a5 5 0 0 1 4.9 4l.7 3.9a2.7 2.7 0 0 1-5 1.9L15.3 16H8.7l-1 1.4a2.7 2.7 0 0 1-5-1.9l.7-3.9a5 5 0 0 1 4.9-4z"
+      />
+      <path d="M6.9 11.7v2.1M5.9 12.8h2" />
+      <circle cx="16.1" cy="12.1" r="1.1" fill="currentColor" stroke="none" />
+      <circle cx="18" cy="14" r="1.1" fill="currentColor" stroke="none" />
+    </g>
+
+    <g v-else-if="name === 'clock'">
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.1V12l3.4 2" />
+    </g>
+
+    <g v-else-if="name === 'dice'">
+      <rect x="3.7" y="3.7" width="16.6" height="16.6" rx="4.4" />
+      <g fill="currentColor" stroke="none">
+        <circle cx="8.4" cy="8.4" r="1.35" />
+        <circle cx="12" cy="12" r="1.35" />
+        <circle cx="15.6" cy="15.6" r="1.35" />
+      </g>
+    </g>
+
+    <path v-else-if="name === 'play'" fill="currentColor" stroke="none" d="M7.8 5.2 19.2 12 7.8 18.8z" />
+
     <path
       v-else
       d="M12 3.4l2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.8l-5.3 2.8 1.1-5.9L3.5 9.6l5.9-.8z"
@@ -86,7 +140,11 @@ defineProps<{
 </template>
 
 <style scoped>
-.ui-icon {
+/* 크기는 놓이는 자리가 정하고, 여기 값은 아무도 안 정했을 때의 바탕이다.
+   :where()로 감싸 특정도를 0으로 만들지 않으면 이 규칙이 (클래스 + 스코프 속성)
+   바깥의 `dt svg`·`.back svg`처럼 클래스 없는 규칙을 이겨서, 아이콘이 지정한
+   크기를 무시하고 칸을 통째로 채운다 — 설명 팝업과 뒤로가기가 그랬다. */
+:where(.ui-icon) {
   display: block;
   width: 100%;
   height: 100%;

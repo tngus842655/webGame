@@ -19,6 +19,7 @@ import {
 } from './state'
 import { drawScorePanel, font } from '../ui'
 import { drawIconValue } from '../icons'
+import { ground } from '../scene'
 
 const TIER_COLORS = ['', '#8D6E63', '#43A047', '#1E88E5', '#8E24AA', '#F4511E', '#FDD835', '#E53935']
 const ENEMY_COLORS = { normal: '#EF5350', fast: '#FFB300', tank: '#795548', boss: '#7B1FA2' } as const
@@ -270,10 +271,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   }
 
   const draw = () => {
-    const c = stage.begin('#33691E', '#9CCC65')
+    const c = stage.begin(ground('#33691E', '#0E1A08'), ground('#9CCC65', '#223A16'))
 
     // 경로
-    c.strokeStyle = '#BCAAA4'
+    c.strokeStyle = ground('#BCAAA4', '#6A5B52')
     c.lineWidth = 90
     c.lineJoin = 'round'
     c.lineCap = 'round'
@@ -281,7 +282,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.moveTo(WAYPOINTS[0][0], WAYPOINTS[0][1])
     for (const [x, y] of WAYPOINTS.slice(1)) c.lineTo(x, y)
     c.stroke()
-    c.strokeStyle = '#A1887F'
+    c.strokeStyle = ground('#A1887F', '#6A5B52')
     c.lineWidth = 4
     c.setLineDash([18, 22])
     c.beginPath()
@@ -293,8 +294,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     // 슬롯
     for (let i = 0; i < SLOTS.length; i++) {
       const [x, y] = SLOTS[i]
-      c.fillStyle = '#7CB342'
-      c.strokeStyle = '#558B2F'
+      c.fillStyle = ground('#7CB342', '#3B5C22')
+      c.strokeStyle = ground('#558B2F', '#2A4416')
       c.lineWidth = 3
       c.beginPath()
       c.roundRect(x - 48, y - 48, 96, 96, 14)
@@ -361,9 +362,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     drawScorePanel(c, {
       label: t('hud.score'),
       value: state.score.toLocaleString(),
-      panelColor: 'rgb(255 255 255 / 0.94)',
-      labelColor: '#AED581',
-      valueColor: '#33691E',
+      panelColor: ground('rgb(255 255 255 / 0.94)', 'rgb(16 26 12 / 0.86)'),
+      labelColor: ground('#AED581', '#93AC7E'),
+      valueColor: ground('#33691E', '#D2E7BF'),
     })
     c.font = font(30, true)
     c.fillStyle = '#FFFFFF'

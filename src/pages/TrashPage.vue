@@ -4,14 +4,11 @@
 import { GAMES } from '@/games/registry'
 import GameCard from '@/shared/GameCard.vue'
 import { t } from '@/shared/i18n'
-import { getLocalBest, popularityRanks, trashedGames } from '@/shared/scores'
+import { getLocalBest, trashedGames } from '@/shared/scores'
 import UiIcon from '@/shared/UiIcon.vue'
 
-// 순위는 홈과 같은 기준으로 매긴다 — 그래서 홈에서 비어 보이는 번호가 여기에 있다
-const ranks = popularityRanks(GAMES)
 const cards = trashedGames(GAMES).map((game) => ({
   ...game,
-  rank: ranks.get(game.slug) ?? null,
   best: getLocalBest(game.slug),
 }))
 </script>
@@ -32,7 +29,6 @@ const cards = trashedGames(GAMES).map((game) => ({
         :key="game.slug"
         :slug="game.slug"
         :title-key="game.titleKey"
-        :rank="game.rank"
         :label="game.best === null ? '' : t('home.best', { n: game.best.toLocaleString() })"
       />
     </main>
@@ -59,19 +55,21 @@ const cards = trashedGames(GAMES).map((game) => ({
   margin-bottom: 16px;
   font-size: 13px;
   line-height: 1.5;
-  color: #bcaaa4;
+  color: var(--ink-faint);
   word-break: keep-all;
 }
 
 .notice {
   padding: 40px 0;
   text-align: center;
-  color: #8d6e63;
+  color: var(--ink-muted);
 }
 
+/* 홈과 같은 이유로 minmax(0, …) — 1fr은 min-content 아래로 줄지 않아
+   좁은 화면에서 카드가 오른쪽으로 넘친다 */
 .game-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 }
 

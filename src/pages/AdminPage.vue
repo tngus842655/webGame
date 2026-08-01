@@ -198,7 +198,7 @@ async function moveToTrash() {
 
 .stats-link {
   font-size: 13px;
-  color: #8d6e63;
+  color: var(--ink-muted);
   text-decoration: underline;
 }
 
@@ -208,7 +208,7 @@ async function moveToTrash() {
   justify-content: space-between;
   padding: 14px 16px;
   margin-bottom: 12px;
-  background: #fff;
+  background: var(--surface);
   border-radius: 14px;
   font-size: 15px;
   font-weight: bold;
@@ -223,7 +223,7 @@ async function moveToTrash() {
 
 .menu-link .count {
   gap: 2px;
-  color: #bcaaa4;
+  color: var(--ink-faint);
 }
 
 .trash-label svg {
@@ -237,7 +237,7 @@ async function moveToTrash() {
 }
 
 .count {
-  color: #bcaaa4;
+  color: var(--ink-faint);
   font-weight: normal;
 }
 
@@ -245,20 +245,20 @@ async function moveToTrash() {
   margin-bottom: 12px;
   font-size: 13px;
   line-height: 1.5;
-  color: #bcaaa4;
+  color: var(--ink-faint);
   word-break: keep-all;
 }
 
 .error {
   margin-bottom: 10px;
   font-size: 13px;
-  color: #c62828;
+  color: var(--danger);
 }
 
 .notice {
   padding: 40px 0;
   text-align: center;
-  color: #8d6e63;
+  color: var(--ink-muted);
 }
 
 .list {
@@ -273,7 +273,7 @@ async function moveToTrash() {
   align-items: center;
   gap: 12px;
   padding: 12px 14px;
-  background: #fff;
+  background: var(--surface);
   border-radius: 14px;
 }
 
@@ -306,7 +306,7 @@ async function moveToTrash() {
 .rank {
   flex: none;
   font-size: 11px;
-  color: #bcaaa4;
+  color: var(--ink-faint);
 }
 
 /* 30위 밖 = 휴지통 후보 */
@@ -321,7 +321,7 @@ async function moveToTrash() {
   gap: 14px;
   margin-top: 6px;
   font-size: 12px;
-  color: #8d6e63;
+  color: var(--ink-muted);
 }
 
 .controls label {
@@ -359,7 +359,7 @@ async function moveToTrash() {
   width: 100%;
   max-width: 320px;
   padding: 22px 20px 16px;
-  background: #fff;
+  background: var(--surface);
   border-radius: 18px;
   box-shadow: 0 12px 32px rgb(62 39 35 / 0.25);
 }
@@ -367,7 +367,7 @@ async function moveToTrash() {
 .ask {
   font-size: 15px;
   line-height: 1.55;
-  color: #4e342e;
+  color: var(--ink);
   text-align: center;
   word-break: keep-all;
 }
@@ -390,8 +390,8 @@ async function moveToTrash() {
 }
 
 .cancel {
-  background: #efebe9;
-  color: #6d4c41;
+  background: var(--line-soft);
+  color: var(--ink-body);
 }
 
 .danger {
@@ -404,7 +404,7 @@ async function moveToTrash() {
   padding: 4px 10px;
   border: 1px solid #ffccbc;
   border-radius: 8px;
-  background: #fff;
+  background: var(--surface);
   font: inherit;
   font-size: 12px;
   color: #e65100;

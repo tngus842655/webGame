@@ -58,8 +58,8 @@ const guide = computed(() => guideFor(props.slug))
   overflow-y: auto;
   padding: 22px 20px 18px;
   border-radius: 22px;
-  background: #fffdf7;
-  color: #4e342e;
+  background: var(--surface);
+  color: var(--ink);
   box-shadow: 0 18px 40px rgb(0 0 0 / 0.28);
 }
 
@@ -80,7 +80,7 @@ dt {
   margin-bottom: 5px;
   font-size: 13px;
   font-weight: 700;
-  color: #a1887f;
+  color: var(--ink-faint);
 }
 
 dt svg {

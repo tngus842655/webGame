@@ -4,7 +4,8 @@ import { ref } from 'vue'
 // 게임은 매 프레임 다시 그리므로 언어 변경이 즉시 반영된다.
 // 번역 범위: 사용자에게 보이는 것은 13개 언어 전부 채운다 (허브·게임 내부·가이드·광고).
 // 예외는 둘뿐 — 관리자/통계/개발노트 화면은 운영자만 보므로 ko/en만,
-// 개인정보처리방침은 법적 문서라 한국어만 (PrivacyPage.vue 주석 참고).
+// 이용약관과 개인정보처리방침은 법적 문서라 제목만 번역하고 본문은 한국어만
+// (PrivacyPage.vue 주석 참고).
 
 export type Locale =
   | 'ko'
@@ -57,9 +58,18 @@ const en = {
   'home.ranking': 'Rankings',
   'common.back': 'Home',
   'common.tapClose': 'Tap anywhere to close',
+  // 탭에 세 개가 나란히 서므로 짧게 — 한국어는 글자가 좁아 한 낱말 더 들어간다
   'home.sectionNew': 'New',
-  'home.sectionPopular': 'Popular',
-  'home.sectionMore': 'More games',
+  'home.sectionFavorites': 'Favorites',
+  'home.sectionMore': 'More',
+  'home.sectionPopular': 'Popular Top 3',
+  'home.sectionRecent': 'Recently played',
+  'home.play': 'Play',
+  'home.random': 'Random',
+  'home.favoriteAdd': 'Add to favorites',
+  'home.favoriteRemove': 'Remove from favorites',
+  'home.favoritesEmpty': 'Tap the star on a game card and it will wait for you here.',
+  'home.newEmpty': 'New games will show up here.',
   'trash.title': 'Trash',
   'trash.hint': 'Games that moved out of the main list. You can still play them here.',
   'trash.empty': 'Nothing here yet.',
@@ -119,8 +129,31 @@ const en = {
   'settings.sound': 'Sound',
   'settings.soundOn': 'Sound effects',
   'settings.musicOn': 'Background music',
+  'settings.theme': 'Theme',
+  'settings.themeLight': 'Light',
+  'settings.themeDark': 'Dark',
+  'settings.themeSystem': 'System',
   'settings.language': 'Language',
+  'terms.title': 'Terms of Service',
   'privacy.title': 'Privacy Policy',
+  'del.title': 'Delete account & data',
+  'del.intro': 'This removes your account and every game record tied to it. Deletion happens right away and cannot be undone.',
+  'del.removedTitle': 'What gets deleted',
+  'del.removedAccount': 'Account: anonymous identifier, nickname',
+  'del.removedSocial': 'Linked account: Google or Kakao identifier, profile photo, email address',
+  'del.removedRecords': 'Game records: scores, ranking entries, play time',
+  'del.removedNote': 'Your entries disappear from the rankings too. Opening the app again starts a fresh guest account.',
+  'del.button': 'Delete account',
+  'del.noSession': 'Couldn\'t find your sign-in. Open a game in the app once, then try again.',
+  'del.confirmAsk': 'Delete for good? Records cannot be recovered.',
+  'del.cancel': 'Cancel',
+  'del.confirm': 'Delete',
+  'del.deleting': 'Deleting…',
+  'del.failed': 'Couldn\'t delete. Try again in a moment, or let us know at the address below.',
+  'del.uninstallTitle': 'Is uninstalling enough?',
+  'del.uninstallBody': 'Uninstalling the app does not remove records stored on the server. Use the button above to delete them.',
+  'del.askTitle': 'Ask us directly',
+  'del.askBody': 'If the button does not work or you cannot open the app, email us your nickname and the address of the linked account. We handle requests within 7 business days of verifying it is you.',
   'account.title': 'Account',
   'account.hint': 'You can keep playing without linking. But records stay on this device only.',
   'account.linked': 'Linked with {provider}.',

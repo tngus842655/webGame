@@ -16,6 +16,7 @@ import {
   update,
 } from './state'
 import { drawScorePanel, font } from '../ui'
+import { ground } from '../scene'
 
 // 먼지·반짝임 한 알
 interface Particle {
@@ -170,7 +171,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   // 먼 산 — 가장 느리게 흐르는 배경 층
   const drawFarRange = (c: CanvasRenderingContext2D, scroll: number) => {
     c.save()
-    c.fillStyle = '#BFE0C4'
+    c.fillStyle = ground('#BFE0C4', '#1E3A2A')
     for (let i = -1; i < 5; i++) {
       const hx = ((i * 260 - scroll * 0.08) % 1560 + 1560) % 1560 - 260
       c.beginPath()
@@ -348,20 +349,20 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   }
 
   const draw = () => {
-    const c = stage.begin('#9FD3E8', '#E1F5FE')
+    const c = stage.begin(ground('#9FD3E8', '#0E1E2A'), ground('#E1F5FE', '#152A38'))
     const scroll = state.distance
 
     // 하늘
     const sky = c.createLinearGradient(0, 0, 0, GROUND_Y)
-    sky.addColorStop(0, '#63BFEA')
-    sky.addColorStop(0.55, '#A9DEF4')
-    sky.addColorStop(1, '#DDF3FB')
+    sky.addColorStop(0, ground('#63BFEA', '#101F30'))
+    sky.addColorStop(0.55, ground('#A9DEF4', '#183245'))
+    sky.addColorStop(1, ground('#DDF3FB', '#22465A'))
     c.fillStyle = sky
     c.fillRect(0, 0, 720, GROUND_Y)
 
     // 해
     c.save()
-    c.fillStyle = 'rgb(255 245 200 / 0.85)'
+    c.fillStyle = ground('rgb(255 245 200 / 0.85)', 'rgb(226 238 255 / 0.7)')
     c.beginPath()
     c.arc(596, 150, 52, 0, Math.PI * 2)
     c.fill()
@@ -403,8 +404,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // 땅: 흙 그라데이션 + 잔디 + 흐르는 자갈
     const dirt = c.createLinearGradient(0, GROUND_Y, 0, 1280)
-    dirt.addColorStop(0, '#A1785F')
-    dirt.addColorStop(1, '#6D4C41')
+    dirt.addColorStop(0, ground('#A1785F', '#3B2A20'))
+    dirt.addColorStop(1, ground('#6D4C41', '#281C16'))
     c.fillStyle = dirt
     c.fillRect(0, GROUND_Y, 720, 1280 - GROUND_Y)
     c.fillStyle = '#7CB342'
@@ -524,9 +525,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     drawScorePanel(c, {
       label: t('hud.score'),
       value: scoreOf(state).toLocaleString(),
-      panelColor: 'rgb(255 255 255 / 0.85)',
-      labelColor: '#90CAF9',
-      valueColor: '#0D47A1',
+      panelColor: ground('rgb(255 255 255 / 0.85)', 'rgb(10 20 30 / 0.86)'),
+      labelColor: ground('#90CAF9', '#7FA6C9'),
+      valueColor: ground('#0D47A1', '#D7E9FF'),
     })
 
     // 텍스트 없는 조작 안내: 위로 튀는 탭 표식

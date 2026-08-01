@@ -17,10 +17,19 @@ import {
 } from './state'
 import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 import { drawIconValue } from '../icons'
+import { ground } from '../scene'
+import { isDarkTheme } from '@/shared/theme'
 
 // 고도에 따라 하늘색이 어두워진다
-const SKY_LOW = [142, 208, 245]
+// 아래쪽 하늘은 테마를 탄다. 위로 올라갈수록 밤이 되는 게임이라
+// 다크에서는 시작부터 해가 진 하늘에서 출발한다.
+const SKY_LOW_LIGHT = [142, 208, 245]
+const SKY_LOW_DARK = [18, 32, 48]
 const SKY_HIGH = [26, 35, 66]
+
+function skyLow() {
+  return isDarkTheme() ? SKY_LOW_DARK : SKY_LOW_LIGHT
+}
 
 function lerpColor(a: number[], b: number[], k: number): string {
   const c = a.map((v, i) => Math.round(v + (b[i] - v) * k))
@@ -135,7 +144,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const draw = () => {
     const altitude = Math.max(0, state.camY - 540)
     const k = Math.min(1, altitude / 9000)
-    const c = stage.begin(lerpColor(SKY_LOW, SKY_HIGH, Math.min(1, k + 0.15)), lerpColor(SKY_LOW, SKY_HIGH, k))
+    const c = stage.begin(
+      lerpColor(skyLow(), SKY_HIGH, Math.min(1, k + 0.15)),
+      lerpColor(skyLow(), SKY_HIGH, k),
+    )
 
     // 장식: 낮은 곳엔 구름, 높은 곳엔 별
     const bandTop = Math.floor((state.camY + 700) / 300)
@@ -219,9 +231,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       label: t('hud.score'),
       value: `${meters(state.maxHeight)}m`,
       sub: true,
-      panelColor: 'rgb(255 255 255 / 0.92)',
-      labelColor: '#90A4AE',
-      valueColor: '#37474F',
+      panelColor: ground('rgb(255 255 255 / 0.92)', 'rgb(12 16 24 / 0.86)'),
+      labelColor: ground('#90A4AE', '#7D8A92'),
+      valueColor: ground('#37474F', '#DDE5EA'),
     })
     c.font = font(24)
     c.fillStyle = '#78909C'

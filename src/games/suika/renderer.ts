@@ -5,6 +5,57 @@ import { drawFruit } from '../fruitArt'
 import { POP_DURATION, POPUP_DURATION, SPARK_DURATION, type SuikaState } from './state'
 import type { SuikaWorld } from './world'
 import { drawScorePanel, font } from '../ui'
+import { isDarkTheme } from '@/shared/theme'
+
+// 판의 바탕만 테마를 탄다. 과일 색(config.ts의 TIERS)은 이 게임의 정체라
+// 두 테마에서 같은 값을 쓴다 — 어둡게 바꾸면 다른 게임이 된다.
+const SCENE = {
+  light: {
+    outer: '#F2D9AE',
+    board: '#FFF8E1',
+    skyTop: '#FFF3D6',
+    skyMid: '#FFF8E1',
+    skyLow: '#F7E3BE',
+    blob: '#FFE7B8',
+    jarTop: 'rgb(255 255 255 / 0.55)',
+    jarLow: 'rgb(255 244 214 / 0.85)',
+    floorShade: 'rgb(141 110 99 / 0.18)',
+    glass: '#FFFFFF',
+    rim: '#B98A5E',
+    rimLight: 'rgb(255 255 255 / 0.45)',
+    mouth: '#A97549',
+    panel: 'rgb(255 255 255 / 0.78)',
+    label: '#BCAAA4',
+    value: '#5D4037',
+    nextPanel: '#FFFFFF',
+    hint: '#8D6E63',
+  },
+  dark: {
+    outer: '#181310',
+    board: '#221B16',
+    skyTop: '#2B2219',
+    skyMid: '#221B16',
+    skyLow: '#16110D',
+    blob: '#3A2C1C',
+    jarTop: 'rgb(255 255 255 / 0.08)',
+    jarLow: 'rgb(255 232 190 / 0.05)',
+    floorShade: 'rgb(0 0 0 / 0.32)',
+    // globalAlpha와 곱해지므로 밝은 쪽은 색 자체를 낮춰 유리 반사만 남긴다
+    glass: 'rgb(255 240 214 / 0.5)',
+    rim: '#6E4F32',
+    rimLight: 'rgb(255 255 255 / 0.16)',
+    mouth: '#5F4229',
+    panel: 'rgb(24 19 16 / 0.8)',
+    label: '#8F7D74',
+    value: '#E5D8D0',
+    nextPanel: '#2C231C',
+    hint: '#B9A69C',
+  },
+} as const
+
+function scene() {
+  return isDarkTheme() ? SCENE.dark : SCENE.light
+}
 
 const JAR_RADIUS = 62
 const DANGER_BAND = 120 // 위험 경고 그라데이션 높이
@@ -51,19 +102,20 @@ export class SuikaRenderer {
 
   private drawBackground() {
     const { c } = this
-    this.stage.begin('#F2D9AE', '#FFF8E1')
+    const s = scene()
+    this.stage.begin(s.outer, s.board)
     // 위쪽에서 내려오는 은은한 빛
     const sky = c.createLinearGradient(0, 0, 0, BOARD.height)
-    sky.addColorStop(0, '#FFF3D6')
-    sky.addColorStop(0.45, '#FFF8E1')
-    sky.addColorStop(1, '#F7E3BE')
+    sky.addColorStop(0, s.skyTop)
+    sky.addColorStop(0.45, s.skyMid)
+    sky.addColorStop(1, s.skyLow)
     c.fillStyle = sky
     c.fillRect(0, 0, BOARD.width, BOARD.height)
 
     // 배경 장식: 흐릿한 원 몇 개
     c.save()
     c.globalAlpha = 0.35
-    c.fillStyle = '#FFE7B8'
+    c.fillStyle = s.blob
     for (const [bx, by, br] of [
       [130, 210, 90],
       [610, 300, 60],
@@ -88,8 +140,8 @@ export class SuikaRenderer {
     c.save()
     this.jarPath(left, top, right, bottom)
     const inner = c.createLinearGradient(0, top, 0, bottom)
-    inner.addColorStop(0, 'rgb(255 255 255 / 0.55)')
-    inner.addColorStop(1, 'rgb(255 244 214 / 0.85)')
+    inner.addColorStop(0, scene().jarTop)
+    inner.addColorStop(1, scene().jarLow)
     c.fillStyle = inner
     c.fill()
 
@@ -97,8 +149,8 @@ export class SuikaRenderer {
     c.save()
     c.clip()
     const floorShadow = c.createLinearGradient(0, bottom - 120, 0, bottom)
-    floorShadow.addColorStop(0, 'rgb(141 110 99 / 0)')
-    floorShadow.addColorStop(1, 'rgb(141 110 99 / 0.18)')
+    floorShadow.addColorStop(0, 'rgb(0 0 0 / 0)')
+    floorShadow.addColorStop(1, scene().floorShade)
     c.fillStyle = floorShadow
     c.fillRect(left, bottom - 120, right - left, 120)
     c.restore()
@@ -118,7 +170,7 @@ export class SuikaRenderer {
     this.jarPath(left, top, right, bottom)
     c.clip()
     c.globalAlpha = 0.45
-    c.fillStyle = '#FFFFFF'
+    c.fillStyle = scene().glass
     c.beginPath()
     c.moveTo(left + 24, top + 50)
     c.lineTo(left + 50, top + 50)
@@ -132,17 +184,17 @@ export class SuikaRenderer {
     c.save()
     this.jarPath(left, top, right, bottom)
     c.lineCap = 'round'
-    c.strokeStyle = '#B98A5E'
+    c.strokeStyle = scene().rim
     c.lineWidth = 14
     c.stroke()
-    c.strokeStyle = 'rgb(255 255 255 / 0.45)'
+    c.strokeStyle = scene().rimLight
     c.lineWidth = 5
     c.stroke()
     c.restore()
 
     // 상단 입구 (통 테두리 마감)
     c.save()
-    c.strokeStyle = '#A97549'
+    c.strokeStyle = scene().mouth
     c.lineWidth = 14
     c.lineCap = 'round'
     c.beginPath()
@@ -289,14 +341,14 @@ export class SuikaRenderer {
       label: t('hud.score'),
       value: state.score.toLocaleString(),
       compact: true,
-      panelColor: 'rgb(255 255 255 / 0.78)',
-      labelColor: '#BCAAA4',
-      valueColor: '#5D4037',
+      panelColor: scene().panel,
+      labelColor: scene().label,
+      valueColor: scene().value,
     })
 
     // 다음 과일 (라벨 대신 작은 점 3개로 표현)
     c.save()
-    c.fillStyle = '#FFFFFF'
+    c.fillStyle = scene().nextPanel
     c.globalAlpha = 0.75
     c.beginPath()
     c.roundRect(566, 34, 124, 124, 26)
@@ -304,7 +356,7 @@ export class SuikaRenderer {
     c.restore()
     c.save()
     c.globalAlpha = 0.45
-    c.fillStyle = '#BCAAA4'
+    c.fillStyle = scene().label
     for (let i = 0; i < 3; i++) {
       c.beginPath()
       c.arc(612 + i * 16, 56, 3.5, 0, Math.PI * 2)
@@ -331,7 +383,7 @@ export class SuikaRenderer {
       if (i < count - 1) {
         c.save()
         c.globalAlpha = 0.3
-        c.fillStyle = '#8D6E63'
+        c.fillStyle = scene().hint
         c.beginPath()
         c.arc(x + gap / 2, CHART_Y, 2.5, 0, Math.PI * 2)
         c.fill()
@@ -350,14 +402,14 @@ export class SuikaRenderer {
 
     c.save()
     c.globalAlpha = 0.5
-    c.strokeStyle = '#8D6E63'
+    c.strokeStyle = scene().hint
     c.lineWidth = 3
     c.beginPath()
     c.arc(x, y, 26 + pulse * 8, 0, Math.PI * 2)
     c.stroke()
 
     c.globalAlpha = 0.75
-    c.fillStyle = '#8D6E63'
+    c.fillStyle = scene().hint
     c.beginPath()
     c.arc(x, y, 15, 0, Math.PI * 2)
     c.fill()

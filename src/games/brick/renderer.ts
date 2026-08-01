@@ -10,6 +10,7 @@ import {
   type BrickState,
 } from './state'
 import { SCORE_PANEL, drawScorePanel, font } from '../ui'
+import { ground } from '../scene'
 
 export class BrickRenderer {
   private readonly stage: CanvasStage
@@ -46,11 +47,11 @@ export class BrickRenderer {
 
   private drawBackground() {
     const { c } = this
-    this.stage.begin('#D6C0A2', '#FFF8E1')
+    this.stage.begin(ground('#D6C0A2', '#171310'), ground('#FFF8E1', '#221B16'))
     const sky = c.createLinearGradient(0, 0, 0, LAYOUT.height)
-    sky.addColorStop(0, '#FFF3D6')
-    sky.addColorStop(0.5, '#FFF8E1')
-    sky.addColorStop(1, '#F4DFB9')
+    sky.addColorStop(0, ground('#FFF3D6', '#2A2119'))
+    sky.addColorStop(0.5, ground('#FFF8E1', '#221B16'))
+    sky.addColorStop(1, ground('#F4DFB9', '#171310'))
     c.fillStyle = sky
     c.fillRect(0, 0, LAYOUT.width, LAYOUT.height)
   }
@@ -63,11 +64,11 @@ export class BrickRenderer {
     const h = LAYOUT.launchY - LAYOUT.fieldTop + 12
 
     c.save()
-    c.fillStyle = 'rgb(255 255 255 / 0.42)'
+    c.fillStyle = ground('rgb(255 255 255 / 0.42)', 'rgb(255 255 255 / 0.08)')
     c.beginPath()
     c.roundRect(x, y, w, h, 18)
     c.fill()
-    c.strokeStyle = 'rgb(141 110 99 / 0.3)'
+    c.strokeStyle = ground('rgb(141 110 99 / 0.3)', 'rgb(255 255 255 / 0.15)')
     c.lineWidth = 4
     c.stroke()
     c.restore()
@@ -89,7 +90,7 @@ export class BrickRenderer {
 
     // 발사선
     c.save()
-    c.strokeStyle = 'rgb(141 110 99 / 0.35)'
+    c.strokeStyle = ground('rgb(141 110 99 / 0.35)', 'rgb(255 255 255 / 0.16)')
     c.lineWidth = 3
     c.setLineDash([14, 12])
     c.beginPath()
@@ -200,19 +201,19 @@ export class BrickRenderer {
       value: state.score.toLocaleString(),
       sub: true,
       compact: true,
-      panelColor: 'rgb(255 255 255 / 0.78)',
-      labelColor: '#BCAAA4',
-      valueColor: '#5D4037',
+      panelColor: ground('rgb(255 255 255 / 0.78)', 'rgb(255 255 255 / 0.08)'),
+      labelColor: ground('#BCAAA4', '#8F7D74'),
+      valueColor: ground('#5D4037', '#E5D8D0'),
     })
 
     // 웨이브
-    c.fillStyle = '#A1887F'
+    c.fillStyle = ground('#A1887F', '#8F7D74')
     c.font = font(20)
     c.fillText(t('brick.wave', { n: state.wave }), SCORE_PANEL.cx, SCORE_PANEL.subY)
 
     // 골드
     c.save()
-    c.fillStyle = '#FFFFFF'
+    c.fillStyle = ground('#FFFFFF', '#2C231C')
     c.globalAlpha = 0.75
     c.beginPath()
     c.roundRect(486, 34, 202, 60, 30)
@@ -226,7 +227,7 @@ export class BrickRenderer {
     c.font = font(20, true)
     c.fillText('G', 520, 71)
     c.textAlign = 'right'
-    c.fillStyle = '#5D4037'
+    c.fillStyle = ground('#5D4037', '#E5D8D0')
     c.font = font(26, true)
     c.fillText(state.run.gold.toLocaleString(), 672, 73)
   }
@@ -244,33 +245,33 @@ export class BrickRenderer {
       if (state.phase === 'flying') c.globalAlpha = 0.45
 
       // 버튼 바탕
-      c.fillStyle = affordable ? '#4CAF50' : '#FFFFFF'
+      c.fillStyle = affordable ? '#4CAF50' : ground('#FFFFFF', '#2C231C')
       if (!affordable) c.globalAlpha *= 0.8
       c.beginPath()
       c.roundRect(rect.x, rect.y + 5, rect.w, rect.h, 18)
       c.fill()
-      c.fillStyle = affordable ? '#66BB6A' : '#FFFFFF'
+      c.fillStyle = affordable ? '#66BB6A' : ground('#FFFFFF', '#2C231C')
       c.beginPath()
       c.roundRect(rect.x, rect.y, rect.w, rect.h, 18)
       c.fill()
-      c.strokeStyle = affordable ? '#2E7D32' : 'rgb(141 110 99 / 0.25)'
+      c.strokeStyle = affordable ? '#2E7D32' : ground('rgb(141 110 99 / 0.25)', 'rgb(255 255 255 / 0.125)')
       c.lineWidth = 3
       c.stroke()
 
       c.textAlign = 'center'
-      c.fillStyle = affordable ? '#FFFFFF' : '#8D6E63'
+      c.fillStyle = affordable ? ground('#FFFFFF', '#2C231C') : ground('#8D6E63', '#B9A69C')
       c.font = font(26, true)
       c.fillText(`${t(def.label)} Lv.${level}`, rect.x + rect.w / 2, rect.y + 50)
 
       // 비용
-      c.fillStyle = affordable ? '#FFFFFF' : '#BCAAA4'
+      c.fillStyle = affordable ? ground('#FFFFFF', '#2C231C') : ground('#BCAAA4', '#8F7D74')
       c.beginPath()
       c.arc(rect.x + rect.w / 2 - 44, rect.y + 88, 13, 0, Math.PI * 2)
       c.fill()
-      c.fillStyle = affordable ? '#2E7D32' : '#E0D6CF'
+      c.fillStyle = affordable ? '#2E7D32' : ground('#E0D6CF', '#4A403B')
       c.font = font(15, true)
       c.fillText('G', rect.x + rect.w / 2 - 44, rect.y + 93)
-      c.fillStyle = affordable ? '#FFFFFF' : '#BCAAA4'
+      c.fillStyle = affordable ? ground('#FFFFFF', '#2C231C') : ground('#BCAAA4', '#8F7D74')
       c.font = font(24, true)
       c.fillText(cost.toLocaleString(), rect.x + rect.w / 2 + 22, rect.y + 96)
       c.restore()
@@ -304,7 +305,7 @@ export class BrickRenderer {
 
     c.save()
     c.globalAlpha = 0.45 * fade
-    c.strokeStyle = '#8D6E63'
+    c.strokeStyle = ground('#8D6E63', '#B9A69C')
     c.lineWidth = 3
     c.setLineDash([8, 10])
     c.beginPath()
@@ -314,7 +315,7 @@ export class BrickRenderer {
     c.setLineDash([])
 
     c.globalAlpha = 0.7 * fade
-    c.fillStyle = '#8D6E63'
+    c.fillStyle = ground('#8D6E63', '#B9A69C')
     c.beginPath()
     c.arc(x, y, 16, 0, Math.PI * 2)
     c.fill()

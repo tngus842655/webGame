@@ -8,6 +8,7 @@ import { CanvasStage } from '../stage'
 import { clearPoints, createState, loadLevel, rotateTile, D, L, R, U } from './state'
 import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 import { drawIconValue } from '../icons'
+import { ground } from '../scene'
 
 // 화면 배치 (논리 720×1280)
 const GRID_X = 36
@@ -122,7 +123,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
 
   const draw = () => {
-    const c = stage.begin('#1565C0', '#E3F2FD')
+    const c = stage.begin(ground('#1565C0', '#0C1A29'), ground('#E3F2FD', '#132539'))
     const size = state.size
     const cell = GRID_W / size
     const clearing = state.phase === 'clearing'
@@ -132,11 +133,11 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       label: t('hud.score'),
       value: state.score.toLocaleString(),
       sub: true,
-      panelColor: 'rgb(255 255 255 / 0.94)',
-      labelColor: '#90CAF9',
-      valueColor: '#0D47A1',
+      panelColor: ground('rgb(255 255 255 / 0.94)', 'rgb(10 18 30 / 0.86)'),
+      labelColor: ground('#90CAF9', '#7FA6C9'),
+      valueColor: ground('#0D47A1', '#D7E9FF'),
     })
-    c.fillStyle = '#1565C0'
+    c.fillStyle = ground('#1565C0', '#8FB6DA')
     c.font = font(24)
     c.textAlign = 'left'
     c.fillText(t('pp.level', { n: state.level }), SCORE_PANEL.left, SCORE_PANEL.subY)

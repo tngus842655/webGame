@@ -7,6 +7,7 @@ import type { GameModule } from '@/games/types'
 import GameGuide from '@/shared/GameGuide.vue'
 import { createGameContext } from '@/shared/gameContext'
 import { t, type TranslationKey } from '@/shared/i18n'
+import { markPlayed } from '@/shared/library'
 import UiIcon from '@/shared/UiIcon.vue'
 import { bgmFor, duckBgm, resumeBgm, startBgm, stopBgm } from '@/shared/music'
 import { startPlayTracking } from '@/shared/playSessions'
@@ -100,6 +101,9 @@ onMounted(async () => {
     return
   }
   titleKey.value = meta.titleKey
+  // 홈의 '최근 플레이' 줄. 게임을 실제로 붙이기 전에 남긴다 — 로딩 도중 나가도
+  // 열어본 것은 사실이고, 다시 찾아 들어가려는 사람에게는 그게 필요한 정보다.
+  markPlayed(slug)
   // 홈을 거치지 않고 바로 들어왔을 수도 있다. 서버 최고점을 맞춰두지 않으면
   // 상단 칩과 게임오버의 신기록 판정이 이 기기 기록만 보고 잘못 나온다.
   void fetchMyStats()
@@ -229,7 +233,7 @@ onBeforeUnmount(() => {
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   box-shadow: 0 2px 8px rgb(40 24 16 / 0.16);
-  color: #5d4037;
+  color: var(--ink-body);
   font-size: 14px;
   font-weight: 700;
   white-space: nowrap;
@@ -267,7 +271,7 @@ onBeforeUnmount(() => {
 .best-chip {
   overflow: hidden;
   font-size: 13px;
-  color: #7d6a63;
+  color: var(--ink-faint);
   text-overflow: ellipsis;
 }
 
@@ -323,7 +327,7 @@ onBeforeUnmount(() => {
   margin-bottom: 6px;
   font-size: 19px;
   font-weight: 800;
-  color: #7a6053;
+  color: var(--ink-muted);
 }
 
 .pause-sheet .btn {
@@ -346,6 +350,26 @@ onBeforeUnmount(() => {
   text-shadow: 0 4px 18px rgb(0 0 0 / 0.5);
   pointer-events: none;
   animation: countdown-pop 0.7s ease-out;
+}
+
+[data-theme='dark'] .chip {
+  background: rgb(38 31 27 / 0.86);
+}
+
+[data-theme='dark'] .back-button:active,
+[data-theme='dark'] .icon-button:active {
+  background: rgb(38 31 27 / 0.98);
+}
+
+[data-theme='dark'] .pause-glyph {
+  border-color: var(--ink-body);
+}
+
+[data-theme='dark'] .pause-sheet {
+  background: linear-gradient(#332a26, #2a221e);
+  box-shadow:
+    0 22px 52px rgb(0 0 0 / 0.6),
+    inset 0 2px 0 rgb(255 255 255 / 0.06);
 }
 
 @keyframes pause-fade {

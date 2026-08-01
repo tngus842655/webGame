@@ -13,6 +13,7 @@ import {
   type Piece,
 } from './state'
 import { drawScorePanel, font } from '../ui'
+import { isDarkTheme } from '@/shared/theme'
 
 export interface DragState {
   trayIndex: number
@@ -21,6 +22,48 @@ export interface DragState {
 }
 
 const BOARD_PAD = 14
+
+// 판의 바탕만 테마를 탄다. 블록 색(config.ts의 COLORS)은 이 게임의 정체라
+// 두 테마에서 같은 값을 쓴다.
+const SCENE = {
+  light: {
+    outer: '#D9C3A0',
+    board: '#FFF8E1',
+    skyTop: '#FFF4DA',
+    skyMid: '#FFF8E1',
+    skyLow: '#F6E2BD',
+    blob: '#FFE7B8',
+    boardPanel: 'rgb(255 255 255 / 0.5)',
+    boardEdge: 'rgb(141 110 99 / 0.28)',
+    traySlot: 'rgb(255 255 255 / 0.42)',
+    trayEdge: 'rgb(141 110 99 / 0.18)',
+    panel: 'rgb(255 255 255 / 0.78)',
+    label: '#BCAAA4',
+    value: '#5D4037',
+    hint: '#8D6E63',
+  },
+  dark: {
+    outer: '#171310',
+    board: '#221B16',
+    skyTop: '#2A2119',
+    skyMid: '#221B16',
+    skyLow: '#171310',
+    blob: '#382B1C',
+    boardPanel: 'rgb(255 255 255 / 0.05)',
+    boardEdge: 'rgb(255 255 255 / 0.12)',
+    traySlot: 'rgb(255 255 255 / 0.045)',
+    trayEdge: 'rgb(255 255 255 / 0.09)',
+    panel: 'rgb(24 19 16 / 0.8)',
+    label: '#8F7D74',
+    value: '#E5D8D0',
+    hint: '#B9A69C',
+  },
+} as const
+
+function scene() {
+  return isDarkTheme() ? SCENE.dark : SCENE.light
+}
+
 
 export class BBRenderer {
   private readonly stage: CanvasStage
@@ -59,17 +102,18 @@ export class BBRenderer {
 
   private drawBackground() {
     const { c } = this
-    this.stage.begin('#D9C3A0', '#FFF8E1')
+    const s = scene()
+    this.stage.begin(s.outer, s.board)
     const sky = c.createLinearGradient(0, 0, 0, LAYOUT.height)
-    sky.addColorStop(0, '#FFF4DA')
-    sky.addColorStop(0.5, '#FFF8E1')
-    sky.addColorStop(1, '#F6E2BD')
+    sky.addColorStop(0, s.skyTop)
+    sky.addColorStop(0.5, s.skyMid)
+    sky.addColorStop(1, s.skyLow)
     c.fillStyle = sky
     c.fillRect(0, 0, LAYOUT.width, LAYOUT.height)
 
     c.save()
     c.globalAlpha = 0.3
-    c.fillStyle = '#FFE7B8'
+    c.fillStyle = s.blob
     for (const [bx, by, br] of [
       [120, 170, 80],
       [630, 210, 55],
@@ -92,7 +136,7 @@ export class BBRenderer {
 
     // 보드 판
     c.save()
-    c.fillStyle = 'rgb(255 255 255 / 0.5)'
+    c.fillStyle = scene().boardPanel
     c.beginPath()
     c.roundRect(
       LAYOUT.boardX - BOARD_PAD,
@@ -102,7 +146,7 @@ export class BBRenderer {
       24,
     )
     c.fill()
-    c.strokeStyle = 'rgb(141 110 99 / 0.28)'
+    c.strokeStyle = scene().boardEdge
     c.lineWidth = 3
     c.stroke()
     c.restore()
@@ -181,11 +225,11 @@ export class BBRenderer {
       const sx = LAYOUT.traySlots[i]
       // 슬롯 홈
       c.save()
-      c.fillStyle = 'rgb(255 255 255 / 0.42)'
+      c.fillStyle = scene().traySlot
       c.beginPath()
       c.roundRect(sx - 95, LAYOUT.trayY - 95, 190, 190, 22)
       c.fill()
-      c.strokeStyle = 'rgb(141 110 99 / 0.18)'
+      c.strokeStyle = scene().trayEdge
       c.lineWidth = 2
       c.stroke()
       c.restore()
@@ -230,9 +274,9 @@ export class BBRenderer {
       label: t('hud.score'),
       value: state.score.toLocaleString(),
       compact: true,
-      panelColor: 'rgb(255 255 255 / 0.78)',
-      labelColor: '#BCAAA4',
-      valueColor: '#5D4037',
+      panelColor: scene().panel,
+      labelColor: scene().label,
+      valueColor: scene().value,
     })
 
     // 연속 클리어 배지 (숫자만 — 언어 무관)
@@ -268,7 +312,7 @@ export class BBRenderer {
 
     c.save()
     c.globalAlpha = 0.5 * fade
-    c.strokeStyle = '#8D6E63'
+    c.strokeStyle = scene().hint
     c.lineWidth = 3
     c.setLineDash([8, 10])
     c.beginPath()
@@ -278,7 +322,7 @@ export class BBRenderer {
     c.setLineDash([])
 
     c.globalAlpha = 0.7 * fade
-    c.fillStyle = '#8D6E63'
+    c.fillStyle = scene().hint
     c.beginPath()
     c.arc(x, y, 16, 0, Math.PI * 2)
     c.fill()

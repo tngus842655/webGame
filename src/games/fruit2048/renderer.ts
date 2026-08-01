@@ -4,6 +4,7 @@ import { LAYOUT, SIZE, cellPos } from './config'
 import { drawTile } from './tileArt'
 import type { F2State } from './state'
 import { drawScorePanel } from '../ui'
+import { ground } from '../scene'
 
 export class F2Renderer {
   private readonly stage: CanvasStage
@@ -35,11 +36,11 @@ export class F2Renderer {
 
   private drawBackground() {
     const { c } = this
-    this.stage.begin('#D9C3A0', '#FFF8E1')
+    this.stage.begin(ground('#D9C3A0', '#171310'), ground('#FFF8E1', '#221B16'))
     const sky = c.createLinearGradient(0, 0, 0, LAYOUT.height)
-    sky.addColorStop(0, '#FFF4DA')
-    sky.addColorStop(0.5, '#FFF8E1')
-    sky.addColorStop(1, '#F6E2BD')
+    sky.addColorStop(0, ground('#FFF4DA', '#2A2119'))
+    sky.addColorStop(0.5, ground('#FFF8E1', '#221B16'))
+    sky.addColorStop(1, ground('#F6E2BD', '#171310'))
     c.fillStyle = sky
     c.fillRect(0, 0, LAYOUT.width, LAYOUT.height)
   }
@@ -53,11 +54,11 @@ export class F2Renderer {
     const size = this.boardSize()
 
     c.save()
-    c.fillStyle = 'rgb(255 255 255 / 0.5)'
+    c.fillStyle = ground('rgb(255 255 255 / 0.5)', 'rgb(255 255 255 / 0.08)')
     c.beginPath()
     c.roundRect(LAYOUT.boardX, LAYOUT.boardY, size, size, 26)
     c.fill()
-    c.strokeStyle = 'rgb(141 110 99 / 0.28)'
+    c.strokeStyle = ground('rgb(141 110 99 / 0.28)', 'rgb(255 255 255 / 0.14)')
     c.lineWidth = 3
     c.stroke()
     c.restore()
@@ -65,7 +66,7 @@ export class F2Renderer {
     for (let row = 0; row < SIZE; row++) {
       for (let col = 0; col < SIZE; col++) {
         const [px, py] = cellPos(col, row)
-        c.fillStyle = 'rgb(93 64 55 / 0.08)'
+        c.fillStyle = ground('rgb(93 64 55 / 0.08)', 'rgb(255 255 255 / 0.08)')
         c.beginPath()
         c.roundRect(px, py, LAYOUT.cell, LAYOUT.cell, 18)
         c.fill()
@@ -117,9 +118,9 @@ export class F2Renderer {
       label: t('hud.score'),
       value: state.score.toLocaleString(),
       compact: true,
-      panelColor: 'rgb(255 255 255 / 0.78)',
-      labelColor: '#BCAAA4',
-      valueColor: '#5D4037',
+      panelColor: ground('rgb(255 255 255 / 0.78)', 'rgb(255 255 255 / 0.08)'),
+      labelColor: ground('#BCAAA4', '#8F7D74'),
+      valueColor: ground('#5D4037', '#E5D8D0'),
     })
   }
 
@@ -135,7 +136,7 @@ export class F2Renderer {
 
     c.save()
     c.globalAlpha = 0.45 * fade
-    c.strokeStyle = '#8D6E63'
+    c.strokeStyle = ground('#8D6E63', '#B9A69C')
     c.lineWidth = 3
     c.setLineDash([8, 10])
     c.beginPath()
@@ -145,7 +146,7 @@ export class F2Renderer {
     c.setLineDash([])
 
     c.globalAlpha = 0.7 * fade
-    c.fillStyle = '#8D6E63'
+    c.fillStyle = ground('#8D6E63', '#B9A69C')
     c.beginPath()
     c.arc(x, y, 16, 0, Math.PI * 2)
     c.fill()

@@ -160,14 +160,14 @@ function duration(sec: number): string {
   padding: 10px 0;
   border: none;
   border-radius: 12px;
-  background: #fff;
-  color: #bcaaa4;
+  background: var(--surface);
+  color: var(--ink-faint);
   cursor: pointer;
 }
 
 .tabs button.active {
-  background: #8d6e63;
-  color: #fff;
+  background: var(--ink-muted);
+  color: var(--surface);
   font-weight: bold;
 }
 
@@ -175,7 +175,7 @@ function duration(sec: number): string {
   margin-bottom: 14px;
   font-size: 12px;
   line-height: 1.5;
-  color: #bcaaa4;
+  color: var(--ink-faint);
   word-break: keep-all;
 }
 
@@ -192,24 +192,24 @@ function duration(sec: number): string {
   align-items: center;
   gap: 2px;
   padding: 14px 6px;
-  background: #fff;
+  background: var(--surface);
   border-radius: 14px;
 }
 
 .summary-item strong {
   font-size: 17px;
-  color: #5d4037;
+  color: var(--ink-body);
 }
 
 .summary-item small {
   font-size: 11px;
-  color: #bcaaa4;
+  color: var(--ink-faint);
 }
 
 .notice {
   padding: 40px 0;
   text-align: center;
-  color: #8d6e63;
+  color: var(--ink-muted);
 }
 
 .list {
@@ -224,7 +224,7 @@ function duration(sec: number): string {
   align-items: center;
   gap: 12px;
   padding: 12px 14px;
-  background: #fff;
+  background: var(--surface);
   border-radius: 14px;
 }
 
@@ -260,7 +260,7 @@ function duration(sec: number): string {
   height: 6px;
   margin: 6px 0;
   border-radius: 3px;
-  background: rgb(141 110 99 / 0.15);
+  background: var(--line);
   overflow: hidden;
 }
 
@@ -276,6 +276,6 @@ function duration(sec: number): string {
   flex-wrap: wrap;
   gap: 4px 12px;
   font-size: 11px;
-  color: #bcaaa4;
+  color: var(--ink-faint);
 }
 </style>

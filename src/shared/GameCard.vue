@@ -1,17 +1,22 @@
 <script setup lang="ts">
 // 홈과 휴지통이 함께 쓰는 게임 카드.
-// 두 화면은 어느 칸에 놓이느냐만 다르고 순위는 하나를 나눠 쓴다 — 휴지통에 있던
-// 게임이 다시 올라오면 그 자리에서 바로 메달이 붙어야 하므로 카드를 하나로 둔다.
 import { useRouter } from 'vue-router'
+import FavoriteButton from './FavoriteButton.vue'
 import GameIcon from './GameIcon.vue'
 import { t, type TranslationKey } from './i18n'
 
 const props = defineProps<{
   slug: string
   titleKey: TranslationKey
-  rank: number | null
+  // 1~3위에만 넘긴다. 번호표를 달지 않고 카드 자체를 금·은·동으로 물들인다 —
+  // 번호가 스물몇 장에 흩어져 있으면 정작 상위 셋이 눈에 안 들어왔다.
+  // 꾸밈이 붙는 값은 1~3뿐이고 그 밖의 숫자가 오면 아무 일도 일어나지 않는다.
+  medal?: number
   // 최고 기록·내 순위 — 문구는 화면마다 달라서 밖에서 넘겨받는다
   label: string
+  // 홈에서만 별을 붙인다. 휴지통 게임은 즐겨찾기 칸(주 목록 기준)에 올라오지
+  // 못하므로, 눌러도 아무 데도 안 나타나는 별을 보여주지 않는다.
+  favoritable?: boolean
 }>()
 
 // RouterLink(<a>)였을 때는 카드를 길게 누르면 웹뷰가 링크 주소를 띄웠다.
@@ -23,22 +28,32 @@ function open() {
   void router.push(`/play/${props.slug}`)
 }
 
-// 1~3위만 메달로 꾸민다
-function rankClass(rank: number): string {
-  return rank <= 3 ? `medal m${rank}` : ''
-}
 </script>
 
 <template>
-  <button type="button" class="game-card" @click="open">
-    <span v-if="rank !== null" class="rank" :class="rankClass(rank)">{{ rank }}</span>
-    <span class="thumb"><GameIcon :slug="slug" /></span>
-    <strong>{{ t(titleKey) }}</strong>
-    <small>{{ label }}</small>
-  </button>
+  <!-- 별은 카드 버튼 안에 넣을 수 없다 (버튼 안의 버튼). 겹쳐 두고 과녁만 나눈다. -->
+  <div class="game-slot">
+    <button type="button" class="game-card" :class="medal ? `m${medal}` : ''" @click="open">
+      <span class="thumb"><GameIcon :slug="slug" /></span>
+      <strong>{{ t(titleKey) }}</strong>
+      <small>{{ label }}</small>
+    </button>
+    <FavoriteButton v-if="favoritable" :slug="slug" />
+  </div>
 </template>
 
 <style scoped>
+.game-slot {
+  position: relative;
+}
+
+/* 이름이 두 줄로 넘어간 카드만 혼자 길어지던 것을 막는다 — 칸의 높이는
+   가장 긴 카드가 정하고, 기록 문구는 어느 카드든 맨 아래에 나란히 선다. */
+.game-slot,
+.game-card {
+  height: 100%;
+}
+
 .game-card {
   position: relative;
   display: flex;
@@ -48,12 +63,10 @@ function rankClass(rank: number): string {
   width: 100%;
   padding: 12px 6px 10px;
   border: none;
-  background: #fff;
+  background: var(--surface);
   border-radius: 16px;
   cursor: pointer;
-  box-shadow:
-    0 1px 2px rgb(93 64 55 / 0.06),
-    0 4px 12px rgb(93 64 55 / 0.09);
+  box-shadow: var(--shadow-raise);
   text-align: center;
   transition:
     transform 0.1s ease,
@@ -66,44 +79,48 @@ function rankClass(rank: number): string {
   box-shadow: 0 1px 3px rgb(93 64 55 / 0.1);
 }
 
-/* 카드 크기는 그대로 두고 왼쪽 위 여백에 얹는다 */
-.rank {
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  display: grid;
-  place-items: center;
-  min-width: 21px;
-  height: 21px;
-  padding: 0 5px;
-  border-radius: 999px;
-  background: #f3eeec;
-  color: #a1887f;
-  font-size: 12px;
-  font-weight: bold;
-  line-height: 1;
+/* 1~3위는 번호 대신 카드 자체가 금·은·동을 띤다. 1위만 테두리를 굵히고
+   그림자를 얹어 한 칸 앞으로 나오게 한다 — 순서를 색만으로 읽기는 어렵다. */
+.game-card.m1 {
+  background: linear-gradient(168deg, #fffbf0, #fff1d2);
+  outline: 2px solid #e3b35a;
+  outline-offset: -2px;
+  box-shadow: var(--shadow-lift);
 }
 
-/* 1~3위는 메달로 */
-.rank.medal {
-  color: #fff;
-  font-size: 13px;
-  text-shadow: 0 1px 1px rgb(0 0 0 / 0.2);
+.game-card.m2 {
+  background: linear-gradient(168deg, #fdfefe, #edf1f4);
+  outline: 1.5px solid #bfc7cd;
+  outline-offset: -1.5px;
+  box-shadow: var(--shadow-raise);
 }
 
-.rank.m1 {
-  background: linear-gradient(#ffd54f, #f9a825);
-  box-shadow: 0 2px 6px rgb(249 168 37 / 0.5);
+.game-card.m3 {
+  background: linear-gradient(168deg, #fff9f3, #f7e6d7);
+  outline: 1.5px solid #d3a077;
+  outline-offset: -1.5px;
+  box-shadow: var(--shadow-raise);
 }
 
-.rank.m2 {
-  background: linear-gradient(#eceff1, #b0bec5);
-  box-shadow: 0 2px 6px rgb(120 144 156 / 0.4);
+[data-theme='dark'] .game-card.m1 {
+  background: linear-gradient(168deg, #3b3019, #2e2617);
+  outline: 2px solid #8a6a26;
+  outline-offset: -2px;
+  box-shadow: var(--shadow-lift);
 }
 
-.rank.m3 {
-  background: linear-gradient(#d9a679, #b07d4e);
-  box-shadow: 0 2px 6px rgb(141 110 99 / 0.4);
+[data-theme='dark'] .game-card.m2 {
+  background: linear-gradient(168deg, #333739, #272b2d);
+  outline: 1.5px solid #5c6369;
+  outline-offset: -1.5px;
+  box-shadow: var(--shadow-raise);
+}
+
+[data-theme='dark'] .game-card.m3 {
+  background: linear-gradient(168deg, #392b21, #2c211a);
+  outline: 1.5px solid #7c5837;
+  outline-offset: -1.5px;
+  box-shadow: var(--shadow-raise);
 }
 
 .thumb {
@@ -122,7 +139,7 @@ strong {
   font-weight: 700;
   line-height: 1.25;
   letter-spacing: -0.01em;
-  color: #4e342e;
+  color: var(--ink);
   word-break: keep-all;
 }
 
@@ -136,6 +153,8 @@ small {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  color: #b3a099;
+  color: var(--ink-faint);
+  margin-top: auto;
+  padding-top: 2px;
 }
 </style>
