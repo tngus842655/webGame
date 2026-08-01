@@ -1,4 +1,5 @@
 import type { GameContext } from '@/games/types'
+import { pauseRunningGame, resumeRunningGame } from '@/games/shell'
 import { adProvider } from './ads'
 import { getLocalBest, saveScore } from './scores'
 
@@ -10,6 +11,17 @@ export function createGameContext(slug: string): GameContext {
     submitScore: (score) => saveScore(slug, score),
     getBestScore: async () => getLocalBest(slug),
     isRewardAdReady: () => adProvider.isReady(),
-    showRewardAd: (placement) => adProvider.show(placement),
+    // 광고가 떠 있는 동안 루프를 멈춘다. 대부분의 호출부는 게임오버 뒤라 멈춰 있지만,
+    // 진행 중에 부르는 곳(오목 무르기·아이스슬라이드 되돌리기)은 그렇지 않다 —
+    // 오목은 제한 시간이 돌아서 광고를 보다 시간 초과로 질 수 있었다.
+    // 멈추는 것은 셸이 세는 depth라 클리어 보너스처럼 이미 멈춘 위에 겹쳐도 안전하다.
+    showRewardAd: async (placement) => {
+      pauseRunningGame()
+      try {
+        return await adProvider.show(placement)
+      } finally {
+        resumeRunningGame()
+      }
+    },
   }
 }
