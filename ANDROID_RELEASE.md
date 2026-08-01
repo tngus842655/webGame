@@ -42,7 +42,7 @@ cd android
 
 `android\app\build\outputs\bundle\release\app-release.aab`를 Play Console에 올린다.
 
-폰에 바로 설치해 확인하려면:
+폰에 바로 설치해 확인하려면 (자세한 것은 `ANDROID_DEBUG.md`):
 
 ```powershell
 .\gradlew.bat assembleDebug
