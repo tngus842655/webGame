@@ -24,6 +24,7 @@ const dict: CoreDict = {
   'home.sectionPopular': '热门 TOP3',
   'home.sectionRecent': '最近玩过',
   'home.play': '开始',
+  'home.random': '随机',
   'home.favoriteAdd': '添加到收藏',
   'home.favoriteRemove': '从收藏中移除',
   'home.favoritesEmpty': '点按卡片右上角的星标，游戏就会收到这里。',

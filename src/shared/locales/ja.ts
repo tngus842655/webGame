@@ -24,6 +24,7 @@ const dict: CoreDict = {
   'home.sectionPopular': '人気TOP3',
   'home.sectionRecent': '最近プレイ',
   'home.play': 'プレイ',
+  'home.random': 'ランダム',
   'home.favoriteAdd': 'お気に入りに追加',
   'home.favoriteRemove': 'お気に入りから削除',
   'home.favoritesEmpty': 'カード右上の星を押すと、ここにまとまります。',

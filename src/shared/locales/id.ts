@@ -24,6 +24,7 @@ const dict: CoreDict = {
   'home.sectionPopular': 'Top 3 populer',
   'home.sectionRecent': 'Baru dimainkan',
   'home.play': 'Main',
+  'home.random': 'Acak',
   'home.favoriteAdd': 'Tambah ke favorit',
   'home.favoriteRemove': 'Hapus dari favorit',
   'home.favoritesEmpty': 'Ketuk bintang di kartu, gamenya akan menunggu di sini.',

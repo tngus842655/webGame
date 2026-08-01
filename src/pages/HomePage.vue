@@ -215,6 +215,16 @@ function tapCard(index: number, slug: string) {
   else focusCard(index)
 }
 
+// 서른 개가 넘으니 뭘 할지 못 정하는 사람이 있다. 아무거나 눌러 바로 들어가게 한다.
+// 후보는 캐러셀이 아니라 지금 즐길 수 있는 게임 전부다 — 인기 셋도 뽑힌다.
+// 방금 한 게임만 빼는데, 안 그러면 연달아 눌렀을 때 같은 게임이 나와 고장 난 것처럼 보인다.
+function playRandom() {
+  const pool = cards.value.filter((card) => card.slug !== recents.value[0])
+  const list = pool.length > 0 ? pool : cards.value
+  if (list.length === 0) return
+  play(list[Math.floor(Math.random() * list.length)].slug)
+}
+
 const centerGame = computed(() => {
   const games = moreGames.value
   return games.length > 0 ? games[centerIndex.value % games.length] : null
@@ -388,6 +398,9 @@ onBeforeUnmount(() => {
             @click="play(centerGame.slug)"
           >
             <UiIcon name="play" />{{ t('home.play') }}
+          </button>
+          <button type="button" class="random-btn" @click="playRandom">
+            <UiIcon name="dice" />{{ t('home.random') }}
           </button>
         </div>
       </div>
@@ -680,9 +693,14 @@ onBeforeUnmount(() => {
   color: var(--ink-faint);
 }
 
+/* 화면이 좁고 낱말이 긴 언어(프랑스어·러시아어·베트남어)에서는 둘이 한 줄에
+   못 선다. 넘치게 두느니 랜덤 쪽을 아래로 내린다. */
 .cf-foot {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
+  gap: 10px;
   padding: 0 12px;
 }
 
@@ -720,6 +738,36 @@ onBeforeUnmount(() => {
 .play-btn svg {
   width: 14px;
   height: 14px;
+}
+
+/* 옆에 서지만 주인공은 아니다 — 같은 높이에 판만 얹고 턱은 주지 않는다 */
+.random-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 42px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 21px;
+  background: var(--surface);
+  box-shadow:
+    inset 0 0 0 1.5px var(--line),
+    var(--shadow-card);
+  color: var(--ink-muted);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: transform 0.09s ease;
+}
+
+.random-btn:active {
+  transform: scale(0.96);
+}
+
+.random-btn svg {
+  width: 16px;
+  height: 16px;
 }
 
 /* ── 최근 플레이 ───────────────────────────────────── */

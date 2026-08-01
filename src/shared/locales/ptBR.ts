@@ -24,6 +24,7 @@ const dict: CoreDict = {
   'home.sectionPopular': 'Top 3 populares',
   'home.sectionRecent': 'Jogados recentemente',
   'home.play': 'Jogar',
+  'home.random': 'Aleatório',
   'home.favoriteAdd': 'Adicionar aos favoritos',
   'home.favoriteRemove': 'Remover dos favoritos',
   'home.favoritesEmpty': 'Toque na estrela de um card e o jogo fica esperando aqui.',

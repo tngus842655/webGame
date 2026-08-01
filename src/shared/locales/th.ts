@@ -24,6 +24,7 @@ const dict: CoreDict = {
   'home.sectionPopular': 'ยอดนิยม 3 อันดับ',
   'home.sectionRecent': 'เล่นล่าสุด',
   'home.play': 'เล่น',
+  'home.random': 'สุ่ม',
   'home.favoriteAdd': 'เพิ่มในรายการโปรด',
   'home.favoriteRemove': 'นำออกจากรายการโปรด',
   'home.favoritesEmpty': 'แตะดาวบนการ์ดเกม แล้วเกมจะรออยู่ที่นี่',

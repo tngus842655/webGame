@@ -24,6 +24,7 @@ const dict: CoreDict = {
   'home.sectionPopular': 'Top 3 phổ biến',
   'home.sectionRecent': 'Chơi gần đây',
   'home.play': 'Chơi',
+  'home.random': 'Ngẫu nhiên',
   'home.favoriteAdd': 'Thêm vào yêu thích',
   'home.favoriteRemove': 'Bỏ khỏi yêu thích',
   'home.favoritesEmpty': 'Chạm vào ngôi sao trên thẻ, trò chơi sẽ đợi bạn ở đây.',

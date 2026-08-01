@@ -65,6 +65,7 @@ const en = {
   'home.sectionPopular': 'Popular Top 3',
   'home.sectionRecent': 'Recently played',
   'home.play': 'Play',
+  'home.random': 'Random',
   'home.favoriteAdd': 'Add to favorites',
   'home.favoriteRemove': 'Remove from favorites',
   'home.favoritesEmpty': 'Tap the star on a game card and it will wait for you here.',

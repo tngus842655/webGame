@@ -24,6 +24,7 @@ const dict: FullDict = {
   'home.sectionPopular': '인기 TOP3',
   'home.sectionRecent': '최근 플레이',
   'home.play': '플레이',
+  'home.random': '랜덤',
   'home.favoriteAdd': '즐겨찾기 추가',
   'home.favoriteRemove': '즐겨찾기 해제',
   'home.favoritesEmpty': '카드 오른쪽 위의 별을 누르면 여기에 모여요.',

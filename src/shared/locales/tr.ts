@@ -24,6 +24,7 @@ const dict: CoreDict = {
   'home.sectionPopular': 'Popüler Top 3',
   'home.sectionRecent': 'Son oynananlar',
   'home.play': 'Oyna',
+  'home.random': 'Rastgele',
   'home.favoriteAdd': 'Favorilere ekle',
   'home.favoriteRemove': 'Favorilerden çıkar',
   'home.favoritesEmpty': 'Bir kartın üzerindeki yıldıza dokun, oyun burada seni bekler.',

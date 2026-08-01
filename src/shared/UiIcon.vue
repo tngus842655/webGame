@@ -18,6 +18,7 @@ defineProps<{
     | 'sparkle'
     | 'gamepad'
     | 'clock'
+    | 'dice'
     | 'play'
     | 'check'
 }>()
@@ -118,6 +119,15 @@ defineProps<{
     <g v-else-if="name === 'clock'">
       <circle cx="12" cy="12" r="8.5" />
       <path d="M12 7.1V12l3.4 2" />
+    </g>
+
+    <g v-else-if="name === 'dice'">
+      <rect x="3.7" y="3.7" width="16.6" height="16.6" rx="4.4" />
+      <g fill="currentColor" stroke="none">
+        <circle cx="8.4" cy="8.4" r="1.35" />
+        <circle cx="12" cy="12" r="1.35" />
+        <circle cx="15.6" cy="15.6" r="1.35" />
+      </g>
     </g>
 
     <path v-else-if="name === 'play'" fill="currentColor" stroke="none" d="M7.8 5.2 19.2 12 7.8 18.8z" />
