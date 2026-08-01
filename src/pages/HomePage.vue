@@ -85,31 +85,54 @@ const TABS: Array<{ key: TabKey; labelKey: TranslationKey; icon: 'sparkle' | 'st
 // 즐겨찾기는 처음 켠 사람에게 비어 있다. 열자마자 빈 칸을 보여주지 않는다.
 const tab = ref<TabKey>('more')
 
-// ── 캐러셀 ──────────────────────────────────────────────
+// ── 좌우로 흐르는 카드 (끝이 없다) ─────────────────────
+// 같은 목록을 세 벌 이어 붙이고 가운데 벌에서만 논다. 손을 뗀 뒤 가운데 벌을
+// 벗어나 있으면 한 벌 폭만큼 소리 없이 되돌린다 — 되돌리는 거리가 칸 간격의
+// 정확한 배수라 눈에 보이는 것은 그대로고, 사용자에게는 끝이 없는 줄이 된다.
+// 되돌리기를 스크롤 도중에 하면 튕긴 힘이 그 자리에서 죽어버려서 멈춘 뒤에 한다.
+const LOOP_COPIES = 3
+const SETTLE_MS = 140
+
 const track = ref<HTMLDivElement | null>(null)
 const centerIndex = ref(0)
 const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 let frame = 0
+let settleTimer = 0
 
-// 가운데와의 거리는 화면상 위치가 아니라 레이아웃 위치(offsetLeft)로 잰다.
-// 변형이 걸린 뒤의 위치를 재면 그 값이 다음 프레임의 변형을 또 바꿔서 카드가 떨린다.
+// 순서가 바뀌지 않는 목록이라 순번을 key로 써도 카드가 뒤섞이지 않는다
+const loopGames = computed(() => {
+  const games = moreGames.value
+  return Array.from({ length: LOOP_COPIES * games.length }, (_, i) => games[i % games.length])
+})
+
+// 카드 폭·간격이 모두 같아서 첫 장 위치와 칸 간격만 재면 나머지는 계산으로 나온다.
+// 카드마다 위치를 물으면 여든 번 넘게 레이아웃을 읽어야 해서 스크롤이 걸린다.
+function metrics(el: HTMLElement) {
+  const slots = el.children as HTMLCollectionOf<HTMLElement>
+  if (slots.length === 0) return null
+  const originLeft = slots[0].offsetLeft
+  const cardWidth = slots[0].offsetWidth
+  const step = slots.length > 1 ? slots[1].offsetLeft - originLeft : cardWidth
+  return { slots, originLeft, cardWidth, step }
+}
+
 function paintCarousel() {
   frame = 0
   const el = track.value
   if (!el || el.clientWidth === 0) return
-  const slots = Array.from(el.children) as HTMLElement[]
-  if (slots.length === 0) return
+  const m = metrics(el)
+  if (!m || m.step === 0) return
 
-  const step = slots.length > 1 ? slots[1].offsetLeft - slots[0].offsetLeft : slots[0].offsetWidth
   const mid = el.scrollLeft + el.clientWidth / 2
   let nearest = 0
   let nearestGap = Infinity
 
-  slots.forEach((slot, index) => {
-    const gap = (slot.offsetLeft + slot.offsetWidth / 2 - mid) / step
+  for (let i = 0; i < m.slots.length; i++) {
+    const gap = (m.originLeft + i * m.step + m.cardWidth / 2 - mid) / m.step
     const away = Math.abs(gap)
     // 옆으로 한 칸을 넘어가면 더 눕지도 작아지지도 않는다 (가운데 120 : 양옆 80)
     const turn = Math.max(-1, Math.min(1, gap))
+    const slot = m.slots[i]
     slot.style.transform =
       `perspective(620px) translateX(${(-turn * 13).toFixed(1)}px)` +
       ` rotateY(${(turn * 20).toFixed(1)}deg) scale(${(1 - Math.min(away, 1) * 0.333).toFixed(3)})`
@@ -117,9 +140,9 @@ function paintCarousel() {
     slot.style.zIndex = String(30 - Math.round(Math.min(away, 2) * 10))
     if (away < nearestGap) {
       nearestGap = away
-      nearest = index
+      nearest = i
     }
-  })
+  }
 
   centerIndex.value = nearest
 }
@@ -129,12 +152,37 @@ function scheduleCarousel() {
   frame = requestAnimationFrame(paintCarousel)
 }
 
+// 가운데 벌의 첫 장이 화면 한가운데에 서는 자리
+function homeOffset(el: HTMLElement): number {
+  const m = metrics(el)
+  return m ? moreGames.value.length * m.step : 0
+}
+
+function normalizeLoop() {
+  const el = track.value
+  if (!el || el.clientWidth === 0) return
+  const copy = homeOffset(el)
+  if (copy === 0) return
+  let left = el.scrollLeft
+  while (left < copy) left += copy
+  while (left >= copy * 2) left -= copy
+  if (Math.abs(left - el.scrollLeft) < 0.5) return
+  el.scrollLeft = left
+  paintCarousel()
+}
+
+function onTrackScroll() {
+  scheduleCarousel()
+  clearTimeout(settleTimer)
+  settleTimer = window.setTimeout(normalizeLoop, SETTLE_MS)
+}
+
 function focusCard(index: number) {
   const el = track.value
-  const slot = el?.children[index] as HTMLElement | undefined
-  if (!el || !slot) return
+  const m = el ? metrics(el) : null
+  if (!el || !m) return
   el.scrollTo({
-    left: slot.offsetLeft + slot.offsetWidth / 2 - el.clientWidth / 2,
+    left: m.originLeft + index * m.step + m.cardWidth / 2 - el.clientWidth / 2,
     behavior: calm ? 'auto' : 'smooth',
   })
 }
@@ -145,14 +193,9 @@ function tapCard(index: number, slug: string) {
   else focusCard(index)
 }
 
-const centerGame = computed(() => moreGames.value[centerIndex.value] ?? null)
-
-// 막대 길이는 고정하고 위치만 옮긴다 — 게임이 스물여덟 개라 비율대로 그리면 실오라기가 된다
-const RAIL_THUMB = 22
-const railLeft = computed(() => {
-  const total = moreGames.value.length
-  if (total < 2) return 0
-  return (centerIndex.value / (total - 1)) * (100 - RAIL_THUMB)
+const centerGame = computed(() => {
+  const games = moreGames.value
+  return games.length > 0 ? games[centerIndex.value % games.length] : null
 })
 
 // 탭을 눌러 다시 보이게 됐을 때 — 숨어 있는 동안에는 폭이 0이라 그릴 수 없었다
@@ -166,6 +209,8 @@ watch(tab, async (key) => {
 const trashCount = trashedGames(GAMES).length
 
 onMounted(async () => {
+  // 가운데 벌에서 시작한다 — 첫 장 왼쪽에도 카드가 서 있어야 끝이 없어 보인다
+  if (track.value) track.value.scrollLeft = homeOffset(track.value)
   paintCarousel()
   window.addEventListener('resize', scheduleCarousel)
   // 노출 설정·인기도는 캐시에 담아두고 다음 진입부터 반영한다 (보는 도중 카드가 움직이지 않도록)
@@ -183,6 +228,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', scheduleCarousel)
+  clearTimeout(settleTimer)
   if (frame) cancelAnimationFrame(frame)
 })
 </script>
@@ -265,10 +311,10 @@ onBeforeUnmount(() => {
       </div>
 
       <div v-show="tab === 'more'" id="panel-more" role="tabpanel" aria-labelledby="tab-more">
-        <div ref="track" class="cf-track" @scroll.passive="scheduleCarousel">
+        <div ref="track" class="cf-track" @scroll.passive="onTrackScroll">
           <div
-            v-for="(game, index) in moreGames"
-            :key="game.slug"
+            v-for="(game, index) in loopGames"
+            :key="index"
             class="cf-slot"
             :class="{ 'is-center': index === centerIndex }"
           >
@@ -283,7 +329,6 @@ onBeforeUnmount(() => {
         </div>
 
         <div v-if="centerGame" class="cf-foot">
-          <span class="rail"><i :style="{ left: `${railLeft}%`, width: `${RAIL_THUMB}%` }"></i></span>
           <button
             type="button"
             class="play-btn"
@@ -605,26 +650,8 @@ onBeforeUnmount(() => {
 
 .cf-foot {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
+  justify-content: center;
   padding: 0 12px;
-}
-
-.rail {
-  position: relative;
-  width: 108px;
-  height: 3px;
-  border-radius: 999px;
-  background: rgb(141 110 99 / 0.16);
-}
-
-.rail i {
-  position: absolute;
-  top: 0;
-  height: 100%;
-  border-radius: 999px;
-  background: #bda79d;
 }
 
 /* 눌리면 아래 턱이 줄면서 실제로 내려앉는다 (게임 팝업 버튼과 같은 결) */
