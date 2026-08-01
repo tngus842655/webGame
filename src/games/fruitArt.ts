@@ -38,7 +38,13 @@ export function drawFruit(
 }
 
 // ── 실루엣 ────────────────────────────────────────────────
-// 물리 몸체는 전부 원이라 크게 벗어나지 않는 선에서만 변형한다.
+// 물리 몸체는 전부 반지름 r짜리 원이라, 그림도 그 원을 최대한 채워야 한다.
+// 안 그러면 부딪히는 자리와 눈에 보이는 자리가 어긋나 억울해진다.
+// 딸기는 원의 84%, 사과는 99%를 채운다 — 모자란 곳이 위 어깨라 티가 덜 난다.
+//
+// 배는 서양배 실루엣이라 원의 64%밖에 못 채웠고, 하필 가장 넓어야 할 한가운데
+// 높이에서 폭이 원의 42%였다. 과일 사이가 비어 보이는데도 서로 밀려났다.
+// 한국 배(나주배)는 원래 둥글고 잔점 무늬로 알아보므로, 원으로 되돌린다.
 
 function bodyPath(c: CanvasRenderingContext2D, tier: number, r: number) {
   switch (tier) {
@@ -47,9 +53,6 @@ function bodyPath(c: CanvasRenderingContext2D, tier: number, r: number) {
       break
     case 4:
       applePath(c, r)
-      break
-    case 5:
-      pearPath(c, r)
       break
     default:
       c.beginPath()
@@ -77,18 +80,6 @@ function applePath(c: CanvasRenderingContext2D, r: number) {
   c.bezierCurveTo(-r, -r * 0.68, -r * 0.46, -r * 1.06, 0, -r * 0.76)
   c.closePath()
 }
-
-// 위가 좁고 아래가 불룩한 조롱박
-function pearPath(c: CanvasRenderingContext2D, r: number) {
-  c.beginPath()
-  c.moveTo(0, -r)
-  c.bezierCurveTo(r * 0.4, -r * 0.94, r * 0.48, -r * 0.36, r * 0.42, -r * 0.06)
-  c.bezierCurveTo(r * 1.0, r * 0.3, r * 0.84, r, 0, r)
-  c.bezierCurveTo(-r * 0.84, r, -r * 1.0, r * 0.3, -r * 0.42, -r * 0.06)
-  c.bezierCurveTo(-r * 0.48, -r * 0.36, -r * 0.4, -r * 0.94, 0, -r)
-  c.closePath()
-}
-
 // 왼쪽 위 광원 기준 입체 음영
 function fillBody(
   c: CanvasRenderingContext2D,
