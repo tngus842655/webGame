@@ -44,7 +44,7 @@ function when(iso: string): string {
     </header>
 
     <p v-if="loading" class="notice">{{ t('ranking.loading') }}</p>
-    <p v-else-if="failed" class="notice">{{ t('ranking.error') }}</p>
+    <p v-else-if="failed" class="notice">{{ t('admin.feedbackFailed') }}</p>
     <p v-else-if="items.length === 0" class="notice">{{ t('admin.feedbackEmpty') }}</p>
     <ul v-else class="list">
       <li v-for="item in items" :key="item.id" class="card">

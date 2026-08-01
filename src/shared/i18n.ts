@@ -100,6 +100,7 @@ const en = {
   'admin.restore': 'Restore',
   'admin.feedback': 'Feedback',
   'admin.feedbackEmpty': 'Nothing has come in yet.',
+  'admin.feedbackFailed': 'Could not load the feedback. Please try again later.',
   'stats.days': 'last {n}d',
   'stats.hint':
     'Periods are rolling windows counted back from right now, not calendar days. A segment is one uninterrupted stretch of play — sending the app to the background ends one and starts another, so segments are not rounds.',
