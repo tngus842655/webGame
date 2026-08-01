@@ -170,6 +170,10 @@ SDK가 링크되어 있는 것만으로 `AD_ID` 권한이 AAB에 병합되므로
 | `.env.local`의 `VITE_ADMOB_REWARD_ID` | 리워드 광고 단위 ID (`ca-app-pub-…/…`) |
 | Play Console | '광고 ID 사용' → 예, 데이터 보안·개인정보처리방침 갱신 (`PLAY_CONSOLE.md`) |
 
+`public/app-ads.txt`는 미리 올려 두었다 — 게시자 ID(`pub-9942492825878908`)를 적어
+두는 파일이고, 구글이 크롤링해 가는 데 시간이 걸려 광고를 켜기 전에 있어야 한다.
+AdMob 콘솔의 **앱 → app-ads.txt** 에서 인식 여부를 확인할 수 있다.
+
 ---
 
 ## assetlinks.json
