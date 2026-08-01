@@ -106,15 +106,36 @@ textarea {
 }
 
 .app-shell {
+  position: relative;
   max-width: 480px;
   margin: 0 auto;
   min-height: 100dvh;
   background: linear-gradient(var(--bg-top), var(--bg-bottom));
+  /* 그러데이션을 화면에 붙여둔다. 문서 높이에 걸어두면 스크롤 위치마다 화면
+     맨 아래 색이 달라져서, 그 자리를 덮는 아래 띠와 색이 어긋난다. */
+  background-attachment: fixed;
   /* 네이티브 앱에서는 Capacitor가 실제 인셋을 --safe-area-inset-*로 넣어준다.
      웹뷰 버전이 낮아 env()를 못 믿는 기기에서는 0을 넣고 네이티브 쪽에서 여백을
      주므로, 변수를 먼저 보고 없을 때만 env()로 떨어져야 이중 계산이 안 난다. */
   padding-top: var(--safe-area-inset-top, env(safe-area-inset-top));
   padding-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom));
+}
+
+/* 안드로이드 15부터 앱이 내비게이션 바 뒤까지 그리는 게 강제다. 위쪽은 그 덕에
+   상태바까지 배경이 이어져서 좋은데, 아래쪽은 스크롤하는 카드가 반투명한 바
+   뒤로 지나가 지저분했다. 위 padding-bottom은 문서 맨 끝에만 생겨서 그 구간을
+   못 덮는다. 바가 앉는 높이만큼 배경색 띠를 화면에 고정해 덮는다.
+   인셋이 0인 곳(웹·데스크톱)에서는 높이가 0이라 없는 것과 같다. */
+.app-shell::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  height: var(--safe-area-inset-bottom, env(safe-area-inset-bottom));
+  background: var(--bg-bottom);
+  pointer-events: none;
 }
 
 a {
