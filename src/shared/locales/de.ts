@@ -56,6 +56,7 @@ const dict: CoreDict = {
   'settings.themeDark': 'Dunkel',
   'settings.themeSystem': 'System',
   'settings.language': 'Sprache',
+  'terms.title': 'Nutzungsbedingungen',
   'privacy.title': 'Datenschutzerklärung',
   'account.title': 'Konto',
   'account.hint': 'Du kannst auch ohne Verknüpfung weiterspielen — beim Gerätewechsel gehen die Ergebnisse aber verloren.',

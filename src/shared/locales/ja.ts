@@ -56,6 +56,7 @@ const dict: CoreDict = {
   'settings.themeDark': 'ダーク',
   'settings.themeSystem': 'システム',
   'settings.language': '言語',
+  'terms.title': '利用規約',
   'privacy.title': 'プライバシーポリシー',
   'account.title': 'アカウント',
   'account.hint': '連携しなくても今まで通り遊べます。ただし機種変更すると記録は引き継げません。',

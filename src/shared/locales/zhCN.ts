@@ -56,6 +56,7 @@ const dict: CoreDict = {
   'settings.themeDark': '深色',
   'settings.themeSystem': '跟随系统',
   'settings.language': '语言',
+  'terms.title': '服务条款',
   'privacy.title': '隐私政策',
   'account.title': '账号',
   'account.hint': '不绑定也能照常游玩，但换设备后无法找回记录。',

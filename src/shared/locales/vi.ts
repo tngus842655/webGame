@@ -56,6 +56,7 @@ const dict: CoreDict = {
   'settings.themeDark': 'Tối',
   'settings.themeSystem': 'Hệ thống',
   'settings.language': 'Ngôn ngữ',
+  'terms.title': 'Điều khoản dịch vụ',
   'privacy.title': 'Chính sách quyền riêng tư',
   'account.title': 'Tài khoản',
   'account.hint': 'Không liên kết vẫn chơi được, nhưng đổi máy thì không lấy lại được thành tích.',

@@ -56,6 +56,7 @@ const dict: CoreDict = {
   'settings.themeDark': 'มืด',
   'settings.themeSystem': 'ตามระบบ',
   'settings.language': 'ภาษา',
+  'terms.title': 'ข้อกำหนดการให้บริการ',
   'privacy.title': 'นโยบายความเป็นส่วนตัว',
   'account.title': 'บัญชี',
   'account.hint': 'ไม่เชื่อมบัญชีก็เล่นได้ตามปกติ แต่เปลี่ยนเครื่องแล้วจะกู้สถิติไม่ได้',

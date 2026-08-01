@@ -56,6 +56,7 @@ const dict: CoreDict = {
   'settings.themeDark': 'Sombre',
   'settings.themeSystem': 'Système',
   'settings.language': 'Langue',
+  'terms.title': 'Conditions d\'utilisation',
   'privacy.title': 'Politique de confidentialité',
   'account.title': 'Compte',
   'account.hint': 'Tu peux jouer sans lier de compte, mais tes scores resteront sur cet appareil.',

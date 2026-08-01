@@ -56,6 +56,7 @@ const dict: CoreDict = {
   'settings.themeDark': 'Gelap',
   'settings.themeSystem': 'Sistem',
   'settings.language': 'Bahasa',
+  'terms.title': 'Ketentuan layanan',
   'privacy.title': 'Kebijakan privasi',
   'account.title': 'Akun',
   'account.hint': 'Tanpa menautkan pun tetap bisa main, tapi rekor tidak bisa dibawa ke perangkat lain.',

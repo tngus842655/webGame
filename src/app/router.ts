@@ -11,6 +11,7 @@ import SettingsPage from '@/pages/SettingsPage.vue'
 import StatsPage from '@/pages/StatsPage.vue'
 import DevNotesPage from '@/pages/DevNotesPage.vue'
 import PrivacyPage from '@/pages/PrivacyPage.vue'
+import TermsPage from '@/pages/TermsPage.vue'
 import AccountDeletionPage from '@/pages/AccountDeletionPage.vue'
 
 export const router = createRouter({
@@ -26,6 +27,7 @@ export const router = createRouter({
     { path: '/admin/trash', component: AdminTrashPage, meta: { admin: true } },
     { path: '/trash', component: TrashPage },
     { path: '/notes', component: DevNotesPage },
+    { path: '/terms', component: TermsPage },
     { path: '/privacy', component: PrivacyPage },
     { path: '/account-deletion', component: AccountDeletionPage },
     { path: '/:pathMatch(.*)*', redirect: '/' },

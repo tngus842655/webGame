@@ -56,6 +56,7 @@ const dict: CoreDict = {
   'settings.themeDark': 'Koyu',
   'settings.themeSystem': 'Sistem',
   'settings.language': 'Dil',
+  'terms.title': 'Hizmet koşulları',
   'privacy.title': 'Gizlilik politikası',
   'account.title': 'Hesap',
   'account.hint': 'Bağlamadan da oynayabilirsin ama cihaz değiştirince kayıtlar geri gelmez.',

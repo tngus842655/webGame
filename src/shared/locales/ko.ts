@@ -91,6 +91,7 @@ const dict: FullDict = {
   'settings.themeDark': '다크',
   'settings.themeSystem': '시스템',
   'settings.language': '언어',
+  'terms.title': '이용약관',
   'privacy.title': '개인정보처리방침',
   'account.title': '계정',
   'account.hint': '연동하지 않아도 지금처럼 플레이할 수 있어요. 다만 기기를 바꾸면 기록을 불러올 수 없습니다.',

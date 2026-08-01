@@ -4,7 +4,8 @@ import { ref } from 'vue'
 // 게임은 매 프레임 다시 그리므로 언어 변경이 즉시 반영된다.
 // 번역 범위: 사용자에게 보이는 것은 13개 언어 전부 채운다 (허브·게임 내부·가이드·광고).
 // 예외는 둘뿐 — 관리자/통계/개발노트 화면은 운영자만 보므로 ko/en만,
-// 개인정보처리방침은 법적 문서라 한국어만 (PrivacyPage.vue 주석 참고).
+// 이용약관과 개인정보처리방침은 법적 문서라 제목만 번역하고 본문은 한국어만
+// (PrivacyPage.vue 주석 참고).
 
 export type Locale =
   | 'ko'
@@ -132,6 +133,7 @@ const en = {
   'settings.themeDark': 'Dark',
   'settings.themeSystem': 'System',
   'settings.language': 'Language',
+  'terms.title': 'Terms of Service',
   'privacy.title': 'Privacy Policy',
   'account.title': 'Account',
   'account.hint': 'You can keep playing without linking. But records stay on this device only.',

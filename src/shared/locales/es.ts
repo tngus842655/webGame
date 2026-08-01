@@ -56,6 +56,7 @@ const dict: CoreDict = {
   'settings.themeDark': 'Oscuro',
   'settings.themeSystem': 'Sistema',
   'settings.language': 'Idioma',
+  'terms.title': 'Términos del servicio',
   'privacy.title': 'Política de privacidad',
   'account.title': 'Cuenta',
   'account.hint': 'Puedes seguir jugando sin vincular, pero al cambiar de dispositivo perderás tus registros.',

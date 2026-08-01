@@ -56,6 +56,7 @@ const dict: CoreDict = {
   'settings.themeDark': 'Тёмная',
   'settings.themeSystem': 'Системная',
   'settings.language': 'Язык',
+  'terms.title': 'Условия использования',
   'privacy.title': 'Политика конфиденциальности',
   'account.title': 'Аккаунт',
   'account.hint': 'Можно играть и без привязки, но на другом устройстве результаты не восстановить.',
