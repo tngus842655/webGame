@@ -298,8 +298,14 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.textBaseline = 'middle'
       for (let col = 0; col < size; col++) {
         const hints = state.colHints[col]
+        // 다 맞힌 줄은 흐려져야 남은 줄이 눈에 들어온다. 어두운 판에서는
+        // 그 관계가 뒤집히므로 밝기를 서로 바꿔 넣는다.
         c.fillStyle =
-          spot?.col === col ? '#FF6F00' : state.colDone[col] ? '#B4BAD9' : '#1A237E'
+          spot?.col === col
+            ? '#FF6F00'
+            : state.colDone[col]
+              ? ground('#B4BAD9', '#4E5478')
+              : ground('#1A237E', '#AEB6E8')
         const cx = GRID_X + col * cell + cell / 2
         hints.forEach((n, i) => {
           c.fillText(String(n), cx, GRID_Y - 10 - gap / 2 - (hints.length - 1 - i) * gap)
@@ -308,7 +314,11 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       for (let row = 0; row < size; row++) {
         const hints = state.rowHints[row]
         c.fillStyle =
-          spot?.row === row ? '#FF6F00' : state.rowDone[row] ? '#B4BAD9' : '#1A237E'
+          spot?.row === row
+            ? '#FF6F00'
+            : state.rowDone[row]
+              ? ground('#B4BAD9', '#4E5478')
+              : ground('#1A237E', '#AEB6E8')
         const cy = GRID_Y + row * cell + cell / 2
         hints.forEach((n, i) => {
           c.fillText(String(n), GRID_X - 10 - gap / 2 - (hints.length - 1 - i) * gap, cy)
