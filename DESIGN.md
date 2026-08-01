@@ -60,7 +60,7 @@ src/
 │  ├─ music.ts             # BGM 재생 (public/bgm/*.mp3, 파일 없으면 무음)
 │  ├─ theme.ts              # 라이트·다크·시스템. <html data-theme> + isDarkTheme()
 │  ├─ library.ts            # 즐겨찾기·최근 플레이 (localStorage 전용)
-│  └─ i18n.ts / sound.ts / GameIcon.vue / GameCard.vue / FavoriteButton.vue / devNotes.ts
+│  └─ i18n.ts / sound.ts / GameIcon.vue / GameCard.vue / FavoriteButton.vue / releaseNotes
 └─ styles/
 ```
 
