@@ -10,6 +10,7 @@ defineProps<{
     | 'gear'
     | 'wrench'
     | 'trash'
+    | 'message'
     | 'target'
     | 'tap'
     | 'star'
@@ -73,6 +74,11 @@ defineProps<{
       <path d="M6.2 6.8 7.3 20.2h9.4L17.8 6.8" />
       <path d="M10.2 10.6v5.8M13.8 10.6v5.8" />
     </g>
+
+    <path
+      v-else-if="name === 'message'"
+      d="M4.5 4h15a2 2 0 0 1 2 2v8.5a2 2 0 0 1-2 2H10.5L6 20v-3.5H4.5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"
+    />
 
     <g v-else-if="name === 'target'">
       <circle cx="12" cy="12" r="8.4" />

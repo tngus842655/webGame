@@ -122,8 +122,13 @@ async function moveToTrash() {
     </header>
 
     <RouterLink class="menu-link" to="/admin/trash">
-      <span class="trash-label"><UiIcon name="trash" />{{ t('admin.trash') }}</span>
+      <span class="menu-label"><UiIcon name="trash" />{{ t('admin.trash') }}</span>
       <span class="count">{{ trashedCount > 0 ? trashedCount : '' }}<UiIcon name="chevron" /></span>
+    </RouterLink>
+
+    <RouterLink class="menu-link" to="/admin/feedback">
+      <span class="menu-label"><UiIcon name="message" />{{ t('admin.feedback') }}</span>
+      <span class="count"><UiIcon name="chevron" /></span>
     </RouterLink>
 
     <p class="hint">{{ t('admin.hint') }}</p>
@@ -214,7 +219,7 @@ async function moveToTrash() {
   font-weight: bold;
 }
 
-.trash-label,
+.menu-label,
 .menu-link .count {
   display: flex;
   align-items: center;
@@ -226,7 +231,7 @@ async function moveToTrash() {
   color: var(--ink-faint);
 }
 
-.trash-label svg {
+.menu-label svg {
   width: 18px;
   height: 18px;
 }
