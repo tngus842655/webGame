@@ -3,6 +3,7 @@ import { playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
+import { createResumeGate } from '../resumeGate'
 import { createGameShell, defineGame } from '../shell'
 import { drawBullet, drawEnemy, drawHero, drawOrb } from './sprites'
 import { CanvasStage } from '../stage'
@@ -133,6 +134,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     },
   })
 
+  // 오버레이보다 뒤에 붙어야 그 위를 덮는다
+  const gate = createResumeGate(shell)
+
   async function reviveWithAd() {
     if (state.phase !== 'over' || adReviveUsed) return
     const rewarded = await ctx.showRewardAd('survivor_revive')
@@ -145,6 +149,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     )
     state.phase = 'playing'
     overlay.hide()
+    await gate.wait()
   }
 
   async function gameOver() {

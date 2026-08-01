@@ -4,6 +4,7 @@ import type { GameContext } from '../types'
 import { createClearBonus } from '../clearBonus'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
+import { createResumeGate } from '../resumeGate'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import { drawPlant } from './plantArt'
@@ -65,6 +66,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     },
   })
 
+  // 오버레이보다 뒤에 붙어야 그 위를 덮는다
+  const gate = createResumeGate(shell)
+
   // 광고 보상: 시간을 되살리고 자리도 비워 같은 스테이지를 이어간다 (판당 1회)
   async function reviveWithAd() {
     if (state.phase !== 'over' || state.cleared || adReviveUsed) return
@@ -74,6 +78,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     clearLowestItems(state)
     reviveWithTime(state, REVIVE_SECONDS)
     overlay.hide()
+    await gate.wait()
   }
 
   // 스테이지 클리어로 받은 남은 시간 보너스를 한 번 더 준다

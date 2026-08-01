@@ -3,6 +3,7 @@ import { playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
+import { createResumeGate } from '../resumeGate'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import {
@@ -11,6 +12,7 @@ import {
   JUMP_V,
   PLAYER_W,
   PLAYER_X,
+  START_SPAWN_DELAY,
   createState,
   scoreOf,
   update,
@@ -78,6 +80,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       void continueWithAd()
     },
   })
+  // 오버레이보다 뒤에 붙어야 그 위를 덮는다
+  const gate = createResumeGate(shell)
 
   async function continueWithAd() {
     if (state.phase !== 'over' || adContinueUsed) return
@@ -87,8 +91,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     state.obstacles = []
     state.playerY = GROUND_Y
     state.vy = 0
+    // 장애물을 비워도 스폰 타이머가 그대로면 죽기 직전 값(거의 0)이라 곧바로 다음
+    // 장애물이 날아온다. 광고를 보고 돌아온 사람에게 준비할 틈이 없어, 시작할 때와
+    // 같은 여유를 준다 — 다른 게임들이 무적 시간이나 조준 대기로 주는 것과 같은 몫이다.
+    state.spawnTimer = START_SPAWN_DELAY
     state.phase = 'playing'
     overlay.hide()
+    await gate.wait()
   }
 
   async function gameOver() {

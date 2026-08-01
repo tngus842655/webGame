@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { DEV_NOTES } from '@/shared/devNotes'
+import { DEV_NOTES } from '@/shared/releaseNotes'
 import { t } from '@/shared/i18n'
 import UiIcon from '@/shared/UiIcon.vue'
 

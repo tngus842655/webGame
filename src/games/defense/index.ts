@@ -4,6 +4,7 @@ import type { GameContext } from '../types'
 import { createClearBonus } from '../clearBonus'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
+import { createResumeGate } from '../resumeGate'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import {
@@ -67,6 +68,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     },
   })
 
+  // 오버레이보다 뒤에 붙어야 그 위를 덮는다
+  const gate = createResumeGate(shell)
+
   // 광고 보상: 생명 5를 받고 현재 웨이브를 다시 막는다 (판당 1회)
   async function continueWithAd() {
     if (state.phase !== 'over' || adContinueUsed) return
@@ -80,6 +84,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     state.waveBreak = 2
     state.phase = 'playing'
     overlay.hide()
+    await gate.wait()
   }
 
   // 웨이브 클리어 점수(wave * 50)를 한 번 더 준다

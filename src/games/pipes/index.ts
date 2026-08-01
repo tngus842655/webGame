@@ -3,6 +3,7 @@ import { playDrop, playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/s
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
+import { createResumeGate } from '../resumeGate'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import { clearPoints, createState, loadLevel, rotateTile, D, L, R, U } from './state'
@@ -72,6 +73,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     },
   })
 
+  // 오버레이보다 뒤에 붙어야 그 위를 덮는다
+  const gate = createResumeGate(shell)
+
   // 광고 보상: 시간 30초를 받고 같은 판을 이어서 푼다 (판당 1회)
   async function continueWithAd() {
     if (state.phase !== 'over' || adContinueUsed) return
@@ -81,6 +85,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     state.timeLeft = 30
     state.phase = 'playing'
     overlay.hide()
+    await gate.wait()
   }
 
   async function gameOver() {

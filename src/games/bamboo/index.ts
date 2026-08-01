@@ -3,6 +3,7 @@ import { playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
+import { createResumeGate } from '../resumeGate'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import { BAR_MAX, SEG_H, branchAt, climb, createState, reviveBelow, update } from './state'
@@ -69,6 +70,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     },
   })
 
+  // 오버레이보다 뒤에 붙어야 그 위를 덮는다
+  const gate = createResumeGate(shell)
+
   async function continueWithAd() {
     if (state.phase !== 'over' || adReviveUsed) return
     const rewarded = await ctx.showRewardAd('bamboo-revive')
@@ -76,6 +80,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     adReviveUsed = true
     reviveBelow(state)
     overlay.hide()
+    await gate.wait()
   }
 
   async function gameOver() {

@@ -213,9 +213,35 @@
   }
 }
 
+/* 광고에서 돌아온 뒤 '준비되면 탭' 안내 — 판을 깔지 않고 글자만 띄운다.
+   여기서 할 일은 읽는 게 아니라 아무 데나 한 번 누르는 것이라, 누를 곳을
+   좁히는 판이 오히려 방해가 된다. 스크림 전체가 과녁이다. */
+.gui-gate {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.5;
+  color: #fff8ef;
+  text-align: center;
+  text-shadow: 0 2px 10px rgb(22 11 4 / 0.5);
+  word-break: keep-all;
+  animation: gui-breathe 1.6s ease-in-out infinite;
+}
+
+/* 멈춰 있는 화면이라 글자가 죽어 보인다 — 숨 쉬듯 옅어졌다 돌아온다 */
+@keyframes gui-breathe {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .gui-scrim.is-open,
   .gui-sheet,
+  .gui-gate,
   .gui-badge::after {
     animation: none;
   }

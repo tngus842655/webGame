@@ -10,6 +10,9 @@ export const JUMP_V = -1250
 // 예전에는 허공에 뜬 막대라 높이 뛰면 위로 넘어가졌고, 넘어야 하는지 지나야 하는지가 불분명했다.
 export const AIR_BAR_BOTTOM = GROUND_Y - 100
 
+// 판을 시작할 때 첫 장애물까지 두는 여유. 광고 이어하기도 같은 몫을 받는다
+export const START_SPAWN_DELAY = 1.4
+
 export type Phase = 'playing' | 'over'
 
 export interface Obstacle {
@@ -59,7 +62,7 @@ export function createState(): RunnerState {
     jumpsLeft: 2,
     obstacles: [],
     coins: [],
-    spawnTimer: 1.4,
+    spawnTimer: START_SPAWN_DELAY,
     coinTimer: 3,
   }
 }

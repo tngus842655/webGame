@@ -293,6 +293,11 @@ function onLangChange() {
       </div>
     </section>
 
+    <RouterLink class="menu-link" to="/feedback">
+      <span>{{ t('fb.title') }}</span>
+      <span class="arrow"><UiIcon name="chevron" /></span>
+    </RouterLink>
+
     <RouterLink class="menu-link" to="/notes">
       <span>{{ t('notes.title') }}</span>
       <span class="arrow"><UiIcon name="chevron" /></span>

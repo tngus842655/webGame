@@ -61,6 +61,21 @@ export async function ensureUserId(): Promise<string> {
   return cachedUserId
 }
 
+// 계정은 사라졌는데 토큰만 남은 상태에서 빠져나오는 길.
+// JWT는 계정이 있든 없든 만료 전까지 형식상 유효해서 supabase-js가 세션을 그대로
+// 들고 있는다(액세스 토큰이 살아 있으면 갱신에 실패해도 보존한다). 그동안 프로필
+// 조회도 소셜 연동도 전부 막히므로, 끊고 새 게스트 계정을 만들어 준다.
+// 부르는 쪽은 '계정이 없다'가 확실할 때만 부를 것 — 네트워크 오류로 부르면
+// 멀쩡한 세션을 날린다.
+export async function resetSession(): Promise<string> {
+  const sb = await getSupabase()
+  // 지워진 계정의 토큰이라 서버는 401/404로 답하지만, 그 경우도 로컬 세션은 지워진다
+  await sb.auth.signOut()
+  cachedUserId = null
+  linkedProvider.value = null
+  return ensureUserId()
+}
+
 // 회원 탈퇴. 지우는 일은 전부 delete_my_account()가 하고, 여기서는 흔적만 정리한다
 // (세션을 끊지 않으면 이미 없는 계정의 토큰으로 요청이 나간다).
 export async function deleteMyAccount(): Promise<void> {
