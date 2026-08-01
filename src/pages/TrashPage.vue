@@ -4,14 +4,11 @@
 import { GAMES } from '@/games/registry'
 import GameCard from '@/shared/GameCard.vue'
 import { t } from '@/shared/i18n'
-import { getLocalBest, popularityRanks, trashedGames } from '@/shared/scores'
+import { getLocalBest, trashedGames } from '@/shared/scores'
 import UiIcon from '@/shared/UiIcon.vue'
 
-// 순위는 홈과 같은 기준으로 매긴다 — 그래서 홈에서 비어 보이는 번호가 여기에 있다
-const ranks = popularityRanks(GAMES)
 const cards = trashedGames(GAMES).map((game) => ({
   ...game,
-  rank: ranks.get(game.slug) ?? null,
   best: getLocalBest(game.slug),
 }))
 </script>
@@ -32,7 +29,6 @@ const cards = trashedGames(GAMES).map((game) => ({
         :key="game.slug"
         :slug="game.slug"
         :title-key="game.titleKey"
-        :rank="game.rank"
         :label="game.best === null ? '' : t('home.best', { n: game.best.toLocaleString() })"
       />
     </main>

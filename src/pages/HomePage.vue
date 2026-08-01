@@ -12,7 +12,6 @@ import {
   featuredSlugs,
   fetchMyStats,
   getLocalBest,
-  popularityRanks,
   refreshPopularity,
   sortByPopularity,
   syncLocalBests,
@@ -39,12 +38,9 @@ function play(slug: string) {
 }
 
 // 카드 순서는 캐시된 인기순으로 처음부터 확정하고, 서버 응답으로는 내 기록만 채운다.
-// 순위 숫자도 같은 캐시에서 나온다 — 아직 기록이 없는 게임은 숫자가 없다.
-const ranks = popularityRanks(GAMES)
 const cards = ref(
   sortByPopularity(GAMES).map((game) => ({
     ...game,
-    rank: ranks.get(game.slug) ?? null,
     best: getLocalBest(game.slug),
     stat: null as MyGameStat | null,
   })),
@@ -130,12 +126,13 @@ function paintCarousel() {
   for (let i = 0; i < m.slots.length; i++) {
     const gap = (m.originLeft + i * m.step + m.cardWidth / 2 - mid) / m.step
     const away = Math.abs(gap)
-    // 옆으로 한 칸을 넘어가면 더 눕지도 작아지지도 않는다 (가운데 120 : 양옆 80)
+    // 옆으로 한 칸을 넘어가면 더 눕지도 작아지지도 않는다 (가운데 120 : 양옆 60).
+    // 양옆이 반으로 줄면서 벌어진 자리는 안쪽으로 당겨 메운다.
     const turn = Math.max(-1, Math.min(1, gap))
     const slot = m.slots[i]
     slot.style.transform =
-      `perspective(620px) translateX(${(-turn * 13).toFixed(1)}px)` +
-      ` rotateY(${(turn * 20).toFixed(1)}deg) scale(${(1 - Math.min(away, 1) * 0.333).toFixed(3)})`
+      `perspective(620px) translateX(${(-turn * 24).toFixed(1)}px)` +
+      ` rotateY(${(turn * 20).toFixed(1)}deg) scale(${(1 - Math.min(away, 1) * 0.5).toFixed(3)})`
     slot.style.opacity = (1 - Math.min(away, 2) * 0.2).toFixed(2)
     slot.style.zIndex = String(30 - Math.round(Math.min(away, 2) * 10))
     if (away < nearestGap) {
@@ -247,14 +244,30 @@ onBeforeUnmount(() => {
       <h2><UiIcon name="flame" />{{ t('home.sectionPopular') }}</h2>
       <div class="game-grid">
         <GameCard
-          v-for="game in top3"
+          v-for="(game, index) in top3"
           :key="game.slug"
           favoritable
           :slug="game.slug"
           :title-key="game.titleKey"
-          :rank="game.rank"
+          :medal="index + 1"
           :label="scoreLabel(game)"
         />
+      </div>
+    </section>
+
+    <section v-if="recentGames.length > 0" class="shelf recent">
+      <h2><UiIcon name="clock" />{{ t('home.sectionRecent') }}</h2>
+      <div class="recent-row">
+        <button
+          v-for="game in recentGames"
+          :key="game.slug"
+          type="button"
+          class="recent-item"
+          @click="play(game.slug)"
+        >
+          <span class="recent-thumb"><GameIcon :slug="game.slug" /></span>
+          <span class="recent-name">{{ t(game.titleKey) }}</span>
+        </button>
       </div>
     </section>
 
@@ -282,7 +295,6 @@ onBeforeUnmount(() => {
             favoritable
             :slug="game.slug"
             :title-key="game.titleKey"
-            :rank="game.rank"
             :label="scoreLabel(game)"
           />
         </div>
@@ -303,7 +315,6 @@ onBeforeUnmount(() => {
             favoritable
             :slug="game.slug"
             :title-key="game.titleKey"
-            :rank="game.rank"
             :label="scoreLabel(game)"
           />
         </div>
@@ -319,7 +330,6 @@ onBeforeUnmount(() => {
             :class="{ 'is-center': index === centerIndex }"
           >
             <button type="button" class="cf-card" @click="tapCard(index, game.slug)">
-              <span v-if="game.rank !== null" class="rank">{{ game.rank }}</span>
               <span class="thumb"><GameIcon :slug="game.slug" /></span>
               <strong>{{ t(game.titleKey) }}</strong>
               <small>{{ scoreLabel(game) }}</small>
@@ -338,22 +348,6 @@ onBeforeUnmount(() => {
             <UiIcon name="play" />{{ t('home.play') }}
           </button>
         </div>
-      </div>
-    </section>
-
-    <section v-if="recentGames.length > 0" class="shelf recent">
-      <h2><UiIcon name="clock" />{{ t('home.sectionRecent') }}</h2>
-      <div class="recent-row">
-        <button
-          v-for="game in recentGames"
-          :key="game.slug"
-          type="button"
-          class="recent-item"
-          @click="play(game.slug)"
-        >
-          <span class="recent-thumb"><GameIcon :slug="game.slug" /></span>
-          <span class="recent-name">{{ t(game.titleKey) }}</span>
-        </button>
       </div>
     </section>
 
@@ -482,35 +476,34 @@ onBeforeUnmount(() => {
 }
 
 /* ── 탭 ───────────────────────────────────────────── */
+/* 셋 다 같은 캡슐이다. 고르지 않은 것도 눌리는 것처럼 보이도록 옅은 판과
+   가는 테를 두르고, 고른 것만 판을 채우고 떠오른다. */
 .tabs {
   display: flex;
-  gap: 2px;
-  margin-bottom: 8px;
-  padding: 4px;
-  border-radius: 17px;
-  background: var(--line-soft);
+  gap: 6px;
+  margin-bottom: 10px;
 }
 
-/* 셋으로 똑같이 잘라 나누면 "더 많은 게임"만 자리가 모자라 잘렸다.
-   글자 길이대로 나눠 갖고, 남는 폭만 고르게 편다. */
 .tabs button {
   display: flex;
   flex: 1 1 auto;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 5px;
   min-width: 0;
-  padding: 9px 5px;
+  padding: 10px 8px;
   border: none;
-  border-radius: 13px;
-  background: none;
-  color: var(--ink-faint);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--ink-muted);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: -0.02em;
   cursor: pointer;
   transition:
     background-color 0.14s ease,
+    box-shadow 0.14s ease,
     color 0.14s ease;
 }
 
@@ -526,20 +519,30 @@ onBeforeUnmount(() => {
   height: 13px;
 }
 
+.tabs button[aria-selected='true'] {
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  color: var(--ink);
+}
+
+.tabs button:active {
+  transform: scale(0.97);
+}
+
+/* 어두운 테마에서는 판 색이 반투명 판과 밝기가 가까워 고른 탭이 묻힌다.
+   한 단계 더 밝은 면으로 띄운다. */
+[data-theme='dark'] .tabs button[aria-selected='true'] {
+  background: var(--surface-press);
+}
+
 /* 화면 크게를 올린 기기는 한 줄에 아이콘과 글자가 다 들어가지 않는다.
    글자를 자르느니 아이콘을 위로 올린다 (러시아어·독일어도 여기서 살아난다). */
 @media (max-width: 330px) {
   .tabs button {
     flex-direction: column;
     gap: 2px;
-    padding: 6px 4px;
+    padding: 8px 4px;
   }
-}
-
-.tabs button[aria-selected='true'] {
-  background: var(--surface);
-  color: var(--ink);
-  box-shadow: var(--shadow-card);
 }
 
 /* ── 좌우로 흐르는 카드 ────────────────────────────── */
@@ -549,8 +552,10 @@ onBeforeUnmount(() => {
   position: relative;
   display: flex;
   gap: 12px;
-  /* 첫 장과 끝 장도 한가운데에 설 수 있도록 양옆을 카드 반쪽만큼 비운다 */
-  padding: 16px calc(50% - 66px) 28px;
+  /* 첫 장과 끝 장도 한가운데에 설 수 있도록 양옆을 카드 반쪽만큼 비운다.
+     아래 여백은 가운데 카드 그림자가 앉을 자리다 — 이 값이 곧 카드와 플레이
+     버튼 사이 간격이라 그림자를 낮게 깔고 여백도 같이 줄였다. */
+  padding: 14px calc(50% - 66px) 16px;
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
@@ -589,24 +594,15 @@ onBeforeUnmount(() => {
 
 /* 가운데만 바닥에서 확실히 떠 있게 — 크기 차이만으로는 앞뒤가 덜 읽힌다 */
 .is-center .cf-card {
-  box-shadow: var(--shadow-lift);
+  box-shadow:
+    0 2px 4px rgb(93 64 55 / 0.1),
+    0 8px 18px rgb(93 64 55 / 0.2);
 }
 
-.cf-card .rank {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  display: grid;
-  place-items: center;
-  min-width: 21px;
-  height: 21px;
-  padding: 0 5px;
-  border-radius: 999px;
-  background: var(--line-soft);
-  color: var(--ink-faint);
-  font-size: 12px;
-  font-weight: bold;
-  line-height: 1;
+[data-theme='dark'] .is-center .cf-card {
+  box-shadow:
+    0 2px 4px rgb(0 0 0 / 0.4),
+    0 8px 18px rgb(0 0 0 / 0.55);
 }
 
 .cf-card .thumb {

@@ -44,10 +44,12 @@
 
   --bg-top: #211b18;
   --bg-bottom: #171310;
-  --surface: #2b2320;
+  /* 반투명 판(--surface-soft)이 어두운 바탕 위에서 #2a2421쯤으로 앉는다.
+     판을 그보다 확실히 밝게 잡지 않으면 카드가 칸 바닥에 묻혀 테두리가 사라진다. */
+  --surface: #322a26;
   --surface-soft: rgb(255 255 255 / 0.055);
   --surface-tint: #3a2c1d;
-  --surface-press: #362d29;
+  --surface-press: #3e3531;
   --ink: #f4eae3;
   --ink-body: #e5d8d0;
   --ink-muted: #b9a69c;
