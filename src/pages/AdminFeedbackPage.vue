@@ -3,6 +3,7 @@
 // 답변 기능은 없다. 여기서 하는 일은 읽고 다음 커밋에 반영할지 판단하는 것까지다.
 import { onMounted, ref } from 'vue'
 import {
+  deleteFeedback,
   feedbackSeenAt,
   fetchFeedback,
   FEEDBACK_KINDS,
@@ -43,6 +44,26 @@ onMounted(async () => {
   }
 })
 
+// 지우기 — 되돌릴 수 없으니 한 번 더 묻는다. 목록 안에서 묻는 일이라 팝업을 띄우지
+// 않고 그 카드의 버튼 자리에서 물어본다 (계정 삭제 화면과 같은 방식).
+const pending = ref(0)
+const deleting = ref(false)
+const error = ref('')
+
+async function remove(item: FeedbackItem) {
+  deleting.value = true
+  error.value = ''
+  try {
+    await deleteFeedback(item.id)
+    items.value = items.value.filter((row) => row.id !== item.id)
+    pending.value = 0
+  } catch {
+    error.value = t('admin.feedbackDeleteFailed')
+  } finally {
+    deleting.value = false
+  }
+}
+
 // 언제 온 것인지가 판단 재료라 날짜와 시각을 함께 본다
 function when(iso: string): string {
   return new Date(iso).toLocaleString(locale.value, {
@@ -62,6 +83,8 @@ function when(iso: string): string {
       <span v-if="items.length" class="total">{{ items.length }}</span>
     </header>
 
+    <p v-if="error" class="error">{{ error }}</p>
+
     <p v-if="loading" class="notice">{{ t('ranking.loading') }}</p>
     <p v-else-if="failed" class="notice">{{ t('admin.feedbackFailed') }}</p>
     <p v-else-if="items.length === 0" class="notice">{{ t('admin.feedbackEmpty') }}</p>
@@ -75,6 +98,20 @@ function when(iso: string): string {
         </div>
         <h2>{{ item.title }}</h2>
         <p class="body">{{ item.body }}</p>
+        <div class="actions">
+          <template v-if="pending === item.id">
+            <span class="ask">{{ t('admin.feedbackDeleteAsk') }}</span>
+            <button type="button" class="ghost" :disabled="deleting" @click="pending = 0">
+              {{ t('account.cancel') }}
+            </button>
+            <button type="button" class="danger" :disabled="deleting" @click="remove(item)">
+              {{ t('admin.feedbackDelete') }}
+            </button>
+          </template>
+          <button v-else type="button" class="ghost" @click="pending = item.id">
+            {{ t('admin.feedbackDelete') }}
+          </button>
+        </div>
       </li>
     </ul>
   </div>
@@ -192,6 +229,57 @@ function when(iso: string): string {
   /* 길게 쓴 글이 목록을 다 밀어내지 않도록 카드 안에서 굴린다 */
   max-height: 300px;
   overflow-y: auto;
+}
+
+.error {
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: var(--danger);
+}
+
+/* 지우기는 자주 쓰는 동작이 아니라 카드 오른쪽 아래에 옅게 둔다 */
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.ask {
+  margin-right: auto;
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.actions button {
+  padding: 5px 12px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.actions button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.ghost {
+  border: none;
+  background: none;
+  color: var(--ink-faint);
+}
+
+.danger {
+  border: 1px solid #ffccbc;
+  background: var(--surface);
+  color: #e65100;
+}
+
+[data-theme='dark'] .danger {
+  border-color: rgb(230 81 0 / 0.45);
+  color: #ffab91;
 }
 
 [data-theme='dark'] .badge.bug {

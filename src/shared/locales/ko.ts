@@ -60,6 +60,9 @@ const dict: FullDict = {
   'admin.feedbackEmpty': '아직 받은 의견이 없어요.',
   'admin.feedbackFailed': '의견을 불러오지 못했어요. 잠시 후 다시 시도해주세요.',
   'admin.feedbackNew': '안 읽음',
+  'admin.feedbackDelete': '삭제',
+  'admin.feedbackDeleteAsk': '지울까요? 되돌릴 수 없어요.',
+  'admin.feedbackDeleteFailed': '지우지 못했어요.',
   'stats.days': '최근 {n}일',
   'stats.hint':
     '기간은 달력 기준이 아니라 지금부터 거꾸로 세는 구간입니다(최근 1일 = 어제 이 시각부터). 한 구간은 끊기지 않고 이어서 논 시간이고, 앱을 백그라운드로 보내면 거기서 끊깁니다 — 구간 수는 판 수가 아닙니다.',

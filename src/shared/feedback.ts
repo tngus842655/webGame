@@ -89,3 +89,13 @@ export async function fetchFeedback(): Promise<FeedbackItem[]> {
     nickname: (Array.isArray(row.profiles) ? row.profiles[0] : row.profiles)?.nickname ?? '',
   }))
 }
+
+// 관리자만 통과한다 (RLS가 막는다)
+export async function deleteFeedback(id: number): Promise<void> {
+  const sb = await getSupabase()
+  // select()를 붙여 실제로 지워진 행을 돌려받는다. RLS에 걸리면 오류가 아니라
+  // '0행 삭제'로 조용히 성공해서, 화면에서만 사라지고 다시 들어오면 되살아난다.
+  const { data, error } = await sb.from('feedback').delete().eq('id', id).select('id')
+  if (error) throw error
+  if ((data ?? []).length === 0) throw new Error('지워진 행이 없습니다')
+}

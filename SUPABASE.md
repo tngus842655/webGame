@@ -21,6 +21,7 @@
 | `20260730000000_stats_players.sql` | `get_total_players()` | ✅ |
 | `20260731000000_delete_account.sql` | `delete_my_account()` — 회원 탈퇴 | ✅ 2026-07-29 |
 | `20260801000000_feedback.sql` | `feedback` 테이블 — 의견 접수, 분당 3회 제한 | ✅ 2026-08-01 |
+| `20260801100000_feedback_delete.sql` | `feedback` 삭제 정책 (관리자만) | ⬜ **미적용** |
 
 ## 테이블
 
@@ -31,7 +32,7 @@
 | `play_sessions` | 플레이 시간 기록 (인기도 산출용) | 조회 전체 공개 / insert는 본인만 |
 | `admin_emails` | 관리자 이메일 목록 | **정책 없음** = 클라이언트 접근 불가. 추가는 대시보드에서 직접 |
 | `game_flags` | 게임 고정·숨김·휴지통 | 조회 전체 공개 / 쓰기는 관리자만 |
-| `feedback` | 사용자 의견 (버그·문의·제안) | insert는 본인만 / **조회는 관리자만** / update·delete 정책 없음(금지) |
+| `feedback` | 사용자 의견 (버그·문의·제안) | insert는 본인만 / **조회·삭제는 관리자만** / update 정책 없음(금지) |
 
 삭제 연쇄: `auth.users` → `profiles` → `scores`·`play_sessions`·`feedback` 순으로
 `on delete cascade`가 걸려 있다. 최상위 한 줄만 지우면 전부 따라 지워진다.
