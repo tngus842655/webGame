@@ -43,7 +43,16 @@ android {
             if (keystorePropertiesFile.exists()) {
                 signingConfig signingConfigs.release
             }
-            minifyEnabled false
+            // R8을 켜면 매핑 파일(mapping.txt)이 .aab 안에 같이 실려 가고 Play가 그걸로
+            // 크래시 로그의 난독화된 이름을 되돌린다. Console의 '가독화 파일이 없습니다'
+            // 경고도 이것 때문에 뜨던 것이다 — 따로 업로드할 필요는 없다.
+            //
+            // 캐패시터 플러그인은 리플렉션으로 찾아 쓰는데, 캐패시터가 자기 라이브러리에
+            // 넣어 배포하는 규칙(consumerProguardFiles)이 Plugin 상속 클래스를 통째로
+            // 지켜 주므로 우리 쪽에 따로 적을 것은 없다.
+            minifyEnabled true
+            // shrinkResources는 켜지 않는다. 스플래시가 drawable·layout을 이름으로 찾는데
+            // (SplashScreen.java의 getResources().getIdentifier) 그런 건 안 쓰는 것으로 보고 지운다.
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

@@ -14,8 +14,9 @@
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# R8은 기본적으로 줄 번호를 지운다. 남겨 두어야 크래시 로그에서 몇 번째 줄인지 보인다.
+-keepattributes SourceFile,LineNumberTable
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
-#-renamesourcefileattribute SourceFile
+-renamesourcefileattribute SourceFile
