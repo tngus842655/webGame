@@ -154,8 +154,10 @@ TWA는 그 자체가 크롬이라 이 문제가 없었다. 앱에서 로그인�
 앱 웹뷰에서 게재하면 프로그램 정책 위반이고 게시자 계정이 제재 대상이 된다.
 웹과 앱인토스는 지금까지대로 AdSense, 안드로이드 앱만 AdMob으로 간다.
 
-**지금은 광고가 꺼져 있다.** `VITE_ADMOB_REWARD_ID`가 비어 있으면 5초 카운트다운 스텁으로
-떨어지고, 매니페스트의 AdMob 앱 ID도 구글이 공개한 테스트 ID가 박혀 있다.
+**지금은 광고가 꺼져 있다.** `VITE_ADMOB_REWARD_ID`가 비어 있거나 테스트 단위면
+5초 카운트다운 스텁 또는 구글 테스트 광고로 떨어진다. 매니페스트의 AdMob 앱 ID는
+실제 값(`ca-app-pub-9942492825878908~7836378510`)으로 바꿔 두었다 — **앱 ID만으로는
+광고가 나가지 않는다.** 실제 광고는 광고 단위 ID를 넣는 순간 시작된다.
 
 ### 광고를 실제로 켤 때
 
@@ -165,7 +167,7 @@ SDK가 링크되어 있는 것만으로 `AD_ID` 권한이 AAB에 병합되므로
 
 | 곳 | 할 일 |
 | --- | --- |
-| `AndroidManifest.xml`의 `APPLICATION_ID` | AdMob 앱 ID (`ca-app-pub-…~…`)로 교체 |
+| ~~`AndroidManifest.xml`의 `APPLICATION_ID`~~ | ✅ 완료 — 실제 앱 ID로 교체해 두었다 |
 | `AndroidManifest.xml`의 `AD_ID` `tools:node="remove"` | 그 `<uses-permission>` 블록을 지운다 |
 | `.env.local`의 `VITE_ADMOB_REWARD_ID` | 리워드 광고 단위 ID (`ca-app-pub-…/…`) |
 | Play Console | '광고 ID 사용' → 예, 데이터 보안·개인정보처리방침 갱신 (`PLAY_CONSOLE.md`) |

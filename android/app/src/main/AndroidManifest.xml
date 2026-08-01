@@ -36,12 +36,14 @@
 
         </activity>
 
-        <!-- AdMob 앱 ID. 지금 박혀 있는 값은 구글이 공개한 테스트용이다.
-             실제 광고를 켜기 전에 AdMob 콘솔에서 발급받은 값으로 바꿀 것 —
-             이 meta-data가 실제 값이 아니면 광고를 켜는 순간 앱이 죽는다. -->
+        <!-- AdMob 앱 ID (실제 값). 물결(~) 뒤가 앱 번호다 — 슬래시(/)로 된
+             광고 단위 ID와 다른 값이니 섞어 넣지 말 것. 이 값이 틀리면 광고를
+             켜는 순간 앱이 죽는다.
+             이것만으로 실제 광고가 나가지는 않는다. 실제 광고는 VITE_ADMOB_REWARD_ID에
+             진짜 광고 단위 ID가 들어가야 시작된다 (ANDROID_RELEASE.md 참고). -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="ca-app-pub-9942492825878908~7836378510" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
