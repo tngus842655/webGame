@@ -207,9 +207,13 @@ onMounted(async () => {
   box-shadow: 0 2px 6px rgb(141 110 99 / 0.3);
 }
 
+/* 1fr의 최소 폭은 0이 아니라 min-content다. 카드 밑 기록 문구가 nowrap이라
+   "7,135점 (1등)" 같은 줄이 열을 밀어냈고, 화면 크게/작게를 올려 폭이 좁아진
+   기기에서는 인기 칸이 통째로 오른쪽으로 넘쳤다 (350px부터). 0까지 줄어들게
+   열어두면 문구가 이미 걸려 있는 말줄임으로 접힌다. */
 .game-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 }
 
