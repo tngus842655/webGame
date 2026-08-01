@@ -138,6 +138,12 @@ function cachedFlags(): Map<string, CachedFlag> {
   }
 }
 
+// 캐시가 아예 없는 첫 실행인지. 홈은 평소 서버 응답을 다음 진입으로 미루지만
+// (보는 도중 카드가 움직이면 안 된다) 첫 실행에는 미룰 배열 자체가 없다.
+export function hasCachedFlags(): boolean {
+  return localStorage.getItem(FLAGS_KEY) !== null
+}
+
 export function cacheGameFlags(rows: Array<[string, CachedFlag]>): void {
   localStorage.setItem(FLAGS_KEY, JSON.stringify(rows))
 }

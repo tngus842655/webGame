@@ -1,3 +1,12 @@
+<script lang="ts">
+type TabKey = 'new' | 'favorite' | 'more'
+
+// 게임에 들어갔다 나오면 홈은 새로 만들어진다. 고른 탭과 캐러셀이 멈춘 자리는
+// 컴포넌트 밖에 둬야 그 사이를 건너뛴다. 앱을 껐다 켜면 기본값으로 돌아간다.
+let keptTab: TabKey = 'more'
+let keptScroll = 0
+</script>
+
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -11,6 +20,7 @@ import UiIcon from '@/shared/UiIcon.vue'
 import {
   featuredSlugs,
   fetchMyStats,
+  hasCachedFlags,
   getLocalBest,
   refreshPopularity,
   sortByPopularity,
@@ -47,9 +57,9 @@ const cards = ref(
 )
 
 // sortByPopularity가 신규(관리자가 올린 것)를 이미 앞에 세워두므로 여기서는 가르기만 한다
-const featured = featuredSlugs()
-const fresh = computed(() => cards.value.filter((card) => featured.has(card.slug)))
-const ranked = computed(() => cards.value.filter((card) => !featured.has(card.slug)))
+const featured = ref(featuredSlugs())
+const fresh = computed(() => cards.value.filter((card) => featured.value.has(card.slug)))
+const ranked = computed(() => cards.value.filter((card) => !featured.value.has(card.slug)))
 
 const top3 = computed(() => ranked.value.slice(0, 3))
 const moreGames = computed(() => ranked.value.slice(3))
@@ -68,8 +78,6 @@ const recentGames = computed(() => {
   return recents.value.flatMap((slug) => bySlug.get(slug) ?? [])
 })
 
-type TabKey = 'new' | 'favorite' | 'more'
-
 const TABS: Array<{ key: TabKey; labelKey: TranslationKey; icon: 'sparkle' | 'star' | 'gamepad' }> =
   [
     { key: 'new', labelKey: 'home.sectionNew', icon: 'sparkle' },
@@ -77,9 +85,12 @@ const TABS: Array<{ key: TabKey; labelKey: TranslationKey; icon: 'sparkle' | 'st
     { key: 'more', labelKey: 'home.sectionMore', icon: 'gamepad' },
   ]
 
-// 셋 중 '더 많은 게임'만 항상 차 있다 — 신규는 관리자가 안 올렸을 수 있고,
-// 즐겨찾기는 처음 켠 사람에게 비어 있다. 열자마자 빈 칸을 보여주지 않는다.
-const tab = ref<TabKey>('more')
+// 게임을 다녀오면 보던 탭으로 돌아온다. 처음 켰을 때의 기본은 '더 많은 게임' —
+// 셋 중 유일하게 항상 차 있다 (신규는 관리자가 안 올렸을 수 있고, 즐겨찾기는 비어 있다).
+const tab = ref<TabKey>(keptTab)
+watch(tab, (key) => {
+  keptTab = key
+})
 
 // ── 좌우로 흐르는 카드 (끝이 없다) ─────────────────────
 // 같은 목록을 세 벌 이어 붙이고 가운데 벌에서만 논다. 손을 뗀 뒤 가운데 벌을
@@ -171,7 +182,21 @@ function normalizeLoop() {
 function onTrackScroll() {
   scheduleCarousel()
   clearTimeout(settleTimer)
-  settleTimer = window.setTimeout(normalizeLoop, SETTLE_MS)
+  settleTimer = window.setTimeout(() => {
+    normalizeLoop()
+    // 멈출 때마다 남겨둔다 — 게임에 들어가면 이 자리로 돌아온다
+    if (track.value) keptScroll = track.value.scrollLeft
+  }, SETTLE_MS)
+}
+
+// 처음이면 가운데 벌의 첫 장에서, 다녀온 뒤라면 멈췄던 자리에서 시작한다.
+// 첫 장 왼쪽에도 카드가 서 있어야 끝이 없어 보인다.
+function restoreCarousel() {
+  const el = track.value
+  if (!el || el.clientWidth === 0) return
+  const start = keptScroll > 0 ? keptScroll : homeOffset(el)
+  if (Math.abs(el.scrollLeft - start) > 0.5) el.scrollLeft = start
+  paintCarousel()
 }
 
 function focusCard(index: number) {
@@ -199,31 +224,48 @@ const centerGame = computed(() => {
 watch(tab, async (key) => {
   if (key !== 'more') return
   await nextTick()
-  paintCarousel()
+  restoreCarousel()
 })
 
 // 휴지통에 아무것도 없으면 입구를 만들지 않는다
 const trashCount = trashedGames(GAMES).length
 
 onMounted(async () => {
-  // 가운데 벌에서 시작한다 — 첫 장 왼쪽에도 카드가 서 있어야 끝이 없어 보인다
-  if (track.value) track.value.scrollLeft = homeOffset(track.value)
-  paintCarousel()
+  restoreCarousel()
   window.addEventListener('resize', scheduleCarousel)
-  // 노출 설정·인기도는 캐시에 담아두고 다음 진입부터 반영한다 (보는 도중 카드가 움직이지 않도록)
-  void fetchGameFlags().catch(() => {})
+  // 설치하고 처음 켠 순간에는 노출 설정 캐시가 비어 있다. 관리자가 신규로 올린
+  // 게임이 있어도 '신규 게임' 칸이 빈 채로 뜨던 이유다 — 다른 화면을 다녀오면
+  // 그제서야 채워졌다. 아직 아무 배열도 보지 않은 때라 미룰 이유가 없으니,
+  // 이때만 응답을 기다렸다 목록을 세운다.
+  const firstRun = !hasCachedFlags()
+  const flags = fetchGameFlags().catch(() => {})
   void ensureAdminChecked()
-  const [, myStats] = await Promise.all([
+  const [, , myStats] = await Promise.all([
+    flags,
     refreshPopularity(),
     fetchMyStats().catch(() => [] as MyGameStat[]),
   ])
   // 서버 기록을 로컬에 되먹인다 — 안 하면 플레이 화면의 최고 기록이 이 기기 값에 머문다
   syncLocalBests(myStats)
   const statBySlug = new Map(myStats.map((stat) => [stat.game_slug, stat]))
+  if (firstRun) {
+    featured.value = featuredSlugs()
+    cards.value = sortByPopularity(GAMES).map((game) => ({
+      ...game,
+      best: getLocalBest(game.slug),
+      stat: statBySlug.get(game.slug) ?? null,
+    }))
+    await nextTick()
+    restoreCarousel()
+    return
+  }
+  // 두 번째부터는 예전대로 — 캐시된 배열을 그대로 두고 내 기록만 채운다
   cards.value = cards.value.map((card) => ({ ...card, stat: statBySlug.get(card.slug) ?? null }))
 })
 
 onBeforeUnmount(() => {
+  // 손을 뗀 직후 카드를 눌러 들어가면 아직 안 남았을 수 있다
+  if (track.value && track.value.scrollLeft > 0) keptScroll = track.value.scrollLeft
   window.removeEventListener('resize', scheduleCarousel)
   clearTimeout(settleTimer)
   if (frame) cancelAnimationFrame(frame)
