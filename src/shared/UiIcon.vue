@@ -130,7 +130,11 @@ defineProps<{
 </template>
 
 <style scoped>
-.ui-icon {
+/* 크기는 놓이는 자리가 정하고, 여기 값은 아무도 안 정했을 때의 바탕이다.
+   :where()로 감싸 특정도를 0으로 만들지 않으면 이 규칙이 (클래스 + 스코프 속성)
+   바깥의 `dt svg`·`.back svg`처럼 클래스 없는 규칙을 이겨서, 아이콘이 지정한
+   크기를 무시하고 칸을 통째로 채운다 — 설명 팝업과 뒤로가기가 그랬다. */
+:where(.ui-icon) {
   display: block;
   width: 100%;
   height: 100%;
