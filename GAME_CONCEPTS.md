@@ -1,6 +1,7 @@
 # 게임 라인업
 
-> 기술 구조는 [DESIGN.md](./DESIGN.md) 참고.
+> 기술 구조는 [DESIGN.md](./DESIGN.md), 게임별 밸런스 분석은
+> [GAME_BALANCE.md](./GAME_BALANCE.md) 참고.
 
 ## 운영 계획
 
