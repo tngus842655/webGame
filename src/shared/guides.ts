@@ -157,9 +157,9 @@ const ko: Record<string, Guide> = {
     score: '별 하나에 50점, 판을 깰 때마다 100점 이상을 더 받습니다.',
   },
   marblejar: {
-    goal: '통 하나가 같은 색으로 가득 차면 비워지고 점수가 됩니다. 통에는 정해진 색이 없어요. 네 통이 다 차면 끝입니다.',
-    how: '구슬을 넣을 통을 탭하세요. 색이 섞인 통은 다시 비워지지 않으니 흐리게 표시됩니다.',
-    score: '구슬 하나에 5점, 통을 비울 때마다 120점. 비운 횟수가 쌓이면 나오는 색이 한 종씩 늘어납니다.',
+    goal: '통 하나가 같은 색으로 가득 차면 비워지고 점수가 됩니다. 색이 섞인 통은 다시 비워지지 않아요. 다섯 통이 다 차면 끝입니다.',
+    how: '구슬을 넣을 통을 탭하세요. 아래 빈 자리에 든 구슬을 잠시 맡겨 둘 수 있고, 통 비우기는 판마다 한 번 통 하나를 통째로 비웁니다.',
+    score: '구슬 하나에 5점, 통을 비울 때마다 120점. 구슬은 색마다 한 통 분량씩 든 가방에서 나오므로 남은 색을 세어 둘 수 있고, 가방이 새로 열릴 때마다 색이 늘기도 합니다.',
   },
   bamboo: {
     goal: '가지를 피해 대나무를 오르세요. 가지에 부딪히거나 시간 막대가 다하면 끝입니다.',
@@ -315,9 +315,9 @@ const en: Record<string, Guide> = {
     score: '50 per star plus 100+ for each board cleared.',
   },
   marblejar: {
-    goal: 'A jar filled with a single colour empties out and scores. No jar has a fixed colour. When all four are full, the run ends.',
-    how: 'Tap the jar you want the marble to go in. A jar with mixed colours can never empty, so it is dimmed.',
-    score: '5 per marble and 120 per jar emptied. Every few jars emptied adds another colour to the mix.',
+    goal: 'A jar filled with a single colour empties out and scores. A jar with mixed colours can never empty. When all five are full, the run ends.',
+    how: 'Tap the jar the marble should go in. Park the marble in hand on an empty slot below, and Empty a jar clears one jar outright, once per run.',
+    score: '5 per marble and 120 per jar emptied. Marbles come from a bag holding exactly one jarful of each colour, so you can count what is left. A new bag may bring another colour.',
   },
   bamboo: {
     goal: 'Climb the bamboo while dodging branches. Hit one, or let the time bar empty, and the run ends.',
@@ -473,9 +473,9 @@ const ja: Record<string, Guide> = {
     score: '星1つ50点、面をクリアするたびに100点以上。',
   },
   marblejar: {
-    goal: '筒が同じ色でいっぱいになると空になって得点です。筒に決まった色はありません。4本すべて埋まると終了です。',
-    how: '玉を入れる筒をタップします。色が混ざった筒は二度と空にならないので薄く表示されます。',
-    score: '玉1つ5点、筒を空けるごとに120点。空けた回数が増えると出る色が1種ずつ増えます。',
+    goal: '同じ色だけで筒が満たされると空になって点数になります。色が混ざった筒は二度と空になりません。5本とも満杯になると終了です。',
+    how: '玉を入れる筒をタップします。下の空き枠に持っている玉を預けられます。「筒を空ける」は1回だけ筒を丸ごと空にできます。',
+    score: '玉1個で5点、筒を空けるたびに120点。玉は色ごとに筒1本分ずつ入った袋から出るので残りを数えられます。袋が新しくなると色が増えることがあります。',
   },
   bamboo: {
     goal: '枝を避けて竹をのぼりましょう。枝にぶつかるか時間ゲージが尽きると終了です。',
@@ -631,9 +631,9 @@ const zhCN: Record<string, Guide> = {
     score: '每颗星50分，每过一盘再加100分以上。',
   },
   marblejar: {
-    goal: '筒里装满同一种颜色就会清空并得分。筒本身没有固定颜色。四个筒都满了就结束。',
-    how: '点击想放入的筒。混色的筒再也无法清空，所以会变暗。',
-    score: '每颗弹珠5分，清空一个筒120分。清空次数累积后出现的颜色会多一种。',
+    goal: '筒里装满同一种颜色就会清空并得分。混色的筒再也无法清空。五个筒都装满就结束。',
+    how: '点击要放入的筒。下方空位可以寄存手上的弹珠，清空一个筒每局一次，能把一个筒整个倒空。',
+    score: '每颗弹珠5分，每清空一个筒120分。弹珠从每种颜色各装一筒份的袋子里取出，可以数剩下的。换新袋子时颜色可能增加。',
   },
   bamboo: {
     goal: '避开竹枝往上爬。撞到枝条或时间条耗尽就结束。',
@@ -789,9 +789,9 @@ const es: Record<string, Guide> = {
     score: '50 por estrella y 100+ por tablero superado.',
   },
   marblejar: {
-    goal: 'Un tarro lleno de un solo color se vacía y puntúa. Ningún tarro tiene color fijo. Cuando los cuatro se llenan, termina.',
-    how: 'Toca el tarro donde quieres la canica. Un tarro con colores mezclados ya no puede vaciarse y se atenúa.',
-    score: '5 por canica y 120 por tarro vaciado. Cada pocos vaciados entra un color más en juego.',
+    goal: 'Un tarro lleno de un solo color se vacía y suma puntos. Un tarro con colores mezclados ya no se vacía. Cuando los cinco están llenos, termina la partida.',
+    how: 'Toca el tarro donde poner la canica. Puedes guardar la canica en mano en una ranura vacía de abajo, y Vaciar tarro deja un tarro limpio una vez por partida.',
+    score: '5 por canica y 120 por cada tarro vaciado. Las canicas salen de una bolsa con un tarro exacto de cada color, así que puedes contarlas. Cada bolsa nueva puede traer otro color.',
   },
   bamboo: {
     goal: 'Trepa el bambú esquivando las ramas. Si chocas o se agota la barra de tiempo, termina.',
@@ -947,9 +947,9 @@ const ptBR: Record<string, Guide> = {
     score: '50 por estrela e 100+ por tabuleiro concluído.',
   },
   marblejar: {
-    goal: 'Um pote cheio de uma só cor se esvazia e pontua. Nenhum pote tem cor fixa. Quando os quatro enchem, a partida acaba.',
-    how: 'Toque no pote onde quer a bolinha. Um pote com cores misturadas nunca mais esvazia, por isso fica apagado.',
-    score: '5 por bolinha e 120 por pote esvaziado. A cada poucos potes entra mais uma cor no jogo.',
+    goal: 'Um pote cheio de uma só cor se esvazia e pontua. Um pote com cores misturadas nunca mais se esvazia. Quando os cinco estiverem cheios, a rodada acaba.',
+    how: 'Toque no pote onde colocar a bolinha. Dá para guardar a bolinha em mão num espaço vazio abaixo, e Esvaziar pote limpa um pote inteiro, uma vez por rodada.',
+    score: '5 por bolinha e 120 por pote esvaziado. As bolinhas saem de um saco com um pote exato de cada cor, então dá para contar. Cada saco novo pode trazer mais uma cor.',
   },
   bamboo: {
     goal: 'Suba o bambu desviando dos galhos. Se bater num galho ou a barra de tempo zerar, a partida acaba.',
@@ -1105,9 +1105,9 @@ const fr: Record<string, Guide> = {
     score: '50 par étoile et 100+ par plateau réussi.',
   },
   marblejar: {
-    goal: 'Un bocal rempli d\'une seule couleur se vide et rapporte des points. Aucun bocal n\'a de couleur fixe. Quand les quatre sont pleins, c\'est fini.',
-    how: 'Touche le bocal où mettre la bille. Un bocal aux couleurs mélangées ne se vide plus, il est donc grisé.',
-    score: '5 par bille et 120 par bocal vidé. Tous les quelques bocaux vidés, une couleur de plus entre en jeu.',
+    goal: 'Un bocal rempli d\'une seule couleur se vide et rapporte des points. Un bocal aux couleurs mêlées ne se vide plus jamais. Quand les cinq sont pleins, la partie est finie.',
+    how: 'Touche le bocal où placer la bille. Tu peux poser la bille en main sur un emplacement vide en bas, et Vider un bocal en nettoie un entièrement, une fois par partie.',
+    score: '5 par bille et 120 par bocal vidé. Les billes sortent d\'un sac contenant un bocal exact de chaque couleur, tu peux donc compter. Chaque nouveau sac peut amener une couleur de plus.',
   },
   bamboo: {
     goal: 'Grimpe le bambou en évitant les branches. Une collision ou la jauge de temps vide et c\'est fini.',
@@ -1263,9 +1263,9 @@ const de: Record<string, Guide> = {
     score: '50 pro Stern und 100+ pro geschafftem Feld.',
   },
   marblejar: {
-    goal: 'Ein Glas voll einer einzigen Farbe leert sich und bringt Punkte. Kein Glas hat eine feste Farbe. Sind alle vier voll, ist Schluss.',
-    how: 'Tippe das Glas an, in das die Murmel soll. Ein gemischtes Glas leert sich nie wieder und wird abgedunkelt.',
-    score: '5 pro Murmel und 120 pro geleertem Glas. Nach ein paar Leerungen kommt eine Farbe dazu.',
+    goal: 'Ein Glas voll einer einzigen Farbe leert sich und gibt Punkte. Ein Glas mit gemischten Farben leert sich nie wieder. Sind alle fünf voll, ist die Runde vorbei.',
+    how: 'Tippe das Glas an, in das die Murmel soll. Die Murmel in der Hand lässt sich unten auf einem freien Platz ablegen, und Glas leeren räumt einmal pro Runde ein Glas komplett.',
+    score: '5 pro Murmel und 120 pro geleertem Glas. Die Murmeln kommen aus einem Beutel mit genau einem Glas voll je Farbe, du kannst also mitzählen. Jeder neue Beutel kann eine Farbe mehr bringen.',
   },
   bamboo: {
     goal: 'Klettere den Bambus hoch und weiche Ästen aus. Ein Treffer oder eine leere Zeitleiste beendet die Runde.',
@@ -1421,9 +1421,9 @@ const ru: Record<string, Guide> = {
     score: '50 за звезду и 100+ за пройденное поле.',
   },
   marblejar: {
-    goal: 'Банка, заполненная одним цветом, опустошается и даёт очки. Цвет банки не задан заранее. Когда все четыре полны — конец.',
-    how: 'Нажмите на банку, куда положить шарик. Банка со смешанными цветами уже никогда не опустеет — она затемнена.',
-    score: '5 за шарик и 120 за опустошённую банку. Через несколько опустошений в игру входит ещё один цвет.',
+    goal: 'Банка, заполненная одним цветом, опустошается и приносит очки. Банка со смешанными цветами больше не опустошается. Когда все пять полны, игра заканчивается.',
+    how: 'Нажмите на банку, куда положить шарик. Шарик из руки можно отложить в пустую ячейку внизу, а «Опустошить» раз за игру очищает банку целиком.',
+    score: '5 за шарик и 120 за каждую опустошённую банку. Шарики выходят из мешка, где на каждый цвет ровно одна банка, так что остаток можно считать. Новый мешок может добавить цвет.',
   },
   bamboo: {
     goal: 'Поднимайтесь по бамбуку, уклоняясь от ветвей. Удар о ветку или пустая шкала времени — конец.',
@@ -1579,9 +1579,9 @@ const id: Record<string, Guide> = {
     score: '50 per bintang plus 100+ tiap papan selesai.',
   },
   marblejar: {
-    goal: 'Tabung yang penuh satu warna akan dikosongkan dan memberi poin. Tabung tidak punya warna tetap. Kalau keempatnya penuh, permainan berakhir.',
-    how: 'Ketuk tabung tujuan kelereng. Tabung yang warnanya tercampur tak bisa dikosongkan lagi, jadi ditampilkan pudar.',
-    score: '5 per kelereng dan 120 per tabung yang dikosongkan. Tiap beberapa kali, satu warna baru masuk.',
+    goal: 'Tabung yang penuh satu warna akan dikosongkan dan memberi poin. Tabung dengan warna campur tak pernah bisa dikosongkan. Kalau kelima tabung penuh, permainan berakhir.',
+    how: 'Ketuk tabung tujuan kelereng. Kelereng di tangan bisa dititipkan di slot kosong bawah, dan Kosongkan membersihkan satu tabung sekali per permainan.',
+    score: '5 per kelereng dan 120 per tabung yang dikosongkan. Kelereng keluar dari kantong berisi tepat satu tabung tiap warna, jadi sisanya bisa dihitung. Kantong baru bisa menambah satu warna.',
   },
   bamboo: {
     goal: 'Panjat bambu sambil menghindari dahan. Kena dahan atau bar waktu habis berarti tamat.',
@@ -1737,9 +1737,9 @@ const vi: Record<string, Guide> = {
     score: '50 điểm mỗi sao và hơn 100 điểm mỗi bảng hoàn thành.',
   },
   marblejar: {
-    goal: 'Ống chứa toàn một màu sẽ được dốc ra và tính điểm. Ống không có màu cố định. Khi cả bốn ống đầy là kết thúc.',
-    how: 'Chạm vào ống muốn đặt viên bi. Ống đã lẫn màu thì không bao giờ dốc được nữa nên bị làm mờ.',
-    score: '5 điểm mỗi viên và 120 điểm mỗi ống dốc được. Cứ vài lần dốc lại thêm một màu mới.',
+    goal: 'Ống chứa đầy một màu sẽ được dốc sạch và tính điểm. Ống đã trộn màu thì không bao giờ dốc được nữa. Khi cả năm ống đầy, lượt chơi kết thúc.',
+    how: 'Chạm vào ống muốn đặt viên bi. Có thể gửi tạm viên bi đang cầm vào ô trống bên dưới, và Dốc một ống làm sạch một ống, mỗi lượt một lần.',
+    score: '5 điểm mỗi viên và 120 điểm mỗi ống dốc sạch. Bi lấy từ túi chứa đúng một ống cho mỗi màu nên đếm được phần còn lại. Túi mới có thể thêm một màu.',
   },
   bamboo: {
     goal: 'Leo lên cây tre và tránh các cành. Đụng cành hoặc hết thanh thời gian là kết thúc.',
@@ -1895,9 +1895,9 @@ const th: Record<string, Guide> = {
     score: 'ดาวละ 50 คะแนน และผ่านกระดานได้อีก 100 คะแนนขึ้นไป',
   },
   marblejar: {
-    goal: 'กระบอกที่เต็มด้วยสีเดียวจะถูกเทออกและได้คะแนน กระบอกไม่มีสีประจำ ถ้าเต็มทั้งสี่ใบก็จบเกม',
-    how: 'แตะกระบอกที่ต้องการใส่ลูกแก้ว กระบอกที่สีปนกันจะเทออกไม่ได้อีกจึงแสดงแบบจาง',
-    score: 'ลูกละ 5 คะแนน เทกระบอกได้ 120 คะแนน เทไปหลายครั้งจะมีสีใหม่เพิ่มเข้ามา',
+    goal: 'กระบอกที่เต็มด้วยสีเดียวจะถูกเทและได้คะแนน กระบอกที่สีปนกันจะเทไม่ได้อีกเลย เมื่อเต็มทั้งห้าใบก็จบเกม',
+    how: 'แตะกระบอกที่ต้องการใส่ลูกแก้ว ฝากลูกแก้วในมือไว้ที่ช่องว่างด้านล่างได้ และเทกระบอกจะเทกระบอกหนึ่งใบจนหมด ใช้ได้เกมละครั้ง',
+    score: 'ลูกละ 5 คะแนน เทกระบอกได้ครั้งละ 120 คะแนน ลูกแก้วออกจากถุงที่มีสีละหนึ่งกระบอกพอดี จึงนับที่เหลือได้ ถุงใหม่อาจเพิ่มสีขึ้นอีกหนึ่งสี',
   },
   bamboo: {
     goal: 'ปีนต้นไผ่ขึ้นไปโดยเลี่ยงกิ่ง ถ้าชนกิ่งหรือหลอดเวลาหมดก็จบเกม',
@@ -2053,9 +2053,9 @@ const tr: Record<string, Guide> = {
     score: 'Yıldız başına 50, geçilen her tahta için 100+ puan.',
   },
   marblejar: {
-    goal: 'Tek renkle dolan kavanoz boşalır ve puan verir. Hiçbir kavanozun sabit rengi yok. Dördü de dolarsa oyun biter.',
-    how: 'Misketi koymak istediğin kavanoza dokun. Renkleri karışan kavanoz bir daha boşalmaz, bu yüzden soluk görünür.',
-    score: 'Misket başına 5, boşalan kavanoz başına 120 puan. Birkaç boşaltmada bir yeni renk oyuna girer.',
+    goal: 'Tek renkle dolan kavanoz boşalır ve puan verir. Renkleri karışan kavanoz bir daha boşalmaz. Beş kavanoz da dolunca oyun biter.',
+    how: 'Misketi koyacağın kavanoza dokun. Elindeki misketi alttaki boş yuvaya bırakabilirsin, Kavanoz boşalt ise oyun başına bir kez bir kavanozu tamamen boşaltır.',
+    score: 'Misket başına 5, boşalttığın her kavanoz için 120 puan. Misketler her renkten tam bir kavanoz dolusu içeren torbadan çıkar, kalanı sayabilirsin. Yeni torba bir renk daha getirebilir.',
   },
   bamboo: {
     goal: 'Dallardan kaçarak bambuya tırman. Bir dala çarparsan ya da süre biterse oyun sona erer.',

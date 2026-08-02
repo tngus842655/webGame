@@ -143,9 +143,12 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* 버튼 생김새는 main.css의 .btn을 그대로 쓰고, 시트 안 간격만 여기서 준다 */
+/* 버튼 생김새는 main.css의 .btn을 그대로 쓰고, 시트 안 간격만 여기서 준다.
+   광고 버튼처럼 '무엇을 주는지'가 괄호로 붙는 문구는 길어서 두 줄이 되는데,
+   그대로 두면 괄호 한가운데가 잘린다. 문구에 넣은 줄바꿈을 살려 괄호 앞에서 끊는다. */
 .gui-sheet .btn {
   margin-top: 12px;
+  white-space: pre-line;
 }
 
 .gui-sheet .btn--ghost {
