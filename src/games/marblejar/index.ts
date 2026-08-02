@@ -16,6 +16,7 @@ import {
   place,
   remainingByColor,
   useHold,
+  wipeJar,
 } from './state'
 import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 
@@ -38,6 +39,9 @@ const HOLD_Y = 486
 const HOLD_R = 34
 const HOLD_GAP = 140
 const GRAVITY = 22000 // px/s² — 낙하 연출의 가속도
+// 통 비우기 버튼 — 통 아래가 통째로 비어 있고 엄지에 가장 가깝다
+const WIPE_BTN = { x: 190, y: 1000, w: 340, h: 88 }
+const COLOR_UP_DUR = 2.2
 
 const jarX = (index: number) => JAR_X0 + index * (JAR_W + JAR_GAP)
 const slotY = (slot: number) => JAR_BOTTOM - 12 - MARBLE_R - slot * SLOT_H
@@ -55,7 +59,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  preloadSfx('clear', 'gameover', 'tap', 'select', 'unlock')
+  preloadSfx('clear', 'gameover', 'tap', 'select', 'unlock', 'whoosh')
   let adEmptyUsed = false
 
   // 손에서 통까지 떨어지는 구슬. 규칙은 탭 즉시 반영되고 이 연출만 뒤따르므로
@@ -73,6 +77,11 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const flights: Flight[] = []
   let clearFlash: { jar: number; t: number } | null = null
   let rejectFlash: { jar: number; t: number } | null = null
+  // 통 비우기를 무장한 상태 — 다음에 누르는 통이 비워진다
+  let armed = false
+  // 색이 한 종 늘어난 것은 화면에서 알아채기 어려워 따로 알린다
+  let lastColors = state.colors
+  let colorUp: { color: number; t: number } | null = null
 
   const launch = (color: number, jar: number, slot: number, cleared: boolean) => {
     const y1 = slotY(slot)
@@ -100,6 +109,16 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   }
 
   const tickVisuals = (dt: number) => {
+    if (state.colors > lastColors) {
+      lastColors = state.colors
+      colorUp = { color: state.colors - 1, t: COLOR_UP_DUR }
+      playSfx('unlock')
+      vibrate([25, 45, 25])
+    }
+    if (colorUp) {
+      colorUp.t -= dt
+      if (colorUp.t <= 0) colorUp = null
+    }
     if (clearFlash) {
       clearFlash.t -= dt
       if (clearFlash.t <= 0) clearFlash = null
@@ -122,7 +141,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     onRetry() {
       if (state.phase !== 'over') return
       adEmptyUsed = false
+      armed = false
       Object.assign(state, createState())
+      lastColors = state.colors
       overlay.hide()
     },
     onContinue() {
@@ -154,6 +175,36 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       if (state.phase !== 'playing') return
       const p = stage.toBoard(clientX, clientY)
 
+      // 통 비우기 버튼 — 눌러 무장하고 다시 누르면 취소한다
+      const b = WIPE_BTN
+      if (p.x >= b.x && p.x <= b.x + b.w && p.y >= b.y && p.y <= b.y + b.h) {
+        if (state.wipes > 0) {
+          armed = !armed
+          playSfx('select')
+          vibrate(12)
+        }
+        return
+      }
+
+      // 무장 중에는 통만 받는다 — 실수로 구슬을 넣거나 자리를 건드리지 않게
+      if (armed) {
+        if (p.y < JAR_TOP - 45 || p.y > JAR_BOTTOM + 40) return
+        for (let i = 0; i < JARS; i++) {
+          const x = jarX(i)
+          if (p.x < x - 11 || p.x > x + JAR_W + 11) continue
+          if (wipeJar(state, i)) {
+            // 비워진 통으로 날아가던 구슬은 앉을 자리가 없어졌다
+            for (let k = flights.length - 1; k >= 0; k--) if (flights[k].jar === i) flights.splice(k, 1)
+            armed = false
+            clearFlash = { jar: i, t: 0.6 }
+            playSfx('whoosh')
+            vibrate([20, 30, 20])
+          }
+          return
+        }
+        return
+      }
+
       // 임시 자리가 통보다 위에 있으므로 먼저 받는다
       if (p.y >= HOLD_Y - 54 && p.y <= HOLD_Y + 54) {
         for (let i = 0; i < HOLD_SLOTS; i++) {
@@ -169,7 +220,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       }
 
       // 통 위아래로 넉넉하게 눌러도 들어가도록 띠 전체를 받는다
-      if (p.y < JAR_TOP - 45 || p.y > JAR_BOTTOM + 90) return
+      if (p.y < JAR_TOP - 45 || p.y > JAR_BOTTOM + 40) return
       for (let i = 0; i < JARS; i++) {
         const x = jarX(i)
         if (p.x < x - 11 || p.x > x + JAR_W + 11) continue
@@ -251,9 +302,19 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     for (let i = 0; i < state.colors; i++) {
       const x = x0 + i * 70
       const n = left[i]
+      // 막 늘어난 색은 잠깐 커졌다 작아지며 테를 두른다 — 무엇이 바뀌었는지 짚어 준다
+      const fresh = colorUp && colorUp.color === i ? colorUp : null
+      const r = fresh ? 15 * (1 + 0.4 * Math.abs(Math.sin(fresh.t * 7))) : 15
+      if (fresh) {
+        c.strokeStyle = '#FFD54F'
+        c.lineWidth = 3
+        c.beginPath()
+        c.arc(x, BAG_Y, r + 8, 0, Math.PI * 2)
+        c.stroke()
+      }
       c.save()
-      if (n === 0) c.globalAlpha = 0.25
-      drawMarble(x, BAG_Y, i, 15)
+      if (n === 0 && !fresh) c.globalAlpha = 0.25
+      drawMarble(x, BAG_Y, i, r)
       c.restore()
       c.fillStyle = n === 0 ? 'rgb(255 255 255 / 0.25)' : 'rgb(255 255 255 / 0.72)'
       c.font = font(19, n > 0)
@@ -290,6 +351,51 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.fillText(t('mj.hold'), 360, HOLD_Y + HOLD_R + 30)
   }
 
+  // 통 비우기 — 판마다 한 번. 무장하면 버튼이 주황으로 서고 통이 점선으로 바뀐다
+  const drawWipeButton = () => {
+    const c = stage.c
+    const { x, y, w, h } = WIPE_BTN
+    const usable = state.wipes > 0
+    c.beginPath()
+    c.roundRect(x, y, w, h, 26)
+    c.fillStyle = armed
+      ? 'rgb(255 167 38 / 0.92)'
+      : usable
+        ? 'rgb(255 255 255 / 0.1)'
+        : 'rgb(255 255 255 / 0.04)'
+    c.fill()
+    c.lineWidth = armed ? 4 : 2.5
+    c.strokeStyle = armed
+      ? '#FFE0B2'
+      : usable
+        ? 'rgb(255 255 255 / 0.3)'
+        : 'rgb(255 255 255 / 0.1)'
+    c.stroke()
+    c.textAlign = 'center'
+    c.fillStyle = armed ? '#3E2723' : usable ? 'rgb(255 255 255 / 0.9)' : 'rgb(255 255 255 / 0.28)'
+    c.font = font(27, true)
+    c.fillText(t('mj.wipe', { n: state.wipes }), x + w / 2, y + h / 2 + 10)
+  }
+
+  // 색이 늘어난 것을 잠깐 크게 알린다 — 가방 줄만 조용히 바뀌면 지나치기 쉽다
+  const drawColorUp = () => {
+    if (!colorUp) return
+    const c = stage.c
+    const text = t('mj.newColor', { n: state.colors })
+    c.save()
+    c.globalAlpha = Math.min(1, colorUp.t / 0.6)
+    c.font = font(23, true)
+    c.textAlign = 'center'
+    const w = c.measureText(text).width + 56
+    c.fillStyle = 'rgb(255 167 38 / 0.94)'
+    c.beginPath()
+    c.roundRect(360 - w / 2, 232, w, 46, 23)
+    c.fill()
+    c.fillStyle = '#3E2723'
+    c.fillText(text, 360, 263)
+    c.restore()
+  }
+
   const draw = () => {
     const c = stage.begin('#241C17', '#332720')
 
@@ -305,7 +411,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     c.fillStyle = 'rgb(255 255 255 / 0.45)'
     c.font = font(22)
-    c.fillText(t('mj.hint'), 360, HINT_Y)
+    c.fillText(t(armed ? 'mj.wipeHint' : 'mj.hint'), 360, HINT_Y)
 
     drawHold()
 
@@ -322,17 +428,23 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.roundRect(x, JAR_TOP, JAR_W, JAR_H, 20)
       c.fillStyle = mixed ? 'rgb(255 255 255 / 0.05)' : 'rgb(255 255 255 / 0.1)'
       c.fill()
-      c.lineWidth = flashing || completes || rejecting ? 5 : 3
-      c.strokeStyle = rejecting
-        ? '#EF5350'
-        : flashing
-          ? '#FFECB3'
-          : completes
-            ? '#FFD54F'
-            : mixed
-              ? 'rgb(255 255 255 / 0.12)'
-              : 'rgb(255 255 255 / 0.28)'
+      // 무장 중에는 비울 수 있는 통(빈 통은 제외)만 점선으로 도드라진다
+      const wipeTarget = armed && jar.length > 0
+      c.lineWidth = flashing || completes || rejecting || wipeTarget ? 5 : 3
+      c.strokeStyle = wipeTarget
+        ? '#FFA726'
+        : rejecting
+          ? '#EF5350'
+          : flashing
+            ? '#FFECB3'
+            : completes
+              ? '#FFD54F'
+              : mixed
+                ? 'rgb(255 255 255 / 0.12)'
+                : 'rgb(255 255 255 / 0.28)'
+      if (wipeTarget) c.setLineDash([11, 8])
       c.stroke()
+      c.setLineDash([])
 
       // 칸 눈금
       c.strokeStyle = 'rgb(255 255 255 / 0.07)'
@@ -365,6 +477,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       }
     }
 
+    drawWipeButton()
+
     // HUD
     drawScorePanel(c, {
       label: t('hud.score'),
@@ -375,6 +489,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.font = font(22)
     c.fillStyle = 'rgb(255 255 255 / 0.6)'
     c.fillText(t('mj.colors', { n: state.colors }), SCORE_PANEL.cx, SCORE_PANEL.subY)
+
+    drawColorUp()
   }
 
   shell.addCleanup(detachInput)

@@ -13,6 +13,11 @@ const MAX_COLORS = 7
 // 자리 수가 곧 난이도 다이얼이다. 시뮬레이션에서 실력이 벌어들이는 몫이
 // 0칸 -17% · 1칸 -3% · 2칸 +23%로 갈렸다 — 한 칸으로는 만회할 여지가 모자란다
 export const HOLD_SLOTS = 2
+// 판마다 한 번, 통 하나를 통째로 비운다. 늦게 쓰면 칸 넷을 되찾는 것뿐이지만 일찍
+// 오염된 통을 살려 내면 그 통이 남은 판 내내 계속 비워져 값이 복리로 붙는다 —
+// 그래서 '아꼈다 죽기 직전에'가 정답이 아니고 언제 어디에 쓰는지가 실력을 가른다.
+// 시뮬레이션에서 실력이 벌어들이는 몫이 24% → 33%로 올랐다.
+export const WIPES = 1
 const MARBLE_POINTS = 5
 const CLEAR_POINTS = 120
 
@@ -27,6 +32,7 @@ export interface MarbleState {
   colors: number
   clears: number
   placed: number
+  wipes: number // 남은 통 비우기 횟수
   overTimer: number
   playTime: number
 }
@@ -50,10 +56,14 @@ function makeBag(colors: number): number[] {
   return bag
 }
 
-// 가방이 비면 그때의 색 수로 새로 채운다 — 색이 느는 시점이 가방 경계와 맞아떨어져
-// '이번 가방은 몇 색인지'가 중간에 흐트러지지 않는다
+// 늘어난 색은 다음 가방부터 나온다. 그래서 색 수도 가방이 새로 열릴 때 반영한다 —
+// 통을 비운 순간에 올려 버리면 아직 한 알도 안 나온 색이 '0개'로 떠서
+// 다 쓴 색과 구별되지 않는다. 덕분에 '이번 가방은 몇 색'이 중간에 흐트러지지 않는다.
 function draw(state: MarbleState): number {
-  if (!state.bag.length) state.bag = makeBag(state.colors)
+  if (!state.bag.length) {
+    state.colors = colorsFor(state.clears)
+    state.bag = makeBag(state.colors)
+  }
   return state.bag.pop() as number
 }
 
@@ -69,6 +79,7 @@ export function createState(): MarbleState {
     colors: START_COLORS,
     clears: 0,
     placed: 0,
+    wipes: WIPES,
     overTimer: 0,
     playTime: 0,
   }
@@ -101,7 +112,6 @@ export function place(state: MarbleState, index: number): PlaceResult | null {
     state.jars[index] = []
     state.clears += 1
     state.score = Math.min(1_000_000, state.score + CLEAR_POINTS)
-    state.colors = colorsFor(state.clears)
     cleared = true
   }
 
@@ -126,6 +136,16 @@ export function useHold(state: MarbleState, slot: number): boolean {
   } else {
     state.marble = kept
   }
+  return true
+}
+
+// 통 비우기 — 비운 구슬은 이미 받은 점수를 그대로 두고 사라진다.
+// 빈 통에는 쓸 수 없다(되찾을 칸이 없어 횟수만 버린다).
+export function wipeJar(state: MarbleState, index: number): boolean {
+  if (state.phase !== 'playing' || state.wipes <= 0) return false
+  if (!state.jars[index].length) return false
+  state.jars[index] = []
+  state.wipes -= 1
   return true
 }
 
