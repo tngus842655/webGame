@@ -378,15 +378,17 @@ defineProps<{ slug: string }>()
 
     <!-- 구슬 정리함 -->
     <g v-else-if="slug === 'marblejar'">
-      <rect x="4" y="18" width="9" height="26" rx="3" fill="#FFFFFF" opacity="0.12" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.4" />
-      <rect x="15.5" y="18" width="9" height="26" rx="3" fill="#FFFFFF" opacity="0.12" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.4" />
-      <rect x="27" y="18" width="9" height="26" rx="3" fill="#FFFFFF" opacity="0.12" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.4" />
-      <rect x="38.5" y="18" width="9" height="26" rx="3" fill="#FFFFFF" opacity="0.12" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.4" />
-      <circle cx="8.5" cy="40" r="3.6" fill="#EF5350" />
-      <circle cx="8.5" cy="32.5" r="3.6" fill="#EF5350" />
-      <circle cx="20" cy="40" r="3.6" fill="#42A5F5" />
-      <circle cx="31.5" cy="40" r="3.6" fill="#66BB6A" />
-      <circle cx="31.5" cy="32.5" r="3.6" fill="#FFCA28" />
+      <rect x="3" y="18" width="7.6" height="26" rx="2.6" fill="#FFFFFF" opacity="0.12" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.3" />
+      <rect x="12.3" y="18" width="7.6" height="26" rx="2.6" fill="#FFFFFF" opacity="0.12" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.3" />
+      <rect x="21.6" y="18" width="7.6" height="26" rx="2.6" fill="#FFFFFF" opacity="0.12" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.3" />
+      <rect x="30.9" y="18" width="7.6" height="26" rx="2.6" fill="#FFFFFF" opacity="0.12" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.3" />
+      <rect x="40.2" y="18" width="7.6" height="26" rx="2.6" fill="#FFFFFF" opacity="0.12" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="1.3" />
+      <circle cx="6.8" cy="40.4" r="3" fill="#EF5350" />
+      <circle cx="6.8" cy="34" r="3" fill="#EF5350" />
+      <circle cx="16.1" cy="40.4" r="3" fill="#42A5F5" />
+      <circle cx="25.4" cy="40.4" r="3" fill="#66BB6A" />
+      <circle cx="25.4" cy="34" r="3" fill="#FFCA28" />
+      <circle cx="34.7" cy="40.4" r="3" fill="#42A5F5" />
       <circle cx="24" cy="8" r="6.5" fill="#AB47BC" />
       <ellipse cx="21.8" cy="5.8" rx="2" ry="1.3" fill="#FFFFFF" opacity="0.5" transform="rotate(-30 21.8 5.8)" />
     </g>

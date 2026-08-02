@@ -5,20 +5,43 @@ import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
-import { CAP, COLORS, JARS, createState, emptyFullestJar, isMixed, place, update } from './state'
+import {
+  CAP,
+  COLORS,
+  HOLD_SLOTS,
+  JARS,
+  createState,
+  emptyJarsForAd,
+  isMixed,
+  place,
+  remainingByColor,
+  update,
+  useHold,
+} from './state'
 import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 
-const JAR_W = 130
-const JAR_GAP = 40
-const JAR_X0 = 40
-const SLOT_H = 76
+const JAR_W = 112
+const JAR_GAP = 25
+const JAR_X0 = 30
+const SLOT_H = 70
 const JAR_TOP = 620
 const JAR_H = CAP * SLOT_H + 20
 const JAR_BOTTOM = JAR_TOP + JAR_H
-const MARBLE_R = 32
+const MARBLE_R = 30
+
+const BAG_Y = 206
+const HAND_Y = 340
+const HAND_R = 46
+const NEXT_X = 556
+const NEXT_R = 26
+const HINT_Y = 416
+const HOLD_Y = 486
+const HOLD_R = 34
+const HOLD_GAP = 140
 
 const jarX = (index: number) => JAR_X0 + index * (JAR_W + JAR_GAP)
-const slotY = (slot: number) => JAR_BOTTOM - 14 - MARBLE_R - slot * SLOT_H
+const slotY = (slot: number) => JAR_BOTTOM - 12 - MARBLE_R - slot * SLOT_H
+const holdX = (slot: number) => 360 - ((HOLD_SLOTS - 1) * HOLD_GAP) / 2 + slot * HOLD_GAP
 
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
@@ -32,7 +55,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  preloadSfx('clear', 'gameover', 'tap', 'unlock')
+  preloadSfx('clear', 'gameover', 'tap', 'select', 'unlock')
   let adEmptyUsed = false
 
   const overlay = createGameOverOverlay(shell.wrapper, {
@@ -53,7 +76,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const rewarded = await ctx.showRewardAd('marblejar-empty')
     if (shell.isDestroyed() || !rewarded || state.phase !== 'over') return
     adEmptyUsed = true
-    emptyFullestJar(state)
+    emptyJarsForAd(state)
     playSfx('unlock')
     overlay.hide()
   }
@@ -71,11 +94,26 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     onDown(clientX, clientY) {
       if (state.phase !== 'playing') return
       const p = stage.toBoard(clientX, clientY)
+
+      // 임시 자리가 통보다 위에 있으므로 먼저 받는다
+      if (p.y >= HOLD_Y - 54 && p.y <= HOLD_Y + 54) {
+        for (let i = 0; i < HOLD_SLOTS; i++) {
+          const x = holdX(i)
+          if (p.x < x - 62 || p.x > x + 62) continue
+          if (useHold(state, i)) {
+            playSfx('select')
+            vibrate(12)
+          }
+          return
+        }
+        return
+      }
+
       // 통 위아래로 넉넉하게 눌러도 들어가도록 띠 전체를 받는다
-      if (p.y < JAR_TOP - 70 || p.y > JAR_BOTTOM + 80) return
+      if (p.y < JAR_TOP - 45 || p.y > JAR_BOTTOM + 90) return
       for (let i = 0; i < JARS; i++) {
         const x = jarX(i)
-        if (p.x < x - 18 || p.x > x + JAR_W + 18) continue
+        if (p.x < x - 11 || p.x > x + JAR_W + 11) continue
         const result = place(state, i)
         if (result === 'cleared') {
           playSfx('clear')
@@ -132,15 +170,72 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.restore()
   }
 
+  // 이번 가방에 남은 색별 개수 — 무엇이 아직 안 나왔는지 세어 계획할 수 있게 한다
+  const drawBag = () => {
+    const c = stage.c
+    const left = remainingByColor(state)
+    const x0 = 360 - ((state.colors - 1) * 70) / 2
+    c.textAlign = 'center'
+    for (let i = 0; i < state.colors; i++) {
+      const x = x0 + i * 70
+      const n = left[i]
+      c.save()
+      if (n === 0) c.globalAlpha = 0.25
+      drawMarble(x, BAG_Y, i, 15)
+      c.restore()
+      c.fillStyle = n === 0 ? 'rgb(255 255 255 / 0.25)' : 'rgb(255 255 255 / 0.72)'
+      c.font = font(19, n > 0)
+      c.fillText(String(n), x, BAG_Y + 38)
+    }
+  }
+
+  // 임시 자리 — 빈 칸은 점선 테두리로 '넣을 수 있는 곳'임을 알린다
+  const drawHold = () => {
+    const c = stage.c
+    for (let i = 0; i < HOLD_SLOTS; i++) {
+      const x = holdX(i)
+      const kept = state.hold[i]
+      if (kept === null) {
+        c.save()
+        c.setLineDash([7, 7])
+        c.strokeStyle = 'rgb(255 255 255 / 0.3)'
+        c.lineWidth = 2.5
+        c.beginPath()
+        c.arc(x, HOLD_Y, HOLD_R, 0, Math.PI * 2)
+        c.stroke()
+        c.restore()
+      } else {
+        c.fillStyle = 'rgb(255 255 255 / 0.08)'
+        c.beginPath()
+        c.arc(x, HOLD_Y, HOLD_R + 7, 0, Math.PI * 2)
+        c.fill()
+        drawMarble(x, HOLD_Y, kept, HOLD_R)
+      }
+    }
+    c.textAlign = 'center'
+    c.fillStyle = 'rgb(255 255 255 / 0.4)'
+    c.font = font(19)
+    c.fillText(t('mj.hold'), 360, HOLD_Y + HOLD_R + 30)
+  }
+
   const draw = () => {
     const c = stage.begin('#241C17', '#332720')
 
-    // 들고 있는 구슬
-    drawMarble(360, 380, state.marble, 46)
+    drawBag()
+
+    // 손에 든 구슬과 다음 구슬
+    drawMarble(360, HAND_Y, state.marble, HAND_R)
+    drawMarble(NEXT_X, HAND_Y - 6, state.next, NEXT_R)
     c.textAlign = 'center'
+    c.fillStyle = 'rgb(255 255 255 / 0.4)'
+    c.font = font(19)
+    c.fillText(t('mj.next'), NEXT_X, HAND_Y + 40)
+
     c.fillStyle = 'rgb(255 255 255 / 0.45)'
     c.font = font(22)
-    c.fillText(t('mj.hint'), 360, 484)
+    c.fillText(t('mj.hint'), 360, HINT_Y)
+
+    drawHold()
 
     for (let i = 0; i < JARS; i++) {
       const x = jarX(i)
@@ -171,10 +266,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.strokeStyle = 'rgb(255 255 255 / 0.07)'
       c.lineWidth = 2
       for (let s = 1; s < CAP; s++) {
-        const y = JAR_BOTTOM - 14 - s * SLOT_H + SLOT_H / 2 - MARBLE_R
+        const y = JAR_BOTTOM - 12 - s * SLOT_H + SLOT_H / 2 - MARBLE_R
         c.beginPath()
-        c.moveTo(x + 14, y)
-        c.lineTo(x + JAR_W - 14, y)
+        c.moveTo(x + 12, y)
+        c.lineTo(x + JAR_W - 12, y)
         c.stroke()
       }
 
@@ -198,13 +293,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       value: state.score.toLocaleString(),
       sub: true,
     })
+    c.textAlign = 'center'
     c.font = font(22)
     c.fillStyle = 'rgb(255 255 255 / 0.6)'
     c.fillText(t('mj.colors', { n: state.colors }), SCORE_PANEL.cx, SCORE_PANEL.subY)
-
-    // 나올 수 있는 색을 늘어놓는다 — 통 수보다 많다는 것이 한눈에 보여야 한다
-    const paletteX = 360 - ((state.colors - 1) * 46) / 2
-    for (let i = 0; i < state.colors; i++) drawMarble(paletteX + i * 46, 214, i, 15)
   }
 
   shell.addCleanup(detachInput)
