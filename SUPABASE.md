@@ -24,6 +24,7 @@
 | `20260801100000_feedback_delete.sql` | `feedback` 삭제 정책 (관리자만) | ✅ 2026-08-01 |
 | `20260802000000_player_stats.sql` | `get_player_stats()` — 이용자별 게임 이용 현황 | ✅ 2026-08-02 |
 | `20260803000000_ad_views.sql` | `ad_views` 테이블 — 리워드 광고 호출 기록, `get_ad_stats()` | ⬜ **실행 필요** |
+| `20260804000000_guest_nickname_en.sql` | 기본 닉네임 `게스트-` → `Guest-` | ⬜ **실행 필요** |
 
 ## 테이블
 
