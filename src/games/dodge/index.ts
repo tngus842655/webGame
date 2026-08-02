@@ -49,7 +49,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   async function continueWithAd() {
     if (state.phase !== 'over' || adContinueUsed) return
-    const rewarded = await ctx.showRewardAd('dodge_continue')
+    const rewarded = await ctx.showRewardAd('dodge-continue')
     if (shell.isDestroyed() || !rewarded || state.phase !== 'over') return
     adContinueUsed = true
     state.rocks = []

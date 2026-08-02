@@ -139,7 +139,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   async function reviveWithAd() {
     if (state.phase !== 'over' || adReviveUsed) return
-    const rewarded = await ctx.showRewardAd('survivor_revive')
+    const rewarded = await ctx.showRewardAd('survivor-revive')
     if (shell.isDestroyed() || !rewarded || state.phase !== 'over') return
     adReviveUsed = true
     state.player.hp = state.player.maxHp
