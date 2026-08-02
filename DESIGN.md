@@ -12,7 +12,7 @@
 | 물리 엔진 | matter.js | 수박게임에만 사용, 게임 모듈 안에 격리 |
 | 라우팅 | vue-router | 게임 = `/play/:slug` 라우트 하나 |
 | 백엔드 | Supabase (Auth + Postgres + RLS) | 점수·랭킹·프로필·플레이 시간 |
-| i18n | 자체 경량 구현 (`shared/i18n.ts`) | 13개 언어, 게임 내부는 ko/en 완역 + en 폴백 |
+| i18n | 자체 경량 구현 (`shared/i18n.ts`) | 13개 언어. 게임 내부 HUD·가이드까지 완역, 관리자·통계·개발노트만 en 폴백 |
 | 사운드 | WebAudio 신스 (`shared/sound.ts`) | 오디오 에셋 0개 |
 | 운영 배포 | Vercel (`main`) | main 반영은 사용자가 직접 수행 |
 | 앱 패키징 | Capacitor (안드로이드) / 앱인토스 | 둘 다 웹 빌드를 앱 안에 넣는다 (`ANDROID_RELEASE.md`) |
@@ -40,6 +40,7 @@ src/
 ├─ app/                     # router, AppLayout
 ├─ pages/                   # Home / GamePlay / RankingHub / Ranking
 │                           #   / Stats / StatsPlayers / StatsAds / Settings
+│                           #   / Admin / AdminTrash / AdminFeedback / Feedback
 │                           #   / DevNotes / Terms / Privacy / AccountDeletion / Trash
 ├─ games/
 │  ├─ types.ts              # GameMeta / GameModule / GameContext
@@ -54,7 +55,7 @@ src/
 │  ├─ profile.ts            # 닉네임 조회·수정, 소셜 닉네임 자동 적용
 │  ├─ scores.ts             # 점수 제출·랭킹·인기도 조회 (+localStorage 병행)
 │  ├─ playSessions.ts       # 플레이 시간 기록 (인기 순위·통계 근거)
-│  ├─ ads.ts                # 리워드 광고 추상화 (H5 Games Ads / AdMob / 개발용 스텁)
+│  ├─ ads.ts                # 리워드 광고 추상화 (H5 Games Ads / AdMob / 없음(기본) / VITE_AD_STUB=on이면 스텁)
 │  ├─ adViews.ts            # 광고 호출 기록·집계 (어느 게임 어느 자리에서, 어떻게 끝났나)
 │  ├─ native.ts             # 안드로이드 앱(Capacitor) 전용 — 딥링크 로그인, 뒤로가기, 스플래시
 │  ├─ appUpdate.ts          # Play 인앱 업데이트 안내 (안드로이드 앱에서만)
@@ -76,11 +77,18 @@ src/
 
 ### 새 게임 추가 체크리스트
 
-1. `src/games/<slug>/` 폴더에 `GameModule` 구현 (`shell.ts`·`stage.ts` 활용)
+1. `src/games/<slug>/` 폴더에 `GameModule` 구현 (`shell.ts`·`stage.ts` 활용).
+   상태는 `state.ts`로 뺀다 — 31개 전부 그렇게 돼 있다. 그리기·밸런스 상수까지
+   `renderer.ts`·`config.ts`로 더 쪼갠 것은 초기 넷(`suika`·`brick`·`blockblast`·`fruit2048`,
+   `config.ts`는 `match3`까지 다섯)뿐이고, 2026-07 추가분 열 개는 `index.ts` + `state.ts` 두 장이다.
 2. `registry.ts`에 항목 추가
-3. `i18n.ts`에 `game.<slug>` 제목 키를 13개 언어로 추가
-4. `GameIcon.vue`에 slug별 벡터 아이콘 추가
-5. `npm run typecheck` 통과 확인
+3. `game.<slug>` 제목 키를 13개 언어로 — 영어는 `i18n.ts`의 `en` 블록, 나머지 12개는
+   `locales/<locale>.ts`. **누락을 `vue-tsc`가 잡아 주는 것은 `FullDict`로 선언한 `ko.ts`
+   하나뿐이다** — 나머지 11개는 `CoreDict`(Partial)라 빠뜨려도 통과하고 런타임에 영어가
+   나간다. 눈으로 셀 것.
+4. `guides.ts`에 목표·조작·점수 세 줄을 13개 언어로 추가
+5. `GameIcon.vue`에 slug별 벡터 아이콘 추가
+6. `npm run typecheck` 통과 확인
 
 ## 5. 데이터·인증
 
@@ -93,10 +101,13 @@ src/
 | `play_sessions` | 게임별 플레이 시간. 인기 순위(`get_game_popularity`)·통계의 근거 |
 | `admin_emails` | 관리자 이메일 목록. RLS를 켜고 정책을 두지 않아 클라이언트에서 읽지도 쓰지도 못한다 |
 | `game_flags` | 게임별 노출 설정(`featured`/`hidden`/`sort_order`). 조회 공개, 쓰기는 관리자만 |
+| `feedback` | 사용자 의견(버그·문의·제안). insert는 본인만, 조회·삭제는 관리자만 |
+| `ad_views` | 리워드 광고 호출 기록(게임·자리·결과). 관리자 통계 `/stats/ads`의 근거. insert는 본인만, 조회는 관리자만 |
 
 ### 인증 흐름 (구현 완료)
 
-- 첫 방문 시 익명 로그인 자동 수행 → 가입 없이 점수 저장·랭킹 등재
+- 가입 없이 점수 저장·랭킹 등재 — 익명 세션은 게임 화면에 들어갈 때 만들어진다
+  (아래 '첫 실행 — 묻지 않고 바로 시작')
 - 설정에서 구글/카카오 연동(`linkIdentity`) → user_id 유지, 기록 그대로
 - 이미 쓰이는 소셜 계정이면 로그인(`signInWithOAuth`)으로 전환해 기존 기록 복구
 - 닉네임을 직접 정하지 않은 유저는 연동 시 소셜 닉네임 자동 적용
@@ -135,11 +146,12 @@ src/
   5초 카운트다운 가짜 광고는 `VITE_AD_STUB=on`으로 켤 때만 나온다 — 보상 흐름을
   실기기에서 확인할 때 쓴다. 기본값에서 뺀 이유는, 가짜라도 광고 화면이 뜨면
   광고가 붙은 사이트로 읽히고 그런 링크를 막는 커뮤니티가 있기 때문이다.
-- 앱에서 매체가 갈리는 이유는 정책이다. AdSense는 웹사이트용 상품이라 앱 웹뷰 안에서
-  게재하면 프로그램 정책 위반이고, 앱에서 쓸 수 있는 구글 매체는 AdMob 쪽이다.
+- 앱에서 매체가 갈리는 이유는 구글 정책이다 — `ANDROID_RELEASE.md`의 '광고 — AdMob' 참고.
 - 노출 지점은 두 가지. **실패 쪽**은 게임오버 오버레이의 이어하기(대부분의 게임),
   **성공 쪽**은 `clearBonus.ts`의 점수 2배(스도쿠·네모로직·디펜스·머지 가든).
-  한 판이 10분 넘게 가는 게임은 실패가 잘 나지 않아 성공 쪽이 유일한 접점이다.
+  한 판이 10분 넘게 가는 게임은 게임오버가 잘 나지 않는다. 네 게임 모두 실패 쪽
+  이어하기(`sudoku-life`·`nonogram-life`·`defense-revive`·`merge-revive`)를 함께 두고
+  있지만 그것만으로는 접점이 드물어 성공 쪽을 따로 붙였다.
 - 리워드 광고에는 횟수 상한을 두지 않는다. 사용자가 버튼을 눌러야 나오는 광고라
   강제 노출과 달리 이탈을 만들지 않고, 빈도 조절은 광고 매체가 알아서 한다.
   강제로 뜨는 전면 광고를 넣게 되면 그때 그쪽에 빈도 제한을 건다.
@@ -181,9 +193,10 @@ src/
   고정해야 하므로 읽을 수 있는 사람이 가장 많은 영어로 둔다.
 - 둘 다 설정 화면에서 언제든 바꾼다.
 
-**계정은 첫 기록이 만든다.** 앱이 뜰 때가 아니라 점수 제출·플레이 시간 기록처럼
-서버에 남길 것이 생겼을 때 `ensureUserId()`가 익명 로그인을 한다. 홈·게임 화면이
-부르는 `fetchMyStats()`는 세션이 없으면 계정을 만들지 않고 빈 배열로 돌아간다 —
+**계정은 게임 화면에 들어갈 때 만들어진다.** 앱이 뜰 때가 아니라 `/play/<slug>`에서
+플레이 시간 측정이 시작될 때(`startPlayTracking` → `ensureUserId()`) 익명 로그인을 한다.
+5초를 못 채워 `play_sessions` 행이 남지 않아도 계정은 그 시점에 이미 생긴다.
+홈 화면이 부르는 `fetchMyStats()`는 세션이 없으면 계정을 만들지 않고 빈 배열로 돌아간다 —
 열어만 보고 나간 방문자와 크롤러까지 계정이 쌓이지 않게 막는 선이 여기다.
 
 대신 무작위 `Guest-xxxx`가 랭킹에 그대로 나간다. 한때 첫 화면에서 닉네임을 받아

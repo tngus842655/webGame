@@ -6,8 +6,8 @@
 **Android Studio는 필요 없다.** 이 프로젝트는 `gradlew`로 직접 빌드하고 `adb`로 설치한다.
 Studio가 필요한 건 `npm run open:android` 하나뿐이라 안 쓰면 그만이다.
 
-광고처럼 **웹에서는 확인이 안 되는 것**을 볼 때 쓴다. 리워드 광고는 앱에서만 AdMob으로
-가고 웹에서는 가짜 광고(스텁)로 떨어지므로, 실제 SDK 동작은 실기기에서만 드러난다.
+광고처럼 **웹에서는 확인이 안 되는 것**을 볼 때 쓴다. 안드로이드 앱만 AdMob으로 가므로
+(매체 분기는 `DESIGN.md`의 '리워드 광고') 실제 SDK 동작은 실기기에서만 드러난다.
 
 ## 준비물
 
@@ -64,9 +64,6 @@ adb shell am start -n com.minigame30.app/.MainActivity
 | `adb install -r ...` | `Success` | 설치. **실행은 안 한다** |
 | `adb shell am start -n ...` | 폰에서 앱이 켜짐 | 실행 (폰에서 아이콘을 눌러도 같다) |
 
-**`npm run build:android`을 건너뛰고 gradle만 돌리면 예전 웹 빌드가 그대로 앱에 들어간다.**
-코드를 고쳤는데 아무것도 안 바뀌는 원인의 대부분이 이것이다.
-
 ## 자주 막히는 곳
 
 | 증상 | 원인 / 해결 |
@@ -79,6 +76,7 @@ adb shell am start -n com.minigame30.app/.MainActivity
 | `install`은 `Success`인데 앱이 안 뜸 | 정상이다. `install`은 설치만 한다. `adb shell am start`로 띄우거나 아이콘을 누른다 |
 | 고친 코드가 반영 안 됨 | `npm run build:android`을 건너뛰었다 |
 | `findstr`이 아무 것도 안 내놓고 멈춤 | 검색할 파일 경로를 빼먹었다. 경로가 없으면 키보드 입력을 기다린다. `Ctrl+C` |
+| 게임에 광고 버튼이 아예 안 보임 | 매체가 없어 `NoAdProvider`로 떨어졌다. `.env.local`에 `VITE_ADMOB_REWARD_ID`(실기기 AdMob) 또는 `VITE_AD_STUB=on`(5초 가짜 광고)을 넣고 `npm run build:android`부터 다시 |
 
 ## 웹 빌드가 앱에 들어갔는지 확인
 

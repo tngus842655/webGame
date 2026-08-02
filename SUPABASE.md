@@ -47,7 +47,7 @@
 | 함수 | 호출하는 곳 | 권한 |
 | --- | --- | --- |
 | `get_leaderboard(p_game_slug, p_since, p_limit)` | 랭킹 화면 | 공개 |
-| `get_my_stats()` | 홈 화면 (내 최고점·순위) | 로그인 사용자 |
+| `get_my_stats()` | 홈 화면, 게임 진입 시 최고점 동기화 | 로그인 사용자 |
 | `get_game_popularity()` | 홈 정렬 | 공개 |
 | `get_game_stats(p_days)` | 관리자 통계 | `is_admin()` 아니면 `forbidden` |
 | `get_total_players(p_days)` | 관리자 통계 | `is_admin()` 아니면 `forbidden` |
@@ -56,8 +56,8 @@
 | `is_admin()` | 라우트 가드, 다른 함수의 권한 검사 | 공개 (결과만 boolean) |
 | `delete_my_account()` | 계정 삭제 화면 | `authenticated`만. `auth.uid()` 본인 것만 지운다 |
 
-트리거 두 개는 클라이언트가 직접 부르지 않는다 — `handle_new_user()`(가입 시 프로필 생성),
-`check_score_rate_limit()`·`check_session_rate_limit()`·`check_ad_view_rate_limit()`(분당 제출 상한).
+트리거로만 도는 함수는 클라이언트가 직접 부르지 않는다 — `handle_new_user()`(가입 시 프로필 생성),
+`check_score_rate_limit()`·`check_session_rate_limit()`·`check_feedback_rate_limit()`·`check_ad_view_rate_limit()`(분당 제출 상한).
 
 ### 권한 설계 원칙
 

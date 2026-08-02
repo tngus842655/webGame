@@ -30,8 +30,8 @@ Capacitor는 `dist/`를 앱 안에 통째로 넣고 앱 자신의 웹뷰로 띄�
 `android/app/build.gradle`에서 두 값을 올린다. `versionCode`는 반드시 이전보다 커야 한다.
 
 ```gradle
-versionCode 11
-versionName "1.2.0"
+versionCode 8
+versionName "8"
 ```
 
 ```powershell
@@ -42,12 +42,7 @@ cd android
 
 `android\app\build\outputs\bundle\release\app-release.aab`를 Play Console에 올린다.
 
-폰에 바로 설치해 확인하려면 (자세한 것은 `ANDROID_DEBUG.md`):
-
-```powershell
-.\gradlew.bat assembleDebug
-C:\Android\Sdk\platform-tools\adb.exe install -r app\build\outputs\apk\debug\app-debug.apk
-```
+폰에 바로 설치해 확인하는 것은 `ANDROID_DEBUG.md`의 '설치까지 한 번에'를 따른다.
 
 > `npm run build:android`은 `vite build` + `cap sync android`다.
 > 이걸 건너뛰고 gradle만 돌리면 **앱 안에 예전 웹 빌드가 그대로 들어간다.**
@@ -154,8 +149,9 @@ TWA는 그 자체가 크롬이라 이 문제가 없었다. 앱에서 로그인�
 앱 웹뷰에서 게재하면 프로그램 정책 위반이고 게시자 계정이 제재 대상이 된다.
 웹과 앱인토스는 지금까지대로 AdSense, 안드로이드 앱만 AdMob으로 간다.
 
-**지금은 광고가 꺼져 있다.** `VITE_ADMOB_REWARD_ID`가 비어 있거나 테스트 단위면
-5초 카운트다운 스텁 또는 구글 테스트 광고로 떨어진다. 매니페스트의 AdMob 앱 ID는
+**지금은 광고가 꺼져 있다.** `VITE_ADMOB_REWARD_ID`가 비어 있으면 앱에 광고가 아예 없다 —
+`NoAdProvider`라 이어하기·무르기 버튼조차 안 그려진다(`DESIGN.md`의 '리워드 광고' 참고).
+테스트 단위를 넣으면 구글 테스트 광고가 뜬다. 매니페스트의 AdMob 앱 ID는
 실제 값(`ca-app-pub-9942492825878908~7836378510`)으로 바꿔 두었다 — **앱 ID만으로는
 광고가 나가지 않는다.** 실제 광고는 광고 단위 ID를 넣는 순간 시작된다.
 
@@ -171,6 +167,8 @@ TWA는 그 자체가 크롬이라 이 문제가 없었다. 앱에서 로그인�
 앱 ID를 틀리면 앱이 바로 죽어서 금방 안다. **광고 단위 ID를 틀리면 조용히 실패한다** —
 `ads.ts`가 로드 실패를 매체 사정으로 보고 보상을 그냥 주기 때문에, 광고는 영영 안 나오는데
 에러도 없다. 넣은 뒤 `adb logcat -s Ads`로 요청이 나가는지 확인할 것.
+관리자 화면 `/stats/ads`도 같이 본다 — 호출 결과가 `ad_views`에 남으므로 단위 ID가
+틀리면 `못 뜸`만 쌓이는 것으로 드러난다(폰을 물리지 않아도 된다).
 
 **배포는 두 번 나뉜다.** AdMob은 앱이 프로덕션으로 스토어에 올라가 있어야 스토어 연결을
 받아주고, **스토어를 연결해야 광고 단위를 만들 수 있다**(2026-08 콘솔 기준 확인).
@@ -184,9 +182,9 @@ TWA는 그 자체가 크롬이라 이 문제가 없었다. 앱에서 로그인�
 
 `AndroidManifest.xml`의 `APPLICATION_ID`는 이미 실제 앱 ID로 바꿔 두었다.
 
-1차와 2차 사이에는 실제 광고가 나갈 수 없다. 그동안 사용자에게 무엇을 보여줄지 정해야
-한다 — 테스트 단위를 그대로 두면 "Test Ad" 라벨이 붙고, 값을 비우면 5초 스텁이 뜨는데
-그 문구가 `ad.sim`("광고 (개발용 시뮬레이션)")이라 실사용자에게는 어색하다.
+1차와 2차 사이에는 실제 광고가 나갈 수 없다. 그동안은 값을 비워 두면 되고, 그러면 광고
+버튼 자체가 화면에 서지 않는다. 테스트 단위를 그대로 두면 "Test Ad" 라벨이 붙으므로
+실사용자용 빌드에서는 비워 둔다.
 
 `public/app-ads.txt`는 미리 올려 두었다 — 게시자 ID(`pub-9942492825878908`)를 적어
 두는 파일이고, 구글이 크롤링해 가는 데 시간이 걸려 광고를 켜기 전에 있어야 한다.
