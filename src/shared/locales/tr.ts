@@ -281,7 +281,7 @@ const dict: CoreDict = {
   'game.marblejar': 'Misket Kavanozları',
   'mj.hint': 'Bu misket için bir kavanoz seç',
   'mj.colors': 'Oyunda {n} renk',
-  'mj.ad': '▶ Reklam izle ve devam et (tüm kavanozları boşalt)',
+  'mj.ad': '▶ Reklam izle ve devam et\n(tüm kavanozları boşalt)',
   'mj.hold': 'Yedek',
   'mj.next': 'Sonraki',
   'mj.wipe': 'Kavanoz boşalt ×{n}',

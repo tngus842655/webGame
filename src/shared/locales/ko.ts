@@ -337,7 +337,7 @@ const dict: FullDict = {
   'game.marblejar': '구슬 정리함',
   'mj.hint': '이 구슬을 넣을 통을 고르세요',
   'mj.colors': '나오는 색 {n}종',
-  'mj.ad': '▶ 광고 보고 이어하기 (통 전부 비우기)',
+  'mj.ad': '▶ 광고 보고 이어하기\n(통 전부 비우기)',
   'mj.hold': '자리',
   'mj.next': '다음',
   'mj.wipe': '통 비우기 ×{n}',

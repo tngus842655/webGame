@@ -281,7 +281,7 @@ const dict: CoreDict = {
   'game.marblejar': '弹珠整理筒',
   'mj.hint': '选一个筒放这颗弹珠',
   'mj.colors': '出现颜色 {n}种',
-  'mj.ad': '▶ 看广告继续（清空所有筒）',
+  'mj.ad': '▶ 看广告继续\n（清空所有筒）',
   'mj.hold': '暂存',
   'mj.next': '下一颗',
   'mj.wipe': '清空一个筒 ×{n}',
