@@ -22,6 +22,7 @@
 | `20260731000000_delete_account.sql` | `delete_my_account()` — 회원 탈퇴 | ✅ 2026-07-29 |
 | `20260801000000_feedback.sql` | `feedback` 테이블 — 의견 접수, 분당 3회 제한 | ✅ 2026-08-01 |
 | `20260801100000_feedback_delete.sql` | `feedback` 삭제 정책 (관리자만) | ✅ 2026-08-01 |
+| `20260802000000_player_stats.sql` | `get_player_stats()` — 이용자별 게임 이용 현황 | ⬜ **실행 필요** |
 
 ## 테이블
 
@@ -47,6 +48,7 @@
 | `get_game_popularity()` | 홈 정렬 | 공개 |
 | `get_game_stats(p_days)` | 관리자 통계 | `is_admin()` 아니면 `forbidden` |
 | `get_total_players(p_days)` | 관리자 통계 | `is_admin()` 아니면 `forbidden` |
+| `get_player_stats(p_days)` | 관리자 통계 → 이용자별 상세 | `is_admin()` 아니면 `forbidden` |
 | `is_admin()` | 라우트 가드, 다른 함수의 권한 검사 | 공개 (결과만 boolean) |
 | `delete_my_account()` | 계정 삭제 화면 | `authenticated`만. `auth.uid()` 본인 것만 지운다 |
 

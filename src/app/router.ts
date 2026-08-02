@@ -10,6 +10,7 @@ import RankingHubPage from '@/pages/RankingHubPage.vue'
 import RankingPage from '@/pages/RankingPage.vue'
 import SettingsPage from '@/pages/SettingsPage.vue'
 import StatsPage from '@/pages/StatsPage.vue'
+import StatsPlayersPage from '@/pages/StatsPlayersPage.vue'
 import DevNotesPage from '@/pages/DevNotesPage.vue'
 import FeedbackPage from '@/pages/FeedbackPage.vue'
 import PrivacyPage from '@/pages/PrivacyPage.vue'
@@ -25,6 +26,7 @@ export const router = createRouter({
     { path: '/ranking/:slug', component: RankingPage },
     { path: '/settings', component: SettingsPage },
     { path: '/stats', component: StatsPage, meta: { admin: true } },
+    { path: '/stats/players', component: StatsPlayersPage, meta: { admin: true } },
     { path: '/admin', component: AdminPage, meta: { admin: true } },
     { path: '/admin/trash', component: AdminTrashPage, meta: { admin: true } },
     { path: '/admin/feedback', component: AdminFeedbackPage, meta: { admin: true } },

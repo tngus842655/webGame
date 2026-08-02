@@ -38,8 +38,8 @@ VITE_SUPABASE_ANON_KEY=
 src/
 ├─ main.ts                  # 앱 부트스트랩 + 익명 세션 시작
 ├─ app/                     # router, AppLayout
-├─ pages/                   # Home / GamePlay / RankingHub / Ranking / Stats / Settings
-│                           #   / DevNotes / Terms / Privacy / AccountDeletion / Trash
+├─ pages/                   # Home / GamePlay / RankingHub / Ranking / Stats / StatsPlayers
+│                           #   / Settings / DevNotes / Terms / Privacy / AccountDeletion / Trash
 ├─ games/
 │  ├─ types.ts              # GameMeta / GameModule / GameContext
 │  ├─ registry.ts           # 게임 목록 (여기 한 줄 추가로 게임 등록)
@@ -268,6 +268,11 @@ RLS가 필요하다.
   섞이지 않는 대신 판 수를 잃는데, 인기 순위가 시간 기반이라 시간 정확도를 택했다.
   이용자 수는 게임별 값으로 만들 수 없어(같은 사람이 여러 게임을 하면 겹친다)
   `get_total_players()`로 따로 센다.
+- 이용자 수 칸의 **상세보기**(`/stats/players`)는 그 인원을 사람 단위로 편다.
+  `get_player_stats()`가 (이용자, 게임) 한 쌍을 한 줄로 돌려주고 사람 단위 합계는
+  화면에서 묶는다. 사람이 많아지면 오래 논 100명까지만 오고, 잘린 경우 화면이 그렇게
+  적는다. 기간 탭은 두 화면이 같은 값(`statsDays`)을 보므로 상세로 들어갔다 나와도
+  고른 기간이 그대로다.
 - 통계(`/stats`)는 관리자만 볼 수 있다. 홈의 📊 링크는 🛠️ 관리자 링크로 바뀌었고
   관리자에게만 보인다. `get_game_popularity()`는 홈 정렬에 필요하므로 공개로 남긴다.
 - 노출 설정은 인기도와 같이 localStorage에 캐시해 첫 렌더부터 쓴다 — 보는 도중
