@@ -379,7 +379,7 @@ const en = {
   'game.marblejar': 'Marble Jars',
   'mj.hint': 'Pick a jar for this marble',
   'mj.colors': '{n} colours in play',
-  'mj.ad': '▶ Watch ad to empty two jars',
+  'mj.ad': '▶ Watch ad to continue (empty every jar)',
   'mj.hold': 'Hold',
   'mj.next': 'Next',
   'game.bamboo': 'Bamboo Climb',

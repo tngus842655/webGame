@@ -281,7 +281,7 @@ const dict: CoreDict = {
   'game.marblejar': 'Ống Xếp Bi',
   'mj.hint': 'Chọn ống để đặt viên bi này',
   'mj.colors': 'Có {n} màu',
-  'mj.ad': '▶ Xem quảng cáo để dốc hai ống',
+  'mj.ad': '▶ Xem quảng cáo để tiếp tục (dốc hết các ống)',
   'mj.hold': 'Giữ',
   'mj.next': 'Tiếp theo',
   'game.bamboo': 'Leo Tre',

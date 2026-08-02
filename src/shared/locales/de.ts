@@ -281,7 +281,7 @@ const dict: CoreDict = {
   'game.marblejar': 'Murmelgläser',
   'mj.hint': 'Wähle ein Glas für diese Murmel',
   'mj.colors': '{n} Farben im Spiel',
-  'mj.ad': '▶ Werbung ansehen: zwei Gläser leeren',
+  'mj.ad': '▶ Werbung ansehen und weiterspielen (alle Gläser leeren)',
   'mj.hold': 'Ablage',
   'mj.next': 'Nächste',
   'game.bamboo': 'Bambus-Klettern',

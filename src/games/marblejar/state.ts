@@ -15,8 +15,6 @@ const MAX_COLORS = 7
 export const HOLD_SLOTS = 2
 const MARBLE_POINTS = 5
 const CLEAR_POINTS = 120
-// 통 하나만 비워 주면 넣을 곳이 한 통뿐이라 네 알 만에 제자리로 돌아온다
-const AD_EMPTY_JARS = 2
 
 export interface MarbleState {
   phase: 'playing' | 'over'
@@ -29,8 +27,6 @@ export interface MarbleState {
   colors: number
   clears: number
   placed: number
-  clearFlash: { jar: number; t: number } | null
-  rejectFlash: { jar: number; t: number } | null
   overTimer: number
   playTime: number
 }
@@ -73,25 +69,12 @@ export function createState(): MarbleState {
     colors: START_COLORS,
     clears: 0,
     placed: 0,
-    clearFlash: null,
-    rejectFlash: null,
     overTimer: 0,
     playTime: 0,
   }
   state.marble = draw(state)
   state.next = draw(state)
   return state
-}
-
-export function update(state: MarbleState, dt: number) {
-  if (state.clearFlash) {
-    state.clearFlash.t -= dt
-    if (state.clearFlash.t <= 0) state.clearFlash = null
-  }
-  if (state.rejectFlash) {
-    state.rejectFlash.t -= dt
-    if (state.rejectFlash.t <= 0) state.rejectFlash = null
-  }
 }
 
 // 이번 가방에 아직 안 나온 색별 개수 — 화면 위에 늘어놓아 다음을 셀 수 있게 한다.
@@ -107,10 +90,7 @@ export type PlaceResult = 'placed' | 'cleared' | 'rejected'
 export function place(state: MarbleState, index: number): PlaceResult | null {
   if (state.phase !== 'playing') return null
   const jar = state.jars[index]
-  if (jar.length >= CAP) {
-    state.rejectFlash = { jar: index, t: 0.3 }
-    return 'rejected'
-  }
+  if (jar.length >= CAP) return 'rejected'
 
   jar.push(state.marble)
   state.placed += 1
@@ -121,7 +101,6 @@ export function place(state: MarbleState, index: number): PlaceResult | null {
     state.jars[index] = []
     state.clears += 1
     state.score = Math.min(1_000_000, state.score + CLEAR_POINTS)
-    state.clearFlash = { jar: index, t: 0.6 }
     state.colors = colorsFor(state.clears)
     cleared = true
   }
@@ -150,9 +129,11 @@ export function useHold(state: MarbleState, slot: number): boolean {
   return true
 }
 
-// 광고 보상: 통 두 개를 비운다. 끝난 시점에는 가득 찬 통이 곧 섞인 통이라
-// (순색은 가득 차는 순간 비워지므로) 어느 통을 고르든 값이 같다.
-export function emptyJarsForAd(state: MarbleState) {
-  for (let i = 0; i < AD_EMPTY_JARS; i++) state.jars[i] = []
+// 광고 보상: 통을 전부 비우고 이어간다.
+// 끝난 시점에는 가득 찬 통이 곧 섞인 통이고(순색은 차는 순간 비워지므로) 색도 이미
+// 최대라, 몇 개만 비워 줘도 넣을 곳이 금세 다시 막힌다 — 두 개만 비웠을 때 실측
+// +42점으로 한 판의 2%였다. 색 수와 가방은 그대로 이어받으므로 늦게 쓸수록 값이 준다.
+export function reviveForAd(state: MarbleState) {
+  state.jars = Array.from({ length: JARS }, () => [])
   state.phase = 'playing'
 }

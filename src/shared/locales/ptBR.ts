@@ -281,7 +281,7 @@ const dict: CoreDict = {
   'game.marblejar': 'Potes de Bolinhas',
   'mj.hint': 'Escolha um pote para esta bolinha',
   'mj.colors': '{n} cores em jogo',
-  'mj.ad': '▶ Ver anúncio e esvaziar dois potes',
+  'mj.ad': '▶ Ver anúncio e continuar (esvaziar todos os potes)',
   'mj.hold': 'Reserva',
   'mj.next': 'Próxima',
   'game.bamboo': 'Sobe no Bambu',

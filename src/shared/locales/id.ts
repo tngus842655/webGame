@@ -281,7 +281,7 @@ const dict: CoreDict = {
   'game.marblejar': 'Tabung Kelereng',
   'mj.hint': 'Pilih tabung untuk kelereng ini',
   'mj.colors': '{n} warna beredar',
-  'mj.ad': '▶ Tonton iklan untuk kosongkan dua tabung',
+  'mj.ad': '▶ Tonton iklan untuk lanjut (kosongkan semua tabung)',
   'mj.hold': 'Simpan',
   'mj.next': 'Berikutnya',
   'game.bamboo': 'Panjat Bambu',

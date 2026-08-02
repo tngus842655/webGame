@@ -11,11 +11,10 @@ import {
   HOLD_SLOTS,
   JARS,
   createState,
-  emptyJarsForAd,
+  reviveForAd,
   isMixed,
   place,
   remainingByColor,
-  update,
   useHold,
 } from './state'
 import { SCORE_PANEL, drawScorePanel, font } from '../ui'
@@ -38,6 +37,7 @@ const HINT_Y = 416
 const HOLD_Y = 486
 const HOLD_R = 34
 const HOLD_GAP = 140
+const GRAVITY = 22000 // px/s² — 낙하 연출의 가속도
 
 const jarX = (index: number) => JAR_X0 + index * (JAR_W + JAR_GAP)
 const slotY = (slot: number) => JAR_BOTTOM - 12 - MARBLE_R - slot * SLOT_H
@@ -46,7 +46,7 @@ const holdX = (slot: number) => 360 - ((HOLD_SLOTS - 1) * HOLD_GAP) / 2 + slot *
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
     state.playTime += dt
-    update(state, dt)
+    tickVisuals(dt)
     if (state.phase === 'over' && state.overTimer > 0) {
       state.overTimer -= dt
       if (state.overTimer <= 0) void gameOver()
@@ -57,6 +57,65 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const state = createState()
   preloadSfx('clear', 'gameover', 'tap', 'select', 'unlock')
   let adEmptyUsed = false
+
+  // 손에서 통까지 떨어지는 구슬. 규칙은 탭 즉시 반영되고 이 연출만 뒤따르므로
+  // 아무리 빨리 눌러도 입력이 밀리지 않는다. 비워지는 번쩍임과 소리는 도착에 맞춘다.
+  interface Flight {
+    color: number
+    jar: number
+    slot: number
+    cleared: boolean
+    x1: number
+    y1: number
+    t: number
+    dur: number
+  }
+  const flights: Flight[] = []
+  let clearFlash: { jar: number; t: number } | null = null
+  let rejectFlash: { jar: number; t: number } | null = null
+
+  const launch = (color: number, jar: number, slot: number, cleared: boolean) => {
+    const y1 = slotY(slot)
+    flights.push({
+      color,
+      jar,
+      slot,
+      cleared,
+      x1: jarX(jar) + JAR_W / 2,
+      y1,
+      t: 0,
+      // 떨어지는 시간을 거리에서 뽑는다 — 아래 칸일수록 조금 더 오래 걸린다
+      dur: Math.sqrt((2 * (y1 - HAND_Y)) / GRAVITY),
+    })
+  }
+
+  const land = (f: Flight) => {
+    if (f.cleared) {
+      clearFlash = { jar: f.jar, t: 0.6 }
+      playSfx('clear')
+      vibrate([15, 35, 25])
+    } else {
+      playDrop()
+    }
+  }
+
+  const tickVisuals = (dt: number) => {
+    if (clearFlash) {
+      clearFlash.t -= dt
+      if (clearFlash.t <= 0) clearFlash = null
+    }
+    if (rejectFlash) {
+      rejectFlash.t -= dt
+      if (rejectFlash.t <= 0) rejectFlash = null
+    }
+    for (let i = flights.length - 1; i >= 0; i--) {
+      const f = flights[i]
+      f.t += dt
+      if (f.t < f.dur) continue
+      flights.splice(i, 1)
+      land(f)
+    }
+  }
 
   const overlay = createGameOverOverlay(shell.wrapper, {
     adLabelKey: 'mj.ad',
@@ -73,10 +132,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   async function continueWithAd() {
     if (state.phase !== 'over' || adEmptyUsed) return
-    const rewarded = await ctx.showRewardAd('marblejar-empty')
+    const rewarded = await ctx.showRewardAd('marblejar-revive')
     if (shell.isDestroyed() || !rewarded || state.phase !== 'over') return
     adEmptyUsed = true
-    emptyJarsForAd(state)
+    reviveForAd(state)
     playSfx('unlock')
     overlay.hide()
   }
@@ -114,14 +173,18 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       for (let i = 0; i < JARS; i++) {
         const x = jarX(i)
         if (p.x < x - 11 || p.x > x + JAR_W + 11) continue
+        const slot = state.jars[i].length // 넣기 전 길이 = 이 구슬이 앉을 칸
+        const color = state.marble
         const result = place(state, i)
-        if (result === 'cleared') {
-          playSfx('clear')
-          vibrate([15, 35, 25])
-        } else if (result === 'rejected') {
+        if (result === 'rejected') {
+          rejectFlash = { jar: i, t: 0.3 }
           vibrate(40)
+        } else if (result === 'cleared') {
+          // 방금 비워진 통으로 아직 날아가던 구슬은 앉을 자리가 없어졌다
+          for (let k = flights.length - 1; k >= 0; k--) if (flights[k].jar === i) flights.splice(k, 1)
+          launch(color, i, slot, true)
         } else if (result) {
-          playDrop()
+          launch(color, i, slot, false)
         }
         return
       }
@@ -168,6 +231,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.ellipse(x - r * 0.3, y - r * 0.34, r * 0.3, r * 0.2, -0.5, 0, Math.PI * 2)
     c.fill()
     c.restore()
+  }
+
+  // 가로는 빨리 붙고 천천히 멎게, 세로는 중력처럼 점점 빨라지게.
+  // 크기가 손에 든 것(HAND_R)에서 통 안 것(MARBLE_R)으로 줄어 같은 구슬로 읽힌다.
+  const drawFlight = (f: Flight) => {
+    const p = Math.min(1, f.t / f.dur)
+    const x = 360 + (f.x1 - 360) * (1 - (1 - p) ** 2)
+    const y = HAND_Y + (f.y1 - HAND_Y) * p * p
+    drawMarble(x, y, f.color, HAND_R + (MARBLE_R - HAND_R) * p)
   }
 
   // 이번 가방에 남은 색별 개수 — 무엇이 아직 안 나왔는지 세어 계획할 수 있게 한다
@@ -243,8 +315,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       const mixed = isMixed(jar)
       // 넣으면 바로 비워지는 통은 금색으로 알려 준다
       const completes = jar.length === CAP - 1 && !mixed && jar[0] === state.marble
-      const flashing = state.clearFlash?.jar === i
-      const rejecting = state.rejectFlash?.jar === i
+      const flashing = clearFlash?.jar === i
+      const rejecting = rejectFlash?.jar === i
 
       c.beginPath()
       c.roundRect(x, JAR_TOP, JAR_W, JAR_H, 20)
@@ -273,7 +345,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         c.stroke()
       }
 
-      for (let s = 0; s < jar.length; s++) drawMarble(x + JAR_W / 2, slotY(s), jar[s])
+      for (let s = 0; s < jar.length; s++) {
+        if (flights.some((f) => f.jar === i && f.slot === s)) continue
+        drawMarble(x + JAR_W / 2, slotY(s), jar[s])
+      }
+
+      // 날아오는 구슬은 이 통의 그늘보다 먼저 그려야 도착할 때 밝기가 튀지 않는다
+      for (const f of flights) if (f.jar === i) drawFlight(f)
 
       // 섞인 통은 다시 비워지지 않는다 — 흐릿하게 표시해 알려 준다
       if (mixed) {

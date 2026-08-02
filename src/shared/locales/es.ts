@@ -281,7 +281,7 @@ const dict: CoreDict = {
   'game.marblejar': 'Tarros de Canicas',
   'mj.hint': 'Elige un tarro para esta canica',
   'mj.colors': '{n} colores en juego',
-  'mj.ad': '▶ Ver anuncio y vaciar dos tarros',
+  'mj.ad': '▶ Ver anuncio y continuar (vaciar todos los tarros)',
   'mj.hold': 'Reserva',
   'mj.next': 'Siguiente',
   'game.bamboo': 'Trepa el Bambú',

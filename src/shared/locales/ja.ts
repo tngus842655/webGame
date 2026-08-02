@@ -281,7 +281,7 @@ const dict: CoreDict = {
   'game.marblejar': 'ビーズ整理箱',
   'mj.hint': 'この玉を入れる筒を選びましょう',
   'mj.colors': '出る色 {n}種',
-  'mj.ad': '▶ 広告を見て筒を2本空ける',
+  'mj.ad': '▶ 広告を見て続ける（筒を全部空ける）',
   'mj.hold': 'キープ',
   'mj.next': '次',
   'game.bamboo': '竹のぼり',

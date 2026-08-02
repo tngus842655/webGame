@@ -281,7 +281,7 @@ const dict: CoreDict = {
   'game.marblejar': 'Bocaux à Billes',
   'mj.hint': 'Choisis un bocal pour cette bille',
   'mj.colors': '{n} couleurs en jeu',
-  'mj.ad': '▶ Pub pour vider deux bocaux',
+  'mj.ad': '▶ Voir une pub et continuer (vider tous les bocaux)',
   'mj.hold': 'Réserve',
   'mj.next': 'Suivante',
   'game.bamboo': 'Grimpe au Bambou',
