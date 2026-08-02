@@ -4,8 +4,7 @@ import { isNative } from './native'
 // 리워드 광고 추상화. 게임은 이 인터페이스만 알면 되고, 실제 매체는 Provider 구현으로 갈아끼운다.
 // 웹·앱인토스는 VITE_ADSENSE_CLIENT가 있으면 H5 Games Ads,
 // 안드로이드 앱은 VITE_ADMOB_REWARD_ID가 있으면 AdMob,
-// 둘 다 없으면 광고 없음이 기본이다. 5초 카운트다운 가짜 광고(스텁)는
-// VITE_AD_STUB=on으로 켤 때만 나온다.
+// 둘 다 없으면 5초 카운트다운 가짜 광고(스텁)를 쓴다.
 
 // 광고를 한 번 부른 결과.
 //   viewed      광고를 끝까지 봤다
@@ -23,20 +22,8 @@ export interface AdProvider {
 
 const AD_SECONDS = 5
 
-// 붙일 매체가 없을 때의 기본값. isReady()가 false라 광고 버튼이 화면에 서지 않는다 —
-// 게임 쪽은 전부 이 값을 보고 버튼을 그리므로, 눌러도 광고가 안 나오는 버튼이
-// 남는 일은 없다. 이어하기·무르기·클리어 보너스도 함께 사라진다.
-class NoAdProvider implements AdProvider {
-  isReady() {
-    return false
-  }
-
-  show(_placement: string): Promise<AdOutcome> {
-    return Promise.resolve('unavailable')
-  }
-}
-
-// 가짜 광고: 5초 카운트다운 후 보상. 버튼 노출·보상 지급 흐름을 실기기에서 확인할 때 쓴다.
+// 가짜 광고: 5초 카운트다운 후 보상. 실제 매체를 붙이기 전까지 배포본에서도 이걸 쓴다 —
+// 버튼 노출·보상 지급·통계 집계까지 흐름 전체를 실기기에서 그대로 확인할 수 있다.
 class StubAdProvider implements AdProvider {
   private showing = false
 
@@ -229,15 +216,14 @@ class AdMobProvider implements AdProvider {
 function createProvider(): AdProvider {
   if (isNative) {
     const adId = import.meta.env.VITE_ADMOB_REWARD_ID as string | undefined
-    if (adId) return new AdMobProvider(adId)
-  } else {
-    const client = import.meta.env.VITE_ADSENSE_CLIENT as string | undefined
-    if (client) return new H5GamesAdProvider(client)
+    return adId ? new AdMobProvider(adId) : new StubAdProvider()
   }
-  // 매체를 붙이기 전 기본값은 '광고 없음'이다. 가짜 광고라도 화면에 뜨면 광고가 붙은
-  // 사이트로 읽히고, 그런 링크를 막는 곳에는 올릴 수가 없다.
-  // 보상 흐름을 실기기에서 확인할 때만 VITE_AD_STUB=on으로 켠다.
-  return import.meta.env.VITE_AD_STUB === 'on' ? new StubAdProvider() : new NoAdProvider()
+
+  const client = import.meta.env.VITE_ADSENSE_CLIENT as string | undefined
+  if (client) return new H5GamesAdProvider(client)
+  // 아직 실제 매체를 붙이지 않았다 — 가짜 광고로 보상 흐름을 그대로 돌린다.
+  // VITE_ADSENSE_CLIENT를 넣는 순간 실제 광고로 바뀐다.
+  return new StubAdProvider()
 }
 
 export const adProvider: AdProvider = createProvider()

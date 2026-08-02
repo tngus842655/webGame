@@ -130,10 +130,8 @@
 버튼 키를 `adLabelKey`로 넘긴다), 클리어 시 점수 2배 제안은
 `src/games/clearBonus.ts`, 최고 기록 표시는 `ctx.getBestScore()`.
 
-**광고 버튼은 반드시 `ctx.isRewardAdReady()`로 가린다**(`overlay.show`의 `canContinue`
-인자). 매체를 안 붙인 기본값이 `NoAdProvider`(항상 false)라, 가리지 않으면 눌러도
-아무 일이 없는 버튼이 남는다. 개발 중에 보상 흐름을 보려면 `VITE_AD_STUB=on`으로
-5초 가짜 광고를 켠다.
+**광고 버튼은 `ctx.isRewardAdReady()`로 가린다**(`overlay.show`의 `canContinue` 인자).
+31개 게임이 전부 그렇게 하고 있다 — 매체가 이미 광고를 띄우는 중이면 false가 된다.
 
 **광고 자리 이름**(`ctx.showRewardAd(placement)`의 인자)은 `<slug>-<동작>` 한 꼴로만
 짓는다 — `omok-undo`, `iceslide-moves`처럼. 이 문자열이 그대로 `ad_views`에 쌓여

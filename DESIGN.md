@@ -55,7 +55,7 @@ src/
 │  ├─ profile.ts            # 닉네임 조회·수정, 소셜 닉네임 자동 적용
 │  ├─ scores.ts             # 점수 제출·랭킹·인기도 조회 (+localStorage 병행)
 │  ├─ playSessions.ts       # 플레이 시간 기록 (인기 순위·통계 근거)
-│  ├─ ads.ts                # 리워드 광고 추상화 (H5 Games Ads / AdMob / 없음(기본) / VITE_AD_STUB=on이면 스텁)
+│  ├─ ads.ts                # 리워드 광고 추상화 (H5 Games Ads / AdMob / 개발용 스텁)
 │  ├─ adViews.ts            # 광고 호출 기록·집계 (어느 게임 어느 자리에서, 어떻게 끝났나)
 │  ├─ native.ts             # 안드로이드 앱(Capacitor) 전용 — 딥링크 로그인, 뒤로가기, 스플래시
 │  ├─ appUpdate.ts          # Play 인앱 업데이트 안내 (안드로이드 앱에서만)
@@ -140,12 +140,9 @@ src/
 
 - `ads.ts`가 매체를 감싼다. 웹·앱인토스는 `VITE_ADSENSE_CLIENT`가 있으면 H5 Games
   Ads(AdSense Ad Placement API), 안드로이드 앱은 `VITE_ADMOB_REWARD_ID`가 있으면 AdMob.
-- **둘 다 없으면 광고가 아예 없다**(`NoAdProvider`). `isReady()`가 false이고 게임 31개가
-  전부 그 값을 보고 버튼을 그리므로, 이어하기·무르기·클리어 보너스 자리가 통째로
-  내려간다. 눌러도 광고가 안 나오는 버튼이 남는 일은 없다.
-  5초 카운트다운 가짜 광고는 `VITE_AD_STUB=on`으로 켤 때만 나온다 — 보상 흐름을
-  실기기에서 확인할 때 쓴다. 기본값에서 뺀 이유는, 가짜라도 광고 화면이 뜨면
-  광고가 붙은 사이트로 읽히고 그런 링크를 막는 커뮤니티가 있기 때문이다.
+- **둘 다 없으면 5초 카운트다운 가짜 광고(스텁)를 쓴다.** 실제 매체를 붙이기 전에도
+  배포본에서 버튼 노출·보상 지급·`/stats/ads` 집계까지 흐름 전체를 그대로 확인하기
+  위해서다 — 스텁을 끝까지 보면 `viewed`, 건너뛰면 `dismissed`로 쌓인다.
 - 앱에서 매체가 갈리는 이유는 구글 정책이다 — `ANDROID_RELEASE.md`의 '광고 — AdMob' 참고.
 - 노출 지점은 두 가지. **실패 쪽**은 게임오버 오버레이의 이어하기(대부분의 게임),
   **성공 쪽**은 `clearBonus.ts`의 점수 2배(스도쿠·네모로직·디펜스·머지 가든).
