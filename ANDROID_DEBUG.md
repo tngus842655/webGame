@@ -76,7 +76,6 @@ adb shell am start -n com.minigame30.app/.MainActivity
 | `install`은 `Success`인데 앱이 안 뜸 | 정상이다. `install`은 설치만 한다. `adb shell am start`로 띄우거나 아이콘을 누른다 |
 | 고친 코드가 반영 안 됨 | `npm run build:android`을 건너뛰었다 |
 | `findstr`이 아무 것도 안 내놓고 멈춤 | 검색할 파일 경로를 빼먹었다. 경로가 없으면 키보드 입력을 기다린다. `Ctrl+C` |
-| 게임에 광고 버튼이 아예 안 보임 | 매체가 없어 `NoAdProvider`로 떨어졌다. `.env.local`에 `VITE_ADMOB_REWARD_ID`(실기기 AdMob) 또는 `VITE_AD_STUB=on`(5초 가짜 광고)을 넣고 `npm run build:android`부터 다시 |
 
 ## 웹 빌드가 앱에 들어갔는지 확인
 

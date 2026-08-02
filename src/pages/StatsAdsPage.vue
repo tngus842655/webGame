@@ -12,14 +12,12 @@ import UiIcon from '@/shared/UiIcon.vue'
 const stats = ref<AdStat[]>([])
 const loading = ref(true)
 const failed = ref(false)
-const open = ref('')
 
 async function load() {
   loading.value = true
   failed.value = false
   try {
     stats.value = await fetchAdStats(statsDays.value)
-    open.value = ''
   } catch {
     failed.value = true
   } finally {
@@ -120,36 +118,29 @@ function pct(n: number, total: number): string {
     <p v-else-if="games.length === 0" class="notice">{{ t('stats.adsEmpty') }}</p>
     <ul v-else class="list">
       <li v-for="game in games" :key="game.slug" class="card">
-        <button
-          type="button"
-          class="head"
-          :aria-expanded="open === game.slug"
-          @click="open = open === game.slug ? '' : game.slug"
-        >
+        <div class="head">
           <span class="thumb"><GameIcon :slug="game.slug" /></span>
-          <span class="info">
-            <span class="title-line">
+          <div class="info">
+            <div class="title-line">
               <strong>{{ gameName(game.slug) }}</strong>
               <span class="count">{{ game.total.toLocaleString() }}</span>
-            </span>
+            </div>
             <!-- 초록 시청 · 회색 닫음 · 주황 못 뜸 -->
-            <span class="bar">
+            <div class="bar">
               <span class="seg viewed" :style="{ width: pct(game.viewed, game.total) }" />
               <span class="seg dismissed" :style="{ width: pct(game.dismissed, game.total) }" />
               <span class="seg unavailable" :style="{ width: pct(game.unavailable, game.total) }" />
-            </span>
+            </div>
             <small class="metrics">
               {{ t('stats.adViewed') }} {{ game.viewed.toLocaleString() }} ·
               {{ t('stats.adDismissed') }} {{ game.dismissed.toLocaleString() }} ·
               {{ t('stats.adUnavailable') }} {{ game.unavailable.toLocaleString() }}
             </small>
-          </span>
-          <span class="chevron" :class="{ open: open === game.slug }">
-            <UiIcon name="chevron" />
-          </span>
-        </button>
+          </div>
+        </div>
 
-        <ul v-if="open === game.slug" class="spots">
+        <!-- 자리가 하나뿐이면 위 줄과 같은 값이라 갈라 볼 것이 없다 -->
+        <ul v-if="game.spots.length > 1" class="spots">
           <li v-for="spot in game.spots" :key="spot.placement">
             <div class="title-line">
               <span class="spot-name">{{ spotName(game.slug, spot.placement) }}</span>
@@ -262,15 +253,7 @@ function pct(n: number, total: number): string {
   display: flex;
   align-items: center;
   gap: 12px;
-  width: 100%;
   padding: 12px 14px;
-  border: none;
-  border-radius: 14px;
-  background: none;
-  color: inherit;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
 }
 
 .thumb {
@@ -336,18 +319,6 @@ function pct(n: number, total: number): string {
   display: block;
   font-size: 11px;
   color: var(--ink-faint);
-}
-
-.chevron {
-  flex: none;
-  width: 13px;
-  height: 13px;
-  color: var(--ink-faint);
-  transition: transform 0.15s ease;
-}
-
-.chevron.open {
-  transform: rotate(90deg);
 }
 
 .spots {
