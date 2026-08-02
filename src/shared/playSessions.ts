@@ -1,4 +1,6 @@
+import { ref } from 'vue'
 import { ensureUserId } from './auth'
+import { t } from './i18n'
 import { getSupabase } from './supabase'
 
 // 플레이 시간 기록 — 인기 순위와 통계의 근거 데이터
@@ -93,6 +95,21 @@ export function startPlayTracking(slug: string): () => void {
   }
 }
 
+// 통계 화면과 이용자별 상세가 같은 기간을 본다 — 상세로 들어갔다 나와도 고른 탭이 그대로다
+export const STATS_PERIODS = [1, 7, 30] as const
+export const statsDays = ref<number>(7)
+
+// 초 → "1시간 23분" / "12분 30초" / "45초"
+export function formatDuration(sec: number): string {
+  if (sec <= 0) return '—'
+  const h = Math.floor(sec / 3600)
+  const m = Math.floor((sec % 3600) / 60)
+  const s = Math.floor(sec % 60)
+  if (h > 0) return `${h}${t('stats.hour')} ${m}${t('stats.minute')}`
+  if (m > 0) return `${m}${t('stats.minute')} ${s}${t('stats.second')}`
+  return `${s}${t('stats.second')}`
+}
+
 export interface GameStat {
   game_slug: string
   plays: number
@@ -122,4 +139,60 @@ export async function fetchGameStats(days: number): Promise<GameStat[]> {
     players: Number(row.players),
     best_score: Number(row.best_score),
   }))
+}
+
+export interface PlayerGameStat {
+  slug: string
+  seconds: number
+}
+
+export interface PlayerStat {
+  userId: string
+  nickname: string
+  seconds: number
+  lastPlayedAt: string
+  // 오래 한 게임부터 (서버가 정한 순서)
+  games: PlayerGameStat[]
+}
+
+// get_player_stats()가 자르는 인원과 같은 값 — 잘린 사실을 화면에 알리는 데 쓴다
+export const PLAYER_LIMIT = 100
+
+// 함수는 구간 수(plays)도 돌려주지만 화면이 쓰지 않아 받지 않는다
+interface PlayerStatRow {
+  user_id: string
+  nickname: string
+  game_slug: string
+  total_seconds: number
+  last_played_at: string
+}
+
+// 관리자만 통과한다 (get_player_stats()의 첫 줄이 막는다)
+export async function fetchPlayerStats(days: number): Promise<PlayerStat[]> {
+  const sb = await getSupabase()
+  const { data, error } = await sb.rpc('get_player_stats', { p_days: days })
+  if (error) throw error
+  // (이용자, 게임) 한 쌍이 한 줄로 온다 — 사람 단위로 묶는다.
+  // 순서는 서버가 정한 대로 두고 여기서 다시 정렬하지 않는다.
+  const byUser = new Map<string, PlayerStat>()
+  for (const row of (data ?? []) as PlayerStatRow[]) {
+    let player = byUser.get(row.user_id)
+    if (!player) {
+      player = {
+        userId: row.user_id,
+        nickname: row.nickname,
+        seconds: 0,
+        lastPlayedAt: row.last_played_at,
+        games: [],
+      }
+      byUser.set(row.user_id, player)
+    }
+    player.seconds += Number(row.total_seconds)
+    // 게임 순서가 시간순이 아니므로 마지막 플레이는 줄마다 견줘서 고른다
+    if (Date.parse(row.last_played_at) > Date.parse(player.lastPlayedAt)) {
+      player.lastPlayedAt = row.last_played_at
+    }
+    player.games.push({ slug: row.game_slug, seconds: Number(row.total_seconds) })
+  }
+  return [...byUser.values()]
 }

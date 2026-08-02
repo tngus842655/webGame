@@ -41,7 +41,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   // 광고 보상: 남은 블록을 소형 블록으로 교체하고 이어하기 (판당 1회)
   async function swapWithAd() {
     if (state.phase !== 'over' || adSwapUsed) return
-    const rewarded = await ctx.showRewardAd('blockblast_swap')
+    const rewarded = await ctx.showRewardAd('blockblast-swap')
     if (shell.isDestroyed() || !rewarded || state.phase !== 'over') return
     adSwapUsed = true
     replaceTrayWithSmall(state)

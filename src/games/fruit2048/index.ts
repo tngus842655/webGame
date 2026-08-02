@@ -34,7 +34,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   async function undoWithAd() {
     if (state.phase !== 'over' || adUndoUsed) return
-    const rewarded = await ctx.showRewardAd('fruit2048_undo')
+    const rewarded = await ctx.showRewardAd('fruit2048-undo')
     if (shell.isDestroyed() || !rewarded || state.phase !== 'over') return
     if (undo(state)) {
       adUndoUsed = true

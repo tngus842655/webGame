@@ -79,7 +79,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   // 키워둔 큰 과일은 남으므로 하던 판을 그대로 잇는다.
   async function continueWithAd() {
     if (state.phase !== 'over' || adContinueUsed) return
-    const rewarded = await ctx.showRewardAd('suika_continue')
+    const rewarded = await ctx.showRewardAd('suika-continue')
     if (shell.isDestroyed() || !rewarded || state.phase !== 'over') return
     adContinueUsed = true
     // 작은 과일이 하나도 없으면(큰 것만 남아 넘친 경우) 한 단계 위까지 걷어낸다

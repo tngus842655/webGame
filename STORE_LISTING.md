@@ -22,7 +22,7 @@ Thirty small games in one app. Pick one, play a round, put it down.
 Thirty quick games in one app. Puzzles, arcade runs, and board classics.
 ```
 
-71자.
+72자.
 
 ---
 
@@ -35,14 +35,13 @@ MiniGame30 is a collection of small games you can finish in a couple of
 minutes — puzzles, arcade runs, board classics, and a few odd ones. Open
 the app, pick something, play a round, put it down.
 
-No energy timers. No waiting to play. Rewarded ads are there if you want
-them, and ignorable if you don't.
+No energy timers. No waiting to play.
 
 WHAT'S INSIDE
 
 Puzzle
 • Nonogram — fill the grid from the number clues
-• Sudoku — with notes, for when you need to think it through
+• Sudoku Daily — one puzzle a day for everyone, with notes and a streak
 • Pipe Connect — rotate the pipes until it all lines up
 • Jewel Match — match three, chain the cascades
 • TriPeaks Solitaire — clear the peaks one card at a time

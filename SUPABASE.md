@@ -22,6 +22,9 @@
 | `20260731000000_delete_account.sql` | `delete_my_account()` — 회원 탈퇴 | ✅ 2026-07-29 |
 | `20260801000000_feedback.sql` | `feedback` 테이블 — 의견 접수, 분당 3회 제한 | ✅ 2026-08-01 |
 | `20260801100000_feedback_delete.sql` | `feedback` 삭제 정책 (관리자만) | ✅ 2026-08-01 |
+| `20260802000000_player_stats.sql` | `get_player_stats()` — 이용자별 게임 이용 현황 | ✅ 2026-08-02 |
+| `20260803000000_ad_views.sql` | `ad_views` 테이블 — 리워드 광고 호출 기록, `get_ad_stats()` | ⬜ **실행 필요** |
+| `20260804000000_guest_nickname_en.sql` | 기본 닉네임 `게스트-` → `Guest-` | ⬜ **실행 필요** |
 
 ## 테이블
 
@@ -33,8 +36,9 @@
 | `admin_emails` | 관리자 이메일 목록 | **정책 없음** = 클라이언트 접근 불가. 추가는 대시보드에서 직접 |
 | `game_flags` | 게임 고정·숨김·휴지통 | 조회 전체 공개 / 쓰기는 관리자만 |
 | `feedback` | 사용자 의견 (버그·문의·제안) | insert는 본인만 / **조회·삭제는 관리자만** / update 정책 없음(금지) |
+| `ad_views` | 리워드 광고 호출 기록 (게임·자리·결과) | insert는 본인만 / **조회는 관리자만** / update·delete 정책 없음(금지) |
 
-삭제 연쇄: `auth.users` → `profiles` → `scores`·`play_sessions`·`feedback` 순으로
+삭제 연쇄: `auth.users` → `profiles` → `scores`·`play_sessions`·`feedback`·`ad_views` 순으로
 `on delete cascade`가 걸려 있다. 최상위 한 줄만 지우면 전부 따라 지워진다.
 (탈퇴하면 그 사람이 보낸 의견도 함께 사라진다 — 개인정보처리방침대로다.)
 
@@ -43,15 +47,17 @@
 | 함수 | 호출하는 곳 | 권한 |
 | --- | --- | --- |
 | `get_leaderboard(p_game_slug, p_since, p_limit)` | 랭킹 화면 | 공개 |
-| `get_my_stats()` | 홈 화면 (내 최고점·순위) | 로그인 사용자 |
+| `get_my_stats()` | 홈 화면, 게임 진입 시 최고점 동기화 | 로그인 사용자 |
 | `get_game_popularity()` | 홈 정렬 | 공개 |
 | `get_game_stats(p_days)` | 관리자 통계 | `is_admin()` 아니면 `forbidden` |
 | `get_total_players(p_days)` | 관리자 통계 | `is_admin()` 아니면 `forbidden` |
+| `get_player_stats(p_days)` | 관리자 통계 → 이용자별 상세 | `is_admin()` 아니면 `forbidden` |
+| `get_ad_stats(p_days)` | 관리자 통계 → 광고 현황 | `is_admin()` 아니면 `forbidden` |
 | `is_admin()` | 라우트 가드, 다른 함수의 권한 검사 | 공개 (결과만 boolean) |
 | `delete_my_account()` | 계정 삭제 화면 | `authenticated`만. `auth.uid()` 본인 것만 지운다 |
 
-트리거 두 개는 클라이언트가 직접 부르지 않는다 — `handle_new_user()`(가입 시 프로필 생성),
-`check_score_rate_limit()`·`check_session_rate_limit()`(분당 제출 상한).
+트리거로만 도는 함수는 클라이언트가 직접 부르지 않는다 — `handle_new_user()`(가입 시 프로필 생성),
+`check_score_rate_limit()`·`check_session_rate_limit()`·`check_feedback_rate_limit()`·`check_ad_view_rate_limit()`(분당 제출 상한).
 
 ### 권한 설계 원칙
 

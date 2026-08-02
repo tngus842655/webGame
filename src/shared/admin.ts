@@ -13,7 +13,7 @@ let checked = false
 
 export async function refreshAdmin(): Promise<boolean> {
   // 세션이 복원되기 전에 물으면 익명 키로 나가 무조건 false가 된다.
-  // 세션이 아예 없으면(온보딩 전) 물어볼 것도 없다 — 관리자는 소셜 로그인 계정이다.
+  // 세션이 아예 없으면(아직 계정이 만들어지기 전) 물어볼 것도 없다 — 관리자는 소셜 로그인 계정이다.
   if (!(await getCurrentUserId().catch(() => null))) {
     isAdmin.value = false
     return false

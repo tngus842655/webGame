@@ -1,14 +1,19 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
+import { fetchAdStats } from '@/shared/adViews'
 import { GAMES } from '@/games/registry'
 import GameIcon from '@/shared/GameIcon.vue'
 import { t } from '@/shared/i18n'
-import { fetchGameStats, fetchTotalPlayers, type GameStat } from '@/shared/playSessions'
+import {
+  fetchGameStats,
+  fetchTotalPlayers,
+  formatDuration,
+  STATS_PERIODS,
+  statsDays,
+  type GameStat,
+} from '@/shared/playSessions'
 import UiIcon from '@/shared/UiIcon.vue'
 
-const PERIODS = [1, 7, 30] as const
-
-const days = ref<number>(7)
 const stats = ref<GameStat[]>([])
 const loading = ref(true)
 const failed = ref(false)
@@ -25,15 +30,10 @@ const rows = computed(() => {
 // 이용자 수는 게임별 값으로 만들 수 없다 (같은 사람이 여러 게임을 하면 겹친다) — 따로 받는다
 const players = ref(0)
 
-const totals = computed(() => {
-  return stats.value.reduce(
-    (acc, s) => ({
-      plays: acc.plays + s.plays,
-      seconds: acc.seconds + s.total_seconds,
-    }),
-    { plays: 0, seconds: 0 },
-  )
-})
+// 끝까지 본 광고 수. 나머지 결과(닫음·못 뜸)는 상세 화면에서 본다.
+const adsViewed = ref(0)
+
+const totalSeconds = computed(() => stats.value.reduce((sum, s) => sum + s.total_seconds, 0))
 
 const maxSeconds = computed(() => Math.max(1, ...stats.value.map((s) => s.total_seconds)))
 
@@ -41,12 +41,14 @@ async function load() {
   loading.value = true
   failed.value = false
   try {
-    const [rows, total] = await Promise.all([
-      fetchGameStats(days.value),
-      fetchTotalPlayers(days.value),
+    const [rows, total, ads] = await Promise.all([
+      fetchGameStats(statsDays.value),
+      fetchTotalPlayers(statsDays.value),
+      fetchAdStats(statsDays.value),
     ])
     stats.value = rows
     players.value = total
+    adsViewed.value = ads.reduce((sum, row) => sum + row.viewed, 0)
   } catch {
     failed.value = true
   } finally {
@@ -55,18 +57,7 @@ async function load() {
 }
 
 onMounted(load)
-watch(days, load)
-
-// 초 → "1시간 23분" / "12분 30초" / "45초"
-function duration(sec: number): string {
-  if (sec <= 0) return '—'
-  const h = Math.floor(sec / 3600)
-  const m = Math.floor((sec % 3600) / 60)
-  const s = Math.floor(sec % 60)
-  if (h > 0) return `${h}${t('stats.hour')} ${m}${t('stats.minute')}`
-  if (m > 0) return `${m}${t('stats.minute')} ${s}${t('stats.second')}`
-  return `${s}${t('stats.second')}`
-}
+watch(statsDays, load)
 </script>
 
 <template>
@@ -78,11 +69,11 @@ function duration(sec: number): string {
 
     <div class="tabs">
       <button
-        v-for="p in PERIODS"
+        v-for="p in STATS_PERIODS"
         :key="p"
         type="button"
-        :class="{ active: days === p }"
-        @click="days = p"
+        :class="{ active: statsDays === p }"
+        @click="statsDays = p"
       >
         {{ t('stats.days', { n: p }) }}
       </button>
@@ -92,17 +83,26 @@ function duration(sec: number): string {
 
     <section class="summary">
       <div class="summary-item">
-        <strong>{{ totals.plays.toLocaleString() }}</strong>
-        <small>{{ t('stats.plays') }}</small>
-      </div>
-      <div class="summary-item">
-        <strong>{{ duration(totals.seconds) }}</strong>
+        <strong>{{ formatDuration(totalSeconds) }}</strong>
         <small>{{ t('stats.playtime') }}</small>
       </div>
-      <div class="summary-item">
+      <!-- 몇 명인지까지가 이 칸의 몫이고, 누가 무엇을 했는지는 상세에서 본다.
+           칸 전체가 과녁이고 아래 알약은 눌러도 된다는 표시다 — 11px 글자만으로는
+           손가락에 비해 과녁이 너무 작다. -->
+      <RouterLink class="summary-item detail" to="/stats/players">
         <strong>{{ players.toLocaleString() }}</strong>
         <small>{{ t('stats.players') }}</small>
-      </div>
+        <span class="detail-chip">
+          {{ t('stats.playerDetail') }}<UiIcon name="chevron" />
+        </span>
+      </RouterLink>
+      <RouterLink class="summary-item detail" to="/stats/ads">
+        <strong>{{ adsViewed.toLocaleString() }}</strong>
+        <small>{{ t('stats.ads') }}</small>
+        <span class="detail-chip">
+          {{ t('stats.playerDetail') }}<UiIcon name="chevron" />
+        </span>
+      </RouterLink>
     </section>
 
     <p v-if="loading" class="notice">{{ t('ranking.loading') }}</p>
@@ -113,7 +113,7 @@ function duration(sec: number): string {
         <div class="info">
           <div class="title-line">
             <strong>{{ t(row.titleKey) }}</strong>
-            <span class="time">{{ duration(row.stat?.total_seconds ?? 0) }}</span>
+            <span class="time">{{ formatDuration(row.stat?.total_seconds ?? 0) }}</span>
           </div>
           <div class="bar">
             <span
@@ -122,8 +122,7 @@ function duration(sec: number): string {
             />
           </div>
           <div class="metrics">
-            <span>{{ t('stats.plays') }} {{ (row.stat?.plays ?? 0).toLocaleString() }}</span>
-            <span>{{ t('stats.avg') }} {{ duration(row.stat?.avg_seconds ?? 0) }}</span>
+            <span>{{ t('stats.avg') }} {{ formatDuration(row.stat?.avg_seconds ?? 0) }}</span>
             <span>{{ t('stats.players') }} {{ (row.stat?.players ?? 0).toLocaleString() }}</span>
             <span>{{ t('stats.best') }} {{ (row.stat?.best_score ?? 0).toLocaleString() }}</span>
           </div>
@@ -186,10 +185,12 @@ function duration(sec: number): string {
   margin-bottom: 16px;
 }
 
+/* 상세보기가 붙은 칸이 더 높아 플레이 시간 칸이 따라 늘어난다 — 가운데로 모아 준다 */
 .summary-item {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 2px;
   padding: 14px 6px;
   background: var(--surface);
@@ -204,6 +205,33 @@ function duration(sec: number): string {
 .summary-item small {
   font-size: 11px;
   color: var(--ink-faint);
+}
+
+.detail {
+  transition: background-color 0.12s ease;
+}
+
+.detail:active {
+  background: var(--surface-press);
+}
+
+/* 숫자를 가리지 않도록 칸 아래에 작게 앉힌다 */
+.detail-chip {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 6px;
+  padding: 3px 7px 3px 9px;
+  border-radius: 999px;
+  background: var(--surface-tint);
+  font-size: 11px;
+  font-weight: bold;
+  color: var(--ink-muted);
+}
+
+.detail-chip svg {
+  width: 10px;
+  height: 10px;
 }
 
 .notice {

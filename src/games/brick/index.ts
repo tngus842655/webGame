@@ -41,7 +41,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   async function continueWithAd() {
     if (state.phase !== 'over' || adContinueUsed) return
-    const rewarded = await ctx.showRewardAd('brick_continue')
+    const rewarded = await ctx.showRewardAd('brick-continue')
     if (shell.isDestroyed() || !rewarded || state.phase !== 'over') return
     adContinueUsed = true
     clearDangerRows(state)

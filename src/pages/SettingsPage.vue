@@ -172,7 +172,7 @@ function onLangChange() {
             :disabled="!loaded"
             @keyup.enter="save"
           />
-          <!-- 2~12자 규칙을 저장을 눌러보고 나서야 알던 것을 입력 중에 알려준다 (온보딩과 같다) -->
+          <!-- 2~12자 규칙을 저장을 눌러보고 나서야 알던 것을 입력 중에 알려준다 -->
           <span class="counter" :class="{ short: nickLength < 2 }">{{ nickLength }}/12</span>
         </div>
         <button
