@@ -3,16 +3,6 @@ import type { CoreDict } from '../i18n'
 // 이 사전은 이 언어를 고른 사람에게만 내려간다 (i18n.ts의 loadLocale)
 const dict: CoreDict = {
   'app.title': 'MiniGame30',
-  'onboard.langTitle': '言語を選択してください',
-  'onboard.next': '次へ',
-  'onboard.accountTitle': '以前プレイしたことがありますか？',
-  'onboard.accountBody': 'GoogleやKakaoと連携していれば、その記録をそのまま引き継げます。',
-  'onboard.accountNo': 'いいえ、初めてです',
-  'onboard.back': '戻る',
-  'onboard.nickTitle': '何とお呼びしましょうか？',
-  'onboard.start': 'はじめる',
-  'onboard.saving': '準備中…',
-  'onboard.failed': '開始できませんでした。しばらくしてからもう一度お試しください。',
   'home.best': 'ベスト {n}',
   'home.myRank': '{score}点 ({rank}位)',
   'home.ranking': 'ランキング',

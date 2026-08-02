@@ -1,4 +1,4 @@
-import { ensureUserId } from './auth'
+import { ensureUserId, getCurrentUserId } from './auth'
 import { getSupabase } from './supabase'
 
 function bestKey(slug: string) {
@@ -85,7 +85,10 @@ export interface MyGameStat {
 
 // 내 게임별 최고점·순위 (세션 없으면 익명 로그인 후 조회)
 export async function fetchMyStats(): Promise<MyGameStat[]> {
-  await ensureUserId()
+  // 세션이 없다 = 아직 아무것도 기록하지 않은 방문자. 보여줄 내 기록도 없다.
+  // 여기서 계정을 만들지 않는다 — 열어만 보고 나간 사람까지 쌓이지 않도록,
+  // 계정은 첫 점수·플레이 기록이 만든다.
+  if (!(await getCurrentUserId())) return []
   const sb = await getSupabase()
   const { data, error } = await sb.rpc('get_my_stats')
   if (error) throw error

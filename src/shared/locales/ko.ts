@@ -3,16 +3,6 @@ import type { FullDict } from '../i18n'
 // 이 사전은 이 언어를 고른 사람에게만 내려간다 (i18n.ts의 loadLocale)
 const dict: FullDict = {
   'app.title': '미니게임30',
-  'onboard.langTitle': '언어를 선택하세요',
-  'onboard.next': '다음',
-  'onboard.accountTitle': '전에 플레이한 적 있나요?',
-  'onboard.accountBody': '구글이나 카카오로 연동해두셨다면 그 기록을 그대로 가져올 수 있어요.',
-  'onboard.accountNo': '아니요, 처음이에요',
-  'onboard.back': '뒤로',
-  'onboard.nickTitle': '어떤 이름으로 부를까요?',
-  'onboard.start': '시작하기',
-  'onboard.saving': '준비 중…',
-  'onboard.failed': '시작하지 못했어요. 잠시 후 다시 시도해 주세요.',
   'home.best': '최고 {n}',
   'home.myRank': '{score}점 ({rank}등)',
   'home.ranking': '랭킹 보기',

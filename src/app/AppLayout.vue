@@ -1,42 +1,17 @@
 <script setup lang="ts">
-// 온보딩을 마치기 전에는 앱을 열지 않는다 — 계정 생성 시점을 온보딩 끝으로 미루기 위해서다.
-// 소셜 로그인으로 돌아온 경우(세션이 이미 있음)는 온보딩을 마친 것으로 본다.
-import { onMounted, ref } from 'vue'
-import OnboardingFlow from '@/shared/OnboardingFlow.vue'
-import { getCurrentUserId } from '@/shared/auth'
+// 시작하기 전에 묻는 화면은 두지 않는다. 게임 주소를 그대로 열면 그 게임이 바로 떠야 한다 —
+// 링크를 받고 들어온 사람에게 언어·닉네임부터 묻는 화면은 가입 절차로 읽힌다.
+// 언어는 브라우저 설정에서 감지하고(못 찾으면 영어), 닉네임은 계정이 생기는 순간
+// DB가 '게스트-xxxx'로 채운다. 둘 다 설정 화면에서 언제든 바꿀 수 있다.
+import { onMounted } from 'vue'
 import { flushPendingScores } from '@/shared/scores'
 
-const ONBOARDED_KEY = 'webgame:onboarded'
-const ready = ref(false)
-const needsOnboarding = ref(false)
-
-function finish() {
-  localStorage.setItem(ONBOARDED_KEY, 'done')
-  needsOnboarding.value = false
-}
-
-onMounted(async () => {
-  if (localStorage.getItem(ONBOARDED_KEY)) {
-    ready.value = true
-    void flushPendingScores().catch(() => {})
-    return
-  }
-  // 온보딩 기록은 없지만 세션이 살아 있는 경우 = 소셜 로그인으로 막 돌아왔거나
-  // 저장소만 지워진 재방문자. 계정이 이미 있으니 다시 묻지 않는다.
-  const existing = await getCurrentUserId().catch(() => null)
-  if (existing) {
-    finish()
-    void flushPendingScores().catch(() => {})
-  } else {
-    needsOnboarding.value = true
-  }
-  ready.value = true
-})
+// 보내지 못하고 남아 있던 점수를 올린다 (오프라인·전송 실패분). 남은 게 없으면 그냥 지나간다.
+onMounted(() => void flushPendingScores().catch(() => {}))
 </script>
 
 <template>
   <div class="app-shell">
-    <OnboardingFlow v-if="ready && needsOnboarding" @done="finish" />
-    <RouterView v-else-if="ready" />
+    <RouterView />
   </div>
 </template>

@@ -43,16 +43,6 @@ const STORAGE_KEY = 'webgame:locale'
 
 const en = {
   'app.title': 'MiniGame30',
-  'onboard.langTitle': 'Choose your language',
-  'onboard.next': 'Next',
-  'onboard.accountTitle': 'Played here before?',
-  'onboard.accountBody': 'If you linked a Google or Kakao account before, you can bring those records over.',
-  'onboard.accountNo': 'No, I\'m new here',
-  'onboard.back': 'Back',
-  'onboard.nickTitle': 'What should we call you?',
-  'onboard.start': 'Start',
-  'onboard.saving': 'Getting ready…',
-  'onboard.failed': 'Couldn\'t get started. Please try again in a moment.',
   'home.best': 'Best {n}',
   'home.myRank': '{score} pts (#{rank})',
   'home.ranking': 'Rankings',
