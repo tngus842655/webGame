@@ -29,15 +29,7 @@ const rows = computed(() => {
 // 이용자 수는 게임별 값으로 만들 수 없다 (같은 사람이 여러 게임을 하면 겹친다) — 따로 받는다
 const players = ref(0)
 
-const totals = computed(() => {
-  return stats.value.reduce(
-    (acc, s) => ({
-      plays: acc.plays + s.plays,
-      seconds: acc.seconds + s.total_seconds,
-    }),
-    { plays: 0, seconds: 0 },
-  )
-})
+const totalSeconds = computed(() => stats.value.reduce((sum, s) => sum + s.total_seconds, 0))
 
 const maxSeconds = computed(() => Math.max(1, ...stats.value.map((s) => s.total_seconds)))
 
@@ -85,11 +77,7 @@ watch(statsDays, load)
 
     <section class="summary">
       <div class="summary-item">
-        <strong>{{ totals.plays.toLocaleString() }}</strong>
-        <small>{{ t('stats.plays') }}</small>
-      </div>
-      <div class="summary-item">
-        <strong>{{ formatDuration(totals.seconds) }}</strong>
+        <strong>{{ formatDuration(totalSeconds) }}</strong>
         <small>{{ t('stats.playtime') }}</small>
       </div>
       <!-- 몇 명인지까지가 이 칸의 몫이고, 누가 무엇을 했는지는 상세에서 본다.
@@ -121,7 +109,6 @@ watch(statsDays, load)
             />
           </div>
           <div class="metrics">
-            <span>{{ t('stats.plays') }} {{ (row.stat?.plays ?? 0).toLocaleString() }}</span>
             <span>{{ t('stats.avg') }} {{ formatDuration(row.stat?.avg_seconds ?? 0) }}</span>
             <span>{{ t('stats.players') }} {{ (row.stat?.players ?? 0).toLocaleString() }}</span>
             <span>{{ t('stats.best') }} {{ (row.stat?.best_score ?? 0).toLocaleString() }}</span>
@@ -180,12 +167,12 @@ watch(statsDays, load)
 
 .summary {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
   margin-bottom: 16px;
 }
 
-/* 상세보기가 붙은 칸이 제일 높아 나머지 둘이 따라 늘어난다 — 가운데로 모아 준다 */
+/* 상세보기가 붙은 칸이 더 높아 옆 칸이 따라 늘어난다 — 가운데로 모아 준다 */
 .summary-item {
   display: flex;
   flex-direction: column;

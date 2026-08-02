@@ -107,7 +107,6 @@ function when(iso: string): string {
             <span class="who">
               <strong>{{ player.nickname }}</strong>
               <small>
-                {{ t('stats.plays') }} {{ player.plays.toLocaleString() }} ·
                 {{ t('stats.gamesPlayed') }} {{ player.games.length }} ·
                 {{ t('stats.lastPlayed') }} {{ when(player.lastPlayedAt) }}
               </small>
@@ -133,9 +132,6 @@ function when(iso: string): string {
                     :style="{ width: `${(game.seconds / player.games[0].seconds) * 100}%` }"
                   />
                 </div>
-                <small class="metrics">
-                  {{ t('stats.plays') }} {{ game.plays.toLocaleString() }}
-                </small>
               </div>
             </li>
           </ul>
@@ -334,7 +330,7 @@ function when(iso: string): string {
 
 .bar {
   height: 5px;
-  margin: 5px 0 4px;
+  margin-top: 5px;
   border-radius: 3px;
   background: var(--line);
   overflow: hidden;
@@ -345,10 +341,5 @@ function when(iso: string): string {
   height: 100%;
   border-radius: 3px;
   background: #43a047;
-}
-
-.metrics {
-  font-size: 11px;
-  color: var(--ink-faint);
 }
 </style>

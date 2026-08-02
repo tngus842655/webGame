@@ -143,14 +143,12 @@ export async function fetchGameStats(days: number): Promise<GameStat[]> {
 
 export interface PlayerGameStat {
   slug: string
-  plays: number
   seconds: number
 }
 
 export interface PlayerStat {
   userId: string
   nickname: string
-  plays: number
   seconds: number
   lastPlayedAt: string
   // 오래 한 게임부터 (서버가 정한 순서)
@@ -160,11 +158,11 @@ export interface PlayerStat {
 // get_player_stats()가 자르는 인원과 같은 값 — 잘린 사실을 화면에 알리는 데 쓴다
 export const PLAYER_LIMIT = 100
 
+// 함수는 구간 수(plays)도 돌려주지만 화면이 쓰지 않아 받지 않는다
 interface PlayerStatRow {
   user_id: string
   nickname: string
   game_slug: string
-  plays: number
   total_seconds: number
   last_played_at: string
 }
@@ -183,24 +181,18 @@ export async function fetchPlayerStats(days: number): Promise<PlayerStat[]> {
       player = {
         userId: row.user_id,
         nickname: row.nickname,
-        plays: 0,
         seconds: 0,
         lastPlayedAt: row.last_played_at,
         games: [],
       }
       byUser.set(row.user_id, player)
     }
-    player.plays += Number(row.plays)
     player.seconds += Number(row.total_seconds)
     // 게임 순서가 시간순이 아니므로 마지막 플레이는 줄마다 견줘서 고른다
     if (Date.parse(row.last_played_at) > Date.parse(player.lastPlayedAt)) {
       player.lastPlayedAt = row.last_played_at
     }
-    player.games.push({
-      slug: row.game_slug,
-      plays: Number(row.plays),
-      seconds: Number(row.total_seconds),
-    })
+    player.games.push({ slug: row.game_slug, seconds: Number(row.total_seconds) })
   }
   return [...byUser.values()]
 }
