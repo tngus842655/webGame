@@ -149,13 +149,16 @@ function pct(n: number, total: number): string {
           </span>
         </button>
 
+        <!-- 자리가 하나뿐이면 숫자도 막대도 위 줄과 같은 값이다 — 이름만 남긴다 -->
         <ul v-if="open === game.slug" class="spots">
           <li v-for="spot in game.spots" :key="spot.placement">
             <div class="title-line">
               <span class="spot-name">{{ spotName(game.slug, spot.placement) }}</span>
-              <span class="count">{{ spot.total.toLocaleString() }}</span>
+              <span v-if="game.spots.length > 1" class="count">
+                {{ spot.total.toLocaleString() }}
+              </span>
             </div>
-            <div class="bar">
+            <div v-if="game.spots.length > 1" class="bar">
               <span class="seg viewed" :style="{ width: pct(spot.viewed, spot.total) }" />
               <span class="seg dismissed" :style="{ width: pct(spot.dismissed, spot.total) }" />
               <span class="seg unavailable" :style="{ width: pct(spot.unavailable, spot.total) }" />
