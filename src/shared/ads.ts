@@ -6,15 +6,18 @@ import { isNative } from './native'
 // 안드로이드 앱은 VITE_ADMOB_REWARD_ID가 있으면 AdMob,
 // 둘 다 없으면 5초 카운트다운 가짜 광고(스텁)를 쓴다.
 
+// 광고를 한 번 부른 결과.
+//   viewed      광고를 끝까지 봤다
+//   dismissed   사용자가 중간에 닫았다
+//   unavailable 띄울 수 없었다 (재고 없음·빈도 상한·에러)
+// 보상 지급 여부(= dismissed만 거절)는 gameContext가 판단한다. 셋을 구분해 두는
+// 이유는 통계 때문이다 — 하나로 뭉치면 '광고를 봤다'와 '광고가 아예 안 떴는데
+// 봐준 것'이 같은 값이 되어, 재고가 비었는지 영영 알 수 없다.
+export type AdOutcome = 'viewed' | 'dismissed' | 'unavailable'
+
 export interface AdProvider {
   isReady(): boolean
-  // 반환값 = 보상을 지급할지.
-  //   광고를 끝까지 봤다            → true
-  //   광고를 띄울 수 없었다(재고 없음·빈도 상한·에러) → true
-  //   사용자가 광고를 중간에 닫았다 → false
-  // 두 번째가 중요하다. 버튼을 눌렀는데 매체 사정으로 광고가 안 나온 것은
-  // 사용자 잘못이 아니므로 기회를 뺏지 않는다.
-  show(placement: string): Promise<boolean>
+  show(placement: string): Promise<AdOutcome>
 }
 
 const AD_SECONDS = 5
@@ -28,9 +31,9 @@ class StubAdProvider implements AdProvider {
     return true
   }
 
-  show(_placement: string): Promise<boolean> {
-    // 겹쳐 부르면 띄울 수 없는 상황이라 보상은 준다 (실제 매체와 같은 규칙)
-    if (this.showing) return Promise.resolve(true)
+  show(_placement: string): Promise<AdOutcome> {
+    // 겹쳐 부르면 띄울 수 없는 상황이다 (실제 매체와 같은 규칙)
+    if (this.showing) return Promise.resolve('unavailable')
     this.showing = true
     return new Promise((resolve) => {
       const el = document.createElement('div')
@@ -49,18 +52,18 @@ class StubAdProvider implements AdProvider {
       if (button) button.textContent = t('ad.skip')
       let remain = AD_SECONDS
 
-      const finish = (rewarded: boolean) => {
+      const finish = (outcome: AdOutcome) => {
         clearInterval(timer)
         window.removeEventListener('popstate', onBack)
         el.remove()
         this.showing = false
-        resolve(rewarded)
+        resolve(outcome)
       }
 
       // 광고 화면은 body에 붙어 있어서 라우터가 페이지를 바꿔도 남는다.
       // 뒤로 가기로 빠져나가면 화면을 덮은 채 굳어 버리므로 여기서 닫는다.
       // (끝까지 안 봤으니 보상은 없다)
-      const onBack = () => finish(false)
+      const onBack = () => finish('dismissed')
       window.addEventListener('popstate', onBack)
 
       const timer = setInterval(() => {
@@ -77,7 +80,7 @@ class StubAdProvider implements AdProvider {
         }
       }, 1000)
 
-      button?.addEventListener('click', () => finish(remain <= 0))
+      button?.addEventListener('click', () => finish(remain <= 0 ? 'viewed' : 'dismissed'))
     })
   }
 }
@@ -95,10 +98,6 @@ type AdBreakStatus =
   | 'ignored'
   | 'other'
   | string
-
-// 사용자가 스스로 광고를 닫은 경우에만 보상을 막는다. 나머지(재고 없음·상한·에러)는
-// 매체 사정이라 보상을 준다.
-const DENIES_REWARD: ReadonlySet<AdBreakStatus> = new Set(['dismissed'])
 
 class H5GamesAdProvider implements AdProvider {
   private queue: unknown[]
@@ -123,18 +122,18 @@ class H5GamesAdProvider implements AdProvider {
     return !this.showing
   }
 
-  show(placement: string): Promise<boolean> {
-    // 이미 광고가 떠 있는데 또 부르면 매체가 거절한다 — 사용자에게 기회를 돌려준다
-    if (this.showing) return Promise.resolve(true)
+  show(placement: string): Promise<AdOutcome> {
+    // 이미 광고가 떠 있는데 또 부르면 매체가 거절한다
+    if (this.showing) return Promise.resolve('unavailable')
     this.showing = true
     return new Promise((resolve) => {
       let dismissed = false
       let settled = false
-      const finish = (reward: boolean) => {
+      const finish = (outcome: AdOutcome) => {
         if (settled) return
         settled = true
         this.showing = false
-        resolve(reward)
+        resolve(outcome)
       }
       this.queue.push({
         type: 'reward',
@@ -147,8 +146,10 @@ class H5GamesAdProvider implements AdProvider {
           dismissed = true
         },
         adBreakDone: (info: { breakStatus: AdBreakStatus }) => {
-          // 재고가 없거나 상한에 걸리면 광고 없이 breakStatus만 돌아온다 → 보상 지급
-          finish(!dismissed && !DENIES_REWARD.has(info.breakStatus))
+          if (dismissed || info.breakStatus === 'dismissed') finish('dismissed')
+          else if (info.breakStatus === 'viewed') finish('viewed')
+          // 재고가 없거나 상한에 걸리면 광고 없이 breakStatus만 돌아온다
+          else finish('unavailable')
         },
       })
     })
@@ -179,8 +180,8 @@ class AdMobProvider implements AdProvider {
     return !this.showing
   }
 
-  async show(_placement: string): Promise<boolean> {
-    if (this.showing) return true
+  async show(_placement: string): Promise<AdOutcome> {
+    if (this.showing) return 'unavailable'
     this.showing = true
     try {
       const { AdMob, RewardAdPluginEvents } = await this.load()
@@ -188,7 +189,7 @@ class AdMobProvider implements AdProvider {
         await AdMob.prepareRewardVideoAd({ adId: this.adId })
       } catch {
         // 재고가 없거나 로드에 실패했다 = 매체 사정이니 기회를 뺏지 않는다
-        return true
+        return 'unavailable'
       }
 
       let rewarded = false
@@ -203,7 +204,9 @@ class AdMobProvider implements AdProvider {
       } finally {
         await earned.remove()
       }
-      return rewarded
+      // 로드까지 끝난 광고가 표시에 실패하는 경우는 여기서 '닫음'으로 잡힌다.
+      // 둘을 가를 신호가 SDK에 없다 — 통계의 '못 뜸'은 그만큼 적게 잡힌다.
+      return rewarded ? 'viewed' : 'dismissed'
     } finally {
       this.showing = false
     }

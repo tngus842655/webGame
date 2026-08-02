@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
+import { fetchAdStats } from '@/shared/adViews'
 import { GAMES } from '@/games/registry'
 import GameIcon from '@/shared/GameIcon.vue'
 import { t } from '@/shared/i18n'
@@ -29,6 +30,9 @@ const rows = computed(() => {
 // 이용자 수는 게임별 값으로 만들 수 없다 (같은 사람이 여러 게임을 하면 겹친다) — 따로 받는다
 const players = ref(0)
 
+// 끝까지 본 광고 수. 나머지 결과(닫음·못 뜸)는 상세 화면에서 본다.
+const adsViewed = ref(0)
+
 const totalSeconds = computed(() => stats.value.reduce((sum, s) => sum + s.total_seconds, 0))
 
 const maxSeconds = computed(() => Math.max(1, ...stats.value.map((s) => s.total_seconds)))
@@ -37,12 +41,14 @@ async function load() {
   loading.value = true
   failed.value = false
   try {
-    const [rows, total] = await Promise.all([
+    const [rows, total, ads] = await Promise.all([
       fetchGameStats(statsDays.value),
       fetchTotalPlayers(statsDays.value),
+      fetchAdStats(statsDays.value),
     ])
     stats.value = rows
     players.value = total
+    adsViewed.value = ads.reduce((sum, row) => sum + row.viewed, 0)
   } catch {
     failed.value = true
   } finally {
@@ -86,6 +92,13 @@ watch(statsDays, load)
       <RouterLink class="summary-item detail" to="/stats/players">
         <strong>{{ players.toLocaleString() }}</strong>
         <small>{{ t('stats.players') }}</small>
+        <span class="detail-chip">
+          {{ t('stats.playerDetail') }}<UiIcon name="chevron" />
+        </span>
+      </RouterLink>
+      <RouterLink class="summary-item detail" to="/stats/ads">
+        <strong>{{ adsViewed.toLocaleString() }}</strong>
+        <small>{{ t('stats.ads') }}</small>
         <span class="detail-chip">
           {{ t('stats.playerDetail') }}<UiIcon name="chevron" />
         </span>
@@ -167,12 +180,12 @@ watch(statsDays, load)
 
 .summary {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   margin-bottom: 16px;
 }
 
-/* 상세보기가 붙은 칸이 더 높아 옆 칸이 따라 늘어난다 — 가운데로 모아 준다 */
+/* 상세보기가 붙은 칸이 더 높아 플레이 시간 칸이 따라 늘어난다 — 가운데로 모아 준다 */
 .summary-item {
   display: flex;
   flex-direction: column;

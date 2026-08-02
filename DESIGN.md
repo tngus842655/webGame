@@ -38,8 +38,9 @@ VITE_SUPABASE_ANON_KEY=
 src/
 ├─ main.ts                  # 앱 부트스트랩 + 익명 세션 시작
 ├─ app/                     # router, AppLayout
-├─ pages/                   # Home / GamePlay / RankingHub / Ranking / Stats / StatsPlayers
-│                           #   / Settings / DevNotes / Terms / Privacy / AccountDeletion / Trash
+├─ pages/                   # Home / GamePlay / RankingHub / Ranking
+│                           #   / Stats / StatsPlayers / StatsAds / Settings
+│                           #   / DevNotes / Terms / Privacy / AccountDeletion / Trash
 ├─ games/
 │  ├─ types.ts              # GameMeta / GameModule / GameContext
 │  ├─ registry.ts           # 게임 목록 (여기 한 줄 추가로 게임 등록)
@@ -55,6 +56,7 @@ src/
 │  ├─ scores.ts             # 점수 제출·랭킹·인기도 조회 (+localStorage 병행)
 │  ├─ playSessions.ts       # 플레이 시간 기록 (인기 순위·통계 근거)
 │  ├─ ads.ts                # 리워드 광고 추상화 (H5 Games Ads / AdMob / 개발용 스텁)
+│  ├─ adViews.ts            # 광고 호출 기록·집계 (어느 게임 어느 자리에서, 어떻게 끝났나)
 │  ├─ native.ts             # 안드로이드 앱(Capacitor) 전용 — 딥링크 로그인, 뒤로가기, 스플래시
 │  ├─ appUpdate.ts          # Play 인앱 업데이트 안내 (안드로이드 앱에서만)
 │  ├─ music.ts             # BGM 재생 (public/bgm/*.mp3, 파일 없으면 무음)
@@ -151,10 +153,18 @@ src/
   아니다. 광고를 닫은 손짓이 그대로 게이트까지 누르지 않도록 300ms는 받지 않는다.
   **손을 떼면 세상이 흘러가는 게임에만 건다** — 내가 두기 전에는 아무것도 안 움직이는
   퍼즐(스도쿠·워들·오목…)에서는 탭 한 번이 군더더기다.
-- **보상 지급 규칙**: `show()`는 "보상을 줄지"를 돌려준다. 끝까지 봤으면 당연히 주고,
+- **보상 지급 규칙**: `show()`는 결과(`viewed`·`dismissed`·`unavailable`)를 돌려주고
+  보상 여부는 `gameContext`가 정한다. 끝까지 봤으면 당연히 주고,
   **재고 없음·빈도 상한·에러처럼 매체 사정으로 광고가 안 나온 경우에도 준다.**
   버튼을 눌렀는데 광고가 없어서 못 본 것은 사용자 잘못이 아니다.
   보상을 막는 건 사용자가 스스로 광고를 닫았을 때(`dismissed`)뿐이다.
+  셋을 뭉치지 않고 나눠 두는 이유는 통계다 — 하나로 합치면 '봤다'와 '안 떴는데 봐준 것'이
+  같은 값이 되어 재고가 비었는지 영영 알 수 없다.
+- **호출 기록**: `gameContext.showRewardAd`가 게임 30여 개의 유일한 통로라 여기서
+  `ad_views`에 한 줄 남긴다 — 게임 코드는 광고를 센다는 사실을 모른다. 자리 이름
+  (`placement`)은 `<slug>-<동작>` 한 가지 꼴로 통일했다(`omok-undo`).
+  AdMob 콘솔은 광고 단위가 하나라 게임별·자리별로 못 쪼갠다 — 그 분해와
+  '눌렀는데 안 떴다'를 보는 것이 이 표의 존재 이유다. 화면은 `/stats/ads`.
 
 ### 첫 실행 온보딩
 
@@ -269,6 +279,8 @@ RLS가 필요하다.
   **구간 수는 화면에 내지 않는다.** 전화 한 통에 갈리는 값이라 사람끼리도 게임끼리도
   비교가 안 된다 — 같은 30분이 누구는 1구간, 누구는 10구간이 된다. 화면에 남긴 것은
   시간과 '구간 평균'(한 번 잡으면 얼마나 오래 붙잡고 있나)뿐이다.
+- 광고 칸의 **상세보기**(`/stats/ads`)는 `get_ad_stats()`로 게임·자리별 호출과 결과를
+  본다. 요약 칸에 세우는 값은 '시청'(끝까지 본 것)이고, 닫음과 못 뜸은 상세에서 본다.
   이용자 수는 게임별 값으로 만들 수 없어(같은 사람이 여러 게임을 하면 겹친다)
   `get_total_players()`로 따로 센다.
 - 이용자 수 칸의 **상세보기**(`/stats/players`)는 그 인원을 사람 단위로 편다.
