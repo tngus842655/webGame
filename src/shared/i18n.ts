@@ -240,7 +240,6 @@ const en = {
   'bb.ad': '▶ Watch ad to swap blocks',
   'brick.wave': 'Wave {n}',
   'brick.attack': 'Damage',
-  'brick.balls': 'Balls',
   'brick.ad': '▶ Watch ad to continue (clear 3 rows)',
   'f2.ad': '▶ Watch ad to undo last move',
   'run.ad': '▶ Watch ad to continue',

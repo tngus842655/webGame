@@ -1,4 +1,4 @@
-import { LAYOUT, MAX_ROWS, WAVE, type UpgradeDef } from './config'
+import { LAYOUT, MAX_ROWS, WAVE } from './config'
 
 export type Phase = 'aiming' | 'flying' | 'over'
 
@@ -7,6 +7,7 @@ export interface Brick {
   row: number
   hp: number
   maxHp: number
+  item: boolean // 부수면 공격력이 1 오른다
 }
 
 export interface Ball {
@@ -15,18 +16,6 @@ export interface Ball {
   vx: number
   vy: number
   active: boolean
-}
-
-// 한 판 안에서만 자라는 강화. 판이 끝나면 함께 사라진다 —
-// 이전 판의 성장이 남으면 순위표가 실력이 아니라 누적 플레이 시간을 재게 된다.
-export interface RunUpgrades {
-  gold: number
-  attackLevel: number // 공 1개당 타격 데미지
-  ballLevel: number // 발사하는 공 개수
-}
-
-export function freshUpgrades(): RunUpgrades {
-  return { gold: 0, attackLevel: 1, ballLevel: 3 }
 }
 
 export interface Popup {
@@ -58,28 +47,12 @@ export interface BrickState {
   toLaunch: number
   launchTimer: number
   firstLandedX: number | null
-  run: RunUpgrades
+  // 공 1개당 타격 데미지. 아이템 벽돌로만 오르고 판이 끝나면 1로 돌아간다 —
+  // 이전 판의 성장이 남으면 순위표가 실력이 아니라 누적 플레이 시간을 재게 된다.
+  attack: number
   popups: Popup[]
   flashes: Flash[]
   hintTime: number // 조작 힌트 애니메이션용
-}
-
-export function upgradeCost(def: UpgradeDef, level: number): number {
-  return Math.round(def.baseCost * Math.pow(def.growth, level - 1))
-}
-
-export function upgradeLevel(run: RunUpgrades, key: UpgradeDef['key']): number {
-  return key === 'attack' ? run.attackLevel : run.ballLevel
-}
-
-export function tryPurchase(state: BrickState, def: UpgradeDef): boolean {
-  const level = upgradeLevel(state.run, def.key)
-  const cost = upgradeCost(def, level)
-  if (state.run.gold < cost) return false
-  state.run.gold -= cost
-  if (def.key === 'attack') state.run.attackLevel += 1
-  else state.run.ballLevel += 1
-  return true
 }
 
 function spawnRow(state: BrickState) {
@@ -91,8 +64,9 @@ function spawnRow(state: BrickState) {
     ;[cols[i], cols[j]] = [cols[j], cols[i]]
   }
   for (const col of cols.slice(0, count)) {
-    const hp = state.wave * (Math.random() < WAVE.doubleHpChance ? 2 : 1)
-    state.bricks.push({ col, row: 0, hp, maxHp: hp })
+    const base = Math.ceil(state.wave * WAVE.hpGrowth)
+    const hp = base * (Math.random() < WAVE.doubleHpChance ? 2 : 1)
+    state.bricks.push({ col, row: 0, hp, maxHp: hp, item: Math.random() < WAVE.itemChance })
   }
 }
 
@@ -108,7 +82,7 @@ export function createState(): BrickState {
     toLaunch: 0,
     launchTimer: 0,
     firstLandedX: null,
-    run: freshUpgrades(),
+    attack: 1,
     popups: [],
     flashes: [],
     hintTime: 0,

@@ -121,7 +121,6 @@ const dict: CoreDict = {
   'hud.score': '得分',
   'brick.wave': '第 {n} 波',
   'brick.attack': '攻击力',
-  'brick.balls': '球数',
   'sv.time': '{n}秒',
   'sv.kills': '击杀 {k} · Lv.{lv}',
   'sv.levelup': '升级！选择一项强化',
