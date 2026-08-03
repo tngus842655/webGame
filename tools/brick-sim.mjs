@@ -29,19 +29,33 @@ async function loadGameModules() {
 }
 
 const { config, state: stateMod } = await loadGameModules()
-const { BALL, LAYOUT, MIN_AIM_TAN, WAVE, brickRect } = config
+const { BALL, COL_W, LAYOUT, MIN_AIM_TAN, WAVE, brickRect } = config
 const { advanceWave, createState } = stateMod
 
 const DT = 1 / 60
 const TURN_CAP = 60 // 초. 넘으면 턴이 안 끝난 것으로 본다
 
+function explode(state, bomb) {
+  for (const b of [...state.bricks]) {
+    if (Math.abs(b.col - bomb.col) > 1 || Math.abs(b.row - bomb.row) > 1) continue
+    b.hp -= bomb.maxHp
+    if (b.hp <= 0) breakBrick(state, b)
+  }
+}
+
+function breakBrick(state, brick) {
+  const index = state.bricks.indexOf(brick)
+  if (index < 0) return
+  state.bricks.splice(index, 1)
+  state.score += Math.ceil(brick.maxHp / 7)
+  if (brick.kind === 'item') state.attack += 1
+  else if (brick.kind === 'bomb') explode(state, brick)
+}
+
 function damageBrick(state, index) {
   const brick = state.bricks[index]
   brick.hp -= state.attack
-  if (brick.hp > 0) return
-  state.bricks.splice(index, 1)
-  state.score += Math.ceil(brick.maxHp / 7)
-  if (brick.item) state.attack += 1
+  if (brick.hp <= 0) breakBrick(state, brick)
 }
 
 function collideBricks(state, ball) {
@@ -139,6 +153,62 @@ function aimAt(state, px, py) {
   return { dx: dx / len, dy: ay / len }
 }
 
+// 격자 위에서 공 하나를 굴려 몇 칸을 스치는지 센다. 벽돌은 부서지지 않는다고 보고
+// 반사만 시킨다 — 주머니에 갇혀 오래 튕기는 경로를 알아보려면 반사가 있어야 한다.
+// 실제 물리의 근사다. 정책이 쓸 만큼만 맞으면 된다.
+function countHits(state, aim) {
+  const occupied = new Set()
+  for (const b of state.bricks) occupied.add(b.row * LAYOUT.cols + b.col)
+
+  const cellOf = (x, y) =>
+    Math.floor((y - LAYOUT.fieldTop) / LAYOUT.rowH) * LAYOUT.cols +
+    Math.floor((x - LAYOUT.fieldLeft) / COL_W)
+
+  let x = state.launchX
+  let y = LAYOUT.launchY
+  let { dx, dy } = aim
+  const step = 12
+  const seen = new Set()
+  let col = Math.floor((x - LAYOUT.fieldLeft) / COL_W)
+  let row = -1
+
+  for (let i = 0; i < 400; i++) {
+    let nx = x + dx * step
+    let ny = y + dy * step
+    if (nx < LAYOUT.fieldLeft) {
+      nx = LAYOUT.fieldLeft
+      dx = -dx
+    } else if (nx > LAYOUT.fieldRight) {
+      nx = LAYOUT.fieldRight
+      dx = -dx
+    }
+    if (ny < LAYOUT.fieldTop) {
+      ny = LAYOUT.fieldTop
+      dy = -dy
+    }
+    if (ny > LAYOUT.launchY) break
+
+    const key = cellOf(nx, ny)
+    if (occupied.has(key)) {
+      seen.add(key)
+      // 어느 면으로 들어왔는지로 꺾을 축을 고르고, 칸에는 들어가지 않는다
+      const nc = key % LAYOUT.cols
+      const nr = (key - nc) / LAYOUT.cols
+      if (nc !== col && nr !== row) {
+        if (Math.abs(dx) > Math.abs(dy)) dx = -dx
+        else dy = -dy
+      } else if (nc !== col) dx = -dx
+      else dy = -dy
+      continue
+    }
+    x = nx
+    y = ny
+    col = key % LAYOUT.cols
+    row = (key - col) / LAYOUT.cols
+  }
+  return seen.size
+}
+
 // 사람의 성장 단계를 흉내 낸 결정적 정책들 (GAME_BALANCE.md 1.1)
 const policies = {
   초보: () => ({ dx: 0, dy: -1 }),
@@ -150,6 +220,25 @@ const policies = {
     for (const b of s.bricks) if (b.row > target.row) target = b
     const r = brickRect(target.col, target.row)
     return aimAt(s, r.x + r.w / 2, r.y + r.h / 2)
+  },
+
+  // 각도는 45° 이상으로 묶고 위치만 고른다. 눕히지 않고도 잘 쏘면 이길 수 있는가 —
+  // 조준 판단에 값어치가 있는지를 재는 계단이다.
+  정밀: (s) => {
+    let best = { dx: 0, dy: -1 }
+    let bestHits = -1
+    for (const sign of [-1, 1]) {
+      for (let deg = 45; deg <= 90; deg += 5) {
+        const rad = (deg * Math.PI) / 180
+        const aim = { dx: sign * Math.cos(rad), dy: -Math.sin(rad) }
+        const hits = countHits(s, aim)
+        if (hits > bestHits) {
+          bestHits = hits
+          best = aim
+        }
+      }
+    }
+    return best
   },
 
   상급: (s) => {
@@ -189,13 +278,13 @@ const runs = Number(process.argv[2] ?? 16)
 
 if (process.argv[3] === 'sweep') {
   // 아이템 확률 × HP 성장률. 조건: 전부 게임오버 · 25~90웨이브 · 180초 이내 · 배수 1.3 이하
-  console.log(`정상 플레이(입문) 기준 · 조합마다 ${runs}판씩\n`)
+  console.log(`정상 플레이(정밀) 기준 · 조합마다 ${runs}판씩\n`)
   console.log('HP성장  아이템   웨이브  최장(초)  배수(중앙값)  게임오버  흔들림  판정')
   for (const hp of [0.85, 1, 1.15]) {
     for (const item of [0.05, 0.06, 0.07, 0.08]) {
       WAVE.hpGrowth = hp
       WAVE.itemChance = item
-      const normal = Array.from({ length: runs }, () => playRun(policies['입문']))
+      const normal = Array.from({ length: runs }, () => playRun(policies['정밀']))
       const flat = Array.from({ length: runs }, () => playRun(policies['상급']))
       const all = [...normal, ...flat]
       const ns = stats(normal.map((r) => r.score))
@@ -233,5 +322,8 @@ if (process.argv[3] === 'sweep') {
         (stalls ? `  (턴 안 끝남 ${stalls})` : ''),
     )
   }
-  console.log(`\n배수(상급 / 입문, 중앙값) = ${(median['상급'] / median['입문']).toFixed(2)}`)
+  // 눕혀 쏘기가 '잘 쏘기'를 얼마나 이기는지가 본 지표다.
+  // 입문 대비는 예전 표와 이어 보려고 같이 찍는다.
+  console.log(`\n배수(상급 / 정밀, 중앙값) = ${(median['상급'] / median['정밀']).toFixed(2)}`)
+  console.log(`배수(상급 / 입문, 중앙값) = ${(median['상급'] / median['입문']).toFixed(2)}`)
 }

@@ -109,7 +109,7 @@ export class BrickRenderer {
         c.stroke()
         c.restore()
       }
-      drawBrick(c, r.x, r.y, r.w, r.h, brick.hp, brick.maxHp, brick.item)
+      drawBrick(c, r.x, r.y, r.w, r.h, brick.hp, brick.maxHp, brick.kind)
     }
   }
 

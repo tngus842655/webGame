@@ -6,7 +6,7 @@ import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
 import { BALL, LAYOUT, MIN_AIM_TAN, brickRect } from './config'
 import { BrickRenderer } from './renderer'
-import { advanceWave, clearDangerRows, createState, updateEffects } from './state'
+import { advanceWave, clearDangerRows, createState, updateEffects, type Brick } from './state'
 
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
@@ -16,9 +16,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const renderer = new BrickRenderer(shell.wrapper)
   const state = createState()
-  preloadSfx('gameover', 'impact', 'select', 'shoot')
+  preloadSfx('explode', 'gameover', 'impact', 'select', 'shoot')
   let adContinueUsed = false
   let aimingActive = false
+  let buzzed = false // 이번 턴에 진동을 울렸는지
 
   const overlay = createGameOverOverlay(shell.wrapper, {
     adLabelKey: 'brick.ad',
@@ -90,21 +91,32 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       state.toLaunch = BALL.count
       state.launchTimer = 0
       state.phase = 'flying'
+      buzzed = false
       playSfx('shoot')
     },
   })
 
-  const damageBrick = (index: number) => {
-    const brick = state.bricks[index]
-    brick.hp -= state.attack
-    if (brick.hp > 0) return
+  // 둘레 여덟 칸에 폭탄 제 최대 HP만큼. 웨이브가 오르면 폭발도 같이 세진다
+  const explode = (bomb: Brick) => {
+    playSfx('explode')
+    for (const b of [...state.bricks]) {
+      if (Math.abs(b.col - bomb.col) > 1 || Math.abs(b.row - bomb.row) > 1) continue
+      b.hp -= bomb.maxHp
+      if (b.hp <= 0) breakBrick(b)
+    }
+  }
+
+  // 벽돌 하나를 없앤다. 폭탄이 폭탄을 부수면 여기로 되돌아와 연쇄가 된다
+  function breakBrick(brick: Brick) {
+    const index = state.bricks.indexOf(brick)
+    if (index < 0) return
     state.bricks.splice(index, 1)
     // 점수만 다른 게임과 자릿수를 맞춘다
     state.score += Math.ceil(brick.maxHp / 7)
     const r = brickRect(brick.col, brick.row)
     state.flashes.push({ x: r.x, y: r.y, w: r.w, h: r.h, age: 0 })
     // 한 턴에 수십 개가 깨지므로 점수 팝업은 띄우지 않는다. 아이템만 알린다
-    if (brick.item) {
+    if (brick.kind === 'item') {
       state.attack += 1
       state.popups.push({
         x: r.x + r.w / 2,
@@ -113,9 +125,21 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         age: 0,
       })
       playSfx('select')
+    } else if (brick.kind === 'bomb') {
+      explode(brick)
     }
     playSfx('impact', { gain: 0.55 })
-    vibrate(10)
+    // 한 턴에 벽돌 열몇 개가 깨진다. 매번 울리면 손이 계속 떨린다
+    if (!buzzed) {
+      buzzed = true
+      vibrate(10)
+    }
+  }
+
+  const damageBrick = (index: number) => {
+    const brick = state.bricks[index]
+    brick.hp -= state.attack
+    if (brick.hp <= 0) breakBrick(brick)
   }
 
   const collideBricks = (ball: { x: number; y: number; vx: number; vy: number }) => {

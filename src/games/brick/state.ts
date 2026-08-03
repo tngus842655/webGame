@@ -2,12 +2,23 @@ import { LAYOUT, MAX_ROWS, WAVE } from './config'
 
 export type Phase = 'aiming' | 'flying' | 'over'
 
+// item — 부수면 공격력이 1 오른다
+// bomb — 부수면 둘레 여덟 칸에 제 최대 HP만큼 데미지. 폭발에 휘말린 폭탄은 같이 터진다
+export type BrickKind = 'plain' | 'item' | 'bomb'
+
 export interface Brick {
   col: number
   row: number
   hp: number
   maxHp: number
-  item: boolean // 부수면 공격력이 1 오른다
+  kind: BrickKind
+}
+
+function rollKind(): BrickKind {
+  const r = Math.random()
+  if (r < WAVE.itemChance) return 'item'
+  if (r < WAVE.itemChance + WAVE.bombChance) return 'bomb'
+  return 'plain'
 }
 
 export interface Ball {
@@ -66,7 +77,7 @@ function spawnRow(state: BrickState) {
   for (const col of cols.slice(0, count)) {
     const base = Math.ceil(state.wave * WAVE.hpGrowth)
     const hp = base * (Math.random() < WAVE.doubleHpChance ? 2 : 1)
-    state.bricks.push({ col, row: 0, hp, maxHp: hp, item: Math.random() < WAVE.itemChance })
+    state.bricks.push({ col, row: 0, hp, maxHp: hp, kind: rollKind() })
   }
 }
 

@@ -1,6 +1,7 @@
 // 벽돌·공 벡터 아트 — HP 크기에 따라 색이 단계적으로 바뀐다(위험도 인지용)
 
 import { font } from '../ui'
+import type { BrickKind } from './state'
 
 interface Palette {
   base: string
@@ -31,7 +32,7 @@ export function drawBrick(
   h: number,
   hp: number,
   maxHp: number,
-  item: boolean,
+  kind: BrickKind,
 ) {
   const p = paletteOf(hp)
   const r = Math.min(w, h) * 0.22
@@ -84,7 +85,7 @@ export function drawBrick(
 
   // 아이템 벽돌 — 부수면 공격력이 오른다. 좁은 칸에서 아이콘은 뭉개지므로
   // 흰 테두리 하나로 알린다 (마지막 줄의 빨간 테두리와는 색으로 갈린다)
-  if (item) {
+  if (kind === 'item') {
     const lw = Math.max(2.5, w * 0.07)
     c.save()
     c.strokeStyle = '#FFFFFF'
@@ -92,6 +93,17 @@ export function drawBrick(
     c.beginPath()
     c.roundRect(x + lw / 2, y + lw / 2, w - lw, face - lw, r)
     c.stroke()
+    c.restore()
+  }
+
+  // 폭탄 벽돌 — 심지까지 그리면 47px 칸에서 뭉갠다. 검은 원 하나면 알아본다.
+  // HP 숫자가 그 위에 흰색으로 얹히니 대비도 오히려 낫다
+  if (kind === 'bomb') {
+    c.save()
+    c.fillStyle = 'rgb(20 16 14 / 0.82)'
+    c.beginPath()
+    c.arc(x + w / 2, y + face / 2, Math.min(w, face) * 0.34, 0, Math.PI * 2)
+    c.fill()
     c.restore()
   }
 

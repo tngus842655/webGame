@@ -48,6 +48,7 @@ export const WAVE = {
   doubleHpChance: 0.3, // HP 2배 벽돌 등장 확률
   hpGrowth: 1, // 잠정: 벽돌 HP = ceil(웨이브 × 이 값)
   itemChance: 0.07, // 잠정: 새 벽돌이 공격력 강화를 품을 확률
+  bombChance: 0.015, // 잠정: 폭탄 벽돌 확률. 드물게 나와야 터졌을 때 값이 있다
 } as const
 
 // 발사선 아래, 예전 상점 버튼 자리. 누르는 곳이 아니라 읽는 곳이다
