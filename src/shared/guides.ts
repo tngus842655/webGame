@@ -23,8 +23,8 @@ const ko: Record<string, Guide> = {
   },
   brick: {
     goal: '공을 튕겨 벽돌을 부수세요. 벽돌이 바닥까지 내려오면 끝입니다.',
-    how: '아래에서 당겨 각도를 정하고 놓으면 공이 날아갑니다. 부순 벽돌로 얻은 골드는 아래 두 버튼에서 공격력·공 개수로 바꿉니다.',
-    score: '웨이브를 오래 버틸수록 점수가 쌓입니다. 강화는 판마다 처음부터 다시 쌓습니다.',
+    how: '아래에서 당겨 각도를 정하고 놓으면 공이 날아갑니다. 흰 테두리를 두른 벽돌을 부수면 공격력이 1 오르고, 검은 원이 박힌 벽돌은 터지면서 둘레를 함께 부숩니다.',
+    score: '웨이브를 오래 버틸수록 점수가 쌓입니다. 공격력은 판마다 처음부터 다시 쌓습니다.',
   },
   fruit2048: {
     goal: '같은 숫자 과일을 밀어 붙여 합치세요. 더 이상 움직일 수 없으면 끝입니다.',
@@ -181,8 +181,8 @@ const en: Record<string, Guide> = {
   },
   brick: {
     goal: 'Bounce the ball to break bricks. If bricks reach the bottom, the run ends.',
-    how: 'Pull back from the bottom to aim, release to launch. Spend the gold you earn on attack or extra balls.',
-    score: 'Survive more waves to score higher. Upgrades start over every run.',
+    how: 'Pull back from the bottom to aim, release to launch. A white-outlined brick raises your damage by 1; a brick marked with a black dot blows up and takes its neighbours with it.',
+    score: 'Survive more waves to score higher. Damage starts over every run.',
   },
   fruit2048: {
     goal: 'Slide matching fruits together to merge them. No moves left means game over.',
@@ -339,8 +339,8 @@ const ja: Record<string, Guide> = {
   },
   brick: {
     goal: 'ボールを弾ませてブロックを壊します。ブロックが下まで来ると終了です。',
-    how: '下から引いて角度を決め、離すと発射します。稼いだゴールドは攻撃力かボール数に使えます。',
-    score: 'ウェーブを長く耐えるほど高得点。強化は毎回リセットされます。',
+    how: '下から引いて角度を決め、離すと発射します。白い枠のブロックは攻撃力が1上がり、黒い丸のブロックは壊すと周りごと吹き飛びます。',
+    score: 'ウェーブを長く耐えるほど高得点。攻撃力は毎回リセットされます。',
   },
   fruit2048: {
     goal: '同じ数字の果物を寄せて合体させます。動かせなくなると終了です。',
@@ -497,8 +497,8 @@ const zhCN: Record<string, Guide> = {
   },
   brick: {
     goal: '弹球打砖块。砖块落到底部就结束。',
-    how: '从下方拖动瞄准，松手发射。用赚到的金币提升攻击力或球数。',
-    score: '撑过越多波次分数越高。强化每局重新开始。',
+    how: '从下方拖动瞄准，松手发射。打碎带白边的砖块，攻击力加 1；带黑点的砖块会爆炸，连周围一起炸掉。',
+    score: '撑过越多波次分数越高。攻击力每局重新开始。',
   },
   fruit2048: {
     goal: '把相同数字的水果推到一起合并。无法移动时结束。',
@@ -655,8 +655,8 @@ const es: Record<string, Guide> = {
   },
   brick: {
     goal: 'Rebota la bola para romper ladrillos. Si los ladrillos llegan abajo, se acaba.',
-    how: 'Tira hacia atrás desde abajo para apuntar y suelta para lanzar. Gasta el oro en ataque o en más bolas.',
-    score: 'Aguanta más oleadas para puntuar más. Las mejoras se reinician cada partida.',
+    how: 'Tira hacia atrás desde abajo para apuntar y suelta para lanzar. Rompe un ladrillo con borde blanco y el daño sube 1; el que lleva un punto negro explota y se lleva a los vecinos.',
+    score: 'Aguanta más oleadas para puntuar más. El daño se reinicia cada partida.',
   },
   fruit2048: {
     goal: 'Junta frutas iguales para fusionarlas. Sin movimientos, se acaba.',
@@ -813,8 +813,8 @@ const ptBR: Record<string, Guide> = {
   },
   brick: {
     goal: 'Rebata a bola para quebrar os tijolos. Se os tijolos chegarem ao fundo, acaba.',
-    how: 'Puxe de baixo para mirar e solte para lançar. Gaste o ouro em ataque ou em mais bolas.',
-    score: 'Aguente mais ondas para pontuar mais. As melhorias reiniciam a cada partida.',
+    how: 'Puxe de baixo para mirar e solte para lançar. Quebre um tijolo de borda branca e o dano sobe 1; o que tem um ponto preto explode e leva os vizinhos junto.',
+    score: 'Aguente mais ondas para pontuar mais. O dano reinicia a cada partida.',
   },
   fruit2048: {
     goal: 'Junte frutas iguais para fundi-las. Sem jogadas, acaba.',
@@ -971,8 +971,8 @@ const fr: Record<string, Guide> = {
   },
   brick: {
     goal: 'Fais rebondir la balle pour casser les briques. Si elles atteignent le bas, la partie est finie.',
-    how: 'Tire vers le bas pour viser, relâche pour lancer. Dépense l\'or en attaque ou en balles.',
-    score: 'Tiens plus de vagues pour marquer plus. Les améliorations repartent de zéro à chaque partie.',
+    how: 'Tire vers le bas pour viser, relâche pour lancer. Casse une brique bordée de blanc et tes dégâts montent de 1. Celle marquée d\'un point noir explose et emporte ses voisines.',
+    score: 'Tiens plus de vagues pour marquer plus. Les dégâts repartent de zéro à chaque partie.',
   },
   fruit2048: {
     goal: 'Rapproche les fruits identiques pour les fusionner. Plus de coup possible et c\'est fini.',
@@ -1129,8 +1129,8 @@ const de: Record<string, Guide> = {
   },
   brick: {
     goal: 'Lass den Ball abprallen und zerschlag die Steine. Erreichen die Steine den Boden, ist Schluss.',
-    how: 'Von unten zurückziehen zum Zielen, loslassen zum Abschuss. Gib das Gold für Angriff oder mehr Bälle aus.',
-    score: 'Je mehr Wellen du hältst, desto mehr Punkte. Verbesserungen beginnen jede Runde neu.',
+    how: 'Von unten zurückziehen zum Zielen, loslassen zum Abschuss. Ein Stein mit weißem Rand steigert den Schaden um 1, einer mit schwarzem Punkt explodiert und reißt die Nachbarn mit.',
+    score: 'Je mehr Wellen du hältst, desto mehr Punkte. Der Schaden beginnt jede Runde neu.',
   },
   fruit2048: {
     goal: 'Schieb gleiche Früchte zusammen, um sie zu verschmelzen. Kein Zug mehr möglich, ist Schluss.',
@@ -1287,8 +1287,8 @@ const ru: Record<string, Guide> = {
   },
   brick: {
     goal: 'Отбивайте мяч и разбивайте кирпичи. Если кирпичи дойдут до низа, игра заканчивается.',
-    how: 'Потяните снизу, чтобы прицелиться, отпустите для запуска. Тратьте золото на урон или на дополнительные шары.',
-    score: 'Продержитесь больше волн — больше очков. Улучшения обнуляются каждый раз.',
+    how: 'Потяните снизу, чтобы прицелиться, отпустите для запуска. Кирпич с белой рамкой поднимает урон на 1, а кирпич с чёрной точкой взрывается и сносит соседние.',
+    score: 'Продержитесь больше волн — больше очков. Урон обнуляется каждый раз.',
   },
   fruit2048: {
     goal: 'Сдвигайте одинаковые фрукты, чтобы объединить их. Нет ходов — игра окончена.',
@@ -1445,8 +1445,8 @@ const id: Record<string, Guide> = {
   },
   brick: {
     goal: 'Pantulkan bola untuk memecah bata. Kalau bata sampai ke bawah, permainan berakhir.',
-    how: 'Tarik dari bawah untuk membidik, lepas untuk menembak. Pakai emas untuk kerusakan atau bola tambahan.',
-    score: 'Bertahan lebih banyak gelombang berarti nilai lebih tinggi. Peningkatan diulang tiap main.',
+    how: 'Tarik dari bawah untuk membidik, lepas untuk menembak. Bata bergaris putih menaikkan kerusakan 1, dan bata bertitik hitam meledak bersama bata di sekelilingnya.',
+    score: 'Bertahan lebih banyak gelombang berarti nilai lebih tinggi. Kerusakan diulang tiap main.',
   },
   fruit2048: {
     goal: 'Dorong buah bernomor sama agar menyatu. Kalau tidak ada langkah lagi, permainan berakhir.',
@@ -1603,8 +1603,8 @@ const vi: Record<string, Guide> = {
   },
   brick: {
     goal: 'Nảy bóng để phá gạch. Gạch xuống tới đáy là kết thúc.',
-    how: 'Kéo từ dưới lên để nhắm, thả ra để bắn. Dùng vàng kiếm được cho sát thương hoặc thêm bóng.',
-    score: 'Trụ được càng nhiều đợt điểm càng cao. Nâng cấp làm lại từ đầu mỗi ván.',
+    how: 'Kéo từ dưới lên để nhắm, thả ra để bắn. Gạch viền trắng tăng 1 sát thương, còn gạch có chấm đen sẽ nổ và phá luôn các viên xung quanh.',
+    score: 'Trụ được càng nhiều đợt điểm càng cao. Sát thương làm lại từ đầu mỗi ván.',
   },
   fruit2048: {
     goal: 'Đẩy các quả cùng số vào nhau để ghép. Hết nước đi là kết thúc.',
@@ -1761,8 +1761,8 @@ const th: Record<string, Guide> = {
   },
   brick: {
     goal: 'กระดอนลูกบอลเพื่อทุบอิฐ ถ้าอิฐลงมาถึงพื้นก็จบ',
-    how: 'ลากจากด้านล่างเพื่อเล็ง ปล่อยเพื่อยิง ใช้ทองที่ได้เพิ่มพลังโจมตีหรือจำนวนลูกบอล',
-    score: 'ทนได้หลายเวฟยิ่งได้คะแนนสูง การอัปเกรดเริ่มใหม่ทุกเกม',
+    how: 'ลากจากด้านล่างเพื่อเล็ง ปล่อยเพื่อยิง อิฐขอบสีขาวเพิ่มพลังโจมตี 1 ส่วนอิฐที่มีจุดสีดำจะระเบิดพร้อมอิฐรอบข้าง',
+    score: 'ทนได้หลายเวฟยิ่งได้คะแนนสูง พลังโจมตีเริ่มใหม่ทุกเกม',
   },
   fruit2048: {
     goal: 'ดันผลไม้ตัวเลขเดียวกันมารวมกัน ถ้าขยับไม่ได้แล้วก็จบ',
@@ -1919,8 +1919,8 @@ const tr: Record<string, Guide> = {
   },
   brick: {
     goal: 'Topu sektirip tuğlaları kır. Tuğlalar alta ulaşırsa oyun biter.',
-    how: 'Nişan almak için alttan geri çek, fırlatmak için bırak. Kazandığın altını hasara ya da fazladan topa harca.',
-    score: 'Daha çok dalga dayanmak daha çok puan demek. Geliştirmeler her oyunda sıfırlanır.',
+    how: 'Nişan almak için alttan geri çek, fırlatmak için bırak. Beyaz çerçeveli tuğla hasarı 1 artırır, siyah noktalı tuğla ise patlayıp çevresindekileri de kırar.',
+    score: 'Daha çok dalga dayanmak daha çok puan demek. Hasar her oyunda sıfırlanır.',
   },
   fruit2048: {
     goal: 'Aynı sayılı meyveleri birbirine itip birleştir. Hamle kalmazsa oyun biter.',

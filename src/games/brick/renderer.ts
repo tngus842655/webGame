@@ -1,14 +1,8 @@
 import { t } from '@/shared/i18n'
 import { CanvasStage } from '../stage'
 import { drawBall, drawBrick, drawLauncher } from './brickArt'
-import { BALL, BUTTON_RECTS, LAYOUT, MAX_ROWS, UPGRADES, brickRect } from './config'
-import {
-  FLASH_DURATION,
-  POPUP_DURATION,
-  upgradeCost,
-  upgradeLevel,
-  type BrickState,
-} from './state'
+import { ATTACK_PANEL, BALL, LAYOUT, MAX_ROWS, brickRect } from './config'
+import { FLASH_DURATION, POPUP_DURATION, type BrickState } from './state'
 import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 import { ground } from '../scene'
 
@@ -37,7 +31,7 @@ export class BrickRenderer {
     this.drawAim(state)
     this.drawBalls(state)
     this.drawHud(state)
-    this.drawButtons(state)
+    this.drawAttack(state)
     this.drawPopups(state)
 
     if (state.wave === 1 && state.phase === 'aiming' && state.score === 0 && !state.aim) {
@@ -104,17 +98,18 @@ export class BrickRenderer {
     const { c } = this
     for (const brick of state.bricks) {
       const r = brickRect(brick.col, brick.row)
-      // 다음 턴에 바닥에 닿는 벽돌은 테두리로 알린다
+      // 다음 턴에 바닥에 닿는 벽돌은 테두리로 알린다.
+      // 칸이 좁아 안쪽으로 그린다 — 밖으로 나가면 옆 벽돌을 덮는다
       if (brick.row >= MAX_ROWS - 1) {
         c.save()
         c.strokeStyle = '#E53935'
-        c.lineWidth = 4
+        c.lineWidth = 3
         c.beginPath()
-        c.roundRect(r.x - 3, r.y - 3, r.w + 6, r.h + 6, 10)
+        c.roundRect(r.x + 1.5, r.y + 1.5, r.w - 3, r.h - 3, 8)
         c.stroke()
         c.restore()
       }
-      drawBrick(c, r.x, r.y, r.w, r.h, brick.hp, brick.maxHp)
+      drawBrick(c, r.x, r.y, r.w, r.h, brick.hp, brick.maxHp, brick.kind)
     }
   }
 
@@ -125,9 +120,9 @@ export class BrickRenderer {
       c.save()
       c.globalAlpha = (1 - k) * 0.85
       c.fillStyle = '#FFFFFF'
-      const grow = k * 12
+      const grow = k * 6
       c.beginPath()
-      c.roundRect(f.x - grow, f.y - grow, f.w + grow * 2, f.h + grow * 2, 12)
+      c.roundRect(f.x - grow, f.y - grow, f.w + grow * 2, f.h + grow * 2, 10)
       c.fill()
       c.restore()
     }
@@ -137,7 +132,7 @@ export class BrickRenderer {
     for (const ball of state.balls) {
       if (ball.active) drawBall(this.c, ball.x, ball.y, BALL.radius)
     }
-    drawLauncher(this.c, state.launchX, LAYOUT.launchY, state.run.ballLevel)
+    drawLauncher(this.c, state.launchX, LAYOUT.launchY, BALL.count)
   }
 
   // 벽 반사까지 반영한 예측 경로
@@ -210,72 +205,33 @@ export class BrickRenderer {
     c.fillStyle = ground('#A1887F', '#8F7D74')
     c.font = font(20)
     c.fillText(t('brick.wave', { n: state.wave }), SCORE_PANEL.cx, SCORE_PANEL.subY)
-
-    // 골드
-    c.save()
-    c.fillStyle = ground('#FFFFFF', '#2C231C')
-    c.globalAlpha = 0.75
-    c.beginPath()
-    c.roundRect(486, 34, 202, 60, 30)
-    c.fill()
-    c.restore()
-    c.fillStyle = '#FFC107'
-    c.beginPath()
-    c.arc(520, 64, 17, 0, Math.PI * 2)
-    c.fill()
-    c.fillStyle = '#B8860B'
-    c.font = font(20, true)
-    c.fillText('G', 520, 71)
-    c.textAlign = 'right'
-    c.fillStyle = ground('#5D4037', '#E5D8D0')
-    c.font = font(26, true)
-    c.fillText(state.run.gold.toLocaleString(), 672, 73)
   }
 
-  private drawButtons(state: BrickState) {
+  // 공격력 — 한 판에서 자라는 유일한 값. 누르는 것이 아니라 읽는 것이라
+  // 예전 상점 버튼처럼 보이지 않게 둔다.
+  private drawAttack(state: BrickState) {
     const { c } = this
-    for (let i = 0; i < UPGRADES.length; i++) {
-      const def = UPGRADES[i]
-      const rect = BUTTON_RECTS[i]
-      const level = upgradeLevel(state.run, def.key)
-      const cost = upgradeCost(def, level)
-      const affordable = state.run.gold >= cost && state.phase === 'aiming'
+    const r = ATTACK_PANEL
 
-      c.save()
-      if (state.phase === 'flying') c.globalAlpha = 0.45
+    c.save()
+    c.fillStyle = ground('rgb(255 255 255 / 0.7)', 'rgb(255 255 255 / 0.07)')
+    c.beginPath()
+    c.roundRect(r.x, r.y, r.w, r.h, 22)
+    c.fill()
+    c.strokeStyle = ground('rgb(141 110 99 / 0.22)', 'rgb(255 255 255 / 0.12)')
+    c.lineWidth = 2
+    c.stroke()
+    c.restore()
 
-      // 버튼 바탕
-      c.fillStyle = affordable ? '#4CAF50' : ground('#FFFFFF', '#2C231C')
-      if (!affordable) c.globalAlpha *= 0.8
-      c.beginPath()
-      c.roundRect(rect.x, rect.y + 5, rect.w, rect.h, 18)
-      c.fill()
-      c.fillStyle = affordable ? '#66BB6A' : ground('#FFFFFF', '#2C231C')
-      c.beginPath()
-      c.roundRect(rect.x, rect.y, rect.w, rect.h, 18)
-      c.fill()
-      c.strokeStyle = affordable ? '#2E7D32' : ground('rgb(141 110 99 / 0.25)', 'rgb(255 255 255 / 0.125)')
-      c.lineWidth = 3
-      c.stroke()
+    c.textAlign = 'left'
+    c.fillStyle = ground('#A1887F', '#8F7D74')
+    c.font = font(22)
+    c.fillText(t('brick.attack'), r.x + 26, r.y + 52)
 
-      c.textAlign = 'center'
-      c.fillStyle = affordable ? ground('#FFFFFF', '#2C231C') : ground('#8D6E63', '#B9A69C')
-      c.font = font(26, true)
-      c.fillText(`${t(def.label)} Lv.${level}`, rect.x + rect.w / 2, rect.y + 50)
-
-      // 비용
-      c.fillStyle = affordable ? ground('#FFFFFF', '#2C231C') : ground('#BCAAA4', '#8F7D74')
-      c.beginPath()
-      c.arc(rect.x + rect.w / 2 - 44, rect.y + 88, 13, 0, Math.PI * 2)
-      c.fill()
-      c.fillStyle = affordable ? '#2E7D32' : ground('#E0D6CF', '#4A403B')
-      c.font = font(15, true)
-      c.fillText('G', rect.x + rect.w / 2 - 44, rect.y + 93)
-      c.fillStyle = affordable ? ground('#FFFFFF', '#2C231C') : ground('#BCAAA4', '#8F7D74')
-      c.font = font(24, true)
-      c.fillText(cost.toLocaleString(), rect.x + rect.w / 2 + 22, rect.y + 96)
-      c.restore()
-    }
+    c.textAlign = 'right'
+    c.fillStyle = ground('#5D4037', '#E5D8D0')
+    c.font = font(34, true)
+    c.fillText(String(state.attack), r.x + r.w - 26, r.y + 56)
   }
 
   private drawPopups(state: BrickState) {

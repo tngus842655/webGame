@@ -198,7 +198,6 @@ const dict: FullDict = {
   'bb.ad': '▶ 광고 보고 블록 교체',
   'brick.wave': '웨이브 {n}',
   'brick.attack': '공격력',
-  'brick.balls': '공 개수',
   'brick.ad': '▶ 광고 보고 이어하기 (3줄 제거)',
   'f2.ad': '▶ 광고 보고 한 수 되돌리기',
   'run.ad': '▶ 광고 보고 이어하기',

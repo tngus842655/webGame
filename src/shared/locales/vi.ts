@@ -121,7 +121,6 @@ const dict: CoreDict = {
   'hud.score': 'Điểm',
   'brick.wave': 'Đợt {n}',
   'brick.attack': 'Sát thương',
-  'brick.balls': 'Số bóng',
   'sv.time': '{n} giây',
   'sv.kills': 'Hạ {k} · Cấp {lv}',
   'sv.levelup': 'Lên cấp! Chọn một nâng cấp',

@@ -1,6 +1,7 @@
 // 벽돌·공 벡터 아트 — HP 크기에 따라 색이 단계적으로 바뀐다(위험도 인지용)
 
 import { font } from '../ui'
+import type { BrickKind } from './state'
 
 interface Palette {
   base: string
@@ -31,14 +32,18 @@ export function drawBrick(
   h: number,
   hp: number,
   maxHp: number,
+  kind: BrickKind,
 ) {
   const p = paletteOf(hp)
   const r = Math.min(w, h) * 0.22
+  // 칸이 47px로 줄어 고정 px는 전부 비율로 잡는다
+  const depth = Math.max(2, Math.round(h * 0.07)) // 아래쪽 두께감
+  const face = h - depth
 
   // 두께감
   c.fillStyle = p.dark
   c.beginPath()
-  c.roundRect(x, y + 5, w, h - 5, r)
+  c.roundRect(x, y + depth, w, face, r)
   c.fill()
 
   // 본체
@@ -48,26 +53,28 @@ export function drawBrick(
   body.addColorStop(1, p.base)
   c.fillStyle = body
   c.beginPath()
-  c.roundRect(x, y, w, h - 5, r)
+  c.roundRect(x, y, w, face, r)
   c.fill()
 
   // 남은 체력 띠 (아래쪽 얇은 바)
   if (hp < maxHp) {
+    const bandH = Math.max(4, Math.round(h * 0.11))
+    const bandY = y + face - bandH
     c.save()
     c.beginPath()
-    c.roundRect(x, y, w, h - 5, r)
+    c.roundRect(x, y, w, face, r)
     c.clip()
     c.fillStyle = 'rgb(0 0 0 / 0.22)'
-    c.fillRect(x, y + h - 14, w, 9)
+    c.fillRect(x, bandY, w, bandH)
     c.fillStyle = 'rgb(255 255 255 / 0.75)'
-    c.fillRect(x + 3, y + h - 14, (w - 6) * (hp / maxHp), 9)
+    c.fillRect(x + 3, bandY, (w - 6) * (hp / maxHp), bandH)
     c.restore()
   }
 
   // 윗면 광택
   c.save()
   c.beginPath()
-  c.roundRect(x, y, w, h - 5, r)
+  c.roundRect(x, y, w, face, r)
   c.clip()
   c.globalAlpha = 0.42
   c.fillStyle = '#FFFFFF'
@@ -76,11 +83,36 @@ export function drawBrick(
   c.fill()
   c.restore()
 
+  // 아이템 벽돌 — 부수면 공격력이 오른다. 좁은 칸에서 아이콘은 뭉개지므로
+  // 흰 테두리 하나로 알린다 (마지막 줄의 빨간 테두리와는 색으로 갈린다)
+  if (kind === 'item') {
+    const lw = Math.max(2.5, w * 0.07)
+    c.save()
+    c.strokeStyle = '#FFFFFF'
+    c.lineWidth = lw
+    c.beginPath()
+    c.roundRect(x + lw / 2, y + lw / 2, w - lw, face - lw, r)
+    c.stroke()
+    c.restore()
+  }
+
+  // 폭탄 벽돌 — 심지까지 그리면 47px 칸에서 뭉갠다. 검은 원 하나면 알아본다.
+  // HP 숫자가 그 위에 흰색으로 얹히니 대비도 오히려 낫다
+  if (kind === 'bomb') {
+    c.save()
+    c.fillStyle = 'rgb(20 16 14 / 0.82)'
+    c.beginPath()
+    c.arc(x + w / 2, y + face / 2, Math.min(w, face) * 0.34, 0, Math.PI * 2)
+    c.fill()
+    c.restore()
+  }
+
   // HP 숫자
+  const size = Math.round(h * 0.5)
   c.save()
   c.textAlign = 'center'
-  c.font = font(Math.round(h * 0.4), true)
-  c.lineWidth = 5
+  c.font = font(size, true)
+  c.lineWidth = Math.max(2, size * 0.18)
   c.strokeStyle = p.dark
   c.strokeText(String(hp), x + w / 2, y + h / 2 + h * 0.11)
   c.fillStyle = '#FFFFFF'
