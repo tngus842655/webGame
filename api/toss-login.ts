@@ -53,8 +53,10 @@ function callToss(
   path: string,
   init: { method: 'GET' | 'POST'; headers?: Record<string, string>; body?: string },
 ): Promise<TossResponse> {
-  const cert = process.env.TOSS_CLIENT_CERT
-  const key = process.env.TOSS_CLIENT_KEY
+  // PEM은 여러 줄이다. 환경 변수에 넣는 과정에서 줄바꿈이 \n 두 글자로 굳어 들어오는
+  // 경우가 흔해서, 그 모양으로 와도 되도록 되돌려 준다
+  const cert = process.env.TOSS_CLIENT_CERT?.replace(/\\n/g, '\n')
+  const key = process.env.TOSS_CLIENT_KEY?.replace(/\\n/g, '\n')
   if (!cert || !key) throw new Error('TOSS_CLIENT_CERT / TOSS_CLIENT_KEY 환경 변수가 필요합니다')
 
   return new Promise((resolve, reject) => {
