@@ -1,0 +1,19 @@
+{
+  // 서버 함수(api/)는 브라우저가 아니라 Node에서 돌아 lib·types가 다르다.
+  // 메인 tsconfig에 섞으면 웹 빌드(`vue-tsc --noEmit`)까지 영향을 받으므로 따로 둔다.
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022"],
+    "types": ["node"],
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "noEmit": true
+  },
+  "include": ["api/**/*.ts"]
+}

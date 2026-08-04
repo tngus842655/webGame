@@ -25,6 +25,7 @@
 | `20260802000000_player_stats.sql` | `get_player_stats()` — 이용자별 게임 이용 현황 | ✅ 2026-08-02 |
 | `20260803000000_ad_views.sql` | `ad_views` 테이블 — 리워드 광고 호출 기록, `get_ad_stats()` | ⬜ **실행 필요** |
 | `20260804000000_guest_nickname_en.sql` | 기본 닉네임 `게스트-` → `Guest-` | ⬜ **실행 필요** |
+| `20260804100000_toss_login.sql` | `toss_accounts` 테이블 — 앱인토스 토스 로그인 | ✅ 2026-08-04 |
 
 ## 테이블
 
@@ -37,6 +38,7 @@
 | `game_flags` | 게임 고정·숨김·휴지통 | 조회 전체 공개 / 쓰기는 관리자만 |
 | `feedback` | 사용자 의견 (버그·문의·제안) | insert는 본인만 / **조회·삭제는 관리자만** / update 정책 없음(금지) |
 | `ad_views` | 리워드 광고 호출 기록 (게임·자리·결과) | insert는 본인만 / **조회는 관리자만** / update·delete 정책 없음(금지) |
+| `toss_accounts` | 토스 `userKey` ↔ `auth.users`. 앱인토스 전용 | **정책 없음** — service_role(서버 함수)만 다룬다 |
 
 삭제 연쇄: `auth.users` → `profiles` → `scores`·`play_sessions`·`feedback`·`ad_views` 순으로
 `on delete cascade`가 걸려 있다. 최상위 한 줄만 지우면 전부 따라 지워진다.
@@ -73,6 +75,10 @@
 - **Authentication → Providers** — Manual Linking 활성화 (`linkIdentity()` 사용)
 - **Authentication → Providers** — 익명 로그인(Anonymous sign-ins) 활성화
 - **Authentication → URL Configuration → Redirect URLs** — 배포 주소 + `/settings` 등록
+- **Authentication → Providers → Email 활성화** — 메일은 보내지 않는다. 앱인토스 토스
+  로그인이 다른 기기의 계정 세션을 만들 때 쓰는 `generateLink`가 이 provider를 탄다
+- **Project Settings → API Keys → `service_role`** — 서버 함수(`api/toss-login.ts`)가
+  쓴다. RLS를 우회하는 키라 프론트에는 절대 넣지 않는다 (`APPS_IN_TOSS.md` 참고)
 - **관리자 등록** — `admin_emails`에 이메일 직접 insert. RLS 정책이 없어 대시보드에서만 가능
 
 ## 새 마이그레이션을 추가할 때

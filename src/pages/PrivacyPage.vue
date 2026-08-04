@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { t } from '@/shared/i18n'
+import { isInToss } from '@/shared/toss'
 import UiIcon from '@/shared/UiIcon.vue'
 
 // 법적 고지 문서라 임의 번역 시 효력 문제가 생길 수 있어 운영 언어(한국어)로만 제공한다.
@@ -27,7 +28,8 @@ const CONTACT_EMAIL = 'tngus842655@gmail.com'
       <h2>1. 수집하는 개인정보 항목</h2>
       <ul>
         <li>계정 정보: 첫 접속 시 자동 발급되는 익명 식별자, 닉네임</li>
-        <li>SNS 연동 시(선택): 구글·카카오 계정 식별자, 닉네임, 프로필 사진, 이메일 주소</li>
+        <li v-if="isInToss">토스 로그인 시(선택): 토스가 발급한 사용자 식별값(userKey), 이름</li>
+        <li v-else>SNS 연동 시(선택): 구글·카카오 계정 식별자, 닉네임, 프로필 사진, 이메일 주소</li>
         <li>서비스 이용 정보: 게임 점수, 플레이 시간, 보상형 광고 시청 기록</li>
       </ul>
       <p class="note">언어·사운드 설정과 일부 게임의 진행 상황은 이용자의 브라우저에만 저장되며 서버로 전송되지 않습니다.</p>
@@ -35,7 +37,9 @@ const CONTACT_EMAIL = 'tngus842655@gmail.com'
       <h2>2. 개인정보의 수집·이용 목적</h2>
       <ul>
         <li>게임 점수 저장 및 랭킹 서비스 제공</li>
-        <li>기기 변경 시 SNS 계정을 통한 기존 기록 복구</li>
+        <li v-if="isInToss">기기 변경 시 토스 계정을 통한 기존 기록 복구</li>
+        <li v-if="isInToss">닉네임 초기값 설정 (설정 화면에서 언제든 바꿀 수 있습니다)</li>
+        <li v-else>기기 변경 시 SNS 계정을 통한 기존 기록 복구</li>
         <li>게임별 인기 순위 등 통계 산출 (개인을 식별하지 않는 형태로 집계)</li>
       </ul>
 

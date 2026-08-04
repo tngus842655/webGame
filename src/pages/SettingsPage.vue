@@ -3,10 +3,13 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import {
   linkedProvider,
   linkSocial,
+  loginWithToss,
   signInSocial,
   takeRedirectError,
+  type LinkedAccount,
   type SocialProvider,
 } from '@/shared/auth'
+import { isInToss } from '@/shared/toss'
 import { LOCALES, locale, setLocale, t, type Locale, type TranslationKey } from '@/shared/i18n'
 import { adoptSocialNickname, fetchMyProfile, updateMyNickname } from '@/shared/profile'
 import { isMusicEnabled, setMusicEnabled } from '@/shared/music'
@@ -32,6 +35,8 @@ const lang = ref<Locale>(locale.value)
 // 연동하려는 계정이 이미 다른 계정에 붙어 있을 때 = 기존 회원 → 불러오기 안내
 const existingAccount = ref<SocialProvider | null>(null)
 const busy = ref<SocialProvider | null>(null)
+// 앱인토스는 버튼이 하나뿐이라 어느 제공자인지 구분할 것이 없다
+const tossBusy = ref(false)
 const accountError = ref('')
 // 실패 원인을 못 알아본 경우에도 '이미 가입한 계정' 경로를 열어두기 위해 제공자를 기억한다
 const failedProvider = ref<SocialProvider | null>(null)
@@ -92,8 +97,24 @@ function tryExisting() {
   accountError.value = ''
 }
 
-function providerLabel(provider: SocialProvider) {
+function providerLabel(provider: LinkedAccount) {
+  if (provider === 'toss') return t('account.toss')
   return provider === 'google' ? t('account.google') : t('account.kakao')
+}
+
+// 앱인토스 전용. 로그인 창이 토스 앱 안에서 열리고 닫혀서 화면이 그대로 살아 있다 —
+// 구글·카카오처럼 리다이렉트로 돌아오는 경로가 없다
+async function loginToss() {
+  tossBusy.value = true
+  accountError.value = ''
+  try {
+    await loginWithToss()
+    await readAccountState()
+  } catch {
+    accountError.value = t('account.failed')
+  } finally {
+    tossBusy.value = false
+  }
 }
 
 async function link(provider: SocialProvider) {
@@ -191,7 +212,23 @@ function onLangChange() {
     <section class="section">
       <h2>{{ t('account.title') }}</h2>
 
-      <template v-if="linkedProvider && !switching">
+      <!-- 앱인토스는 미니앱 안에서 구글·카카오를 쓸 수 없다(토스 정책). 토스 로그인만 남긴다.
+           계정이 토스 앱 하나로 정해져 있어 '다른 계정으로 전환'도 뜻이 없다 -->
+      <template v-if="isInToss">
+        <p v-if="linkedProvider" class="linked">
+          {{ t('account.linked', { provider: providerLabel(linkedProvider) }) }}
+        </p>
+        <template v-else>
+          <div class="social-row">
+            <button type="button" class="social toss" :disabled="tossBusy" @click="loginToss">
+              <span>{{ tossBusy ? t('account.linking') : t('account.tossLogin') }}</span>
+            </button>
+          </div>
+          <p class="hint">{{ t('account.hint') }}</p>
+        </template>
+      </template>
+
+      <template v-else-if="linkedProvider && !switching">
         <p class="linked">
           {{ t('account.linked', { provider: providerLabel(linkedProvider) }) }}
         </p>
@@ -386,6 +423,13 @@ function onLangChange() {
   border: none;
   background: #fee500;
   color: rgb(25 22 0 / 0.85);
+}
+
+/* 토스 브랜드 블루. 앱인토스 빌드에서만 쓰인다 */
+.social.toss {
+  border: none;
+  background: #0064ff;
+  color: #fff;
 }
 
 .linked {

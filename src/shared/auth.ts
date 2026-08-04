@@ -2,8 +2,13 @@ import { ref } from 'vue'
 import type { User } from '@supabase/supabase-js'
 import { getSupabase, whenSupabaseReady } from './supabase'
 import { AUTH_CALLBACK, closeAuthTab, isNative, openAuthTab, watchAuthTab } from './native'
+import { requestTossLogin } from './toss'
 
 export type SocialProvider = 'google' | 'kakao'
+
+// 앱인토스에서는 구글·카카오를 쓸 수 없어 토스 로그인이 그 자리를 대신한다.
+// 연결된 계정 표시는 세 가지를 함께 다룬다
+export type LinkedAccount = SocialProvider | 'toss'
 
 // 연동 요청을 보낸 제공자 — OAuth 리다이렉트로 돌아왔을 때 어떤 버튼이었는지 알기 위해 남긴다
 const PENDING_KEY = 'webgame:pendingProvider'
@@ -11,9 +16,11 @@ const PENDING_KEY = 'webgame:pendingProvider'
 let cachedUserId: string | null = null
 
 // 현재 계정에 연결된 소셜 제공자 (없으면 게스트) — 설정 화면과 허브 팝업이 함께 본다
-export const linkedProvider = ref<SocialProvider | null>(null)
+export const linkedProvider = ref<LinkedAccount | null>(null)
 
-function readProvider(user: User | null | undefined): SocialProvider | null {
+function readProvider(user: User | null | undefined): LinkedAccount | null {
+  // 토스는 Supabase provider가 아니라서 identities에 없다 — 서버가 넣어 준 표시를 본다
+  if (user?.user_metadata?.toss_user_key != null) return 'toss'
   const found = user?.identities?.find(
     (identity) => identity.provider === 'google' || identity.provider === 'kakao',
   )
@@ -146,6 +153,32 @@ export async function signInSocial(provider: SocialProvider): Promise<boolean> {
   const { data, error } = await sb.auth.signInWithOAuth({ provider, options: oauthOptions() })
   if (error) throw error
   return awaitOAuth(data.url)
+}
+
+// 앱인토스 전용 로그인. 구글·카카오와 달리 OAuth 리다이렉트가 없어서 창이 닫히면
+// 그 자리에서 끝난다 — 돌아오기를 기다리는 장치가 필요 없다.
+// 처음이면 지금 쓰던 계정에 묶이고(기록 유지), 다른 기기에서 이미 연동해 뒀으면
+// 그 계정으로 갈아탄다.
+export async function loginWithToss(): Promise<void> {
+  await ensureUserId()
+  const sb = await getSupabase()
+  const { data } = await sb.auth.getSession()
+  const token = data.session?.access_token
+  if (!token) throw new Error('세션을 찾지 못했습니다')
+
+  const result = await requestTossLogin(token)
+
+  if (result.mode === 'switched') {
+    if (!result.tokenHash) throw new Error('세션 토큰을 받지 못했습니다')
+    const { error } = await sb.auth.verifyOtp({ token_hash: result.tokenHash, type: 'magiclink' })
+    if (error) throw error
+    return
+  }
+
+  // 연동은 서버에서 계정 정보만 바꾼 상태다. 손에 든 토큰에는 아직 반영되지 않아
+  // 다음 실행에서 연동이 풀린 것처럼 보인다 — 토큰을 새로 받아 둔다
+  const { error } = await sb.auth.refreshSession()
+  if (error) throw error
 }
 
 export interface RedirectError {
