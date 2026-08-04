@@ -14,6 +14,7 @@
 // 필요한 환경 변수 (Vercel → Settings → Environment Variables):
 //   TOSS_CLIENT_CERT / TOSS_CLIENT_KEY  콘솔에서 받은 mTLS 인증서·개인키 (PEM 전문)
 //   SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY
+import { createDecipheriv } from 'node:crypto'
 import { request as httpsRequest } from 'node:https'
 import { createClient } from '@supabase/supabase-js'
 
@@ -94,7 +95,30 @@ function unwrap(response: TossResponse, what: string): Record<string, unknown> {
   return response.success
 }
 
-async function fetchUserKey(authorizationCode: string, referrer: string): Promise<number> {
+// login-me의 개인정보 필드는 암호화되어 온다 (toss-docs/login-develop.md 5장).
+// AES-256-GCM, 앞 12바이트가 IV, 끝 16바이트가 인증 태그, AAD는 콘솔에서 받은 값.
+function decryptField(encrypted: string): string {
+  const rawKey = process.env.TOSS_DECRYPT_KEY
+  if (!rawKey) throw new Error('TOSS_DECRYPT_KEY 환경 변수가 필요합니다')
+
+  const bytes = Buffer.from(encrypted, 'base64')
+  const iv = bytes.subarray(0, 12)
+  const tag = bytes.subarray(bytes.length - 16)
+  const body = bytes.subarray(12, bytes.length - 16)
+
+  const decipher = createDecipheriv('aes-256-gcm', Buffer.from(rawKey, 'base64'), iv)
+  decipher.setAAD(Buffer.from(process.env.TOSS_DECRYPT_AAD ?? 'TOSS'))
+  decipher.setAuthTag(tag)
+  return Buffer.concat([decipher.update(body), decipher.final()]).toString('utf8')
+}
+
+interface TossUser {
+  userKey: number
+  // 동의 항목에 이름이 없거나 사용자가 동의하지 않았으면 null이다
+  name: string | null
+}
+
+async function fetchTossUser(authorizationCode: string, referrer: string): Promise<TossUser> {
   const token = unwrap(
     await callToss(GENERATE_TOKEN, {
       method: 'POST',
@@ -115,7 +139,17 @@ async function fetchUserKey(authorizationCode: string, referrer: string): Promis
   )
   const userKey = me.userKey
   if (typeof userKey !== 'number') throw new Error('userKey가 응답에 없습니다')
-  return userKey
+
+  // 닉네임을 채우는 용도라, 못 풀어도 로그인 자체를 막을 이유는 없다
+  let name: string | null = null
+  if (typeof me.name === 'string') {
+    try {
+      name = decryptField(me.name)
+    } catch (error) {
+      console.error('toss-login 이름 복호화 실패', error)
+    }
+  }
+  return { userKey, name }
 }
 
 function createAdmin(url: string, serviceRoleKey: string) {
@@ -165,7 +199,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   const admin = createAdmin(url, serviceRoleKey)
 
   try {
-    const userKey = await fetchUserKey(authorizationCode, referrer)
+    const { userKey, name } = await fetchTossUser(authorizationCode, referrer)
 
     const { data: bound } = await admin
       .from('toss_accounts')
@@ -203,7 +237,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
       const { data: created, error: createError } = await admin.auth.admin.createUser({
         email: syntheticEmail(userKey),
         email_confirm: true,
-        user_metadata: { toss_user_key: userKey },
+        // name은 클라이언트가 닉네임 초기값으로 쓴다 (auth.ts의 fetchSocialName)
+        user_metadata: { toss_user_key: userKey, name },
       })
       if (createError) throw createError
       const { error: insertError } = await admin
@@ -225,7 +260,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     const { error: updateError } = await admin.auth.admin.updateUserById(caller.user.id, {
       email: syntheticEmail(userKey),
       email_confirm: true,
-      user_metadata: { ...caller.user.user_metadata, toss_user_key: userKey },
+      user_metadata: { ...caller.user.user_metadata, toss_user_key: userKey, name },
     })
     if (updateError) throw updateError
 

@@ -70,7 +70,7 @@ const dict: CoreDict = {
   'del.removedTitle': 'สิ่งที่ถูกลบ',
   'del.removedAccount': 'บัญชี: รหัสนิรนาม ชื่อเล่น',
   'del.removedSocial': 'บัญชีที่เชื่อม: รหัส Google หรือ Kakao รูปโปรไฟล์ อีเมล',
-  'del.removedToss': 'บัญชีที่เชื่อม: รหัสผู้ใช้ Toss (userKey)',
+  'del.removedToss': 'บัญชีที่เชื่อม: รหัสผู้ใช้ Toss (userKey) และชื่อ',
   'del.removedRecords': 'ข้อมูลการเล่น: คะแนน อันดับ เวลาที่เล่น',
   'del.removedNote': 'ข้อมูลในกระดานอันดับจะหายไปด้วย เมื่อเปิดแอปอีกครั้งจะเริ่มด้วยบัญชีผู้เยี่ยมชมใหม่',
   'del.button': 'ลบบัญชี',

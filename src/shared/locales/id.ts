@@ -70,7 +70,7 @@ const dict: CoreDict = {
   'del.removedTitle': 'Yang dihapus',
   'del.removedAccount': 'Akun: pengenal anonim, nama panggilan',
   'del.removedSocial': 'Akun tertaut: pengenal Google atau Kakao, foto profil, alamat email',
-  'del.removedToss': 'Akun tertaut: pengenal pengguna Toss (userKey)',
+  'del.removedToss': 'Akun tertaut: pengenal pengguna Toss (userKey) dan nama',
   'del.removedRecords': 'Catatan permainan: skor, entri peringkat, waktu bermain',
   'del.removedNote': 'Entri di papan peringkat juga hilang. Saat aplikasi dibuka lagi, kamu mulai dengan akun tamu baru.',
   'del.button': 'Hapus akun',

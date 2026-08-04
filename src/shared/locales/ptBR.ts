@@ -70,7 +70,7 @@ const dict: CoreDict = {
   'del.removedTitle': 'O que é excluído',
   'del.removedAccount': 'Conta: identificador anônimo, apelido',
   'del.removedSocial': 'Conta vinculada: identificador do Google ou Kakao, foto de perfil, e-mail',
-  'del.removedToss': 'Conta vinculada: o identificador de usuário da Toss (userKey)',
+  'del.removedToss': 'Conta vinculada: o identificador de usuário da Toss (userKey) e o nome',
   'del.removedRecords': 'Histórico de jogo: pontuações, registros de ranking, tempo de jogo',
   'del.removedNote': 'Some também dos rankings. Ao abrir o app de novo, você começa com uma nova conta de convidado.',
   'del.button': 'Excluir conta',

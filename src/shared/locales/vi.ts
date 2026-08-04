@@ -70,7 +70,7 @@ const dict: CoreDict = {
   'del.removedTitle': 'Những gì bị xoá',
   'del.removedAccount': 'Tài khoản: mã ẩn danh, biệt danh',
   'del.removedSocial': 'Tài khoản liên kết: mã Google hoặc Kakao, ảnh đại diện, địa chỉ email',
-  'del.removedToss': 'Tài khoản liên kết: mã người dùng Toss (userKey)',
+  'del.removedToss': 'Tài khoản liên kết: mã người dùng Toss (userKey) và tên',
   'del.removedRecords': 'Dữ liệu chơi: điểm số, thứ hạng, thời gian chơi',
   'del.removedNote': 'Bạn cũng biến mất khỏi bảng xếp hạng. Mở lại ứng dụng sẽ bắt đầu bằng tài khoản khách mới.',
   'del.button': 'Xoá tài khoản',

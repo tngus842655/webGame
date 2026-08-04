@@ -170,7 +170,7 @@ const en = {
   'del.removedTitle': 'What gets deleted',
   'del.removedAccount': 'Account: anonymous identifier, nickname',
   'del.removedSocial': 'Linked account: Google or Kakao identifier, profile photo, email address',
-  'del.removedToss': 'Linked account: the Toss user identifier (userKey)',
+  'del.removedToss': 'Linked account: the Toss user identifier (userKey) and name',
   'del.removedRecords': 'Game records: scores, ranking entries, play time',
   'del.removedNote': 'Your entries disappear from the rankings too. Opening the app again starts a fresh guest account.',
   'del.button': 'Delete account',
