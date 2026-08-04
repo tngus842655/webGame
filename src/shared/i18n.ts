@@ -1,4 +1,10 @@
 import { ref } from 'vue'
+import { isInToss } from './toss'
+
+// 앱 이름은 고유명사라 13개 언어가 모두 같은 값을 쓴다 — 번역 대상이 아니라 상수다.
+// 앱인토스만 한글인 이유는 콘솔 '앱 정보'에 등록한 이름과 같아야 하기 때문이다.
+// 다르면 검토에서 반려된다 (APPS_IN_TOSS.md).
+export const APP_NAME = isInToss ? '미니게임30' : 'MiniGame30'
 
 // 경량 i18n — 허브(Vue)와 게임(Canvas) 양쪽에서 t()를 쓴다.
 // 게임은 매 프레임 다시 그리므로 언어 변경이 즉시 반영된다.
@@ -42,7 +48,6 @@ export const LOCALES: Array<{ code: Locale; label: string }> = [
 const STORAGE_KEY = 'webgame:locale'
 
 const en = {
-  'app.title': 'MiniGame30',
   'home.best': 'Best {n}',
   'home.myRank': '{score} pts (#{rank})',
   'home.ranking': 'Rankings',
@@ -452,7 +457,7 @@ export function t(key: TranslationKey, params?: Record<string, string | number>)
 
 function applyToDocument() {
   document.documentElement.lang = locale.value
-  document.title = t('app.title')
+  document.title = APP_NAME
 }
 
 export function setLocale(next: Locale) {

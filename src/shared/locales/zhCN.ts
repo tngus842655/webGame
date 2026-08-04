@@ -2,7 +2,6 @@ import type { CoreDict } from '../i18n'
 
 // 이 사전은 이 언어를 고른 사람에게만 내려간다 (i18n.ts의 loadLocale)
 const dict: CoreDict = {
-  'app.title': 'MiniGame30',
   'home.best': '最高 {n}',
   'home.myRank': '{score}分 (第{rank}名)',
   'home.ranking': '排行榜',

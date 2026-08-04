@@ -2,7 +2,6 @@ import type { FullDict } from '../i18n'
 
 // 이 사전은 이 언어를 고른 사람에게만 내려간다 (i18n.ts의 loadLocale)
 const dict: FullDict = {
-  'app.title': '미니게임30',
   'home.best': '최고 {n}',
   'home.myRank': '{score}점 ({rank}등)',
   'home.ranking': '랭킹 보기',
