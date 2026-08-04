@@ -20,8 +20,9 @@ export default defineConfig({
     host: 'localhost',
     port: 5173,
     commands: {
-      dev: 'vite',
-      build: 'vue-tsc --noEmit && vite build',
+      dev: 'vite --mode toss',
+      // --mode toss가 .env.toss를 읽는다. 미니앱 전용 분기(토스 로그인)가 여기서 켜진다
+      build: 'vue-tsc --noEmit && vite build --mode toss',
     },
   },
   outdir: 'dist',

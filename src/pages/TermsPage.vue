@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { t } from '@/shared/i18n'
+import { isInToss } from '@/shared/toss'
 import UiIcon from '@/shared/UiIcon.vue'
 
 // 개인정보처리방침과 같은 이유로 운영 언어(한국어)로만 제공한다 —
@@ -46,7 +47,11 @@ const CONTACT_EMAIL = 'tngus842655@gmail.com'
         계정은 앱을 설치한 기기에만 남으므로, 앱을 지우거나 저장 공간을 비우면 기록을 되찾지
         못할 수 있습니다.
       </p>
-      <p>
+      <p v-if="isInToss">
+        토스 계정으로 로그인하면 기기를 바꾸어도 같은 기록을 이어서 쓸 수 있습니다. 로그인은
+        선택 사항이며, 하지 않아도 모든 게임을 그대로 즐길 수 있습니다.
+      </p>
+      <p v-else>
         구글 또는 카카오 계정을 연동하면 기기를 바꾸어도 같은 기록을 이어서 쓸 수 있습니다.
         연동은 선택 사항이며, 하지 않아도 모든 게임을 그대로 즐길 수 있습니다.
       </p>

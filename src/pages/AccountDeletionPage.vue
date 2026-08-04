@@ -3,6 +3,7 @@ import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { deleteMyAccount, getCurrentUserId } from '@/shared/auth'
 import { t } from '@/shared/i18n'
+import { isInToss } from '@/shared/toss'
 import UiIcon from '@/shared/UiIcon.vue'
 
 // 약관·처리방침과 달리 이 화면은 13개 언어를 다 채운다. 법적 고지가 아니라
@@ -51,7 +52,7 @@ async function remove() {
       <h2>{{ t('del.removedTitle') }}</h2>
       <ul>
         <li>{{ t('del.removedAccount') }}</li>
-        <li>{{ t('del.removedSocial') }}</li>
+        <li>{{ isInToss ? t('del.removedToss') : t('del.removedSocial') }}</li>
         <li>{{ t('del.removedRecords') }}</li>
       </ul>
       <p class="note">{{ t('del.removedNote') }}</p>
