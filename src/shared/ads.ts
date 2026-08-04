@@ -1,10 +1,15 @@
 import { t } from './i18n'
 import { isNative } from './native'
+import { isInToss } from './toss'
 
 // 리워드 광고 추상화. 게임은 이 인터페이스만 알면 되고, 실제 매체는 Provider 구현으로 갈아끼운다.
-// 웹·앱인토스는 VITE_ADSENSE_CLIENT가 있으면 H5 Games Ads,
+// 웹은 VITE_ADSENSE_CLIENT가 있으면 H5 Games Ads,
+// 앱인토스는 VITE_TOSS_AD_GROUP_ID가 있으면 토스 인앱광고,
 // 안드로이드 앱은 VITE_ADMOB_REWARD_ID가 있으면 AdMob,
-// 둘 다 없으면 5초 카운트다운 가짜 광고(스텁)를 쓴다.
+// 없으면 5초 카운트다운 가짜 광고(스텁)를 쓴다.
+//
+// 매체가 셋으로 갈리는 건 취향이 아니라 정책이다 — AdSense는 웹사이트용이라 앱 웹뷰에
+// 게재하면 프로그램 정책 위반이고, 미니앱 안에서는 토스가 자기 광고 SDK를 쓰게 한다.
 
 // 광고를 한 번 부른 결과.
 //   viewed      광고를 끝까지 봤다
@@ -213,10 +218,111 @@ class AdMobProvider implements AdProvider {
   }
 }
 
+type TossSdk = typeof import('@apps-in-toss/web-framework')
+
+// 재고가 없을 때 onEvent도 onError도 오지 않는 경우가 있다. 광고를 부르는 동안 게임 루프가
+// 멈춰 있으므로(gameContext), 응답이 없으면 여기서 끊어야 화면이 굳지 않는다.
+const TOSS_LOAD_TIMEOUT = 10000
+
+// 앱인토스 리워드 광고 — 미니앱 빌드 전용.
+// 미니앱도 결국 토스 앱 안의 웹뷰라 위의 AdSense를 그대로 쓸 수 없고, 토스가 자체 SDK로
+// 재고를 준다. adGroupId는 앱인토스 콘솔에서 발급받은 광고 단위 그룹 ID다.
+//
+// SDK는 구독형이다 — load/show가 콜백을 받고 구독 해제 함수를 돌려준다.
+// preload/present가 그것을 한 번만 정해지는 약속으로 바꿔 AdProvider에 맞춘다.
+class TossAdProvider implements AdProvider {
+  private showing = false
+  private sdk: Promise<TossSdk> | null = null
+
+  constructor(private readonly adGroupId: string) {}
+
+  // 광고를 처음 부를 때 받아 온다 — 게임만 하고 버튼을 안 누르는 사람도 많다
+  private loadSdk() {
+    if (!this.sdk) this.sdk = import('@apps-in-toss/web-framework')
+    return this.sdk
+  }
+
+  isReady() {
+    return !this.showing
+  }
+
+  async show(_placement: string): Promise<AdOutcome> {
+    if (this.showing) return 'unavailable'
+    this.showing = true
+    try {
+      const { loadFullScreenAd, showFullScreenAd } = await this.loadSdk()
+      // 토스 밖(브라우저로 연 dev 서버)에서는 브릿지가 없어 여기서 걸리거나 예외가 난다
+      if (!loadFullScreenAd.isSupported() || !showFullScreenAd.isSupported()) return 'unavailable'
+      if (!(await this.preload(loadFullScreenAd))) return 'unavailable'
+      return await this.present(showFullScreenAd)
+    } catch {
+      return 'unavailable'
+    } finally {
+      this.showing = false
+    }
+  }
+
+  private preload(load: TossSdk['loadFullScreenAd']): Promise<boolean> {
+    return new Promise((resolve) => {
+      let dispose = () => {}
+      let done = false
+      const settle = (loaded: boolean) => {
+        if (done) return
+        done = true
+        clearTimeout(timer)
+        dispose()
+        resolve(loaded)
+      }
+      const timer = setTimeout(() => settle(false), TOSS_LOAD_TIMEOUT)
+      dispose = load({
+        options: { adGroupId: this.adGroupId },
+        onEvent: (event) => {
+          if (event.type === 'loaded') settle(true)
+        },
+        onError: () => settle(false),
+      })
+      if (done) dispose()
+    })
+  }
+
+  // 보상은 userEarnedReward로 먼저 오고, 광고 창이 닫힐 때 dismissed가 온다.
+  // 여기엔 시간 제한을 두지 않는다 — 광고 길이만큼 기다리는 게 맞고, 중간에 끊으면
+  // 끝까지 본 사람의 보상을 뺏게 된다.
+  private present(show: TossSdk['showFullScreenAd']): Promise<AdOutcome> {
+    return new Promise((resolve) => {
+      let dispose = () => {}
+      let done = false
+      let rewarded = false
+      const settle = (outcome: AdOutcome) => {
+        if (done) return
+        done = true
+        dispose()
+        resolve(outcome)
+      }
+      dispose = show({
+        options: { adGroupId: this.adGroupId },
+        onEvent: (event) => {
+          if (event.type === 'userEarnedReward') rewarded = true
+          else if (event.type === 'dismissed') settle(rewarded ? 'viewed' : 'dismissed')
+          else if (event.type === 'failedToShow') settle('unavailable')
+        },
+        onError: () => settle('unavailable'),
+      })
+      if (done) dispose()
+    })
+  }
+}
+
 function createProvider(): AdProvider {
   if (isNative) {
     const adId = import.meta.env.VITE_ADMOB_REWARD_ID as string | undefined
     return adId ? new AdMobProvider(adId) : new StubAdProvider()
+  }
+
+  // 미니앱에서는 AdSense로 흘려보내면 안 된다. 광고 그룹 ID가 아직 없으면 스텁으로 둔다.
+  if (isInToss) {
+    const adGroupId = import.meta.env.VITE_TOSS_AD_GROUP_ID as string | undefined
+    return adGroupId ? new TossAdProvider(adGroupId) : new StubAdProvider()
   }
 
   const client = import.meta.env.VITE_ADSENSE_CLIENT as string | undefined
