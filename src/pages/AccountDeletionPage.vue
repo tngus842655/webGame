@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { deleteMyAccount, getCurrentUserId } from '@/shared/auth'
-import { t } from '@/shared/i18n'
+import { APP_NAME, t } from '@/shared/i18n'
 import { isInToss } from '@/shared/toss'
 import UiIcon from '@/shared/UiIcon.vue'
 
@@ -42,7 +42,7 @@ async function remove() {
       <RouterLink class="back" to="/settings"><UiIcon name="back" /></RouterLink>
       <div>
         <h1>{{ t('del.title') }}</h1>
-        <p class="effective">{{ t('app.title') }}</p>
+        <p class="effective">{{ APP_NAME }}</p>
       </div>
     </header>
 

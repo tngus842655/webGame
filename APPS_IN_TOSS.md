@@ -55,7 +55,7 @@ npm run build:toss     # 루트에 minigame30.ait 생성 (약 11MB)
 | `web.commands.dev` | `vite --mode toss` | `.env.toss`를 읽어 토스 로그인 분기를 켠다 |
 | `brand.icon` | Vercel의 512 아이콘 URL | 파일 업로드가 아니라 URL 참조다. **그 배포가 살아 있어야 한다** |
 | `brand.primaryColor` | `#FFCA28` | 아이콘의 금색 "30"과 앱 팔레트에서 가장 많이 쓰인 앰버 |
-| `brand.displayName` | `MiniGame30` | 토스 템플릿 주석은 **한글 이름**을 권한다. 검토에서 지적되면 `미니게임30` 등으로 바꿀 것 |
+| `brand.displayName` | `미니게임30` | **콘솔 '앱 정보'의 이름과 글자 하나까지 같아야 한다.** `MiniGame30`으로 뒀다가 "미니앱 이름이 앱 정보등록에 제출된 이름과 동일해야 해요"로 반려됐다. 앱 정보 쪽을 바꾸는 것도 방법이지만, 스토어에 노출되는 이름이라 한글이 낫다 |
 | `permissions` | `[]` | 카메라·위치·연락처 안 쓴다 |
 | `web.commands.build` | `vue-tsc --noEmit && vite build --mode toss` | `build:toss`가 이걸 돌린 뒤 결과를 묶는다 |
 | `outdir` | `dist` | vite 기본값 |

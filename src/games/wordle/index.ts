@@ -1,4 +1,4 @@
-import { t } from '@/shared/i18n'
+import { APP_NAME, t } from '@/shared/i18n'
 import { playDrop, playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
@@ -116,7 +116,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const shareResult = () => {
     if (!state.dailyShare) return
     const d = new Date()
-    const text = `${t('app.title')} ${t('game.wordle')} ${d.getMonth() + 1}/${d.getDate()}\n${state.dailyShare}`
+    const text = `${APP_NAME} ${t('game.wordle')} ${d.getMonth() + 1}/${d.getDate()}\n${state.dailyShare}`
     navigator.clipboard
       .writeText(text)
       .then(() => showToast(t('wd.copied')))
