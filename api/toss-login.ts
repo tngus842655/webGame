@@ -188,6 +188,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   res.setHeader('access-control-allow-headers', 'content-type')
   res.setHeader('access-control-allow-methods', 'POST, OPTIONS')
   if (req.method === 'OPTIONS') return res.status(204).end()
+
+  // 브라우저로 열어 환경 변수가 제대로 들어갔는지 확인하는 용도. 값은 내보내지 않고
+  // 있는지 없는지만 본다. 이름은 Vercel에 등록한 것과 그대로 맞춰 눈으로 대조하게 한다
+  if (req.method === 'GET') {
+    return res.status(200).json({
+      ok: true,
+      TOSS_CLIENT_CERT: Boolean(process.env.TOSS_CLIENT_CERT),
+      TOSS_CLIENT_KEY: Boolean(process.env.TOSS_CLIENT_KEY),
+      TOSS_DECRYPT_KEY: Boolean(process.env.TOSS_DECRYPT_KEY),
+      SUPABASE_URL: Boolean(process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL),
+      SUPABASE_SERVICE_ROLE_KEY: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
+    })
+  }
+
   if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' })
 
   const { authorizationCode, referrer, accessToken } = (req.body ?? {}) as Record<string, unknown>
