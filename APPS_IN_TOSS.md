@@ -151,8 +151,11 @@ Vercel → Settings → Environment Variables:
 | `TOSS_CLIENT_KEY` | 같이 받은 `.key` 전문 (PEM) |
 | `TOSS_DECRYPT_KEY` | 콘솔에서 메일로 받은 복호화 키 (base64) |
 | `TOSS_DECRYPT_AAD` | 같이 받은 AAD. 안 넣으면 `TOSS`로 본다 |
-| `SUPABASE_URL` | 프론트의 `VITE_SUPABASE_URL`과 같은 값 |
-| `SUPABASE_SERVICE_ROLE_KEY` | **service_role 키.** 절대 프론트에 넣지 않는다 |
+| `SUPABASE_SERVICE_ROLE_KEY` | **service_role 키.** `VITE_` 접두사를 붙이면 번들에 실려 나간다 |
+
+URL은 따로 넣지 않아도 된다 — 이미 등록된 `VITE_SUPABASE_URL`을 읽는다. 비밀이 아니라
+어차피 클라이언트 번들에 박혀 나가는 값이다. 굳이 나누고 싶으면 `SUPABASE_URL`을
+등록하면 그쪽을 먼저 본다.
 
 인증서 파일은 저장소에 두지 않는다 (`.gitignore`에 `*.key`, `*.crt`, `*.pem`, `*.p12`).
 유효기간은 발급일로부터 약 1년이라 만료 전에 콘솔에서 재발급해야 한다.

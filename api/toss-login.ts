@@ -195,7 +195,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return res.status(400).json({ error: 'missing_authorization_code' })
   }
 
-  const url = process.env.SUPABASE_URL
+  // URL은 비밀이 아니다 — 이미 클라이언트 번들에 박혀 나간다. 웹 빌드가 쓰는 값을
+  // 그대로 읽어 같은 값을 두 번 등록하지 않게 한다.
+  // 반면 service_role 키는 절대 VITE_ 접두사를 붙이면 안 된다. 붙이는 순간
+  // Vite가 번들에 넣어 모든 사용자에게 내려간다.
+  const url = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!url || !serviceRoleKey) {
     return res.status(500).json({ error: 'server_not_configured' })
