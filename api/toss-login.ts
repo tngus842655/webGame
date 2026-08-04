@@ -118,8 +118,10 @@ function decryptField(encrypted: string): string {
 
 interface TossUser {
   userKey: number
-  // 동의 항목에 이름이 없거나 사용자가 동의하지 않았으면 null이다
+  // 동의 항목에 없거나 사용자가 동의하지 않았으면 null이다.
+  // 이메일은 동의했더라도 토스 가입 시 필수가 아니라 값이 없을 수 있다
   name: string | null
+  email: string | null
 }
 
 async function fetchTossUser(authorizationCode: string, referrer: string): Promise<TossUser> {
@@ -144,16 +146,22 @@ async function fetchTossUser(authorizationCode: string, referrer: string): Promi
   const userKey = me.userKey
   if (typeof userKey !== 'number') throw new Error('userKey가 응답에 없습니다')
 
-  // 닉네임을 채우는 용도라, 못 풀어도 로그인 자체를 막을 이유는 없다
-  let name: string | null = null
-  if (typeof me.name === 'string') {
+  // 닉네임과 계정 주소를 채우는 용도라, 못 풀어도 로그인 자체를 막을 이유는 없다
+  const decryptOrNull = (value: unknown, label: string) => {
+    if (typeof value !== 'string') return null
     try {
-      name = decryptField(me.name)
+      return decryptField(value)
     } catch (error) {
-      console.error('toss-login 이름 복호화 실패', error)
+      console.error(`toss-login ${label} 복호화 실패`, error)
+      return null
     }
   }
-  return { userKey, name }
+
+  return {
+    userKey,
+    name: decryptOrNull(me.name, '이름'),
+    email: decryptOrNull(me.email, '이메일'),
+  }
 }
 
 function createAdmin(url: string, serviceRoleKey: string) {
@@ -161,6 +169,29 @@ function createAdmin(url: string, serviceRoleKey: string) {
 }
 
 type Admin = ReturnType<typeof createAdmin>
+
+// 토스가 준 이메일을 계정 주소로 쓴다. 다만 그 주소를 이미 쓰는 계정이 있을 수 있다 —
+// 웹에서 구글로 가입한 같은 사람이 그렇다. Supabase는 이메일이 계정마다 유일해야 하고
+// 두 계정을 합칠 방법도 없으므로, 그때는 수신이 불가능한 주소로 물러난다.
+async function assignEmail(
+  admin: Admin,
+  userId: string,
+  candidates: string[],
+  metadata: Record<string, unknown>,
+): Promise<void> {
+  let lastError: unknown = null
+  for (const email of candidates) {
+    const { error } = await admin.auth.admin.updateUserById(userId, {
+      email,
+      email_confirm: true,
+      user_metadata: metadata,
+    })
+    if (!error) return
+    lastError = error
+    console.error('toss-login 계정 이메일 설정 실패, 다음 후보로', error)
+  }
+  throw lastError ?? new Error('계정 이메일을 설정하지 못했습니다')
+}
 
 // 다른 기기에서 이미 연동해 둔 계정으로 들어가는 길. Supabase에는 '이 유저의 세션을
 // 만들어 달라'는 API가 없어서, 메일을 보내지 않는 매직링크를 만들어 그 토큰만 넘긴다.
@@ -188,6 +219,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   res.setHeader('access-control-allow-headers', 'content-type')
   res.setHeader('access-control-allow-methods', 'POST, OPTIONS')
   if (req.method === 'OPTIONS') return res.status(204).end()
+
+  // 브라우저로 열어 환경 변수가 제대로 들어갔는지 확인하는 용도. 값은 내보내지 않고
+  // 있는지 없는지만 본다. 이름은 Vercel에 등록한 것과 그대로 맞춰 눈으로 대조하게 한다
+  if (req.method === 'GET') {
+    return res.status(200).json({
+      ok: true,
+      TOSS_CLIENT_CERT: Boolean(process.env.TOSS_CLIENT_CERT),
+      TOSS_CLIENT_KEY: Boolean(process.env.TOSS_CLIENT_KEY),
+      TOSS_DECRYPT_KEY: Boolean(process.env.TOSS_DECRYPT_KEY),
+      SUPABASE_URL: Boolean(process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL),
+      SUPABASE_SERVICE_ROLE_KEY: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY),
+    })
+  }
+
   if (req.method !== 'POST') return res.status(405).json({ error: 'method_not_allowed' })
 
   const { authorizationCode, referrer, accessToken } = (req.body ?? {}) as Record<string, unknown>
@@ -207,7 +252,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   const admin = createAdmin(url, serviceRoleKey)
 
   try {
-    const { userKey, name } = await fetchTossUser(authorizationCode, referrer)
+    const { userKey, name, email } = await fetchTossUser(authorizationCode, referrer)
+    // name은 클라이언트가 닉네임 초기값으로 쓴다 (auth.ts의 fetchSocialName)
+    const metadata = { toss_user_key: userKey, name, email }
+    // 토스가 준 주소를 먼저 쓰고, 못 쓰면 수신 불가 주소로 물러난다
+    const emails = email ? [email, syntheticEmail(userKey)] : [syntheticEmail(userKey)]
 
     const { data: bound } = await admin
       .from('toss_accounts')
@@ -242,13 +291,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
       .maybeSingle()
 
     if (callerBound) {
+      // 빈 계정을 먼저 만들고 이메일은 assignEmail이 붙인다 — 주소가 겹칠 때
+      // 물러나는 처리를 한 군데에 모아 둔다
       const { data: created, error: createError } = await admin.auth.admin.createUser({
         email: syntheticEmail(userKey),
         email_confirm: true,
-        // name은 클라이언트가 닉네임 초기값으로 쓴다 (auth.ts의 fetchSocialName)
-        user_metadata: { toss_user_key: userKey, name },
+        user_metadata: metadata,
       })
       if (createError) throw createError
+      await assignEmail(admin, created.user.id, emails, metadata)
       const { error: insertError } = await admin
         .from('toss_accounts')
         .insert({ user_key: userKey, user_id: created.user.id })
@@ -265,12 +316,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
       .insert({ user_key: userKey, user_id: caller.user.id })
     if (insertError) throw insertError
 
-    const { error: updateError } = await admin.auth.admin.updateUserById(caller.user.id, {
-      email: syntheticEmail(userKey),
-      email_confirm: true,
-      user_metadata: { ...caller.user.user_metadata, toss_user_key: userKey, name },
+    await assignEmail(admin, caller.user.id, emails, {
+      ...caller.user.user_metadata,
+      ...metadata,
     })
-    if (updateError) throw updateError
 
     // user_id가 그대로라 클라이언트는 쓰던 세션을 계속 쓰면 된다
     return res.status(200).json({ mode: 'linked' })

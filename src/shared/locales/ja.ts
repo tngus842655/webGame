@@ -70,7 +70,7 @@ const dict: CoreDict = {
   'del.removedTitle': '削除される項目',
   'del.removedAccount': 'アカウント情報：匿名ID、ニックネーム',
   'del.removedSocial': '連携情報：Google・Kakaoのアカウント識別子、プロフィール画像、メールアドレス',
-  'del.removedToss': '連携情報：Tossが発行したユーザー識別子(userKey)、氏名',
+  'del.removedToss': '連携情報：Tossが発行したユーザー識別子(userKey)、氏名、メールアドレス',
   'del.removedRecords': 'プレイ記録：ゲームごとのスコア、ランキング、プレイ時間',
   'del.removedNote': 'ランキングからも消えます。アプリを開き直すと新しいゲストアカウントで始まります。',
   'del.button': 'アカウント削除',

@@ -175,10 +175,12 @@ export async function loginWithToss(): Promise<void> {
     return
   }
 
-  // 연동은 서버에서 계정 정보만 바꾼 상태다. 손에 든 토큰에는 아직 반영되지 않아
-  // 다음 실행에서 연동이 풀린 것처럼 보인다 — 토큰을 새로 받아 둔다
+  // 여기까지 왔으면 서버에서 연동은 이미 끝났다. 손에 든 토큰에 계정 정보가 아직
+  // 반영되지 않아 새로 받아 두지만, 실패해도 연동을 되돌릴 수는 없다.
+  // 실패로 처리하면 '연동하지 못했어요'가 뜨는데 실제로는 연동된 상태라 거짓말이 된다.
+  // 화면은 곧 getUser()로 최신 계정을 다시 읽으므로(fetchSocialName) 그대로 두면 된다.
   const { error } = await sb.auth.refreshSession()
-  if (error) throw error
+  if (error) console.error('토스 연동 후 토큰 갱신 실패', error)
 }
 
 export interface RedirectError {

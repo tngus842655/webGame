@@ -70,7 +70,7 @@ const dict: CoreDict = {
   'del.removedTitle': 'Ce qui est supprimé',
   'del.removedAccount': 'Compte : identifiant anonyme, pseudo',
   'del.removedSocial': 'Compte lié : identifiant Google ou Kakao, photo de profil, adresse e-mail',
-  'del.removedToss': 'Compte lié : l\'identifiant utilisateur Toss (userKey) et le nom',
+  'del.removedToss': 'Compte lié : identifiant utilisateur Toss (userKey), nom et adresse e-mail',
   'del.removedRecords': 'Historique de jeu : scores, entrées de classement, temps de jeu',
   'del.removedNote': 'Vos entrées disparaissent aussi des classements. À la réouverture, vous repartez avec un nouveau compte invité.',
   'del.button': 'Supprimer le compte',
