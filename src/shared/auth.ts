@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import type { User } from '@supabase/supabase-js'
+import type { SupabaseClient, User } from '@supabase/supabase-js'
 import { getSupabase, whenSupabaseReady } from './supabase'
 import { AUTH_CALLBACK, closeAuthTab, isNative, openAuthTab, watchAuthTab } from './native'
 import { requestTossLogin } from './toss'
@@ -52,12 +52,50 @@ whenSupabaseReady((sb) => {
   })
 })
 
+// 저장된 세션의 계정이 아직 있는지 이번 실행에서 확인했는가.
+// 매번 확인하면 점수를 올릴 때마다 조회가 한 번씩 더 붙는다 — 계정이 사라지는 건
+// 실행 중이 아니라 실행과 실행 사이에 벌어지는 일이라 한 번이면 충분하다.
+let sessionChecked = false
+
+// profiles는 조회가 전체 공개라 RLS에 가려질 일이 없다. 행이 없으면 계정이 없는 것이다
+async function accountGone(sb: SupabaseClient, id: string): Promise<boolean> {
+  const { data, error } = await sb.from('profiles').select('id').eq('id', id).maybeSingle()
+  // 통신 오류는 '계정이 없다'가 아니다. 멀쩡한 세션을 날리면 안 되므로 있다고 본다
+  if (error) return false
+  return data === null
+}
+
+// 게임에 들어가면 플레이 기록과 점수 지킴이가 나란히 이걸 부른다. 세션을 새로
+// 만들어야 하는 상황에서 둘이 각자 익명 로그인을 하면 계정이 두 개 생기므로,
+// 먼저 시작한 쪽의 결과를 함께 기다리게 한다
+let resolving: Promise<string> | null = null
+
 // 세션이 없으면 익명 로그인으로 부트스트랩 (DESIGN.md 6장 인증 흐름)
-export async function ensureUserId(): Promise<string> {
-  if (cachedUserId) return cachedUserId
+export function ensureUserId(): Promise<string> {
+  if (cachedUserId && sessionChecked) return Promise.resolve(cachedUserId)
+  resolving ??= resolveUserId().finally(() => {
+    resolving = null
+  })
+  return resolving
+}
+
+async function resolveUserId(): Promise<string> {
   const sb = await getSupabase()
   const { data } = await sb.auth.getSession()
   let session = data.session
+
+  // 계정이 지워졌는데 토큰만 남은 경우. JWT는 계정 유무와 무관하게 만료 전까지
+  // 형식상 유효해서 세션만 봐서는 알 수 없다. 그대로 두면 점수 저장이 조용히
+  // 실패하기만 하므로, 끊어내고 아래에서 처음 온 사람처럼 새로 시작한다
+  // (이전 계정의 로컬 최고점은 onAuthStateChange가 지운다).
+  if (session && !sessionChecked && (await accountGone(sb, session.user.id))) {
+    await sb.auth.signOut()
+    session = null
+    cachedUserId = null
+    linkedProvider.value = null
+  }
+  sessionChecked = true
+
   if (!session) {
     const { data: anon, error } = await sb.auth.signInAnonymously()
     if (error) throw error
