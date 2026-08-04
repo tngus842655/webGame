@@ -70,7 +70,7 @@ const dict: CoreDict = {
   'del.removedTitle': 'Was gelöscht wird',
   'del.removedAccount': 'Konto: anonyme Kennung, Spitzname',
   'del.removedSocial': 'Verknüpftes Konto: Google- oder Kakao-Kennung, Profilbild, E-Mail-Adresse',
-  'del.removedToss': 'Verknüpftes Konto: die Toss-Benutzerkennung (userKey) und der Name',
+  'del.removedToss': 'Verknüpftes Konto: Toss-Benutzerkennung (userKey), Name, E-Mail-Adresse',
   'del.removedRecords': 'Spielverlauf: Punktzahlen, Ranglisteneinträge, Spielzeit',
   'del.removedNote': 'Auch aus den Ranglisten verschwinden die Einträge. Beim nächsten Start beginnst du mit einem neuen Gastkonto.',
   'del.button': 'Konto löschen',

@@ -70,7 +70,7 @@ const dict: CoreDict = {
   'del.removedTitle': 'Silinenler',
   'del.removedAccount': 'Hesap: anonim kimlik, takma ad',
   'del.removedSocial': 'Bağlı hesap: Google veya Kakao kimliği, profil fotoğrafı, e-posta adresi',
-  'del.removedToss': 'Bağlı hesap: Toss kullanıcı kimliği (userKey) ve ad',
+  'del.removedToss': 'Bağlı hesap: Toss kullanıcı kimliği (userKey), ad, e-posta adresi',
   'del.removedRecords': 'Oyun kayıtları: puanlar, sıralama kayıtları, oynama süresi',
   'del.removedNote': 'Sıralamalardan da kaybolur. Uygulamayı yeniden açtığınızda yeni bir misafir hesabıyla başlarsınız.',
   'del.button': 'Hesabı sil',

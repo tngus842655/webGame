@@ -70,7 +70,7 @@ const dict: CoreDict = {
   'del.removedTitle': '删除的项目',
   'del.removedAccount': '账号信息：匿名标识、昵称',
   'del.removedSocial': '关联信息：Google·Kakao 账号标识、头像、邮箱地址',
-  'del.removedToss': '关联信息：Toss 发放的用户标识（userKey）、姓名',
+  'del.removedToss': '关联信息：Toss 发放的用户标识（userKey）、姓名、邮箱地址',
   'del.removedRecords': '游戏记录：各游戏分数、排行榜记录、游玩时长',
   'del.removedNote': '排行榜中也会一并消失。再次打开应用会以新的访客账号重新开始。',
   'del.button': '删除账号',
