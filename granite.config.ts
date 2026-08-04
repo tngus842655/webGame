@@ -5,7 +5,9 @@ import { defineConfig } from '@apps-in-toss/web-framework/config'
 export default defineConfig({
   appName: 'minigame30',
   brand: {
-    displayName: 'MiniGame30',
+    // 콘솔 '앱 정보'에 등록한 이름과 글자 하나까지 같아야 한다.
+    // 영문으로 뒀다가 '미니앱 이름이 앱 정보등록에 제출된 이름과 동일해야 해요'로 반려됐다
+    displayName: '미니게임30',
     primaryColor: '#FFCA28',
     icon: 'https://web-game-ecru.vercel.app/icon/icon-eng-512-v1.png',
   },
