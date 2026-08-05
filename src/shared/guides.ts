@@ -33,8 +33,8 @@ const ko: Record<string, Guide> = {
   },
   runner: {
     goal: '장애물을 피해 최대한 멀리 달리세요. 부딪히면 끝입니다.',
-    how: '탭하면 점프, 공중에서 한 번 더 탭하면 2단 점프예요.',
-    score: '달린 거리 + 주운 코인.',
+    how: '탭하면 점프, 길게 누르면 더 높이 뜹니다. 공중에서 한 번 더 탭하면 2단 점프예요.',
+    score: '코인을 연달아 주울수록 배수가 오릅니다. 하나라도 흘리면 1배로 돌아가요.',
   },
   dodge: {
     goal: '위에서 떨어지는 물체를 피해 오래 버티세요.',
@@ -191,8 +191,8 @@ const en: Record<string, Guide> = {
   },
   runner: {
     goal: 'Run as far as you can while dodging obstacles. One hit ends the run.',
-    how: 'Tap to jump, tap again in mid-air for a double jump.',
-    score: 'Distance run plus coins collected.',
+    how: 'Tap to jump, hold to jump higher. Tap again in mid-air for a double jump.',
+    score: 'Coins picked up in a row raise your multiplier. Drop one and it falls back to ×1.',
   },
   dodge: {
     goal: 'Survive as long as you can under the falling objects.',
@@ -349,8 +349,8 @@ const ja: Record<string, Guide> = {
   },
   runner: {
     goal: '障害物を避けてできるだけ遠くまで走ります。ぶつかると終了です。',
-    how: 'タップでジャンプ、空中でもう一度タップで二段ジャンプ。',
-    score: '走った距離＋拾ったコイン。',
+    how: 'タップでジャンプ、長押しでより高く。空中でもう一度タップで二段ジャンプ。',
+    score: 'コインを続けて拾うほど倍率が上がります。一つでも取り逃すと1倍に戻ります。',
   },
   dodge: {
     goal: '上から落ちてくる物を避けて長く生き残ります。',
@@ -507,8 +507,8 @@ const zhCN: Record<string, Guide> = {
   },
   runner: {
     goal: '躲避障碍尽量跑远。撞到就结束。',
-    how: '点击跳跃，空中再点一次可二段跳。',
-    score: '跑的距离加上收集的金币。',
+    how: '点击跳跃，长按跳得更高。空中再点一次可二段跳。',
+    score: '连续吃到金币会提高倍率，漏掉一个就回到1倍。',
   },
   dodge: {
     goal: '躲开落下的物体，坚持得越久越好。',
@@ -665,8 +665,8 @@ const es: Record<string, Guide> = {
   },
   runner: {
     goal: 'Corre lo más lejos posible esquivando obstáculos. Un golpe y se acaba.',
-    how: 'Toca para saltar y toca otra vez en el aire para el doble salto.',
-    score: 'Distancia recorrida más monedas.',
+    how: 'Toca para saltar y mantén pulsado para saltar más alto. Toca otra vez en el aire para el doble salto.',
+    score: 'Las monedas seguidas suben el multiplicador. Si se te escapa una, vuelve a ×1.',
   },
   dodge: {
     goal: 'Sobrevive lo máximo posible bajo los objetos que caen.',
@@ -823,8 +823,8 @@ const ptBR: Record<string, Guide> = {
   },
   runner: {
     goal: 'Corra o mais longe possível desviando dos obstáculos. Uma batida e acaba.',
-    how: 'Toque para pular e toque de novo no ar para o pulo duplo.',
-    score: 'Distância percorrida mais moedas.',
+    how: 'Toque para pular e segure para pular mais alto. Toque de novo no ar para o pulo duplo.',
+    score: 'Moedas seguidas aumentam o multiplicador. Se perder uma, volta para ×1.',
   },
   dodge: {
     goal: 'Sobreviva o máximo que puder sob os objetos que caem.',
@@ -981,8 +981,8 @@ const fr: Record<string, Guide> = {
   },
   runner: {
     goal: 'Cours le plus loin possible en évitant les obstacles. Un choc et c\'est fini.',
-    how: 'Touche pour sauter, touche encore en l\'air pour un double saut.',
-    score: 'Distance parcourue plus les pièces ramassées.',
+    how: 'Touche pour sauter, maintiens pour sauter plus haut. Touche encore en l\'air pour un double saut.',
+    score: 'Les pièces enchaînées font monter le multiplicateur. Une pièce ratée et il retombe à ×1.',
   },
   dodge: {
     goal: 'Survis le plus longtemps possible sous les objets qui tombent.',
@@ -1139,8 +1139,8 @@ const de: Record<string, Guide> = {
   },
   runner: {
     goal: 'Lauf so weit du kannst und weich Hindernissen aus. Ein Treffer beendet die Runde.',
-    how: 'Tippen zum Springen, in der Luft nochmal tippen für den Doppelsprung.',
-    score: 'Gelaufene Strecke plus gesammelte Münzen.',
+    how: 'Tippen zum Springen, gedrückt halten für einen höheren Sprung. In der Luft nochmal tippen für den Doppelsprung.',
+    score: 'Münzen in Folge erhöhen den Multiplikator. Eine verpasst, und er fällt auf ×1 zurück.',
   },
   dodge: {
     goal: 'Überleb so lange wie möglich unter den fallenden Objekten.',
@@ -1297,8 +1297,8 @@ const ru: Record<string, Guide> = {
   },
   runner: {
     goal: 'Бегите как можно дальше, уворачиваясь от препятствий. Одно столкновение — конец.',
-    how: 'Нажмите для прыжка, в воздухе ещё раз — двойной прыжок.',
-    score: 'Пройденное расстояние плюс собранные монеты.',
+    how: 'Нажмите для прыжка, удерживайте — прыжок выше. В воздухе ещё раз — двойной прыжок.',
+    score: 'Монеты подряд повышают множитель. Пропустите одну — он вернётся к ×1.',
   },
   dodge: {
     goal: 'Продержитесь как можно дольше под падающими предметами.',
@@ -1455,8 +1455,8 @@ const id: Record<string, Guide> = {
   },
   runner: {
     goal: 'Berlari sejauh mungkin sambil menghindari rintangan. Sekali tertabrak, berakhir.',
-    how: 'Ketuk untuk melompat, ketuk lagi di udara untuk lompat ganda.',
-    score: 'Jarak tempuh ditambah koin yang dikumpulkan.',
+    how: 'Ketuk untuk melompat, tahan untuk melompat lebih tinggi. Ketuk lagi di udara untuk lompat ganda.',
+    score: 'Koin berturut-turut menaikkan pengali. Satu terlewat, kembali ke ×1.',
   },
   dodge: {
     goal: 'Bertahan selama mungkin di bawah benda yang jatuh.',
@@ -1613,8 +1613,8 @@ const vi: Record<string, Guide> = {
   },
   runner: {
     goal: 'Chạy càng xa càng tốt và né chướng ngại vật. Va một lần là kết thúc.',
-    how: 'Chạm để nhảy, chạm lần nữa giữa không trung để nhảy đúp.',
-    score: 'Quãng đường chạy cộng số xu nhặt được.',
+    how: 'Chạm để nhảy, giữ lâu hơn để nhảy cao hơn. Chạm lần nữa giữa không trung để nhảy đúp.',
+    score: 'Nhặt xu liên tiếp sẽ tăng hệ số nhân. Lỡ một xu là về lại ×1.',
   },
   dodge: {
     goal: 'Sống sót càng lâu càng tốt dưới những vật rơi xuống.',
@@ -1771,8 +1771,8 @@ const th: Record<string, Guide> = {
   },
   runner: {
     goal: 'วิ่งให้ไกลที่สุดพร้อมหลบสิ่งกีดขวาง ชนครั้งเดียวก็จบ',
-    how: 'แตะเพื่อกระโดด แตะอีกครั้งกลางอากาศเพื่อกระโดดสองชั้น',
-    score: 'ระยะทางที่วิ่งบวกเหรียญที่เก็บได้',
+    how: 'แตะเพื่อกระโดด กดค้างเพื่อกระโดดสูงขึ้น แตะอีกครั้งกลางอากาศเพื่อกระโดดสองชั้น',
+    score: 'เก็บเหรียญต่อเนื่องจะเพิ่มตัวคูณ พลาดเพียงเหรียญเดียวก็กลับไปที่ ×1',
   },
   dodge: {
     goal: 'เอาตัวรอดให้นานที่สุดใต้สิ่งของที่ตกลงมา',
@@ -1929,8 +1929,8 @@ const tr: Record<string, Guide> = {
   },
   runner: {
     goal: 'Engellerden kaçarak olabildiğince uzağa koş. Bir çarpma oyunu bitirir.',
-    how: 'Zıplamak için dokun, havadayken tekrar dokunup çift zıplama yap.',
-    score: 'Koşulan mesafe artı toplanan altınlar.',
+    how: 'Zıplamak için dokun, daha yükseğe zıplamak için basılı tut. Havadayken tekrar dokunup çift zıplama yap.',
+    score: 'Arka arkaya toplanan altınlar çarpanı yükseltir. Birini kaçırırsan ×1\'e döner.',
   },
   dodge: {
     goal: 'Düşen cisimlerin altında olabildiğince uzun dayan.',
