@@ -8,16 +8,21 @@ import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import {
   AIR_BAR_BOTTOM,
+  CHAIN_STEP,
   GROUND_Y,
-  JUMP_V,
+  MAX_MULT,
   PLAYER_W,
   PLAYER_X,
   START_SPAWN_DELAY,
   createState,
+  jump,
+  multOf,
+  release,
   scoreOf,
   update,
 } from './state'
-import { drawScorePanel, font } from '../ui'
+import { SCORE_PANEL, drawScorePanel, font } from '../ui'
+import { drawIconValue } from '../icons'
 import { ground } from '../scene'
 
 // 먼지·반짝임 한 알
@@ -47,9 +52,18 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       }
       for (const spot of result.coinSpots) {
         burstCoin(spot.x, spot.y)
-        popups.push({ x: spot.x, y: spot.y, age: 0 })
+        popups.push({ x: spot.x, y: spot.y, age: 0, value: spot.value })
       }
-      if (result.coinsTaken > 0) playSfx('coin')
+      // 체인이 쌓일수록 음이 올라간다 — 몇 번째로 이어 붙였는지 소리로 안다
+      if (result.coinSpots.length > 0) {
+        playSfx('coin', { rate: 1 + Math.min(state.chain, 24) * 0.02 })
+      }
+      if (result.multUp) playSfx('unlock')
+      if (result.chainBroke) {
+        breakFx = 1
+        playSfx('fail')
+        vibrate(30)
+      }
       if (result.died) void gameOver()
     }
     stepEffects(dt)
@@ -57,14 +71,16 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  preloadSfx('coin', 'gameover', 'impact', 'whoosh')
+  preloadSfx('coin', 'fail', 'gameover', 'impact', 'unlock', 'whoosh')
   let adContinueUsed = false
 
   // 착지 눌림(1 → 0으로 잦아든다)과 도약 늘어남
   let landFx = 0
   let jumpFx = 0
+  // 체인이 끊긴 순간 배수 표시가 붉게 눌린다 — 왜 점수가 안 오르는지 알려주는 유일한 신호다
+  let breakFx = 0
   const particles: Particle[] = []
-  const popups: Array<{ x: number; y: number; age: number }> = []
+  const popups: Array<{ x: number; y: number; age: number; value: number }> = []
 
   const overlay = createGameOverOverlay(shell.wrapper, {
     adLabelKey: 'run.ad',
@@ -89,8 +105,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (shell.isDestroyed() || !rewarded || state.phase !== 'over') return
     adContinueUsed = true
     state.obstacles = []
+    // 장애물만 비우고 코인을 두면 짝 잃은 코인이 흘러나가 체인부터 끊고 시작한다
+    state.coins = []
+    state.chain = 0
     state.playerY = GROUND_Y
     state.vy = 0
+    state.jumpsLeft = 2
+    state.holding = false
     // 장애물을 비워도 스폰 타이머가 그대로면 죽기 직전 값(거의 0)이라 곧바로 다음
     // 장애물이 날아온다. 광고를 보고 돌아온 사람에게 준비할 틈이 없어, 시작할 때와
     // 같은 여유를 준다 — 다른 게임들이 무적 시간이나 조준 대기로 주는 것과 같은 몫이다.
@@ -146,6 +167,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const stepEffects = (dt: number) => {
     landFx = Math.max(0, landFx - dt * 5)
     jumpFx = Math.max(0, jumpFx - dt * 5)
+    breakFx = Math.max(0, breakFx - dt * 1.6)
     for (let i = particles.length - 1; i >= 0; i--) {
       const p = particles[i]
       p.age += dt
@@ -165,16 +187,17 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   const detachInput = attachInput(stage.canvas, {
     onDown() {
-      if (state.phase !== 'playing' || state.jumpsLeft <= 0) return
+      const grounded = state.playerY >= GROUND_Y - 1
+      if (!jump(state)) return
       // 땅에서 차고 나갈 때만 먼지가 인다 (2단 점프는 공중이라 밟을 게 없다)
-      if (state.playerY >= GROUND_Y - 1) puffDust(5, 1)
-      state.vy = JUMP_V
-      state.jumpsLeft -= 1
+      if (grounded) puffDust(5, 1)
       jumpFx = 1
       playSfx('whoosh')
     },
     onMove() {},
-    onUp() {},
+    onUp() {
+      release(state)
+    },
   })
 
   // 먼 산 — 가장 느리게 흐르는 배경 층
@@ -487,6 +510,14 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       const bob = Math.sin(state.time * 4 + coin.x * 0.03) * 4
       c.save()
       c.translate(coin.x, coin.y + bob)
+      // 보너스는 놓쳐도 체인이 안 끊긴다 — 테두리 하나로 갈라 보인다
+      if (coin.bonus) {
+        c.strokeStyle = 'rgb(255 255 255 / 0.6)'
+        c.lineWidth = 3
+        c.beginPath()
+        c.arc(0, 0, 26, 0, Math.PI * 2)
+        c.stroke()
+      }
       c.fillStyle = '#C88A16'
       c.beginPath()
       c.ellipse(0, 0, 18 * spin + 3, 18, 0, 0, Math.PI * 2)
@@ -522,22 +553,61 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.font = font(30, true)
     for (const p of popups) {
       const k = p.age / POPUP_LIFE
+      const text = `+${p.value}`
       c.globalAlpha = 1 - k * k
       c.lineWidth = 6
       c.strokeStyle = 'rgb(255 255 255 / 0.9)'
-      c.strokeText('+3', p.x, p.y - k * 46)
+      c.strokeText(text, p.x, p.y - k * 46)
       c.fillStyle = '#F57F17'
-      c.fillText('+3', p.x, p.y - k * 46)
+      c.fillText(text, p.x, p.y - k * 46)
     }
     c.globalAlpha = 1
 
     drawScorePanel(c, {
       label: t('hud.score'),
       value: scoreOf(state).toLocaleString(),
+      sub: true,
       panelColor: ground('rgb(255 255 255 / 0.85)', 'rgb(10 20 30 / 0.86)'),
       labelColor: ground('#90CAF9', '#7FA6C9'),
       valueColor: ground('#0D47A1', '#D7E9FF'),
     })
+
+    // 아랫줄 — 주운 코인과 지금 배수. 배수가 이 게임의 진짜 눈금이라 점수 바로 밑에 둔다
+    const mult = multOf(state.chain)
+    c.font = font(21, true)
+    c.fillStyle = ground('#8D6E15', '#C8B171')
+    const coinX = SCORE_PANEL.left
+    drawIconValue(c, 'coin', String(state.coinCount), coinX, SCORE_PANEL.subY - 8, 12, 'left')
+
+    const topMult = mult >= MAX_MULT
+    // 끊긴 순간 표가 흔들려 눈이 그쪽으로 간다
+    const shake = breakFx > 0 ? Math.sin(breakFx * 38) * 5 * breakFx : 0
+    c.textAlign = 'right'
+    c.textBaseline = 'alphabetic'
+    c.font = font(mult > 1 ? 30 : 24, true)
+    c.fillStyle = breakFx > 0
+      ? '#E5484D'
+      : topMult
+        ? '#F57F17'
+        : mult > 1
+          ? ground('#0D47A1', '#D7E9FF')
+          : ground('#9AA7B4', '#5E6E7C')
+    c.fillText(`×${mult}`, SCORE_PANEL.right + shake, SCORE_PANEL.subY)
+
+    // 다음 배수까지 얼마나 남았는지 — 한 칸씩 차오르는 게 보여야 하나 더 주우러 간다
+    if (!topMult) {
+      const k = (state.chain % CHAIN_STEP) / CHAIN_STEP
+      const bw = 66
+      const bx = SCORE_PANEL.right - bw
+      c.fillStyle = ground('rgb(13 71 161 / 0.14)', 'rgb(215 233 255 / 0.16)')
+      c.beginPath()
+      c.roundRect(bx, SCORE_PANEL.subY + 8, bw, 5, 3)
+      c.fill()
+      c.fillStyle = ground('#1E88E5', '#7FB4E8')
+      c.beginPath()
+      c.roundRect(bx, SCORE_PANEL.subY + 8, Math.max(5, bw * k), 5, 3)
+      c.fill()
+    }
 
     // 텍스트 없는 조작 안내: 위로 튀는 탭 표식
     if (state.time < 4 && state.phase === 'playing') {
