@@ -207,9 +207,9 @@ Supabase 대시보드:
 - [x] 웹뷰 전용 버그 3건 수정 후 재빌드 → 실기기 확인 완료
 - [x] 앱 승인
 - [x] 토스 로그인 — 코드 작성 완료 (아래 미확인 항목 남음)
+- [x] 인앱광고 — 코드 작성 완료 (광고 그룹 ID 발급과 실기기 확인이 남았다)
 - [ ] 콘솔 앱 정보 — 아이콘, 스크린샷, 설명, 검색 키워드
 - [ ] 검토 요청
-- [ ] 인앱광고
 
 토스 로그인은 **실기기에서 한 번도 돌려보지 않았다.** 확인해야 할 것:
 
@@ -221,22 +221,118 @@ Supabase 대시보드:
 
 ---
 
-## 다음: 인앱광고
+## 인앱광고
 
-SDK에 광고 API가 이미 들어 있다. `@apps-in-toss/web-framework`에서 그대로 import한다.
+### 웹의 AdSense를 미니앱에 그대로 쓸 수 없다
 
-| API | 용도 |
+미니앱은 결국 **토스 앱 안의 웹뷰**이고, AdSense(H5 Games Ads)는 웹사이트용 상품이라
+앱 웹뷰 게재는 프로그램 정책 위반이다 — 안드로이드 앱에 AdMob을 따로 붙인 것과 정확히
+같은 이유다(`src/shared/ads.ts`의 `AdMobProvider` 주석). 정책을 접어 두더라도, 미니앱은
+자산을 번들에 통째로 넣어 올리는 방식이라 AdSense가 요구하는 **크롤 가능한 사이트 URL이
+아예 없다.** 실제로 게재가 안 되거나 무효 트래픽으로 잡힐 자리다.
+
+그래서 매체가 셋으로 갈린다.
+
+| 빌드 | 매체 | 환경 변수 |
+| --- | --- | --- |
+| 웹 (Vercel·Cloudflare) | H5 Games Ads (AdSense) | `VITE_ADSENSE_CLIENT` (`.env.local`) |
+| 앱인토스 미니앱 | 토스 인앱광고 | `VITE_TOSS_AD_GROUP_ID` (`.env.toss`) |
+| 안드로이드 앱 | AdMob | `VITE_ADMOB_REWARD_ID` (`.env.local`) |
+
+가르는 방식은 토스 로그인과 같다 — `createProvider()`가 `isNative` → `isInToss` 순으로
+보고 고른다. `isInToss`는 빌드 플래그라 **컴파일 타임에 상수**가 되고, 그래서 미니앱
+번들에는 AdSense 쪽 코드가 통째로 안 실린다. `VITE_ADSENSE_CLIENT`를 채운 채로
+`vite build --mode toss`를 돌려 산출물에 `adsbygoogle`이 한 글자도 없는 것을 확인했다.
+(같은 조건의 웹 빌드에는 그대로 들어간다.)
+
+### SDK 계약
+
+`toss-docs/interstitial-rewarded-ad.md` 기준. 전면형과 보상형이 **같은 API**를 쓰고,
+어느 쪽인지는 `adGroupId`가 정한다 — 그래서 콘솔에서 광고 유형을 `리워드`로 만들어야 한다.
+
+```ts
+loadFullScreenAd({ options: { adGroupId }, onEvent, onError }) // → 구독 해제 함수
+showFullScreenAd({ options: { adGroupId }, onEvent, onError }) // → 구독 해제 함수
+```
+
+둘 다 `isSupported()`를 달고 있다. 콜백을 받고 **구독 해제 함수를 돌려주는** 형태라,
+`TossAdProvider`가 이것을 한 번만 정해지는 Promise로 바꿔 기존 `AdProvider` 인터페이스에 맞춘다.
+
+| 단계 | 이벤트 | `AdOutcome` |
+| --- | --- | --- |
+| load | `loaded` | 받아 둔 상태로 표시 |
+| show | `userEarnedReward` → `dismissed` | `viewed` |
+| show | `dismissed` (보상 없이) | `dismissed` |
+| show | `failedToShow`, `onError` | `unavailable` |
+
+`impression`·`clicked`·`show`·`requested`는 안 쓴다 — 보상 지급과 게임 재개를 가르는 데
+필요한 건 위 넷뿐이다.
+
+**받아 두는 것이 이 매체의 핵심이다.** 가이드가 `load → show → (다음 load)` 순서를 못박고,
+FAQ가 로드 소요를 **토스애즈 1\~2초 / 애드몹 5\~20초, 최대 60초**로 적어 뒀다. 버튼을 누른
+뒤에 부르면 그 시간만큼 게임이 멈춰 있게 되므로, **판에 들어올 때 미리 받아 둔다**
+(`createGameContext`가 `adProvider.preload?.()`를 부른다). 띄운 광고는 소진되니 `show` 뒤에
+다음 편을 다시 받는다. `isReady()`는 받아 뒀거나 받는 중일 때만 참이라, 받기가 실패한
+뒤에는 광고 버튼이 아예 안 뜬다 — 눌러도 안 나올 버튼을 보여주지 않는 편이 낫다.
+
+시간 제한 셋은 전부 **SDK가 아무 이벤트도 주지 않을 때를 위한 안전망**이고 정상 동작에서는
+걸리지 않는다: 받아 두기 90초(화면을 막지 않고 뒤에서 돈다) · 버튼을 누른 뒤 대기 20초 ·
+표시 3분. 마지막 것은 아래 알려진 버그 때문이다.
+
+**알려진 버그** (가이드 FAQ, 안드로이드 토스앱)
+
+- **5.255.0에서 `dismissed`가 오지 않는다.** 그래서 표시에 3분 안전망을 뒀다. 이때 보상은
+  `userEarnedReward`를 받았는지로 가른다
+- **5.266.0에서 여러 `adGroupId`를 동시에 로드하면 이벤트가 유실된다.** 지금은 그룹이 하나라
+  해당 없지만, **배너를 붙이면 걸린다** — 그때는 순차 로드로 짜야 한다 (5.267.0/5.268.0에서
+  개선)
+
+**토스 앱 버전**: 5.227.0 미만은 미지원, 5.247.0 이상이라야 토스애즈+애드몹 통합이 돈다.
+`isSupported()`가 이걸 판별하고, 거짓이면 받기를 포기한다.
+
+배너(`TossAds.attachBanner`)는 안 붙였다. 지금 이 앱의 광고는 전부 사용자가 버튼을 눌러
+보는 리워드 광고 하나뿐이고, 배너는 게임 화면 자리를 새로 잡아야 하는 별개의 일이다.
+
+### 테스트
+
+**운영 ID로 테스트하면 정책 위반이다.** 가이드가 테스트용 ID를 따로 준다.
+
+| 광고 | 테스트 ID |
 | --- | --- |
-| `loadFullScreenAd` / `showFullScreenAd` | 전면·보상형 광고 |
-| `attachBanner(adGroupId, target, options)` | 배너 |
-| `TossAds` / `GoogleAdMob` | 제공자별 진입점 |
+| 리워드 | `ait-ad-test-rewarded-id` |
+| 전면형 | `ait-ad-test-interstitial-id` |
 
-지금 웹은 AdSense(H5 Games Ads)를 쓴다 — `src/shared/ads.ts`의 `AdProvider` 인터페이스와
-`VITE_ADSENSE_CLIENT` 환경변수. 매체를 갈아끼우도록 이미 추상화돼 있으므로,
-**앱인토스용 `AdProvider` 구현을 하나 더 만들어 환경에 따라 고르는 방식**이 자연스럽다.
+`.env.toss`에는 운영 ID를 두고, 테스트 번들만 환경 변수로 덮어쓴다. 셸 값이 `.env.toss`를
+이긴다는 것과 그 값이 `.ait` 안까지 들어간다는 것을 확인했다.
 
-시작 전에 확인할 것:
+```bash
+VITE_TOSS_AD_GROUP_ID=ait-ad-test-rewarded-id npm run build:toss
+```
 
-- 콘솔에서 인앱광고를 **먼저 신청·승인**받아야 하는지
-- `adGroupId`를 콘솔 어디서 발급받는지
-- 웹뷰 안에서 AdSense를 그대로 두면 정책 위반인지 (토스 심사 기준 확인 필요)
+**샌드박스(`npm run dev:toss`)에서는 인앱광고가 아예 동작하지 않는다.** 가이드가 명시한
+제약이라 우회할 수 없다 — 콘솔에 번들을 올리고 **QR로 실기기에서** 확인해야 한다.
+
+출시 전 확인 항목(가이드): 광고가 로드되는지 · 클릭 시 의도한 화면으로 가는지 ·
+뒤로 가기가 정상인지 · 결제나 인증 흐름을 방해하지 않는지.
+
+### 가이드가 요구하는 것 (`toss-docs/in-app-ad.md`)
+
+- **광고 중에는 앱 사운드를 멈춘다.** `gameContext.showRewardAd`가 게임 루프와 함께 BGM도
+  접는다. 결과 팝업에서 부르는 광고는 팝업이 이미 접어 둔 뒤라, 원래 흐르고 있던 경우에만
+  되살린다. 이걸 넣기 전에는 인게임 광고(되돌리기·시간 추가·목숨 등 15곳 남짓)에서 BGM이
+  그대로 흘렀다
+- **SDK를 우회하지 않는다.** 자체 로직으로 광고를 호출하거나 Click/Impression 이벤트를
+  변조하면 제재다. 지금 구현은 `loadFullScreenAd`/`showFullScreenAd`를 그대로 쓰고 광고 UI도
+  건드리지 않는다. 위의 시간 제한들은 구독을 끊고 포기할 뿐이라 이벤트 변조가 아니다
+- **광고 그룹 ID는 구글에 등록되기까지 최대 2시간.** 그 사이에는 로드가 실패하는데, 이 앱은
+  `unavailable`이면 보상을 그냥 주므로 **"광고는 안 뜨는데 이어하기는 되는" 모습**으로 보인다.
+  연동이 됐는지는 `ad_views`의 outcome으로 확인할 것
+
+### 남은 것
+
+- [x] 사업자 정보 등록, 정산 정보 등록·검토
+- [x] 콘솔에서 **광고 유형 `리워드`로 광고 그룹 생성** (보상: `생명연장, 1`)
+- [x] 구글 반영 완료, ID 발급 → `.env.toss`에 넣었다
+- [ ] **테스트 ID로 빌드해 실기기에서 확인** (위 '테스트' 참고). 샌드박스로는 안 되고
+      콘솔 QR로 받아야 한다. 게임오버 → 이어하기 버튼
+- [ ] 확인이 끝나면 운영 ID 그대로 `npm run build:toss` → 콘솔에 버전 등록
