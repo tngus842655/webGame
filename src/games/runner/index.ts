@@ -8,10 +8,11 @@ import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import type { Obstacle } from './state'
 import {
-  AIR_BAR_BOTTOM,
   CHAIN_STEP,
   GROUND_Y,
   MAX_MULT,
+  OVERHANG_BOTTOM,
+  OVERHANG_TOP,
   PLAYER_W,
   PLAYER_X,
   START_SPAWN_DELAY,
@@ -494,32 +495,57 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     // 장애물
     for (const o of state.obstacles) {
       if (o.air) {
-        // 천장에서 내려온 벽 — 아래 틈으로만 지나갈 수 있다는 게 한눈에 보여야 한다
-        const h = AIR_BAR_BOTTOM
+        // 허공에 뜬 바위 처마. 윗면을 울퉁불퉁하게 둬서 '올라설 수 있는 바닥'으로
+        // 읽히지 않게 하고, 땅에 그림자를 깔아 떠 있다는 것을 알린다
+        const top = OVERHANG_TOP
+        const bot = OVERHANG_BOTTOM
         c.save()
-        const grad = c.createLinearGradient(o.x, 0, o.x, h)
-        grad.addColorStop(0, '#F57C00')
-        grad.addColorStop(1, '#FFB74D')
+        c.fillStyle = 'rgb(62 39 35 / 0.14)'
+        c.beginPath()
+        c.ellipse(o.x + o.w / 2, GROUND_Y + 6, o.w * 0.44, 10, 0, 0, Math.PI * 2)
+        c.fill()
+
+        const grad = c.createLinearGradient(0, top, 0, bot)
+        grad.addColorStop(0, '#93A0A9')
+        grad.addColorStop(1, '#55636D')
         c.fillStyle = grad
         c.beginPath()
-        c.roundRect(o.x, -20, o.w, h + 20, [0, 0, 12, 12])
+        c.moveTo(o.x, bot - 6)
+        c.lineTo(o.x + o.w * 0.06, top + 30)
+        c.lineTo(o.x + o.w * 0.3, top + 6)
+        c.lineTo(o.x + o.w * 0.52, top + 26)
+        c.lineTo(o.x + o.w * 0.76, top)
+        c.lineTo(o.x + o.w, top + 34)
+        c.lineTo(o.x + o.w * 0.94, bot)
+        c.closePath()
         c.fill()
+
+        // 빛 받는 왼쪽 면
+        c.fillStyle = 'rgb(255 255 255 / 0.18)'
+        c.beginPath()
+        c.moveTo(o.x + o.w * 0.06, top + 30)
+        c.lineTo(o.x + o.w * 0.3, top + 6)
+        c.lineTo(o.x + o.w * 0.34, bot - 4)
+        c.lineTo(o.x + o.w * 0.12, bot - 5)
+        c.closePath()
+        c.fill()
+
         // 아래끝 경고 줄무늬 (지나갈 틈의 높이를 눈으로 재게 해준다)
         c.save()
         c.beginPath()
-        c.rect(o.x, h - 70, o.w, 70)
+        c.rect(o.x, bot - 34, o.w, 34)
         c.clip()
-        c.strokeStyle = 'rgb(62 39 35 / 0.35)'
+        c.strokeStyle = 'rgb(255 183 77 / 0.9)'
         c.lineWidth = 9
-        for (let sx = -70; sx < o.w + 70; sx += 26) {
+        for (let sx = -40; sx < o.w + 40; sx += 26) {
           c.beginPath()
-          c.moveTo(o.x + sx, h)
-          c.lineTo(o.x + sx + 70, h - 70)
+          c.moveTo(o.x + sx, bot)
+          c.lineTo(o.x + sx + 34, bot - 34)
           c.stroke()
         }
         c.restore()
         c.fillStyle = '#E65100'
-        c.fillRect(o.x, h - 8, o.w, 8)
+        c.fillRect(o.x, bot - 7, o.w * 0.94, 7)
         c.restore()
       } else {
         drawRock(c, o.x, o.w, o.h)
@@ -532,7 +558,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.strokeStyle = `rgb(229 72 77 / ${0.6 + 0.4 * Math.abs(Math.sin(deathT * 16))})`
       c.lineWidth = 7
       c.lineJoin = 'round'
-      if (killer.air) c.strokeRect(killer.x, -20, killer.w, AIR_BAR_BOTTOM + 20)
+      if (killer.air) c.strokeRect(killer.x, OVERHANG_TOP, killer.w, OVERHANG_BOTTOM - OVERHANG_TOP)
       else c.strokeRect(killer.x, GROUND_Y - killer.h, killer.w, killer.h)
       c.restore()
     }
