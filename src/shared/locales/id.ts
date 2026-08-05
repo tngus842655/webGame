@@ -198,7 +198,7 @@ const dict: CoreDict = {
   // 게임별 이어하기 버튼 — 게임오버 화면은 번역돼 있는데 이 줄만 영어로 남아 있었다
   'suika.ad': '▶ Tonton iklan untuk lanjut (hapus buah kecil)',
   'bb.ad': '▶ Tonton iklan untuk ganti blok',
-  'daily.label': 'Harian {date}',
+  'daily.label': 'Harian',
   'daily.streak': '🔥 Beruntun {n}',
   'daily.goal': 'Target {n}',
   'daily.goalDone': 'Target tercapai!',

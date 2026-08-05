@@ -198,7 +198,7 @@ const dict: CoreDict = {
   // 게임별 이어하기 버튼 — 게임오버 화면은 번역돼 있는데 이 줄만 영어로 남아 있었다
   'suika.ad': '▶ Voir une pub et continuer (retire les petits fruits)',
   'bb.ad': '▶ Voir une pub et changer de blocs',
-  'daily.label': 'Quotidien {date}',
+  'daily.label': 'Quotidien',
   'daily.streak': '🔥 Série {n}',
   'daily.goal': 'Objectif {n}',
   'daily.goalDone': 'Objectif atteint !',

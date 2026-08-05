@@ -322,11 +322,8 @@ export class BBRenderer {
     }
     c.fillStyle = hud.daily ? '#FFFFFF' : s.hint
     c.font = font(22, true)
-    const now = new Date()
     c.fillText(
-      hud.daily
-        ? t('daily.label', { date: `${now.getMonth() + 1}/${now.getDate()}` })
-        : t('daily.free'),
+      t(hud.daily ? 'daily.label' : 'daily.free'),
       chip.x + chip.w / 2,
       chip.y + chip.h / 2 + 8,
     )

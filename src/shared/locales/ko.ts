@@ -198,7 +198,7 @@ const dict: FullDict = {
   'hud.score': '점수',
   'suika.ad': '▶ 광고 보고 이어하기 (작은 과일 없애기)',
   'bb.ad': '▶ 광고 보고 블록 교체',
-  'daily.label': '데일리 {date}',
+  'daily.label': '데일리',
   'daily.streak': '🔥 연속 {n}일',
   'daily.goal': '목표 {n}',
   'daily.goalDone': '목표 달성!',
