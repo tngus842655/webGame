@@ -1,5 +1,5 @@
 // 블록퍼즐을 화면 없이 돌려 밸런스를 잰다.
-// GAME_BALANCE.md 5장의 숫자가 여기서 나온다. 방법은 1장(정책 계단 + 점수 분해 + 죽음 부검).
+// GAME_BALANCE.md 4장의 숫자가 여기서 나온다. 방법은 1장(정책 계단 + 점수 분해 + 죽음 부검).
 //
 //   node tools/blockblast-sim.mjs               정책 넷을 200판씩
 //   node tools/blockblast-sim.mjs 100           판 수 지정

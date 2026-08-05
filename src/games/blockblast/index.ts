@@ -42,6 +42,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   function newGame(daily: boolean) {
     hud.daily = daily
+    // 자정을 넘겨 다시 시작해도 어제의 달성·스트릭이 남지 않게 저장소에서 다시 읽는다
+    hud.streak = currentStreak(SLUG)
+    hud.done = isDoneToday(SLUG)
     adSwapUsed = false
     drag = null
     Object.assign(state, createState(daily ? mulberry32(dailySeed()) : undefined))
