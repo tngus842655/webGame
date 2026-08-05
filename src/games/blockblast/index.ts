@@ -5,6 +5,7 @@ import { currentStreak, dailySeed, isDoneToday, mulberry32, recordDailyDone } fr
 import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
+import { createSheet } from '../ui'
 import { DAILY, LAYOUT } from './config'
 import { BBRenderer, type DragState, type HudInfo } from './renderer'
 import {
@@ -48,6 +49,46 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     adSwapUsed = false
     drag = null
     Object.assign(state, createState(daily ? mulberry32(dailySeed()) : undefined))
+  }
+
+  // 모드를 바꾸면 딜이 달라져 반드시 새 판이 된다 — 놓던 판이 말없이 사라지지 않도록
+  // 한 번 묻고, 바뀌는 모드가 무엇인지도 이 자리에서 설명한다
+  const switchSheet = createSheet(
+    shell.wrapper,
+    `<p data-title class="gui-title"></p>
+     <p data-desc class="gui-reason"></p>
+     <p data-warn class="gui-sub"></p>
+     <button data-go class="btn btn--go" type="button"></button>
+     <button data-stay class="btn btn--ghost" type="button"></button>`,
+  )
+
+  const closeSwitch = (go: boolean) => {
+    switchSheet.close()
+    shell.resume()
+    if (go) newGame(!hud.daily)
+  }
+
+  switchSheet.find('[data-go]')?.addEventListener('click', () => closeSwitch(true))
+  switchSheet.find('[data-stay]')?.addEventListener('click', () => closeSwitch(false))
+
+  function askSwitch() {
+    const toDaily = !hud.daily
+    const set = (selector: string, text: string) => {
+      const node = switchSheet.find(selector)
+      if (node) node.textContent = text
+    }
+    set('[data-title]', t(toDaily ? 'bb.toDaily' : 'bb.toFree'))
+    set('[data-desc]', t(toDaily ? 'bb.toDailyDesc' : 'bb.toFreeDesc'))
+    // 아직 한 칸도 안 놓았으면 잃을 판이 없다 — 겁줄 이유도 없다
+    const warn = switchSheet.find('[data-warn]')
+    if (warn) {
+      warn.textContent = state.placedOnce ? t('bb.switchWarn') : ''
+      warn.style.display = state.placedOnce ? '' : 'none'
+    }
+    set('[data-go]', t('bb.switchGo'))
+    set('[data-stay]', t('bb.switchStay'))
+    shell.pause()
+    switchSheet.open()
   }
 
   const overlay = createGameOverOverlay(shell.wrapper, {
@@ -104,7 +145,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         p.y <= chip.y + chip.h
       ) {
         playSfx('select')
-        newGame(!hud.daily)
+        askSwitch()
         return
       }
       const i = hitTray(p.x, p.y)
