@@ -23,6 +23,9 @@ export type AdOutcome = 'viewed' | 'dismissed' | 'unavailable'
 export interface AdProvider {
   isReady(): boolean
   show(placement: string): Promise<AdOutcome>
+  // 판에 들어올 때 미리 받아 두라는 신호. 받아 두는 개념이 있는 매체만 구현한다
+  // (앱인토스는 로드에 최대 1분이 걸려서, 버튼을 누른 뒤에 부르면 늦는다).
+  preload?(): void
 }
 
 const AD_SECONDS = 5
@@ -220,74 +223,114 @@ class AdMobProvider implements AdProvider {
 
 type TossSdk = typeof import('@apps-in-toss/web-framework')
 
-// 재고가 없을 때 onEvent도 onError도 오지 않는 경우가 있다. 광고를 부르는 동안 게임 루프가
-// 멈춰 있으므로(gameContext), 응답이 없으면 여기서 끊어야 화면이 굳지 않는다.
-const TOSS_LOAD_TIMEOUT = 10000
+// 셋 다 SDK가 아무 이벤트도 주지 않을 때를 위한 안전망이다. 정상 동작에서는 걸리지 않는다.
+//
+// 받아 두기: 애드몹 광고는 5~20초, 네트워크 사정에 따라 SDK 자체 상한인 60초까지 걸린다.
+// 화면을 막지 않고 뒤에서 도는 일이라 넉넉히 잡는다.
+const TOSS_LOAD_TIMEOUT = 90000
+// 버튼을 눌렀는데 아직 안 받아졌을 때, 게임을 멈춰 둔 채 기다리는 한도
+const TOSS_WAIT_TIMEOUT = 20000
+// 안드로이드 토스앱 5.255.0은 dismissed를 주지 않는다(가이드 FAQ). 그 버전에서 화면이
+// 영영 굳지 않게 끊는다 — 그때 보상은 userEarnedReward를 받았는지로 가른다.
+const TOSS_SHOW_TIMEOUT = 180000
 
 // 앱인토스 리워드 광고 — 미니앱 빌드 전용.
 // 미니앱도 결국 토스 앱 안의 웹뷰라 위의 AdSense를 그대로 쓸 수 없고, 토스가 자체 SDK로
 // 재고를 준다. adGroupId는 앱인토스 콘솔에서 발급받은 광고 단위 그룹 ID다.
 //
-// SDK는 구독형이다 — load/show가 콜백을 받고 구독 해제 함수를 돌려준다.
-// preload/present가 그것을 한 번만 정해지는 약속으로 바꿔 AdProvider에 맞춘다.
+// 가이드가 정한 순서를 그대로 따른다 — 화면에 들어올 때 미리 받아 두고(load), 버튼을
+// 누르면 그것을 띄우고(show), 띄운 광고는 소진되므로 다음 편을 다시 받아 둔다.
+// 한 번에 하나만 받아 둘 수 있어서, 받는 중이면 그 약속을 함께 쓴다.
 class TossAdProvider implements AdProvider {
   private showing = false
+  private loaded = false
+  private loading: Promise<boolean> | null = null
   private sdk: Promise<TossSdk> | null = null
 
   constructor(private readonly adGroupId: string) {}
 
-  // 광고를 처음 부를 때 받아 온다 — 게임만 하고 버튼을 안 누르는 사람도 많다
   private loadSdk() {
     if (!this.sdk) this.sdk = import('@apps-in-toss/web-framework')
     return this.sdk
   }
 
+  preload() {
+    void this.ensureLoaded()
+  }
+
+  // 받아 둔 광고가 있거나 받는 중이면 버튼을 보여준다. 받기가 실패한 뒤에는 감춘다 —
+  // 눌러도 광고가 안 나올 버튼이다.
   isReady() {
-    return !this.showing
+    return !this.showing && (this.loaded || this.loading !== null)
+  }
+
+  private ensureLoaded(): Promise<boolean> {
+    if (this.loaded) return Promise.resolve(true)
+    if (!this.loading) {
+      this.loading = this.runLoad().then((ok) => {
+        this.loaded = ok
+        this.loading = null
+        return ok
+      })
+    }
+    return this.loading
   }
 
   async show(_placement: string): Promise<AdOutcome> {
     if (this.showing) return 'unavailable'
     this.showing = true
     try {
-      const { loadFullScreenAd, showFullScreenAd } = await this.loadSdk()
-      // 토스 밖(브라우저로 연 dev 서버)에서는 브릿지가 없어 여기서 걸리거나 예외가 난다
-      if (!loadFullScreenAd.isSupported() || !showFullScreenAd.isSupported()) return 'unavailable'
-      if (!(await this.preload(loadFullScreenAd))) return 'unavailable'
+      const { showFullScreenAd } = await this.loadSdk()
+      // 아직 받는 중이면 잠깐 기다린다. 한도를 넘겨도 받기 자체는 계속 돌아 다음 기회에 쓰인다
+      const ready = await Promise.race([
+        this.ensureLoaded(),
+        new Promise<boolean>((r) => setTimeout(() => r(false), TOSS_WAIT_TIMEOUT)),
+      ])
+      if (!ready) return 'unavailable'
       return await this.present(showFullScreenAd)
     } catch {
       return 'unavailable'
     } finally {
+      // 한 번 띄운 광고는 다시 띄울 수 없다 — 비우고 다음 편을 받아 둔다
+      this.loaded = false
       this.showing = false
+      this.preload()
     }
   }
 
-  private preload(load: TossSdk['loadFullScreenAd']): Promise<boolean> {
-    return new Promise((resolve) => {
-      let dispose = () => {}
-      let done = false
-      const settle = (loaded: boolean) => {
-        if (done) return
-        done = true
-        clearTimeout(timer)
-        dispose()
-        resolve(loaded)
-      }
-      const timer = setTimeout(() => settle(false), TOSS_LOAD_TIMEOUT)
-      dispose = load({
-        options: { adGroupId: this.adGroupId },
-        onEvent: (event) => {
-          if (event.type === 'loaded') settle(true)
-        },
-        onError: () => settle(false),
+  private async runLoad(): Promise<boolean> {
+    try {
+      const { loadFullScreenAd } = await this.loadSdk()
+      // 토스 밖(브라우저로 연 dev 서버, 샌드박스)에는 브릿지가 없다
+      if (!loadFullScreenAd.isSupported()) return false
+      return await new Promise<boolean>((resolve) => {
+        let dispose = () => {}
+        let done = false
+        const settle = (ok: boolean) => {
+          if (done) return
+          done = true
+          clearTimeout(timer)
+          dispose()
+          resolve(ok)
+        }
+        const timer = setTimeout(() => settle(false), TOSS_LOAD_TIMEOUT)
+        dispose = loadFullScreenAd({
+          options: { adGroupId: this.adGroupId },
+          onEvent: (event) => {
+            if (event.type === 'loaded') settle(true)
+          },
+          onError: () => settle(false),
+        })
+        if (done) dispose()
       })
-      if (done) dispose()
-    })
+    } catch {
+      return false
+    }
   }
 
   // 보상은 userEarnedReward로 먼저 오고, 광고 창이 닫힐 때 dismissed가 온다.
-  // 여기엔 시간 제한을 두지 않는다 — 광고 길이만큼 기다리는 게 맞고, 중간에 끊으면
-  // 끝까지 본 사람의 보상을 뺏게 된다.
+  // dismissed를 기다리는 것은 광고가 화면을 덮고 있는 동안 게임이 뒤에서 되살아나지
+  // 않게 하기 위해서다 — 러너처럼 손을 놓으면 죽는 게임이 있다.
   private present(show: TossSdk['showFullScreenAd']): Promise<AdOutcome> {
     return new Promise((resolve) => {
       let dispose = () => {}
@@ -296,9 +339,11 @@ class TossAdProvider implements AdProvider {
       const settle = (outcome: AdOutcome) => {
         if (done) return
         done = true
+        clearTimeout(timer)
         dispose()
         resolve(outcome)
       }
+      const timer = setTimeout(() => settle(rewarded ? 'viewed' : 'unavailable'), TOSS_SHOW_TIMEOUT)
       dispose = show({
         options: { adGroupId: this.adGroupId },
         onEvent: (event) => {

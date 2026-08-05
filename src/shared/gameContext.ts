@@ -9,6 +9,9 @@ import { getLocalBest, saveScore } from './scores'
 // 강제 노출과 달리 이탈을 만들지 않고, 빈도 조절은 광고 매체가 알아서 한다.
 // (강제로 뜨는 전면 광고를 넣게 되면 그쪽에 빈도 제한을 건다)
 export function createGameContext(slug: string): GameContext {
+  // 판에 들어오는 순간 광고 한 편을 미리 받아 둔다. 앱인토스는 로드에만 5~20초(최대 1분)가
+  // 걸려서, 버튼을 누른 뒤에 부르면 그동안 게임이 멈춰 있게 된다.
+  adProvider.preload?.()
   return {
     submitScore: (score) => saveScore(slug, score),
     getBestScore: async () => getLocalBest(slug),
