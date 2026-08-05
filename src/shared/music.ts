@@ -90,6 +90,12 @@ function fade(to: number, ms: number, onDone?: () => void) {
   }, FADE_STEP)
 }
 
+// 지금 곡이 흐르고 있나. 접었다가 되살릴 때, 원래 흐르고 있던 경우에만 되살리려고 쓴다
+// (결과 팝업처럼 이미 접어 둔 자리에서 광고를 부르면 되살려선 안 된다).
+export function isBgmPlaying(): boolean {
+  return !!audio && !audio.paused
+}
+
 export function duckBgm() {
   if (!audio || audio.paused) return
   fade(0, 500, () => audio?.pause())

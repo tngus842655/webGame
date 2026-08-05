@@ -247,10 +247,11 @@ Supabase 대시보드:
 
 ### SDK 계약
 
-**개발자센터 문서에 인앱광고 항목이 없어서**(`toss-docs/`는 로그인·프로모션뿐이고,
-`developers-apps-in-toss.toss.im`은 Claude 세션에서 차단된다) npm 패키지의 타입 정의를
-직접 읽어 확인했다 — `@apps-in-toss/web-bridge` 2.10.8의 `dist/index.d.ts`,
-`@apps-in-toss/types` 2.10.8. 버전을 올릴 때 계약이 그대로인지 같은 방법으로 다시 볼 것.
+`toss-docs/in-app-ad.md`는 콘솔 설정과 정책까지만 다루고 **호출 방법은 링크로 넘긴다**
+(`/documentation/common/monetization/iaa/interstitial-rewarded-ad.md` — 아직 안 받았다).
+그래서 npm 패키지의 타입 정의를 직접 읽어 확인했다 — `@apps-in-toss/web-bridge` 2.10.8의
+`dist/index.d.ts`, `@apps-in-toss/types` 2.10.8. 버전을 올릴 때 계약이 그대로인지 같은
+방법으로 다시 볼 것.
 
 ```ts
 loadFullScreenAd({ options: { adGroupId }, onEvent, onError }) // → 구독 해제 함수
@@ -275,11 +276,30 @@ showFullScreenAd({ options: { adGroupId }, onEvent, onError }) // → 구독 해
 배너(`TossAds.attachBanner`)는 안 붙였다. 지금 이 앱의 광고는 전부 사용자가 버튼을 눌러
 보는 리워드 광고 하나뿐이고, 배너는 게임 화면 자리를 새로 잡아야 하는 별개의 일이다.
 
+### 가이드가 요구하는 것 (`toss-docs/in-app-ad.md`)
+
+- **광고 중에는 앱 사운드를 멈춘다.** `gameContext.showRewardAd`가 게임 루프와 함께 BGM도
+  접는다. 결과 팝업에서 부르는 광고는 팝업이 이미 접어 둔 뒤라, 원래 흐르고 있던 경우에만
+  되살린다. 이걸 넣기 전에는 인게임 광고(되돌리기·시간 추가·목숨 등 15곳 남짓)에서 BGM이
+  그대로 흘렀다
+- **테스트는 반드시 테스트용 ID로.** 운영 ID로 테스트하면 제재 대상이다. 테스트 ID를 어디서
+  받는지는 위의 안 받은 개발 문서에 있을 것이다 — **실기기 확인 전에 반드시 확인할 것**
+- **SDK를 우회하지 않는다.** 자체 로직으로 광고를 호출하거나 Click/Impression 이벤트를
+  변조하면 제재다. 지금 구현은 `loadFullScreenAd`/`showFullScreenAd`를 그대로 쓰고 광고 UI도
+  건드리지 않는다. `load`의 10초 제한은 구독을 끊고 포기할 뿐이라 이벤트 변조가 아니다
+- **광고 그룹 ID는 구글에 등록되기까지 최대 2시간.** 그 사이에는 로드가 실패하는데, 이 앱은
+  `unavailable`이면 보상을 그냥 주므로 **"광고는 안 뜨는데 이어하기는 되는" 모습**으로 보인다.
+  연동이 됐는지는 `ad_views`의 outcome으로 확인할 것
+
 ### 남은 것
 
-- [ ] 콘솔에서 **광고 단위 그룹 생성 → ID 발급**. 콘솔 MCP를 쓰면 `iaa_ad_unit_group_list`로
-      목록을 볼 수 있다(`toss-docs/console-mcp.md`). 인앱광고를 미리 신청·승인받아야
-      하는지는 확인 못 했다 — 콘솔에서 광고 단위 그룹을 만들 수 있으면 된 것이다
+- [ ] **사업자 정보 등록 → 정산 정보 등록·검토.** 광고 그룹은 그 다음이다. 정산 검토가
+      영업일 2~3일 걸린다("인앱광고를 먼저 신청·승인받아야 하나"의 답이 이것이다)
+- [ ] 콘솔에서 **광고 유형 `리워드`로 광고 그룹 생성 → ID 발급.** 배너나 전면형이 아니다 —
+      `loadFullScreenAd`/`showFullScreenAd`는 전면·보상형 그룹만 받는다
+- [ ] 그룹 만들 때 넣는 **리워드 이름·수량은 사용자 화면에 그대로 뜬다.** 이 앱은 게임마다
+      보상이 달라서(이어하기·되돌리기·시간·목숨·칸 비우기…) 그룹 하나에 이름 하나로는 못
+      맞춘다. 가이드 예시대로 `기회 / 1`처럼 중립적으로 적는 쪽이 낫다
 - [ ] 받은 ID를 `.env.toss`의 `VITE_TOSS_AD_GROUP_ID`에 넣기. **비어 있으면 스텁으로
       떨어진다** — 실수로 AdSense가 나가는 일은 없지만, 광고도 안 나간다
-- [ ] 실기기에서 리워드 광고 확인 (게임오버 → 이어하기 버튼)
+- [ ] 실기기에서 리워드 광고 확인 (게임오버 → 이어하기 버튼). 위의 테스트 ID 먼저
