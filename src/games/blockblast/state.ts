@@ -2,6 +2,9 @@ import { COLORS, GRID, LAYOUT, SCORING, SHAPES, type PieceShape } from './config
 
 export type Phase = 'playing' | 'over'
 
+// 데일리 모드는 시드 고정 난수를 꽂아 딜 순서를 모두에게 같게 만든다
+export type Rng = () => number
+
 export interface Piece {
   shape: PieceShape
   color: number // COLORS 인덱스
@@ -29,17 +32,19 @@ export interface BBState {
   score: number
   grid: number[] // GRID×GRID, 0=빈칸, n>0 = COLORS[n-1]
   tray: (Piece | null)[]
+  rng: Rng
   streak: number
   streakAge: number // 콤보 배지 팝 연출용
+  streakGrace: number // 남은 콤보 유예 — 줄을 못 지운 배치를 한 번은 버틴다
   popups: Popup[]
   clearFx: ClearFx[]
   placedOnce: boolean // 첫 플레이 힌트용
   hintTime: number // 힌트·강조 애니메이션 시간
 }
 
-function randomFrom(shapes: PieceShape[]): Piece {
+function randomFrom(shapes: PieceShape[], rng: Rng): Piece {
   const total = shapes.reduce((sum, s) => sum + s.weight, 0)
-  let r = Math.random() * total
+  let r = rng() * total
   let picked = shapes[0]
   for (const s of shapes) {
     r -= s.weight
@@ -48,17 +53,19 @@ function randomFrom(shapes: PieceShape[]): Piece {
       break
     }
   }
-  return { shape: picked, color: Math.floor(Math.random() * COLORS.length) }
+  return { shape: picked, color: Math.floor(rng() * COLORS.length) }
 }
 
-export function createState(): BBState {
+export function createState(rng: Rng = Math.random): BBState {
   return {
     phase: 'playing',
     score: 0,
     grid: new Array<number>(GRID * GRID).fill(0),
-    tray: [randomFrom(SHAPES), randomFrom(SHAPES), randomFrom(SHAPES)],
+    tray: [randomFrom(SHAPES, rng), randomFrom(SHAPES, rng), randomFrom(SHAPES, rng)],
+    rng,
     streak: 0,
     streakAge: 0,
+    streakGrace: 0,
     popups: [],
     clearFx: [],
     placedOnce: false,
@@ -70,7 +77,11 @@ export function createState(): BBState {
 // (꽉 찬 줄은 즉시 지워진다) 1×1은 항상 놓을 수 있다
 export function replaceTrayWithSmall(state: BBState) {
   const smalls = SHAPES.filter((s) => s.cells.length <= 3)
-  state.tray = [randomFrom([SHAPES[0]]), randomFrom(smalls), randomFrom(smalls)]
+  state.tray = [
+    randomFrom([SHAPES[0]], state.rng),
+    randomFrom(smalls, state.rng),
+    randomFrom(smalls, state.rng),
+  ]
 }
 
 export function pieceSize(piece: Piece): { w: number; h: number } {
@@ -155,6 +166,7 @@ export interface PlaceResult {
   gained: number
   linesCleared: number
   clearedCells: Array<{ col: number; row: number; color: number }>
+  allClear: boolean // 이 배치로 보드가 완전히 비었다
   gameOver: boolean
 }
 
@@ -187,23 +199,35 @@ export function placePiece(
 
   const lines = rows.length + cols.length
   let gained = SCORING.perCell * piece.shape.cells.length
+  let allClear = false
   if (lines > 0) {
     state.streak += 1
     state.streakAge = 0
+    state.streakGrace = 1
     gained += SCORING.lineBase * lines * lines + (state.streak - 1) * SCORING.streakBonus
+    if (state.grid.every((v) => v === 0)) {
+      allClear = true
+      gained += SCORING.allClear
+    }
+  } else if (state.streakGrace > 0) {
+    state.streakGrace -= 1 // 콤보 유예: 줄을 못 지운 배치 한 번은 콤보가 버틴다
   } else {
     state.streak = 0
   }
   state.score += gained
 
   if (state.tray.every((p) => p === null)) {
-    state.tray = [randomFrom(SHAPES), randomFrom(SHAPES), randomFrom(SHAPES)]
+    state.tray = [
+      randomFrom(SHAPES, state.rng),
+      randomFrom(SHAPES, state.rng),
+      randomFrom(SHAPES, state.rng),
+    ]
   }
   const remaining = state.tray.filter((p): p is Piece => p !== null)
   const gameOver = !remaining.some((p) => anyFit(state.grid, p))
   if (gameOver) state.phase = 'over'
 
-  return { gained, linesCleared: lines, clearedCells, gameOver }
+  return { gained, linesCleared: lines, clearedCells, allClear, gameOver }
 }
 
 export function updateEffects(state: BBState, dt: number) {

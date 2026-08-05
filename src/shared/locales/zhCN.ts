@@ -198,6 +198,12 @@ const dict: CoreDict = {
   // 게임별 이어하기 버튼 — 게임오버 화면은 번역돼 있는데 이 줄만 영어로 남아 있었다
   'suika.ad': '▶ 看广告继续（清除小水果）',
   'bb.ad': '▶ 看广告更换方块',
+  'daily.label': '每日 {date}',
+  'daily.streak': '🔥 连续 {n} 天',
+  'daily.goal': '目标 {n}',
+  'daily.goalDone': '目标达成！',
+  'daily.free': '自由模式',
+  'bb.allClear': '全部清空！',
   'brick.ad': '▶ 看广告继续（清除3行）',
   'f2.ad': '▶ 看广告撤销一步',
   'run.ad': '▶ 看广告继续',

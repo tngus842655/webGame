@@ -198,6 +198,12 @@ const dict: CoreDict = {
   // 게임별 이어하기 버튼 — 게임오버 화면은 번역돼 있는데 이 줄만 영어로 남아 있었다
   'suika.ad': '▶ Werbung ansehen und weiterspielen (kleine Früchte weg)',
   'bb.ad': '▶ Werbung ansehen und Blöcke tauschen',
+  'daily.label': 'Täglich {date}',
+  'daily.streak': '🔥 Serie {n}',
+  'daily.goal': 'Ziel {n}',
+  'daily.goalDone': 'Ziel erreicht!',
+  'daily.free': 'Freies Spiel',
+  'bb.allClear': 'Alles leer!',
   'brick.ad': '▶ Werbung ansehen und weiterspielen (3 Reihen weg)',
   'f2.ad': '▶ Werbung ansehen und Zug zurück',
   'run.ad': '▶ Werbung ansehen und weiterspielen',
