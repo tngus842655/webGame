@@ -31,20 +31,29 @@ function reactAt(time: number): number {
   return Math.max(0.13, 0.22 - time / 1300)
 }
 
-// 공중 장애물 = 천장에서 내려온 벽. 아래 틈으로만 지나갈 수 있으니 점프하면 죽는다.
-export const AIR_BAR_BOTTOM = GROUND_Y - 100
+// 공중 장애물 = 허공에 뜬 바위 처마. 아래 틈으로 낮게 지나가는 것이 정답이고,
+// 2단을 제대로 쓰면 위로 넘어가는 길도 있다 (한 번 뛰어서는 220px이라 절대 못 넘는다 —
+// 반사적으로 누르면 죽는 것은 그대로다).
+// 예전에는 천장부터 이어진 기둥이라 세로 820px, 화면의 3분의 2를 덮었다.
+export const OVERHANG_BOTTOM = GROUND_Y - 100 // 800 — 아래로 지나갈 틈
+export const OVERHANG_TOP = GROUND_Y - 260 // 640 — 넘어가려면 2단이 필요한 높이
 
 // 판을 시작할 때 첫 장애물까지 두는 여유. 광고 이어하기도 같은 몫을 받는다
 export const START_SPAWN_DELAY = 1.4
 
 const SPAWN_X = 760
-const WALL_W = 90
+const OVERHANG_W = 130
 // 코인 줄은 몸통 한가운데를 지난다
 const COIN_OFFSET = PLAYER_H / 2
 // 코인에 닿는 세로 여유. 몸통 전체(위 20·아래 10 = 94px)로 잡았더니 짧은 점프(165)와
 // 홀드 점프(220)의 판정이 171~210에서 겹쳐서, 홀드를 23~231ms 아무 데나 눌러도
 // 모든 코인 줄이 다 들어왔다 — 배수가 상수가 됐다. 두 줄이 갈리는 폭으로 좁힌다.
 const COIN_REACH = 30
+// 고공 보너스. 2단 정점(440)에 딱 맞춰 뒀더니 두 번 다 끝까지 눌러야만 닿았고
+// (탭이 하나만 섞여도 304·327px에 그친다) 그마저 판정 하한 턱걸이라 사실상 못 먹었다.
+// 어떤 2단이든 지나가는 높이로 내리고 여유도 넓힌다. 한 번 뛰어서는 220px이라 여전히 안 닿는다.
+const BONUS_H = 345
+const BONUS_REACH = 65
 
 // 연달아 먹은 개수가 배수를 올리고, 하나라도 흘리면 1배로 돌아간다.
 // 살아 있는 것 말고 잃을 것이 하나 더 있어야 판이 팽팽해진다.
@@ -84,10 +93,10 @@ export interface Coin {
 // 빠를 때는 못 지나가는 것이 된다 — 사람이 쓰는 것은 시간이지 거리가 아니다.
 type Piece =
   | { t: 'rock'; dt: number; w: number; h: number }
-  | { t: 'wall'; dt: number }
+  | { t: 'overhang'; dt: number }
   // 점프 궤적을 따라가는 코인 줄. 어느 높이로 뛰라는 지시다
   | { t: 'arc'; dt: number; hold: boolean }
-  // 벽 아래 틈을 낮게 지나갈 때 딸려오는 줄
+  // 처마 아래 틈을 낮게 지나갈 때 딸려오는 줄
   | { t: 'low'; dt: number; n: number }
   // 2단을 끝까지 눌러야 닿는 보너스
   | { t: 'high'; dt: number }
@@ -135,26 +144,26 @@ const CHUNKS: Chunk[] = [
     tier: 0,
   },
   {
-    // 천장 벽. 뛰면 죽고, 낮게 지나가면 아래 코인이 붙는다 —
+    // 허공에 뜬 처마. 한 번 뛰어서는 못 넘으니 낮게 지나가고, 그러면 아래 코인이 붙는다 —
     // '가만히 있기'였던 것이 '낮게 훑고 지나가기'가 된다
     pieces: [
-      { t: 'wall', dt: 0 },
+      { t: 'overhang', dt: 0 },
       { t: 'low', dt: 0.012, n: 3 },
     ],
-    span: 0.24,
+    span: 0.34,
     rest: 0.6,
     exitAir: 0,
     tier: 0,
   },
   {
-    // 낮은 바위 뒤에 벽. 뛰고 곧바로 낮게 붙는 것을 여유 있게 익힌다
+    // 낮은 바위 뒤에 처마. 뛰고 곧바로 낮게 붙는 것을 여유 있게 익힌다
     pieces: [
       { t: 'rock', dt: 0, w: 64, h: 80 },
       { t: 'arc', dt: 0.035, hold: false },
-      { t: 'wall', dt: 0.95 },
+      { t: 'overhang', dt: 0.95 },
       { t: 'low', dt: 0.962, n: 3 },
     ],
-    span: 1.19,
+    span: 1.3,
     rest: 0.65,
     exitAir: 0,
     tier: 0,
@@ -183,9 +192,9 @@ const CHUNKS: Chunk[] = [
     tier: 1,
   },
   {
-    // 벽을 낮게 지나자마자 바위. 참았다가 바로 뛰어야 한다
+    // 처마를 낮게 지나자마자 바위. 참았다가 바로 뛰어야 한다
     pieces: [
-      { t: 'wall', dt: 0 },
+      { t: 'overhang', dt: 0 },
       { t: 'low', dt: 0.012, n: 3 },
       { t: 'rock', dt: 0.72, w: 64, h: 88 },
       { t: 'arc', dt: 0.755, hold: false },
@@ -196,11 +205,11 @@ const CHUNKS: Chunk[] = [
     tier: 1,
   },
   {
-    // 뛰고 → 내려서고 → 다시 뛴다. 높이 뜬 채로 벽에 닿으면 끝이라 짧게 끊어 뛰어야 한다
+    // 뛰고 → 내려서고 → 다시 뛴다. 뜬 채로 처마에 닿으면 끝이라 짧게 끊어 뛰어야 한다
     pieces: [
       { t: 'rock', dt: 0, w: 64, h: 85 },
       { t: 'arc', dt: 0.035, hold: false },
-      { t: 'wall', dt: 1 },
+      { t: 'overhang', dt: 1 },
       { t: 'low', dt: 1.012, n: 3 },
       { t: 'rock', dt: 1.75, w: 64, h: 85 },
       { t: 'arc', dt: 1.785, hold: false },
@@ -211,25 +220,25 @@ const CHUNKS: Chunk[] = [
     tier: 2,
   },
   {
-    // 높은 바위를 크게 넘자마자 벽 — 뜬 채로는 못 지나간다
+    // 높은 바위를 크게 넘자마자 처마 — 뜬 채로는 못 지나간다
     pieces: [
       { t: 'rock', dt: 0, w: 48, h: 175 },
       { t: 'arc', dt: 0.03, hold: true },
-      { t: 'wall', dt: 0.95 },
+      { t: 'overhang', dt: 0.95 },
       { t: 'low', dt: 0.962, n: 3 },
     ],
-    span: 1.19,
+    span: 1.3,
     rest: 0.7,
     exitAir: 0,
     tier: 3,
   },
   {
-    // 붙은 두 개 → 벽 → 바위. 크게 한 번, 참고, 다시 짧게
+    // 붙은 두 개 → 처마 → 바위. 크게 한 번, 참고, 다시 짧게
     pieces: [
       { t: 'rock', dt: 0, w: 56, h: 70 },
       { t: 'rock', dt: 0.24, w: 56, h: 70 },
       { t: 'arc', dt: 0.13, hold: true },
-      { t: 'wall', dt: 1.15 },
+      { t: 'overhang', dt: 1.15 },
       { t: 'low', dt: 1.162, n: 3 },
       { t: 'rock', dt: 1.9, w: 64, h: 85 },
       { t: 'arc', dt: 1.935, hold: false },
@@ -242,15 +251,15 @@ const CHUNKS: Chunk[] = [
   {
     // 낮게 붙어 지나가자마자 크게 넘고, 다시 낮게 붙는다
     pieces: [
-      { t: 'wall', dt: 0 },
+      { t: 'overhang', dt: 0 },
       { t: 'low', dt: 0.012, n: 3 },
       { t: 'rock', dt: 0.78, w: 56, h: 70 },
       { t: 'rock', dt: 1.02, w: 56, h: 70 },
       { t: 'arc', dt: 0.91, hold: true },
-      { t: 'wall', dt: 1.95 },
+      { t: 'overhang', dt: 1.95 },
       { t: 'low', dt: 1.962, n: 3 },
     ],
-    span: 2.19,
+    span: 2.3,
     rest: 0.7,
     exitAir: 0,
     tier: 4,
@@ -307,17 +316,17 @@ function placeChunk(state: RunnerState, chunk: Chunk, speed: number): number {
   for (const p of chunk.pieces) {
     const x = SPAWN_X + (p.dt - lead) * speed
     if (p.t === 'rock') state.obstacles.push({ x, w: p.w, h: p.h, air: false })
-    else if (p.t === 'wall') state.obstacles.push({ x, w: WALL_W, h: 0, air: true })
+    else if (p.t === 'overhang') state.obstacles.push({ x, w: OVERHANG_W, h: 0, air: true })
     else if (p.t === 'arc') pushArc(state, x, p.hold, speed)
     else if (p.t === 'low') {
       // 땅을 달리며 줍는 줄이라 간격은 속도와 무관하게 눈에 보이는 대로 둔다.
-      // 벽 폭(90) 안에 들어가야 '틈으로 지나가면 딸려온다'로 읽힌다
+      // 처마 폭(130) 안에 들어가야 '틈으로 지나가면 딸려온다'로 읽힌다
       const lowY = GROUND_Y - COIN_OFFSET - 10
-      for (let i = 0; i < p.n; i++) state.coins.push({ x: x + i * 36, y: lowY, bonus: false })
+      for (let i = 0; i < p.n; i++) state.coins.push({ x: x + i * 40, y: lowY, bonus: false })
     } else {
-      // 2단 정점의 몸통 한가운데 — 끝까지 두 번 누른 사람만 닿는다
-      const highY = GROUND_Y - HOLD_H * 2 - COIN_OFFSET
-      for (let i = 0; i < 3; i++) state.coins.push({ x: x + i * 70, y: highY, bonus: true })
+      // 정점 언저리에 뭉쳐 둔다. 넓게 늘어놓으면 정점에 머무는 짧은 순간에 다 못 훑는다
+      const highY = GROUND_Y - BONUS_H - COIN_OFFSET
+      for (let i = 0; i < 3; i++) state.coins.push({ x: x + i * 52, y: highY, bonus: true })
     }
   }
   return -lead
@@ -448,7 +457,7 @@ export function update(state: RunnerState, dt: number): UpdateResult {
     }
     const hit =
       Math.abs(coin.x - PLAYER_X) < PLAYER_W / 2 + 20 &&
-      Math.abs(coin.y - (state.playerY - COIN_OFFSET)) < COIN_REACH
+      Math.abs(coin.y - (state.playerY - COIN_OFFSET)) < (coin.bonus ? BONUS_REACH : COIN_REACH)
     if (hit) {
       state.chain += 1
       state.coinCount += 1
@@ -465,8 +474,8 @@ export function update(state: RunnerState, dt: number): UpdateResult {
   const px1 = PLAYER_X - PLAYER_W / 2
   const px2 = PLAYER_X + PLAYER_W / 2
   for (const o of state.obstacles) {
-    const oy1 = o.air ? 0 : GROUND_Y - o.h
-    const oy2 = o.air ? AIR_BAR_BOTTOM : GROUND_Y
+    const oy1 = o.air ? OVERHANG_TOP : GROUND_Y - o.h
+    const oy2 = o.air ? OVERHANG_BOTTOM : GROUND_Y
     if (px2 > o.x && px1 < o.x + o.w && state.playerY > oy1 && top < oy2) {
       state.phase = 'over'
       return { died: true, landed, coinSpots, chainBroke, multUp: false, killer: o }
