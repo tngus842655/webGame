@@ -6,6 +6,7 @@ import { attachInput } from '../pointer'
 import { createResumeGate } from '../resumeGate'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
+import type { Obstacle } from './state'
 import {
   AIR_BAR_BOTTOM,
   CHAIN_STEP,
@@ -64,7 +65,11 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         playSfx('fail')
         vibrate(30)
       }
-      if (result.died) void gameOver()
+      if (result.died) {
+        killer = result.killer
+        deathT = 0
+        void gameOver()
+      }
     }
     stepEffects(dt)
     draw()
@@ -79,6 +84,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   let jumpFx = 0
   // 체인이 끊긴 순간 배수 표시가 붉게 눌린다 — 왜 점수가 안 오르는지 알려주는 유일한 신호다
   let breakFx = 0
+  // 무엇에 부딪혔는지. 판이 멈춘 채로 그것만 붉게 세워 둔다
+  let killer: Obstacle | null = null
+  let deathT = 0
   const particles: Particle[] = []
   const popups: Array<{ x: number; y: number; age: number; value: number }> = []
 
@@ -90,6 +98,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       Object.assign(state, createState())
       particles.length = 0
       popups.length = 0
+      killer = null
       overlay.hide()
     },
     onContinue() {
@@ -107,7 +116,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     state.obstacles = []
     // 장애물만 비우고 코인을 두면 짝 잃은 코인이 흘러나가 체인부터 끊고 시작한다
     state.coins = []
-    state.chain = 0
+    // 쌓아둔 배수를 반은 남긴다. 광고를 보는 이유가 '한 번 더 사는 것'에서
+    // '여기까지 올린 배수를 지키는 것'이 되면 누를 이유가 훨씬 세진다
+    state.chain = Math.floor(state.chain / 2)
+    killer = null
     state.playerY = GROUND_Y
     state.vy = 0
     state.jumpsLeft = 2
@@ -127,6 +139,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const score = scoreOf(state)
     const prevBest = await ctx.getBestScore()
     void ctx.submitScore(score)
+    // 부딪힌 것이 붉게 서 있는 걸 보고 나서 팝업이 뜬다. 바로 덮으면 왜 죽었는지 모른다
+    await new Promise((r) => setTimeout(r, 480))
     if (shell.isDestroyed() || state.phase !== 'over') return
     overlay.show(score, prevBest, ctx.isRewardAdReady() && !adContinueUsed)
   }
@@ -168,6 +182,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     landFx = Math.max(0, landFx - dt * 5)
     jumpFx = Math.max(0, jumpFx - dt * 5)
     breakFx = Math.max(0, breakFx - dt * 1.6)
+    if (killer) deathT += dt
     for (let i = particles.length - 1; i >= 0; i--) {
       const p = particles[i]
       p.age += dt
@@ -504,13 +519,24 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       }
     }
 
+    // 부딪힌 것을 붉게 세운다 — 판이 멈춘 채라 무엇에 걸렸는지 눈으로 짚을 수 있다
+    if (killer) {
+      c.save()
+      c.strokeStyle = `rgb(229 72 77 / ${0.6 + 0.4 * Math.abs(Math.sin(deathT * 16))})`
+      c.lineWidth = 7
+      c.lineJoin = 'round'
+      if (killer.air) c.strokeRect(killer.x, -20, killer.w, AIR_BAR_BOTTOM + 20)
+      else c.strokeRect(killer.x, GROUND_Y - killer.h, killer.w, killer.h)
+      c.restore()
+    }
+
     // 코인 (회전 + 테두리 + 반짝임)
     for (const coin of state.coins) {
       const spin = Math.abs(Math.cos(scroll * 0.02 + coin.x * 0.02))
       const bob = Math.sin(state.time * 4 + coin.x * 0.03) * 4
       c.save()
       c.translate(coin.x, coin.y + bob)
-      // 보너스는 놓쳐도 체인이 안 끊긴다 — 테두리 하나로 갈라 보인다
+      // 고공 줄은 2단을 끝까지 눌러야 닿는다 — 테두리 하나로 갈라 보인다
       if (coin.bonus) {
         c.strokeStyle = 'rgb(255 255 255 / 0.6)'
         c.lineWidth = 3
