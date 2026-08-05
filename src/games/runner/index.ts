@@ -142,7 +142,14 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     // 부딪힌 것이 붉게 서 있는 걸 보고 나서 팝업이 뜬다. 바로 덮으면 왜 죽었는지 모른다
     await new Promise((r) => setTimeout(r, 480))
     if (shell.isDestroyed() || state.phase !== 'over') return
-    overlay.show(score, prevBest, ctx.isRewardAdReady() && !adContinueUsed)
+    // 다시 누르게 만드는 숫자는 점수가 아니라 여기다. 5,688은 잘한 건지 감이 안 오지만
+    // 체인 19는 ×5까지 다섯 개 남았다는 뜻이고, 그 다섯을 어디서 놓쳤는지 본인이 안다.
+    // 금빛은 클리어 보너스(gui-gain)가 쓰는 값 그대로 — 두 테마에서 다 읽힌다.
+    overlay.show(score, prevBest, ctx.isRewardAdReady() && !adContinueUsed, undefined, [
+      { label: t('run.chain'), value: String(state.bestChain), color: '#EF8F14' },
+      { label: t('run.mult'), value: `×${multOf(state.bestChain)}` },
+      { label: t('run.coins'), value: state.coinCount.toLocaleString() },
+    ])
   }
 
   // 발밑에서 뒤로 흩어지는 흙먼지
