@@ -19,8 +19,8 @@ android {
         // 1 = TWA 마지막 빌드, 2 = Capacitor 첫 빌드. 올릴 때마다 둘 다 1씩 올린다.
         // versionCode는 한 번 올라간 번호를 재사용할 수 없고 Console에서도 고칠 수 없다.
         // versionName은 스토어에 보이는 표시용이라 중복돼도 되지만, 헷갈리지 않게 맞춰 둔다.
-        versionCode 8
-        versionName "8"
+        versionCode 10
+        versionName "10"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

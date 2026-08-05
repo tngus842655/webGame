@@ -5,6 +5,7 @@ import { GAMES } from '@/games/registry'
 import { pauseRunningGame, resumeRunningGame } from '@/games/shell'
 import type { GameModule } from '@/games/types'
 import GameGuide from '@/shared/GameGuide.vue'
+import { setBackHandler } from '@/shared/backButton'
 import { createGameContext } from '@/shared/gameContext'
 import { t, type TranslationKey } from '@/shared/i18n'
 import { markPlayed } from '@/shared/library'
@@ -63,14 +64,12 @@ function stopCountdown() {
 }
 
 function pauseGame() {
-  // 카운트다운 도중이면 그 카운트다운을 접고 다시 멈춤 상태로 돌아간다
-  if (countdownId) {
-    stopCountdown()
-    return
-  }
   if (paused.value) return
+  // 카운트다운 도중이면 그 카운트다운을 접고 다시 멈춤 상태로 돌아간다.
+  // 셸은 셋을 다 세야 풀리므로 아직 멈춘 채다 — 여기서 또 멈추면 depth가 어긋나 영영 안 풀린다.
+  if (countdownId) stopCountdown()
+  else pauseRunningGame()
   paused.value = true
-  pauseRunningGame()
   duckBgm()
 }
 
@@ -92,6 +91,15 @@ function resumeGame() {
 // 셸도 백그라운드에서 루프를 세우지만, 돌아오는 순간 바로 이어져서 손쓸 새가 없었다.
 function onVisibility() {
   if (document.hidden) pauseGame()
+}
+
+// 안드로이드 하드웨어 뒤로가기. 게임을 하다 화면 아래를 스치면 판이 통째로 날아가던 자리라,
+// 첫 번째 누름은 일시정지가 받아낸다 — 누르는 순간 멈추므로 망설이는 사이에 죽지 않는다.
+// 멈춘 상태에서 한 번 더 누르면 그때는 나간다 (뒤로가기로 결국 나갈 수 있어야 한다).
+function onHardwareBack() {
+  if (guideOpen.value) closeGuide()
+  else if (paused.value) void router.push('/')
+  else pauseGame()
 }
 
 onMounted(async () => {
@@ -118,6 +126,8 @@ onMounted(async () => {
   stopScoreGuard = startScoreGuard(slug, () => game?.currentScore() ?? null)
   startBgm(bgmFor(slug))
   document.addEventListener('visibilitychange', onVisibility)
+  // 게임이 실제로 붙은 뒤부터 뒤로가기를 받는다 — 로딩 중에는 지킬 판이 아직 없다
+  setBackHandler(onHardwareBack)
   // 최고 기록은 게임오버 제출 때 갱신되므로 현재 점수와 함께 다시 읽는다
   pollId = window.setInterval(() => {
     best.value = getLocalBest(slug)
@@ -127,6 +137,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   disposed = true
+  setBackHandler(null)
   clearInterval(pollId)
   stopCountdown()
   document.removeEventListener('visibilitychange', onVisibility)
