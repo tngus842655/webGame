@@ -38,14 +38,7 @@ const router = useRouter()
 // 앱인토스 프로모션 배너. 상태를 못 읽었으면(비로그인·조회 실패) 아예 안 그린다.
 // 웹·안드로이드에서는 상태가 채워질 일이 없지만(claimTossPromotion이 즉시 빠져나온다),
 // 배너 문구는 이 컴포넌트에 그대로 있으므로 조건에서 한 번 더 막는다.
-//
-// 끝난 뒤에 처음 들어온 사람에게는 띄우지 않는다 — 받은 것도 받을 것도 없어서
-// 지난 이벤트 안내가 짐만 된다.
-const promo = computed(() => {
-  const status = isInToss ? promotionStatus.value : null
-  if (!status || (status.ended && status.granted === 0)) return null
-  return status
-})
+const promo = computed(() => (isInToss ? promotionStatus.value : null))
 
 const promoHeadline = computed(() => {
   const status = promo.value
