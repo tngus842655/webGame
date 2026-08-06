@@ -528,9 +528,62 @@ anon key만 있으면 누구나 `authenticated`가 되므로 그 판정은 아�
 
 **운영 적용 현황 (2026-08-06).** `20260806600000`·`20260806700000`을 운영 Supabase에
 넣었고 `ends_at`은 `2026-08-31 14:59:00+00`(한국시간 8/31 23:59, 콘솔 종료일과 같다)이다.
+`ended_at`은 비어 있고, 킬스위치가 사라진 것도 확인했다
+(`select prosrc like '%promotion_state%' from pg_proc where proname = 'record_promotion_failure'` → `false`).
 **콘솔에서 종료일을 늘리면 `ends_at`도 같이 미뤄야 한다** — 콘솔만 고치면 서버가 단계를
 내주지 않아 아무도 못 받는다. 화면 문구는 `ended`를 읽는 빌드가 검토를 통과한 뒤부터
 바뀐다. SQL만 먼저 들어간 동안에는 예전 빌드가 늘어난 컬럼을 무시하므로 달라지는 것이 없다.
+
+### 운영 중에 쓰는 쿼리
+
+예산이 예정보다 빨리 소진되거나 급히 손봐야 할 때 쓴다. 전부 Supabase SQL 편집기에서
+그대로 돌아간다.
+
+**지금 상태 한눈에** — 무슨 일이 벌어지고 있는지 여기서 시작한다.
+
+```sql
+select
+  promotion_ended()                                        as 끝났나,
+  (select ends_at from promotion_state)                    as 종료예정,
+  (select ended_at from promotion_state)                   as 중단시각,
+  (select ended_code from promotion_state)                 as 중단사유,
+  (select coalesce(sum(amount), 0) from promotion_grants)  as 지급총액,
+  (select count(distinct anon_key) from promotion_grants)  as 참여자,
+  (select count(*) from promotion_grants where stage = 3)  as 완주자;
+```
+
+전체 예산은 100,000원이다. **지급총액이 여기 가까워지면 소진이 임박한 것**이고, 1인 100원
+이라 완주자 1,000명이 상한이다.
+
+**예산이 바닥났는지** — 소진되면 `4112`가 쌓이기 시작한다. 이게 보이면 이미 거절당하는
+사람이 있다는 뜻이다.
+
+```sql
+select code, count(*) as 사람, sum(attempts) as 시도, max(last_at) as 마지막
+from promotion_failures
+group by code
+order by 마지막 desc;
+```
+
+**즉시 중단** — 예산이 소진됐거나 급히 멈춰야 할 때. 재배포가 필요 없고, 다음 실행부터
+지급 시도가 멈추고 화면이 '이벤트가 끝났어요'로 바뀐다.
+
+```sql
+update promotion_state set ended_at = now(), ended_code = '예산 소진';
+```
+
+**되살리기** — 충전했거나 잘못 껐을 때. 무엇으로 꺼졌는지 모르면 셋 다 지우면 확실하다
+(`ends_at`을 지우면 예정 종료도 함께 풀리니, 종료일을 유지하려면 앞의 둘만 지울 것).
+
+```sql
+update promotion_state set ended_at = null, ended_code = null;
+```
+
+**종료일 연장** — 콘솔에서 연장했다면 반드시 여기도 같이 미룬다.
+
+```sql
+update promotion_state set ends_at = '2026-09-30 23:59+09';
+```
 
 **지급이 먼저, 기록이 나중이다.** 그 사이에 연결이 끊기면 같은 단계를 한 번 더 받을 수
 있다. 창이 짧아 이 순서를 택했다 — 반대로 하면 토스앱 버전이 낮아 지급이 실패한 사람이
