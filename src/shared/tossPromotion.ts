@@ -50,9 +50,18 @@ export async function claimTossPromotion(): Promise<void> {
     const result = await grantPromotionReward({
       params: { promotionCode: PROMOTION_CODE, amount: next.amount },
     })
-    // 'ERROR'는 알 수 없는 오류, undefined는 토스앱 버전 미달, errorCode는 지급 거절.
-    // 어느 쪽이든 기록하지 않으므로 다음 기회에 다시 시도된다.
-    if (typeof result !== 'object' || !('key' in result)) return
+    // 거절당했으면 사유를 남기고 물러난다. 지급을 기록하지 않으므로 다음 기회에 다시
+    // 시도되고, 왜 안 됐는지는 promotion_failures에 남는다 — 실기기에서는 콘솔 로그를
+    // 볼 수 없어서 이게 유일한 단서다.
+    if (typeof result !== 'object' || !('key' in result)) {
+      const failure = describeFailure(result)
+      await sb.rpc('record_promotion_failure', {
+        p_stage: next.stage,
+        p_code: failure.code,
+        p_message: failure.message,
+      })
+      return
+    }
 
     await sb.rpc('record_promotion_grant', {
       p_stage: next.stage,
@@ -63,6 +72,20 @@ export async function claimTossPromotion(): Promise<void> {
   } finally {
     running = false
     await refreshPromotionStatus()
+  }
+}
+
+// 지급 결과는 네 가지 모양으로 온다 — undefined(토스앱 버전 미달), 'ERROR'(알 수 없는 오류),
+// { errorCode, message }(지급 거절), { code }. 어느 쪽이든 한 줄로 옮긴다.
+function describeFailure(result: unknown): { code: string; message: string } {
+  if (result === undefined) return { code: 'UNSUPPORTED_VERSION', message: '' }
+  if (typeof result !== 'object' || result === null) {
+    return { code: String(result), message: '' }
+  }
+  const row = result as Record<string, unknown>
+  return {
+    code: String(row.errorCode ?? row.code ?? 'UNKNOWN'),
+    message: typeof row.message === 'string' ? row.message : JSON.stringify(result),
   }
 }
 
