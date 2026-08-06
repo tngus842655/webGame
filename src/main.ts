@@ -5,6 +5,7 @@ import { loadLocale, locale } from './shared/i18n'
 import { handleBack } from './shared/backButton'
 import { checkAppUpdate } from './shared/appUpdate'
 import { exitApp, startNativeShell } from './shared/native'
+import { claimTossPromotion } from './shared/tossPromotion'
 // 첫 적용은 index.html이 하고, 이 import는 그 뒤를 잇는다 — 설정 화면을 한 번도
 // 열지 않아도 '시스템'을 고른 사람이 폰 설정을 바꾸면 바로 따라가야 한다.
 import './shared/theme'
@@ -40,4 +41,8 @@ void loadLocale(locale.value).then(() => {
   void startNativeShell(goBack)
   // 스토어에 새 버전이 있으면 Play가 알린다 (안드로이드 앱에서만, 웹은 그냥 지나간다)
   void checkAppUpdate()
+  // 미니앱은 접속만으로도 프로모션 포인트를 준다. 지급 이력을 남기려면 계정이 있어야
+  // 해서 위 원칙의 예외가 된다 — 접속 보상을 받은 사람은 열어만 보고 나간 방문자가
+  // 아니다. 웹·안드로이드 빌드에서는 상수가 false라 이 줄이 통째로 빠진다.
+  void claimTossPromotion()
 })

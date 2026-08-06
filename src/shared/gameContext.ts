@@ -4,6 +4,7 @@ import { adProvider } from './ads'
 import { recordAdView } from './adViews'
 import { duckBgm, isBgmPlaying, resumeBgm } from './music'
 import { getLocalBest, saveScore } from './scores'
+import { claimTossPromotion } from './tossPromotion'
 
 // 리워드 광고에는 횟수 상한을 두지 않는다. 사용자가 버튼을 눌러야만 나오는 광고라
 // 강제 노출과 달리 이탈을 만들지 않고, 빈도 조절은 광고 매체가 알아서 한다.
@@ -13,7 +14,12 @@ export function createGameContext(slug: string): GameContext {
   // 걸려서, 버튼을 누른 뒤에 부르면 그동안 게임이 멈춰 있게 된다.
   adProvider.preload?.()
   return {
-    submitScore: (score) => saveScore(slug, score),
+    // 판이 끝난 자리다. 게임 30여 개의 게임오버가 전부 여기를 지나므로 프로모션
+    // 단계(1판·누적 3판)도 여기서 확인한다 — 판 수는 서버가 scores를 세어 판정한다.
+    submitScore: async (score) => {
+      await saveScore(slug, score)
+      void claimTossPromotion()
+    },
     getBestScore: async () => getLocalBest(slug),
     isRewardAdReady: () => adProvider.isReady(),
     // 광고가 떠 있는 동안 루프를 멈춘다. 대부분의 호출부는 게임오버 뒤라 멈춰 있지만,
