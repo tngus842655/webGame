@@ -235,7 +235,6 @@ const dict: CoreDict = {
   'dk.ad': '▶ 看广告复活（HP 30）',
   'ac.ad': '▶ 看广告复活（HP 5）',
   'hud.best': '最高 {n}',
-  'hud.record': '新纪录 {n}',
   'ad.sim': '广告（开发模拟）',
   'ad.skip': '跳过（无奖励）',
   'ad.claim': '领取奖励',

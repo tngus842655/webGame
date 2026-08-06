@@ -1,3 +1,4 @@
+import { t } from '@/shared/i18n'
 import './ui.css'
 
 // 캔버스 글씨체 — ui.css의 .gui-scrim과 같은 스택이다. 한쪽만 고치지 말 것.
@@ -25,6 +26,28 @@ export const SCORE_PANEL = {
   right: 544,
 } as const
 
+// 점수판 머리줄에 함께 그릴 최고 기록. 예전에는 화면 맨 위에 따로 칩을 띄웠는데,
+// 캔버스는 레터박스로 가운데 정렬이라 세로가 짧은 기기에서는 점수판이 그 칩 밑까지
+// 올라와 현재 점수가 가려졌다. 한 카드에 넣으면 화면 비율과 무관하게 겹칠 자리가 없다.
+// 값은 플레이 화면이 채워 넣는다 — 게임 30여 개가 저마다 기록을 챙기지 않도록.
+let hudBest: number | null = null
+let hudLive = 0
+
+export function setHudBest(best: number | null, live: number) {
+  // 0점 기록은 없는 것과 같다 ("최고 0"은 보여줄 값이 아니다)
+  hudBest = best !== null && best > 0 ? best : null
+  hudLive = live
+}
+
+// 머리줄에 덧붙일 최고 기록. 기록이 없으면 빈 문자열 — 라벨만 그대로 둔다.
+// 넘어선 뒤에는 이미 지나친 숫자 대신 '신기록'을 띄운다. 방금 깬 기록보다
+// 깼다는 사실이 다음 판을 부르고, 큰 숫자와 따로 노는 숫자도 안 생긴다.
+function bestHead(): { text: string; record: boolean } {
+  if (hudBest === null) return { text: '', record: false }
+  if (hudLive > hudBest) return { text: t('over.newRecord'), record: true }
+  return { text: t('hud.best', { n: hudBest.toLocaleString() }), record: false }
+}
+
 export interface ScorePanelOptions {
   label: string
   value: string
@@ -50,10 +73,18 @@ export function drawScorePanel(c: CanvasRenderingContext2D, o: ScorePanelOptions
   c.restore()
   c.textAlign = 'center'
   c.textBaseline = 'alphabetic'
-  c.fillStyle = o.labelColor ?? 'rgb(255 255 255 / 0.5)'
-  c.font = font(18)
-  c.fillText(o.label, cx, labelY)
-  c.fillStyle = o.valueColor ?? '#FFFFFF'
+  // 머리줄 = 라벨 + 최고 기록. 기록을 넘어선 동안에는 줄 전체가 점수 색으로 굵어진다 —
+  // 넘어서는 순간이 눈에 걸려야 "한 판 더"가 나온다.
+  const valueColor = o.valueColor ?? '#FFFFFF'
+  const head = bestHead()
+  const line = head.text === '' ? o.label : `${o.label}  ·  ${head.text}`
+  c.fillStyle = head.record ? valueColor : (o.labelColor ?? 'rgb(255 255 255 / 0.5)')
+  c.font = font(18, head.record)
+  // 라벨에 진행 상황을 담는 게임(서바이버)과 긴 번역이 만나면 줄이 판 밖으로 나간다
+  const over = c.measureText(line).width / (panelW - 36)
+  if (over > 1) c.font = font(Math.max(13, Math.floor(18 / over)), head.record)
+  c.fillText(line, cx, labelY)
+  c.fillStyle = valueColor
   c.font = font(50, true)
   c.fillText(o.value, cx, valueY)
 }

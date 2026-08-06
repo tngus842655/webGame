@@ -235,7 +235,6 @@ const dict: CoreDict = {
   'dk.ad': '▶ Ver anúncio e reviver (30 HP)',
   'ac.ad': '▶ Ver anúncio e reviver (5 HP)',
   'hud.best': 'Melhor {n}',
-  'hud.record': 'Recorde {n}',
   'ad.sim': 'Anúncio (simulação)',
   'ad.skip': 'Pular (sem recompensa)',
   'ad.claim': 'Receber recompensa',
