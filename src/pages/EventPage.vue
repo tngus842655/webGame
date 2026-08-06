@@ -115,6 +115,12 @@ const playsLeft = computed(() => Math.max(0, 3 - (status.value?.plays ?? 0)))
   color: var(--ink-muted);
 }
 
+/* UiIcon은 놓이는 자리가 크기를 정한다 (:where(.ui-icon)이 100%다) */
+.back svg {
+  width: 20px;
+  height: 20px;
+}
+
 .card {
   background: var(--surface);
   border: 1px solid var(--line-soft);

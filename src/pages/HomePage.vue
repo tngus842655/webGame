@@ -491,8 +491,11 @@ onBeforeUnmount(() => {
   color: #a9743a;
 }
 
+/* UiIcon은 놓이는 자리가 크기를 정한다(:where(.ui-icon)이 100%다) — 안 주면 줄을 통째로 채운다 */
 .promo > svg {
   flex: none;
+  width: 18px;
+  height: 18px;
   color: #c66d20;
 }
 
