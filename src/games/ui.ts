@@ -63,7 +63,7 @@ export interface ScorePanelOptions {
 }
 
 export function drawScorePanel(c: CanvasRenderingContext2D, o: ScorePanelOptions) {
-  const { y, w, cx, labelY, valueY } = SCORE_PANEL
+  const { y, w, cx, valueY } = SCORE_PANEL
   const panelW = o.compact ? 260 : w
   c.save()
   c.fillStyle = o.panelColor ?? 'rgb(255 255 255 / 0.1)'
@@ -73,20 +73,46 @@ export function drawScorePanel(c: CanvasRenderingContext2D, o: ScorePanelOptions
   c.restore()
   c.textAlign = 'center'
   c.textBaseline = 'alphabetic'
-  // 머리줄 = 라벨 + 최고 기록. 기록을 넘어선 동안에는 줄 전체가 점수 색으로 굵어진다 —
-  // 넘어서는 순간이 눈에 걸려야 "한 판 더"가 나온다.
-  const valueColor = o.valueColor ?? '#FFFFFF'
-  const head = bestHead()
-  const line = head.text === '' ? o.label : `${o.label}  ·  ${head.text}`
-  c.fillStyle = head.record ? valueColor : (o.labelColor ?? 'rgb(255 255 255 / 0.5)')
-  c.font = font(18, head.record)
-  // 라벨에 진행 상황을 담는 게임(서바이버)과 긴 번역이 만나면 줄이 판 밖으로 나간다
-  const over = c.measureText(line).width / (panelW - 36)
-  if (over > 1) c.font = font(Math.max(13, Math.floor(18 / over)), head.record)
-  c.fillText(line, cx, labelY)
-  c.fillStyle = valueColor
+  drawPanelHead(c, o, panelW)
+  c.fillStyle = o.valueColor ?? '#FFFFFF'
   c.font = font(50, true)
   c.fillText(o.value, cx, valueY)
+}
+
+// 머리줄 = 라벨(캡션) + 최고 기록. 기록은 캡션이 아니라 읽으라고 있는 값이라
+// 캡션 크기·색으로 두면 눈에 안 들어온다 — 예전 상단 칩과 같은 크기(26 ≈ 13px)로
+// 키우고, 점수 색을 옅게 깔아 캡션보다 한 톤만 진하게 한다. 게임마다 팔레트를
+// 따로 챙기지 않아도 밝은 판·어두운 판 양쪽에서 같은 세기로 앉는다.
+// 기록을 넘어선 동안에는 그 자리가 '신기록'으로 바뀌며 점수 색을 그대로 입는다.
+function drawPanelHead(c: CanvasRenderingContext2D, o: ScorePanelOptions, panelW: number) {
+  const { cx, labelY } = SCORE_PANEL
+  const labelColor = o.labelColor ?? 'rgb(255 255 255 / 0.5)'
+  const head = bestHead()
+  if (head.text === '') {
+    c.fillStyle = labelColor
+    c.font = font(18)
+    c.fillText(o.label, cx, labelY)
+    return
+  }
+  const caption = `${o.label}  ·  `
+  c.font = font(18)
+  const captionW = c.measureText(caption).width
+  c.font = font(26, true)
+  const bestW = c.measureText(head.text).width
+  // 라벨에 진행 상황을 담는 게임(서바이버)에 긴 번역이 겹치면 판 밖으로 나간다.
+  // 그때만 두 쪽을 같은 비율로 줄여 판 안에 담는다 (글자 크기 차이는 유지된다).
+  const k = Math.min(1, (panelW - 36) / (captionW + bestW))
+  c.save()
+  c.textAlign = 'left'
+  const x = cx - ((captionW + bestW) * k) / 2
+  c.fillStyle = labelColor
+  c.font = font(18 * k)
+  c.fillText(caption, x, labelY)
+  c.fillStyle = o.valueColor ?? '#FFFFFF'
+  if (!head.record) c.globalAlpha = 0.7
+  c.font = font(26 * k, true)
+  c.fillText(head.text, x + captionW * k, labelY)
+  c.restore()
 }
 
 // 게임 위에 뜨는 팝업(게임오버·클리어 보너스)이 함께 쓰는 껍데기.
