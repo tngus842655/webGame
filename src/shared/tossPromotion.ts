@@ -15,6 +15,11 @@ const PROMOTION_CODE = import.meta.env.VITE_TOSS_PROMOTION_CODE as string | unde
 // 접속과 게임오버가 겹쳐 두 번 들어오면 같은 단계를 두 번 지급할 수 있다
 let running = false
 
+// 한 번 거절당하면 이번 실행에서는 더 두드리지 않는다. 예산이 소진되면 프로모션이 끝날
+// 때까지 모두가 거절당하는데, 판을 마칠 때마다 SDK와 서버를 부를 이유가 없다.
+// 앱을 다시 켜면 풀린다 — 그 사이에 예산이 충전됐을 수 있다.
+let rejected = false
+
 interface Stage {
   stage: number
   amount: number
@@ -35,7 +40,7 @@ export const promotionStatus = ref<PromotionStatus | null>(null)
 // 한 번에 한 단계만 준다. 접속할 때와 판이 끝날 때마다 불리므로, 여러 단계가 한꺼번에
 // 충족돼 있어도 몇 판 안에 따라잡는다.
 export async function claimTossPromotion(): Promise<void> {
-  if (!isInToss || !PROMOTION_CODE || running) return
+  if (!isInToss || !PROMOTION_CODE || running || rejected) return
   running = true
   try {
     // 서버가 auth.uid()로 식별키를 찾으므로 등록이 먼저다 (계정도 여기서 만들어진다)
@@ -54,6 +59,7 @@ export async function claimTossPromotion(): Promise<void> {
     // 시도되고, 왜 안 됐는지는 promotion_failures에 남는다 — 실기기에서는 콘솔 로그를
     // 볼 수 없어서 이게 유일한 단서다.
     if (typeof result !== 'object' || !('key' in result)) {
+      rejected = true
       const failure = describeFailure(result)
       await sb.rpc('record_promotion_failure', {
         p_stage: next.stage,
