@@ -471,6 +471,7 @@ SDK에 멱등키가 없고, 진행도(1판 했는지, 3판 했는지)를 토스�
 | 지급 | `src/shared/tossPromotion.ts` |
 | 부르는 곳 | 접속 = `main.ts`, 판 종료 = `gameContext.submitScore` |
 | 진행 상황 조회 | `my_promotion_status()` → `promotionStatus` ref |
+| 종료 판정 | `promotion_state` 표 + `promotion_ended()` |
 | 고지 화면 | `src/pages/EventPage.vue` (`/event`), 홈 배너가 입구 |
 
 **전부 미니앱 빌드에서만 돈다.** `isInToss`가 빌드 때 정해지는 상수라 웹·안드로이드
@@ -489,6 +490,100 @@ SDK에 멱등키가 없고, 진행도(1판 했는지, 3판 했는지)를 토스�
 앱을 껐다 켜기만 해도 접속할 때마다 한 단계씩 나갔다.** 실기기 테스트에서 세 번 접속으로
 100원이 다 지급된 것을 확인하고 고쳤다. 기준점은 1단계를 받은 시각이고, 1단계는 조건이
 없어 가장 먼저 나가므로 2·3단계를 따질 때는 항상 존재한다.
+
+**끝난 것을 앱이 알아야 한다.** 예산이 소진되거나 종료일이 지나도 앱은 그걸 알 길이
+없어서, 홈 배너는 계속 '80원 더 받을 수 있어요'를, 안내 화면은 '조건을 채우면 바로
+지급됩니다'를 띄웠다. 시키는 대로 게임을 해도 아무것도 들어오지 않는다. 그래서
+`promotion_state`에 스위치를 두고, `my_promotion_status()`가 `ended`를 함께 돌려준다.
+끝난 뒤에는 `next_promotion_stage()`가 단계를 내주지 않아 지급 시도 자체가 멈춘다.
+
+**끄는 방법은 둘, 둘 다 재배포가 필요 없다.**
+
+| 언제 | 어디 | 방법 |
+| --- | --- | --- |
+| 예정된 종료 | `ends_at` | 콘솔 종료일을 넣어두면 그 시각에 저절로 꺼진다 |
+| 즉시 중단 | `ended_at` | 예산 소진·긴급 중단 때 사람이 켠다 |
+
+```sql
+-- 즉시 끄기
+update promotion_state set ended_at = now(), ended_code = '예산 소진';
+-- 되살리기 (무엇으로 꺼졌는지 모르면 둘 다 지운다)
+update promotion_state set ended_at = null, ended_code = null, ends_at = null;
+```
+
+**거절 코드로 자동 판정하지 않는다.** 처음에는 `record_promotion_failure()`가 `4112`
+(예산 부족)·`4105`(종료)·`4109`(실행중 아님)를 받으면 스스로 끄게 했는데, 두 가지가
+틀렸다. **`p_code`는 클라이언트가 넘기는 문자열이고 이 앱은 익명 로그인을 쓴다** — 번들의
+anon key만 있으면 누구나 `authenticated`가 되므로 그 판정은 아무나 누를 수 있는 전역
+킬스위치였다. 그리고 `4112`·`4109`는 충전하거나 재개하면 풀리는 일시 상태인데, 한 번
+박힌 `ended_at`은 사람이 지우기 전까지 남아 예산을 채워도 지급이 재개되지 않았다.
+자동 판정이 벌어주는 것(예산 소진을 스스로 알아채기)은 콘솔 잔액과 `promotion_failures`에
+쌓이는 `4112`로도 드러난다 — 값이 비용을 못 넘는다. `20260806700000`에서 걷어냈다.
+
+끝난 뒤에도 홈 배너는 남는다 — **"왜 안 들어오냐"가 가장 많이 몰리는 때가 끝난 직후**라,
+고지 화면으로 가는 입구를 그때 없애면 물어볼 곳이 사라진다. 문구만 '이벤트가 끝났어요 /
+받은 포인트는 토스 혜택 탭에서 볼 수 있어요'로 바뀌고, 다 받은 사람은 헤드라인이 그대로다
+(다 받았다는 사실은 끝나도 변하지 않는다). 고지 문구 자체는 상태에 따라 바꾸지 않는다 —
+검수 때 어느 버전을 본 것인지 흐려진다.
+
+**운영 적용 현황 (2026-08-06).** `20260806600000`·`20260806700000`을 운영 Supabase에
+넣었고 `ends_at`은 `2026-08-31 14:59:00+00`(한국시간 8/31 23:59, 콘솔 종료일과 같다)이다.
+`ended_at`은 비어 있고, 킬스위치가 사라진 것도 확인했다
+(`select prosrc like '%promotion_state%' from pg_proc where proname = 'record_promotion_failure'` → `false`).
+**콘솔에서 종료일을 늘리면 `ends_at`도 같이 미뤄야 한다** — 콘솔만 고치면 서버가 단계를
+내주지 않아 아무도 못 받는다. 화면 문구는 `ended`를 읽는 빌드가 검토를 통과한 뒤부터
+바뀐다. SQL만 먼저 들어간 동안에는 예전 빌드가 늘어난 컬럼을 무시하므로 달라지는 것이 없다.
+
+### 운영 중에 쓰는 쿼리
+
+예산이 예정보다 빨리 소진되거나 급히 손봐야 할 때 쓴다. 전부 Supabase SQL 편집기에서
+그대로 돌아간다.
+
+**지금 상태 한눈에** — 무슨 일이 벌어지고 있는지 여기서 시작한다.
+
+```sql
+select
+  promotion_ended()                                        as 끝났나,
+  (select ends_at from promotion_state)                    as 종료예정,
+  (select ended_at from promotion_state)                   as 중단시각,
+  (select ended_code from promotion_state)                 as 중단사유,
+  (select coalesce(sum(amount), 0) from promotion_grants)  as 지급총액,
+  (select count(distinct anon_key) from promotion_grants)  as 참여자,
+  (select count(*) from promotion_grants where stage = 3)  as 완주자;
+```
+
+전체 예산은 100,000원이다. **지급총액이 여기 가까워지면 소진이 임박한 것**이고, 1인 100원
+이라 완주자 1,000명이 상한이다.
+
+**예산이 바닥났는지** — 소진되면 `4112`가 쌓이기 시작한다. 이게 보이면 이미 거절당하는
+사람이 있다는 뜻이다.
+
+```sql
+select code, count(*) as 사람, sum(attempts) as 시도, max(last_at) as 마지막
+from promotion_failures
+group by code
+order by 마지막 desc;
+```
+
+**즉시 중단** — 예산이 소진됐거나 급히 멈춰야 할 때. 재배포가 필요 없고, 다음 실행부터
+지급 시도가 멈추고 화면이 '이벤트가 끝났어요'로 바뀐다.
+
+```sql
+update promotion_state set ended_at = now(), ended_code = '예산 소진';
+```
+
+**되살리기** — 충전했거나 잘못 껐을 때. 무엇으로 꺼졌는지 모르면 셋 다 지우면 확실하다
+(`ends_at`을 지우면 예정 종료도 함께 풀리니, 종료일을 유지하려면 앞의 둘만 지울 것).
+
+```sql
+update promotion_state set ended_at = null, ended_code = null;
+```
+
+**종료일 연장** — 콘솔에서 연장했다면 반드시 여기도 같이 미룬다.
+
+```sql
+update promotion_state set ends_at = '2026-09-30 23:59+09';
+```
 
 **지급이 먼저, 기록이 나중이다.** 그 사이에 연결이 끊기면 같은 단계를 한 번 더 받을 수
 있다. 창이 짧아 이 순서를 택했다 — 반대로 하면 토스앱 버전이 낮아 지급이 실패한 사람이
