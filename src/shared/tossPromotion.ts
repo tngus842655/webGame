@@ -1,3 +1,4 @@
+import { ref } from 'vue'
 import { isInToss, recordTossAnonKey } from './toss'
 
 // 앱인토스 프로모션 — 접속 20원, 1판 30원, 누적 3판 50원 (1인 100원).
@@ -18,6 +19,18 @@ interface Stage {
   stage: number
   amount: number
 }
+
+export interface PromotionStatus {
+  total: number
+  granted: number
+  plays: number
+  // 이미 받은 단계 번호
+  done: number[]
+}
+
+// 홈 배너와 안내 화면이 함께 본다. 지급을 시도한 뒤 갱신되므로 화면이 따로 조회하지 않는다
+// — 계정은 claimTossPromotion()이 만들고, 그 전에 물으면 세션이 없어 조회가 막힌다.
+export const promotionStatus = ref<PromotionStatus | null>(null)
 
 // 한 번에 한 단계만 준다. 접속할 때와 판이 끝날 때마다 불리므로, 여러 단계가 한꺼번에
 // 충족돼 있어도 몇 판 안에 따라잡는다.
@@ -49,5 +62,17 @@ export async function claimTossPromotion(): Promise<void> {
     // 지급은 게임 진행과 무관하다 — 실패해도 조용히 넘어가고 다음에 다시 시도한다
   } finally {
     running = false
+    await refreshPromotionStatus()
+  }
+}
+
+async function refreshPromotionStatus(): Promise<void> {
+  try {
+    const { getSupabase } = await import('./supabase')
+    const sb = await getSupabase()
+    const { data } = await sb.rpc('my_promotion_status')
+    promotionStatus.value = (data as PromotionStatus[] | null)?.[0] ?? null
+  } catch {
+    // 안내 화면이 진행 상황 없이 고지 문구만 보여준다
   }
 }

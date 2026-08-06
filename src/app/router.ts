@@ -17,6 +17,8 @@ import FeedbackPage from '@/pages/FeedbackPage.vue'
 import PrivacyPage from '@/pages/PrivacyPage.vue'
 import TermsPage from '@/pages/TermsPage.vue'
 import AccountDeletionPage from '@/pages/AccountDeletionPage.vue'
+import EventPage from '@/pages/EventPage.vue'
+import { isInToss } from '@/shared/toss'
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -38,6 +40,9 @@ export const router = createRouter({
     { path: '/terms', component: TermsPage },
     { path: '/privacy', component: PrivacyPage },
     { path: '/account-deletion', component: AccountDeletionPage },
+    // 프로모션은 앱인토스에서만 돈다. isInToss가 빌드 때 정해지는 상수라 웹·안드로이드
+    // 번들에는 이 줄도 EventPage도 실리지 않는다 (없는 주소라 홈으로 떨어진다).
+    ...(isInToss ? [{ path: '/event', component: EventPage }] : []),
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
 })
