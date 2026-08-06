@@ -642,7 +642,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   const drawHud = (c: CanvasRenderingContext2D) => {
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: state.score.toLocaleString(),
       sub: true,
     })

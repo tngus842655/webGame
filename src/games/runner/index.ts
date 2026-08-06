@@ -623,7 +623,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.globalAlpha = 1
 
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: scoreOf(state).toLocaleString(),
       sub: true,
       panelColor: ground('rgb(255 255 255 / 0.85)', 'rgb(10 20 30 / 0.86)'),

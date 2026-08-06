@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { GAMES } from '@/games/registry'
 import { pauseRunningGame, resumeRunningGame } from '@/games/shell'
@@ -14,6 +14,7 @@ import { bgmFor, duckBgm, resumeBgm, startBgm, stopBgm } from '@/shared/music'
 import { startPlayTracking } from '@/shared/playSessions'
 import { fetchMyStats, getLocalBest, syncLocalBests } from '@/shared/scores'
 import { startScoreGuard } from '@/shared/scoreGuard'
+import { setHudBest } from '@/games/ui'
 
 const route = useRoute()
 const router = useRouter()
@@ -27,17 +28,6 @@ const guideOpen = ref(false)
 const paused = ref(false)
 const countdown = ref(0)
 let countdownId = 0
-
-// 플레이 중 최고 기록 표시 — 넘어서는 순간이 "한 판 더"의 방아쇠라 실시간으로 보여준다
-const best = ref<number | null>(null)
-const live = ref(0)
-const isRecord = computed(() => best.value !== null && live.value > best.value)
-const bestLabel = computed(() => {
-  if (best.value === null) return ''
-  return isRecord.value
-    ? t('hud.record', { n: live.value.toLocaleString() })
-    : t('hud.best', { n: best.value.toLocaleString() })
-})
 
 let game: GameModule | null = null
 let disposed = false
@@ -113,7 +103,7 @@ onMounted(async () => {
   // 열어본 것은 사실이고, 다시 찾아 들어가려는 사람에게는 그게 필요한 정보다.
   markPlayed(slug)
   // 홈을 거치지 않고 바로 들어왔을 수도 있다. 서버 최고점을 맞춰두지 않으면
-  // 상단 칩과 게임오버의 신기록 판정이 이 기기 기록만 보고 잘못 나온다.
+  // 점수판과 게임오버의 신기록 판정이 이 기기 기록만 보고 잘못 나온다.
   void fetchMyStats()
     .then(syncLocalBests)
     .catch(() => {})
@@ -128,10 +118,11 @@ onMounted(async () => {
   document.addEventListener('visibilitychange', onVisibility)
   // 게임이 실제로 붙은 뒤부터 뒤로가기를 받는다 — 로딩 중에는 지킬 판이 아직 없다
   setBackHandler(onHardwareBack)
-  // 최고 기록은 게임오버 제출 때 갱신되므로 현재 점수와 함께 다시 읽는다
+  // 플레이 중 최고 기록은 게임의 점수판이 머리줄에 함께 그린다 — 화면 위에 따로 띄우면
+  // 세로가 짧은 기기에서 그 점수판과 겹쳤다. 기록은 게임오버 제출 때 갱신되므로
+  // 현재 점수와 함께 다시 읽는다 (넘어섰는지는 점수판이 이 둘을 비교해 판정한다).
   pollId = window.setInterval(() => {
-    best.value = getLocalBest(slug)
-    live.value = game?.currentScore() ?? 0
+    setHudBest(getLocalBest(slug), game?.currentScore() ?? 0)
   }, 250)
 })
 
@@ -139,6 +130,8 @@ onBeforeUnmount(() => {
   disposed = true
   setBackHandler(null)
   clearInterval(pollId)
+  // 다음 게임이 이전 게임의 기록을 달고 뜨지 않도록 (첫 갱신까지 250ms가 뜬다)
+  setHudBest(null, 0)
   stopCountdown()
   document.removeEventListener('visibilitychange', onVisibility)
   stopBgm()
@@ -159,11 +152,6 @@ onBeforeUnmount(() => {
       <button class="chip back-button" type="button" @click="router.push('/')">
         <UiIcon name="back" />{{ t('common.back') }}
       </button>
-      <div class="best-slot">
-        <div v-if="bestLabel" class="chip best-chip" :class="{ record: isRecord }">
-          {{ bestLabel }}
-        </div>
-      </div>
       <button
         class="chip icon-button"
         type="button"
@@ -220,11 +208,13 @@ onBeforeUnmount(() => {
   inset: 0;
 }
 
-/* 뒤로·최고기록·도움말을 한 줄로 묶는다. 예전에는 셋이 제각각 크기라
-   게임 화면 위에 흩어져 보였다. 캔버스를 덮으므로 줄 자체는 탭을 받지 않는다. */
+/* 뒤로·멈춤·도움말을 한 줄로 묶는다. 예전에는 셋이 제각각 크기라
+   게임 화면 위에 흩어져 보였다. 캔버스를 덮으므로 줄 자체는 탭을 받지 않는다.
+   safe-area는 .app-shell이 이미 패딩으로 밀어 놨다 — 여기서 또 더하면 노치가 있는
+   기기에서만 줄이 그만큼 내려앉아 캔버스 점수판 위를 덮었다. */
 .top-bar {
   position: absolute;
-  top: calc(10px + env(safe-area-inset-top));
+  top: 10px;
   left: 10px;
   right: 10px;
   display: flex;
@@ -253,15 +243,9 @@ onBeforeUnmount(() => {
     background-color 0.1s ease;
 }
 
-/* 뒤로 버튼 길이가 언어마다 달라도 기록이 두 버튼 사이 한가운데에 오도록 */
-.best-slot {
-  display: flex;
-  flex: 1;
-  justify-content: center;
-  min-width: 0;
-}
-
 .back-button {
+  /* 뒤로는 왼쪽 끝, 멈춤·도움말은 오른쪽 끝으로 (버튼 길이가 언어마다 달라도) */
+  margin-right: auto;
   gap: 4px;
   padding-left: 10px;
   cursor: pointer;
@@ -277,19 +261,6 @@ onBeforeUnmount(() => {
 .icon-button:active {
   background: rgb(255 255 255 / 0.98);
   transform: scale(0.95);
-}
-
-.best-chip {
-  overflow: hidden;
-  font-size: 13px;
-  color: var(--ink-faint);
-  text-overflow: ellipsis;
-}
-
-.best-chip.record {
-  background: #ffca28;
-  color: #5d4037;
-  box-shadow: 0 2px 10px rgb(245 166 0 / 0.45);
 }
 
 .icon-button {

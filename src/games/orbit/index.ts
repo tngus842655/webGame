@@ -1,4 +1,3 @@
-import { t } from '@/shared/i18n'
 import { playGameOver, playMerge, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
@@ -626,7 +625,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // HUD — 적이 사방에서 오므로 판을 좁게 잡아 시야를 덜 가린다
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: state.score.toLocaleString(),
       sub: true,
       compact: true,

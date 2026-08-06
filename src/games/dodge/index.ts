@@ -1,4 +1,3 @@
-import { t } from '@/shared/i18n'
 import { playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
@@ -115,7 +114,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // HUD — 낙하물이 지나는 자리라 좁은 판을 쓴다
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: scoreOf(state).toLocaleString(),
       compact: true,
       panelColor: ground('rgb(255 255 255 / 0.8)', 'rgb(14 18 22 / 0.84)'),

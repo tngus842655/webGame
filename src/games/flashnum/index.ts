@@ -192,7 +192,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // HUD: 점수 + 단계 + 하트 (공통 점수판 규격)
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: state.score.toLocaleString(),
       sub: true,
     })

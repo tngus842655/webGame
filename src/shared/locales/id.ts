@@ -235,7 +235,6 @@ const dict: CoreDict = {
   'dk.ad': '▶ Tonton iklan untuk hidup lagi (30 HP)',
   'ac.ad': '▶ Tonton iklan untuk hidup lagi (5 HP)',
   'hud.best': 'Terbaik {n}',
-  'hud.record': 'Rekor {n}',
   'ad.sim': 'Iklan (simulasi)',
   'ad.skip': 'Lewati (tanpa hadiah)',
   'ad.claim': 'Ambil hadiah',

@@ -1,4 +1,3 @@
-import { t } from '@/shared/i18n'
 import { playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
@@ -233,7 +232,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // HUD: 최고 높이 + 현재 높이 + 남은 시간
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: `${meters(state.maxHeight)}m`,
       sub: true,
       panelColor: ground('rgb(255 255 255 / 0.92)', 'rgb(12 16 24 / 0.86)'),

@@ -259,7 +259,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       : t('sd.practice', { n: state.practiceCount })
     // 밝은 판 위라 흰 판에 어두운 글씨를 쓴다 (공통 점수판 규격)
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: state.score.toLocaleString(),
       sub: true,
       panelColor: ground('rgb(255 255 255 / 0.92)', 'rgb(14 18 20 / 0.86)'),

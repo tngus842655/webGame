@@ -226,7 +226,6 @@ const en = {
   'over.byStuck': 'No moves left to make',
   'over.byClear': 'You made it to the end',
   'hud.best': 'Best {n}',
-  'hud.record': 'Record {n}',
   'daily.label': 'Daily',
   'daily.streak': '🔥 Streak {n}',
   'daily.goal': 'Goal {n}',

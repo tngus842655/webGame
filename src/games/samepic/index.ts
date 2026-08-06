@@ -1,4 +1,3 @@
-import { t } from '@/shared/i18n'
 import { playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
@@ -206,7 +205,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.restore()
 
     // HUD: 공통 점수판 + 시간 게이지
-    drawScorePanel(c, { label: t('hud.score'), value: state.score.toLocaleString() })
+    drawScorePanel(c, { value: state.score.toLocaleString() })
     if (state.combo >= 2) {
       c.fillStyle = '#FFD54F'
       c.font = font(28, true)

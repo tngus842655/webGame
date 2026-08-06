@@ -196,7 +196,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // HUD: 흰 카드 + 점수 + 퍼즐 번호 + 하트
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: state.score.toLocaleString(),
       sub: true,
       panelColor: ground('rgb(255 255 255 / 0.92)', 'rgb(16 18 34 / 0.86)'),

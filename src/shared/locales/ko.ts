@@ -178,7 +178,6 @@ const dict: FullDict = {
   'over.byStuck': '더 이상 둘 곳이 없습니다',
   'over.byClear': '끝까지 해냈습니다',
   'hud.best': '최고 {n}',
-  'hud.record': '신기록 {n}',
   'ad.sim': '광고 (개발용 시뮬레이션)',
   'ad.skip': '건너뛰기 (보상 없음)',
   'ad.claim': '보상 받기',

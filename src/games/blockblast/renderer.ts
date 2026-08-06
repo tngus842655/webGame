@@ -21,13 +21,12 @@ export interface DragState {
   y: number
 }
 
-// 세션이 들고 있는 HUD 부가 정보 (모드·스트릭·목표·최고 기록)
+// 세션이 들고 있는 HUD 부가 정보 (모드·스트릭·목표)
 export interface HudInfo {
   daily: boolean
   streak: number
   done: boolean // 오늘 목표를 이미 달성했다
   goal: number
-  best: number | null // 아직 안 불러왔으면 null
 }
 
 const BOARD_PAD = 14
@@ -300,7 +299,6 @@ export class BBRenderer {
     c.textAlign = 'center'
 
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: state.score.toLocaleString(),
       compact: true,
       panelColor: s.panel,
@@ -329,17 +327,14 @@ export class BBRenderer {
     )
     c.restore()
 
-    // 스트릭·목표·최고 기록 안내줄 — 최고 기록을 넘어서는 순간 주황으로 바뀐다
-    const parts: string[] = []
+    // 스트릭·목표 안내줄 (최고 기록은 점수판이 머리줄에 그린다 — 여기 두면 같은 값이 두 번 나온다)
     if (hud.daily) {
-      parts.push(t('daily.streak', { n: hud.streak }))
-      parts.push(hud.done ? t('daily.goalDone') : t('daily.goal', { n: hud.goal.toLocaleString() }))
-    }
-    if (hud.best !== null && hud.best > 0) parts.push(t('hud.best', { n: hud.best.toLocaleString() }))
-    if (parts.length > 0) {
-      const beating = hud.best !== null && hud.best > 0 && state.score > hud.best
-      c.fillStyle = beating ? '#FF7043' : s.hint
-      c.font = font(26, beating)
+      const parts = [
+        t('daily.streak', { n: hud.streak }),
+        hud.done ? t('daily.goalDone') : t('daily.goal', { n: hud.goal.toLocaleString() }),
+      ]
+      c.fillStyle = s.hint
+      c.font = font(26)
       c.fillText(parts.join('  ·  '), LAYOUT.width / 2, LAYOUT.infoY)
     }
 

@@ -192,7 +192,6 @@ export class BrickRenderer {
     c.textAlign = 'center'
 
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: state.score.toLocaleString(),
       sub: true,
       compact: true,

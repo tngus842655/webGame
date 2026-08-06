@@ -1,4 +1,3 @@
-import { t } from '@/shared/i18n'
 import { CanvasStage } from '../stage'
 import { LAYOUT, SIZE, cellPos } from './config'
 import { drawTile } from './tileArt'
@@ -115,7 +114,6 @@ export class F2Renderer {
     const { c } = this
     c.textAlign = 'center'
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: state.score.toLocaleString(),
       compact: true,
       panelColor: ground('rgb(255 255 255 / 0.78)', 'rgb(255 255 255 / 0.08)'),

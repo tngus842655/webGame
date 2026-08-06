@@ -235,7 +235,6 @@ const dict: CoreDict = {
   'dk.ad': '▶ Reklam izle ve diril (30 HP)',
   'ac.ad': '▶ Reklam izle ve diril (5 HP)',
   'hud.best': 'En iyi {n}',
-  'hud.record': 'Rekor {n}',
   'ad.sim': 'Reklam (simülasyon)',
   'ad.skip': 'Atla (ödülsüz)',
   'ad.claim': 'Ödülü al',

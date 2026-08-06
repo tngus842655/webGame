@@ -422,7 +422,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // HUD: 점수 + 최다 연결 + 남은 기회
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: state.score.toLocaleString(),
       sub: state.bestChain >= 2,
     })
