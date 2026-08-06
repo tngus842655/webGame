@@ -16,6 +16,8 @@ import GameCard from '@/shared/GameCard.vue'
 import GameIcon from '@/shared/GameIcon.vue'
 import { t, type TranslationKey } from '@/shared/i18n'
 import { favorites, recents } from '@/shared/library'
+import { isInToss } from '@/shared/toss'
+import { promotionStatus } from '@/shared/tossPromotion'
 import UiIcon from '@/shared/UiIcon.vue'
 import {
   featuredSlugs,
@@ -32,6 +34,18 @@ import { ensureAdminChecked, fetchGameFlags, isAdmin } from '@/shared/admin'
 import { refreshUnreadFeedback, unreadFeedback } from '@/shared/feedback'
 
 const router = useRouter()
+
+// 앱인토스 프로모션 배너. 상태를 못 읽었으면(비로그인·조회 실패) 아예 안 그린다.
+// 웹·안드로이드에서는 상태가 채워질 일이 없지만(claimTossPromotion이 즉시 빠져나온다),
+// 배너 문구는 이 컴포넌트에 그대로 있으므로 조건에서 한 번 더 막는다.
+const promo = computed(() => (isInToss ? promotionStatus.value : null))
+const promoHeadline = computed(() => {
+  const status = promotionStatus.value
+  if (!status) return ''
+  if (status.granted >= status.total) return '토스포인트 100원을 다 받았어요'
+  if (status.granted > 0) return `${status.total - status.granted}원 더 받을 수 있어요`
+  return '게임 3판이면 토스포인트 100원'
+})
 
 // 기록이 없어도 빈 문자열을 반환해 한 줄을 차지한다 (CSS에서 높이 확보)
 function scoreLabel(card: { best: number | null; stat: MyGameStat | null }): string {
@@ -297,6 +311,16 @@ onBeforeUnmount(() => {
       <RouterLink to="/settings" :aria-label="t('settings.title')"><UiIcon name="gear" /></RouterLink>
     </nav>
 
+    <!-- 앱인토스 프로모션. 미니앱 빌드에서만, 그리고 지급 상태를 읽어온 뒤에만 뜬다.
+         고지 화면으로 가는 유일한 입구라 다 받은 뒤에도 남긴다 -->
+    <RouterLink v-if="promo" class="promo" to="/event">
+      <span class="promo-text">
+        <strong>{{ promoHeadline }}</strong>
+        <small>접속 20원 · 1판 30원 · 3판 50원</small>
+      </span>
+      <UiIcon name="chevron" />
+    </RouterLink>
+
     <section v-if="top3.length > 0" class="shelf top3">
       <h2><UiIcon name="flame" />{{ t('home.sectionPopular') }}</h2>
       <div class="game-grid">
@@ -430,6 +454,49 @@ onBeforeUnmount(() => {
   justify-content: flex-end;
   gap: 4px;
   margin-bottom: 18px;
+}
+
+/* 프로모션 배너 — 게임 목록 위 한 줄. 카드보다 낮고 얇게 둬서 목록을 밀어내지 않는다 */
+.promo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  border: 1px solid #ffe0b2;
+  border-radius: 14px;
+  background: linear-gradient(#fffaf2, #fff8e1);
+  color: var(--ink);
+}
+
+.promo:active {
+  background: #fff3d8;
+}
+
+.promo-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.promo-text strong {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.promo-text small {
+  font-size: 12px;
+  color: #a9743a;
+}
+
+/* UiIcon은 놓이는 자리가 크기를 정한다(:where(.ui-icon)이 100%다) — 안 주면 줄을 통째로 채운다 */
+.promo > svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: #c66d20;
 }
 
 .home-header a {
