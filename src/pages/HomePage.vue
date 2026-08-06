@@ -38,14 +38,32 @@ const router = useRouter()
 // 앱인토스 프로모션 배너. 상태를 못 읽었으면(비로그인·조회 실패) 아예 안 그린다.
 // 웹·안드로이드에서는 상태가 채워질 일이 없지만(claimTossPromotion이 즉시 빠져나온다),
 // 배너 문구는 이 컴포넌트에 그대로 있으므로 조건에서 한 번 더 막는다.
-const promo = computed(() => (isInToss ? promotionStatus.value : null))
+//
+// 끝난 뒤에 처음 들어온 사람에게는 띄우지 않는다 — 받은 것도 받을 것도 없어서
+// 지난 이벤트 안내가 짐만 된다.
+const promo = computed(() => {
+  const status = isInToss ? promotionStatus.value : null
+  if (!status || (status.ended && status.granted === 0)) return null
+  return status
+})
+
 const promoHeadline = computed(() => {
-  const status = promotionStatus.value
+  const status = promo.value
   if (!status) return ''
+  // 다 받았다는 사실은 이벤트가 끝나도 변하지 않는다 — 종료보다 먼저 본다
   if (status.granted >= status.total) return '토스포인트 100원을 다 받았어요'
+  if (status.ended) return '토스포인트 이벤트가 끝났어요'
   if (status.granted > 0) return `${status.total - status.granted}원 더 받을 수 있어요`
   return '게임 3판이면 토스포인트 100원'
 })
+
+// 끝난 뒤에도 조건표를 띄우면 이제 못 받는 조건을 계속 광고하는 셈이 된다.
+// 그 자리에 받은 포인트가 어디 있는지를 넣는다 — 종료 직후에 가장 많이 묻는 것이다.
+const promoNote = computed(() =>
+  promo.value?.ended
+    ? '받은 포인트는 토스 혜택 탭에서 볼 수 있어요'
+    : '접속 20원 · 1판 30원 · 3판 50원',
+)
 
 // 기록이 없어도 빈 문자열을 반환해 한 줄을 차지한다 (CSS에서 높이 확보)
 function scoreLabel(card: { best: number | null; stat: MyGameStat | null }): string {
@@ -312,11 +330,12 @@ onBeforeUnmount(() => {
     </nav>
 
     <!-- 앱인토스 프로모션. 미니앱 빌드에서만, 그리고 지급 상태를 읽어온 뒤에만 뜬다.
-         고지 화면으로 가는 유일한 입구라 다 받은 뒤에도 남긴다 -->
+         고지 화면으로 가는 유일한 입구라 다 받은 뒤에도, 이벤트가 끝난 뒤에도 남긴다 —
+         "왜 안 들어오냐"가 가장 많이 몰리는 때가 끝난 직후다 -->
     <RouterLink v-if="promo" class="promo" to="/event">
       <span class="promo-text">
         <strong>{{ promoHeadline }}</strong>
-        <small>접속 20원 · 1판 30원 · 3판 50원</small>
+        <small>{{ promoNote }}</small>
       </span>
       <UiIcon name="chevron" />
     </RouterLink>

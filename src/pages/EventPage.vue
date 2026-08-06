@@ -24,6 +24,7 @@ const granted = computed(() => status.value?.granted ?? 0)
 const total = computed(() => status.value?.total ?? 100)
 const percent = computed(() => Math.min(100, Math.round((granted.value / total.value) * 100)))
 const allDone = computed(() => status.value != null && granted.value >= total.value)
+const ended = computed(() => status.value?.ended ?? false)
 
 function isDone(stage: number) {
   return status.value?.done.includes(stage) ?? false
@@ -42,6 +43,7 @@ const playsLeft = computed(() => Math.max(0, 3 - (status.value?.plays ?? 0)))
 
     <section class="progress card">
       <p v-if="allDone" class="headline done">100원을 모두 받았어요</p>
+      <p v-else-if="ended" class="headline">이벤트가 끝났어요</p>
       <p v-else-if="granted > 0" class="headline">
         {{ granted }}원 받았어요<span class="left">{{ total - granted }}원 남음</span>
       </p>
@@ -59,7 +61,12 @@ const playsLeft = computed(() => Math.max(0, 3 - (status.value?.plays ?? 0)))
         </li>
       </ol>
 
-      <p v-if="!allDone && playsLeft > 0 && isDone(1)" class="nudge">
+      <!-- 끝난 뒤에는 재촉을 지운다. 남은 판을 채워도 지급되지 않는다 -->
+      <p v-if="ended" class="ended">
+        지급이 끝나 더 이상 포인트를 받을 수 없어요. 이미 받은 포인트는 토스 앱 혜택 탭 →
+        토스포인트에서 확인할 수 있어요.
+      </p>
+      <p v-else-if="!allDone && playsLeft > 0 && isDone(1)" class="nudge">
         {{ playsLeft }}판만 더 하면 남은 포인트를 받아요
       </p>
     </section>
@@ -224,6 +231,14 @@ const playsLeft = computed(() => Math.max(0, 3 - (status.value?.plays ?? 0)))
   margin: 12px 0 0;
   font-size: 13px;
   color: #c66d20;
+}
+
+/* 재촉이 아니라 사실 전달이라 nudge처럼 색을 쓰지 않는다 */
+.ended {
+  margin: 12px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--ink-muted);
 }
 
 .notice h2 {
