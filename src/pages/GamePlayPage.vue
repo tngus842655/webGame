@@ -14,6 +14,7 @@ import { bgmFor, duckBgm, resumeBgm, startBgm, stopBgm } from '@/shared/music'
 import { startPlayTracking } from '@/shared/playSessions'
 import { fetchMyStats, getLocalBest, syncLocalBests } from '@/shared/scores'
 import { startScoreGuard } from '@/shared/scoreGuard'
+import { recordTossAnonKey } from '@/shared/toss'
 
 const route = useRoute()
 const router = useRouter()
@@ -123,6 +124,8 @@ onMounted(async () => {
   game = mod.default
   game.mount(host.value, createGameContext(slug))
   stopTracking = startPlayTracking(slug)
+  // 계정이 만들어지는 자리가 여기다 — 토스 식별키도 이때 붙여 둔다 (미니앱 빌드에서만)
+  void recordTossAnonKey()
   stopScoreGuard = startScoreGuard(slug, () => game?.currentScore() ?? null)
   startBgm(bgmFor(slug))
   document.addEventListener('visibilitychange', onVisibility)
