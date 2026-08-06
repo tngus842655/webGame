@@ -32,11 +32,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     streak: currentStreak(SLUG),
     done: isDoneToday(SLUG),
     goal: DAILY.target,
-    best: null,
   }
-  void ctx.getBestScore().then((best) => {
-    hud.best = best
-  })
   preloadSfx('gameover', 'pop', 'select', 'clear')
   let adSwapUsed = false
   let drag: DragState | null = null
@@ -119,7 +115,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     vibrate(120)
     const prevBest = await ctx.getBestScore()
     void ctx.submitScore(state.score)
-    hud.best = prevBest === null ? state.score : Math.max(prevBest, state.score)
     // 못 놓는 조각에 ×가 얹힌 화면을 잠깐 보여주고 팝업을 연다 — 왜 죽었는지 눈에 남게
     await new Promise((resolve) => setTimeout(resolve, 900))
     if (shell.isDestroyed() || state.phase !== 'over') return

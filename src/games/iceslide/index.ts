@@ -631,7 +631,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // HUD — 판이 y 250부터라 공통 점수판이 그대로 들어간다
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: state.score.toLocaleString(),
       sub: true,
     })

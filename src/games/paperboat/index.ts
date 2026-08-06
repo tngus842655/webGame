@@ -1,4 +1,3 @@
-import { t } from '@/shared/i18n'
 import { playGameOver, playMerge, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
@@ -565,7 +564,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // HUD — 배가 화면 위끝에서 나오므로 판을 좁게 잡는다
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: state.score.toLocaleString(),
       sub: state.combo >= 2,
       compact: true,

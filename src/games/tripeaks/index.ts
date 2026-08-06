@@ -227,7 +227,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // HUD (골프식 흰 카드)
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: state.score.toLocaleString(),
       sub: true,
       panelColor: 'rgb(255 255 255 / 0.85)',

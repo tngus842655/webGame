@@ -184,7 +184,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.fillText(String(state.stage), 105, 88)
 
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: state.score.toLocaleString(),
       compact: true,
       panelColor: ground('rgb(255 255 255 / 0.75)', 'rgb(255 255 255 / 0.08)'),

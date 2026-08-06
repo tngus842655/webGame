@@ -1,4 +1,3 @@
-import { t } from '@/shared/i18n'
 import { CanvasStage } from '../stage'
 import { BOARD, TIERS } from './config'
 import { drawFruit } from '../fruitArt'
@@ -338,7 +337,6 @@ export class SuikaRenderer {
     // 점수 (숫자만 크게)
     c.textAlign = 'center'
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: state.score.toLocaleString(),
       compact: true,
       panelColor: scene().panel,

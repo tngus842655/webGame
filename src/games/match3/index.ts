@@ -342,7 +342,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // HUD 카드
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: state.score.toLocaleString(),
       sub: true,
       panelColor: s.panel,

@@ -367,7 +367,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const c = stage.begin('#1B242B', '#2B3A44')
     drawBackdrop(c)
 
-    drawScorePanel(c, { label: t('hud.score'), value: state.score.toLocaleString(), sub: true })
+    drawScorePanel(c, { value: state.score.toLocaleString(), sub: true })
     c.font = font(20)
     c.textAlign = 'center'
     c.fillStyle = 'rgb(255 255 255 / 0.6)'

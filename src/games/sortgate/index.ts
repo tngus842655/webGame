@@ -1,4 +1,3 @@
-import { t } from '@/shared/i18n'
 import { playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { createGameOverOverlay } from '../overlay'
@@ -504,7 +503,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // HUD: 점수 + 목숨
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: state.score.toLocaleString(),
       sub: true,
     })

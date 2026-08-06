@@ -481,7 +481,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // HUD
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: state.score.toLocaleString(),
       sub: true,
     })

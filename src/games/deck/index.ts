@@ -672,7 +672,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     }
 
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: state.score.toLocaleString(),
       sub: true,
     })

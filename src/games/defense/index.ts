@@ -365,7 +365,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // HUD: 점수 카드 + 웨이브 + 생명
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: state.score.toLocaleString(),
       panelColor: ground('rgb(255 255 255 / 0.94)', 'rgb(16 26 12 / 0.86)'),
       labelColor: ground('#AED581', '#93AC7E'),

@@ -39,17 +39,33 @@ export function setHudBest(best: number | null, live: number) {
   hudLive = live
 }
 
-// 머리줄에 덧붙일 최고 기록. 기록이 없으면 빈 문자열 — 라벨만 그대로 둔다.
-// 넘어선 뒤에는 이미 지나친 숫자 대신 '신기록'을 띄운다. 방금 깬 기록보다
-// 깼다는 사실이 다음 판을 부르고, 큰 숫자와 따로 노는 숫자도 안 생긴다.
+// 머리줄에 얹을 최고 기록. 기록이 없으면 빈 문자열이다.
+// 넘어선 뒤에는 숫자 대신 '신기록'을 띄운다 — 그 순간 최고 기록과 현재 점수는
+// 같은 숫자라, 둘을 나란히 세우면 같은 값을 두 번 보여주는 꼴이 된다.
 function bestHead(): { text: string; record: boolean } {
   if (hudBest === null) return { text: '', record: false }
   if (hudLive > hudBest) return { text: t('over.newRecord'), record: true }
   return { text: t('hud.best', { n: hudBest.toLocaleString() }), record: false }
 }
 
+// 신기록 불빛 — 위는 노랗고 아래로 갈수록 붉어진다. 큰 숫자에만 쓰고,
+// 머리줄의 '신기록'은 같은 불의 한가운데 색(FIRE_INK)으로 맞춰 한 덩어리로 읽히게 한다.
+const FIRE_INK = '#FF7043'
+
+function fireInk(c: CanvasRenderingContext2D, valueY: number): CanvasGradient {
+  const g = c.createLinearGradient(0, valueY - 40, 0, valueY + 8)
+  g.addColorStop(0, '#FFD54F')
+  g.addColorStop(0.55, '#FF8F00')
+  g.addColorStop(1, '#F4511E')
+  return g
+}
+
+const REDUCED_MOTION = matchMedia('(prefers-reduced-motion: reduce)').matches
+
 export interface ScorePanelOptions {
-  label: string
+  // 큰 숫자 위에 얹을 게임 정보 (서바이버의 처치·레벨처럼).
+  // '점수' 같은 캡션은 두지 않는다 — 큰 숫자가 스스로 말하는 자리다.
+  label?: string
   value: string
   // 판 안에 아랫줄을 그릴 때 true — 판이 길어진다
   sub?: boolean
@@ -73,45 +89,61 @@ export function drawScorePanel(c: CanvasRenderingContext2D, o: ScorePanelOptions
   c.restore()
   c.textAlign = 'center'
   c.textBaseline = 'alphabetic'
-  drawPanelHead(c, o, panelW)
-  c.fillStyle = o.valueColor ?? '#FFFFFF'
+  const head = bestHead()
+  drawPanelHead(c, o, panelW, head)
+  c.save()
+  if (head.record) {
+    // 최고 기록을 넘어선 동안에는 이 숫자가 곧 최고 기록이다 — 둘을 하나로 태운다
+    c.fillStyle = fireInk(c, valueY)
+    c.shadowColor = 'rgb(244 81 30 / 0.45)'
+    // 색은 두고 번지는 폭만 숨 쉬듯 흔든다 (정지된 화면에서도 어색하지 않도록)
+    c.shadowBlur = REDUCED_MOTION ? 18 : 17 + Math.sin(performance.now() / 260) * 6
+  } else {
+    c.fillStyle = o.valueColor ?? '#FFFFFF'
+  }
   c.font = font(50, true)
   c.fillText(o.value, cx, valueY)
+  c.restore()
 }
 
-// 머리줄 = 라벨(캡션) + 최고 기록. 기록은 캡션이 아니라 읽으라고 있는 값이라
-// 캡션 크기·색으로 두면 눈에 안 들어온다 — 예전 상단 칩과 같은 크기(26 ≈ 13px)로
-// 키우고, 점수 색을 옅게 깔아 캡션보다 한 톤만 진하게 한다. 게임마다 팔레트를
-// 따로 챙기지 않아도 밝은 판·어두운 판 양쪽에서 같은 세기로 앉는다.
-// 기록을 넘어선 동안에는 그 자리가 '신기록'으로 바뀌며 점수 색을 그대로 입는다.
-function drawPanelHead(c: CanvasRenderingContext2D, o: ScorePanelOptions, panelW: number) {
+// 머리줄 = (게임 정보) + 최고 기록. 기록은 읽으라고 있는 값이라 캡션 크기로 두면
+// 눈에 안 들어온다 — 예전 상단 칩과 같은 크기(26 ≈ 13px)로 키우고, 점수 색을 옅게
+// 깔아 큰 숫자보다 한 톤 뒤에 앉힌다. 게임마다 팔레트를 따로 챙기지 않아도
+// 밝은 판·어두운 판 양쪽에서 같은 세기가 나온다.
+function drawPanelHead(
+  c: CanvasRenderingContext2D,
+  o: ScorePanelOptions,
+  panelW: number,
+  head: { text: string; record: boolean },
+) {
   const { cx, labelY } = SCORE_PANEL
-  const labelColor = o.labelColor ?? 'rgb(255 255 255 / 0.5)'
-  const head = bestHead()
-  if (head.text === '') {
-    c.fillStyle = labelColor
-    c.font = font(18)
-    c.fillText(o.label, cx, labelY)
-    return
-  }
-  const caption = `${o.label}  ·  `
+  // 정보를 담은 라벨 뒤에 기록이 붙을 때만 사이를 띄운다
+  const info = o.label === undefined ? '' : head.text === '' ? o.label : `${o.label}  ·  `
+  if (info === '' && head.text === '') return
+
   c.font = font(18)
-  const captionW = c.measureText(caption).width
+  const infoW = info === '' ? 0 : c.measureText(info).width
   c.font = font(26, true)
-  const bestW = c.measureText(head.text).width
+  const bestW = head.text === '' ? 0 : c.measureText(head.text).width
   // 라벨에 진행 상황을 담는 게임(서바이버)에 긴 번역이 겹치면 판 밖으로 나간다.
   // 그때만 두 쪽을 같은 비율로 줄여 판 안에 담는다 (글자 크기 차이는 유지된다).
-  const k = Math.min(1, (panelW - 36) / (captionW + bestW))
+  const k = Math.min(1, (panelW - 36) / (infoW + bestW))
   c.save()
   c.textAlign = 'left'
-  const x = cx - ((captionW + bestW) * k) / 2
-  c.fillStyle = labelColor
-  c.font = font(18 * k)
-  c.fillText(caption, x, labelY)
-  c.fillStyle = o.valueColor ?? '#FFFFFF'
-  if (!head.record) c.globalAlpha = 0.7
-  c.font = font(26 * k, true)
-  c.fillText(head.text, x + captionW * k, labelY)
+  let x = cx - ((infoW + bestW) * k) / 2
+  if (info !== '') {
+    c.fillStyle = o.labelColor ?? 'rgb(255 255 255 / 0.5)'
+    c.font = font(18 * k)
+    c.fillText(info, x, labelY)
+    x += infoW * k
+  }
+  if (head.text !== '') {
+    // 신기록 구간에는 큰 숫자와 같은 불빛을 입어 한 덩어리로 읽힌다
+    c.fillStyle = head.record ? FIRE_INK : (o.valueColor ?? '#FFFFFF')
+    if (!head.record) c.globalAlpha = 0.7
+    c.font = font(26 * k, true)
+    c.fillText(head.text, x, labelY)
+  }
   c.restore()
 }
 

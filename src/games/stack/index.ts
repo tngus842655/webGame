@@ -220,7 +220,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // HUD: 점수 + 층수
     drawScorePanel(c, {
-      label: t('hud.score'),
       value: state.score.toLocaleString(),
       sub: true,
     })
