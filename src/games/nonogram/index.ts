@@ -127,8 +127,12 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     vibrate(30)
     state.phase = 'clearing'
     state.clearTimer = 1.4
+    // 3판에 한 번만 묻는다 — 5×5는 20초면 끝나서 매 판 물으면 1분 반 사이에 세 번
+    // 화면이 멈춘다. 보너스 시트는 광고를 안 봐도 닫아야 넘어가는 모달이라 잦으면
+    // 그 자체가 방해고, 800점짜리 제안을 반복하면 '그냥 받기'가 습관이 되어 정작
+    // 10×10 클리어의 좋은 제안까지 같이 닫힌다. 디펜스도 같은 이유로 5웨이브마다 묻는다.
     // 보너스를 묻는 동안 셸이 멈추므로 다음 퍼즐로 넘어가지 않는다
-    if (await bonus.offer(points)) points *= 2
+    if (state.level % 3 === 0 && (await bonus.offer(points))) points *= 2
     if (shell.isDestroyed()) return
     state.score = Math.min(1_000_000, state.score + points)
     popup = { text: `+${points}`, age: 0 }
