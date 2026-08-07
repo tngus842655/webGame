@@ -2,16 +2,18 @@
 // 운영자 전용 — 리워드 광고를 어디서 부르고 어떻게 끝나는지.
 // AdMob 콘솔에는 광고 단위 하나로 뭉쳐 있어 게임별·자리별로 안 쪼개진다.
 import { computed, onMounted, ref, watch } from 'vue'
+import type { AdMedium } from '@/shared/ads'
 import { fetchAdStats, type AdStat } from '@/shared/adViews'
 import { GAMES } from '@/games/registry'
 import GameIcon from '@/shared/GameIcon.vue'
-import { t } from '@/shared/i18n'
+import { t, type TranslationKey } from '@/shared/i18n'
 import { STATS_PERIODS, statsDays } from '@/shared/playSessions'
 import UiIcon from '@/shared/UiIcon.vue'
 
 const stats = ref<AdStat[]>([])
 const loading = ref(true)
 const failed = ref(false)
+const medium = ref<AdMedium | 'all'>('all')
 
 async function load() {
   loading.value = true
@@ -28,13 +30,61 @@ async function load() {
 onMounted(load)
 watch(statsDays, load)
 
-// (게임, 자리) 줄로 오는 것을 게임 단위로 묶는다
+const MEDIUM_LABELS: Record<AdMedium, TranslationKey> = {
+  adsense: 'stats.adWeb',
+  admob: 'stats.adAndroid',
+  toss: 'stats.adToss',
+}
+
+// 실제로 기록이 있는 매체만. 하나뿐이면 갈라 볼 것이 없어 필터를 감춘다
+const mediums = computed(() =>
+  (Object.keys(MEDIUM_LABELS) as AdMedium[]).filter((m) =>
+    stats.value.some((row) => row.medium === m),
+  ),
+)
+
+// 기간을 바꾸면 고른 매체가 그 기간에 없을 수 있다
+watch(mediums, (list) => {
+  if (medium.value !== 'all' && !list.includes(medium.value)) medium.value = 'all'
+})
+
+const rows = computed(() =>
+  medium.value === 'all' ? stats.value : stats.value.filter((row) => row.medium === medium.value),
+)
+
+type Spot = Omit<AdStat, 'medium'>
+
+// 전체를 볼 때는 같은 자리가 매체 수만큼 나뉘어 온다 — 자리 단위로 먼저 합친다
+const spots = computed(() => {
+  const bySpot = new Map<string, Spot>()
+  for (const row of rows.value) {
+    const prev = bySpot.get(`${row.slug} ${row.placement}`)
+    if (prev) {
+      prev.viewed += row.viewed
+      prev.dismissed += row.dismissed
+      prev.unavailable += row.unavailable
+      prev.total += row.total
+      continue
+    }
+    bySpot.set(`${row.slug} ${row.placement}`, {
+      slug: row.slug,
+      placement: row.placement,
+      viewed: row.viewed,
+      dismissed: row.dismissed,
+      unavailable: row.unavailable,
+      total: row.total,
+    })
+  }
+  return [...bySpot.values()]
+})
+
+// (게임, 자리) 줄을 게임 단위로 묶는다
 const games = computed(() => {
   const byGame = new Map<
     string,
-    { slug: string; viewed: number; dismissed: number; unavailable: number; total: number; spots: AdStat[] }
+    { slug: string; viewed: number; dismissed: number; unavailable: number; total: number; spots: Spot[] }
   >()
-  for (const row of stats.value) {
+  for (const row of spots.value) {
     let game = byGame.get(row.slug)
     if (!game) {
       game = { slug: row.slug, viewed: 0, dismissed: 0, unavailable: 0, total: 0, spots: [] }
@@ -50,7 +100,7 @@ const games = computed(() => {
 })
 
 const totals = computed(() =>
-  stats.value.reduce(
+  rows.value.reduce(
     (acc, row) => ({
       viewed: acc.viewed + row.viewed,
       unavailable: acc.unavailable + row.unavailable,
@@ -93,6 +143,22 @@ function pct(n: number, total: number): string {
         @click="statsDays = p"
       >
         {{ t('stats.days', { n: p }) }}
+      </button>
+    </div>
+
+    <!-- 매체가 하나뿐이면 전체와 같은 값이라 갈라 볼 것이 없다 -->
+    <div v-if="mediums.length > 1" class="tabs mediums">
+      <button type="button" :class="{ active: medium === 'all' }" @click="medium = 'all'">
+        {{ t('stats.adAll') }}
+      </button>
+      <button
+        v-for="m in mediums"
+        :key="m"
+        type="button"
+        :class="{ active: medium === m }"
+        @click="medium = m"
+      >
+        {{ t(MEDIUM_LABELS[m]) }}
       </button>
     </div>
 
@@ -194,6 +260,11 @@ function pct(n: number, total: number): string {
   background: var(--ink-muted);
   color: var(--surface);
   font-weight: bold;
+}
+
+/* 기간 탭과 한 묶음으로 읽히도록 붙여 둔다 */
+.mediums {
+  margin-top: -6px;
 }
 
 .hint {

@@ -20,7 +20,12 @@ import { isInToss } from './toss'
 // 봐준 것'이 같은 값이 되어, 재고가 비었는지 영영 알 수 없다.
 export type AdOutcome = 'viewed' | 'dismissed' | 'unavailable'
 
+// 광고가 나간 매체. 재고도 단가도 따로 놀아서 통계는 이 단위로 갈라 본다.
+export type AdMedium = 'adsense' | 'admob' | 'toss'
+
 export interface AdProvider {
+  // 통계에 남길 매체. 테스트 광고면 null이고, 그때는 기록을 남기지 않는다.
+  readonly medium: AdMedium | null
   isReady(): boolean
   show(placement: string): Promise<AdOutcome>
   // 판에 들어올 때 미리 받아 두라는 신호. 받아 두는 개념이 있는 매체만 구현한다
@@ -31,8 +36,10 @@ export interface AdProvider {
 const AD_SECONDS = 5
 
 // 가짜 광고: 5초 카운트다운 후 보상. 실제 매체를 붙이기 전까지 배포본에서도 이걸 쓴다 —
-// 버튼 노출·보상 지급·통계 집계까지 흐름 전체를 실기기에서 그대로 확인할 수 있다.
+// 버튼 노출부터 보상 지급까지 흐름을 실기기에서 그대로 확인할 수 있다. 통계에는 남지
+// 않는다 (medium이 null) — 5초 스텁은 무조건 '시청'이라 시청률을 통째로 부풀린다.
 class StubAdProvider implements AdProvider {
+  readonly medium = null
   private showing = false
 
   isReady() {
@@ -111,7 +118,7 @@ class H5GamesAdProvider implements AdProvider {
   private queue: unknown[]
   private showing = false
 
-  constructor(client: string) {
+  constructor(client: string, readonly medium: AdMedium | null) {
     const script = document.createElement('script')
     script.async = true
     script.crossOrigin = 'anonymous'
@@ -171,7 +178,10 @@ class AdMobProvider implements AdProvider {
   private showing = false
   private sdk: Promise<typeof import('@capacitor-community/admob')> | null = null
 
-  constructor(private readonly adId: string) {}
+  constructor(
+    private readonly adId: string,
+    readonly medium: AdMedium | null,
+  ) {}
 
   // 광고를 처음 부를 때 받아 온다 — 게임만 하고 버튼을 안 누르는 사람도 많다
   private load() {
@@ -247,7 +257,10 @@ class TossAdProvider implements AdProvider {
   private loading: Promise<boolean> | null = null
   private sdk: Promise<TossSdk> | null = null
 
-  constructor(private readonly adGroupId: string) {}
+  constructor(
+    private readonly adGroupId: string,
+    readonly medium: AdMedium | null,
+  ) {}
 
   private loadSdk() {
     if (!this.sdk) this.sdk = import('@apps-in-toss/web-framework')
@@ -358,20 +371,38 @@ class TossAdProvider implements AdProvider {
   }
 }
 
+// 실제 광고인지 테스트 광고인지는 광고 단위 ID로 가른다. 테스트 단위는 출시한 뒤에도
+// 계속 쓴다 — AdMob은 개발 중에 실제 단위로 자기 광고를 보면 무효 트래픽으로 계정이
+// 막히고, 앱인토스도 운영 ID로 테스트하면 정책 위반이다. 게임을 하나 더 붙일 때마다
+// 다시 쓰게 되는 값이라, 출시하면 없어질 것으로 두면 안 된다.
+//
+// 구글이 공개한 테스트 광고 단위는 전부 이 게시자 ID를 쓴다
+const ADMOB_TEST_PUBLISHER = 'ca-app-pub-3940256099942544/'
+// 앱인토스 테스트 광고 그룹 — 고정 ID와 개발 환경 ID. 운영은 ait.v2.live.* 꼴이다
+const TOSS_TEST_PREFIXES = ['ait-ad-test-', 'ait.dev.']
+
+// dev 서버도 테스트로 친다. 운영과 같은 Supabase를 보는 데다, localhost는 AdSense
+// 승인 도메인이 아니라 광고가 전부 '못 뜸'으로 떨어져서 재고 지표를 통째로 망친다.
+const isDev = import.meta.env.DEV
+
 function createProvider(): AdProvider {
   if (isNative) {
     const adId = import.meta.env.VITE_ADMOB_REWARD_ID as string | undefined
-    return adId ? new AdMobProvider(adId) : new StubAdProvider()
+    if (!adId) return new StubAdProvider()
+    const isTest = isDev || adId.startsWith(ADMOB_TEST_PUBLISHER)
+    return new AdMobProvider(adId, isTest ? null : 'admob')
   }
 
   // 미니앱에서는 AdSense로 흘려보내면 안 된다. 광고 그룹 ID가 아직 없으면 스텁으로 둔다.
   if (isInToss) {
     const adGroupId = import.meta.env.VITE_TOSS_AD_GROUP_ID as string | undefined
-    return adGroupId ? new TossAdProvider(adGroupId) : new StubAdProvider()
+    if (!adGroupId) return new StubAdProvider()
+    const isTest = isDev || TOSS_TEST_PREFIXES.some((prefix) => adGroupId.startsWith(prefix))
+    return new TossAdProvider(adGroupId, isTest ? null : 'toss')
   }
 
   const client = import.meta.env.VITE_ADSENSE_CLIENT as string | undefined
-  if (client) return new H5GamesAdProvider(client)
+  if (client) return new H5GamesAdProvider(client, isDev ? null : 'adsense')
   // 아직 실제 매체를 붙이지 않았다 — 가짜 광고로 보상 흐름을 그대로 돌린다.
   // VITE_ADSENSE_CLIENT를 넣는 순간 실제 광고로 바뀐다.
   return new StubAdProvider()
