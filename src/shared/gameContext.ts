@@ -36,7 +36,9 @@ export function createGameContext(slug: string): GameContext {
       duckBgm()
       try {
         const outcome = await adProvider.show(placement)
-        void recordAdView(slug, placement, outcome)
+        // 테스트 광고는 매체가 없다 = 통계에 넣지 않는다. 스텁 5초 광고나 테스트
+        // 광고 단위가 섞이면 '못 뜸'이 재고 문제인지 내가 만든 잡음인지 갈라볼 수 없다.
+        if (adProvider.medium) void recordAdView(slug, placement, adProvider.medium, outcome)
         // 사용자가 스스로 닫은 경우에만 보상을 막는다. 재고 없음·상한·에러는
         // 매체 사정이라 기회를 뺏지 않는다.
         return outcome !== 'dismissed'
