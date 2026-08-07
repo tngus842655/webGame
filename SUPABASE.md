@@ -23,9 +23,18 @@
 | `20260801000000_feedback.sql` | `feedback` 테이블 — 의견 접수, 분당 3회 제한 | ✅ 2026-08-01 |
 | `20260801100000_feedback_delete.sql` | `feedback` 삭제 정책 (관리자만) | ✅ 2026-08-01 |
 | `20260802000000_player_stats.sql` | `get_player_stats()` — 이용자별 게임 이용 현황 | ✅ 2026-08-02 |
-| `20260803000000_ad_views.sql` | `ad_views` 테이블 — 리워드 광고 호출 기록, `get_ad_stats()` | ⬜ **실행 필요** |
-| `20260804000000_guest_nickname_en.sql` | 기본 닉네임 `게스트-` → `Guest-` | ⬜ **실행 필요** |
+| `20260803000000_ad_views.sql` | `ad_views` 테이블 — 리워드 광고 호출 기록, `get_ad_stats()` | ✅ |
+| `20260804000000_guest_nickname_en.sql` | 기본 닉네임 `게스트-` → `Guest-` | ✅ |
 | `20260804100000_toss_login.sql` | `toss_accounts` 테이블 — 앱인토스 토스 로그인 | ✅ 2026-08-04 |
+| `20260806000000_toss_anon_keys.sql` | `toss_anon_keys` — 토스 식별키, 프로모션 중복 지급 기준 | ✅ |
+| `20260806100000_promotion_grants.sql` | `promotion_grants` — 프로모션 지급 이력 (식별키 단위) | ✅ |
+| `20260806200000_promotion_status.sql` | `get_promotion_status()` — 안내 화면이 읽는 진행 상황 | ✅ |
+| `20260806300000_promotion_plays_since.sql` | 판 수를 접속 보상 이후로만 세도록 수정 | ✅ |
+| `20260806400000_promotion_failures.sql` | `promotion_failures` — 지급 거절 사유 기록 | ✅ |
+| `20260806500000_promotion_failures_dedup.sql` | 실패 기록을 (식별키, 단계, 코드) 한 줄로 묶고 횟수를 센다 | ✅ |
+| `20260806600000_promotion_state.sql` | 프로모션 종료를 앱이 알게 한다 | ✅ |
+| `20260806700000_promotion_end_manual.sql` | 프로모션 종료 스위치를 클라이언트 손에서 뺀다 | ✅ |
+| `20260807000000_ad_views_medium.sql` | `ad_views.medium` 컬럼 — 매체 구분, `get_ad_stats()` 재정의 | ⬜ **실행 필요** |
 
 ## 테이블
 
@@ -37,7 +46,7 @@
 | `admin_emails` | 관리자 이메일 목록 | **정책 없음** = 클라이언트 접근 불가. 추가는 대시보드에서 직접 |
 | `game_flags` | 게임 고정·숨김·휴지통 | 조회 전체 공개 / 쓰기는 관리자만 |
 | `feedback` | 사용자 의견 (버그·문의·제안) | insert는 본인만 / **조회·삭제는 관리자만** / update 정책 없음(금지) |
-| `ad_views` | 리워드 광고 호출 기록 (게임·자리·결과) | insert는 본인만 / **조회는 관리자만** / update·delete 정책 없음(금지) |
+| `ad_views` | 리워드 광고 호출 기록 (매체·게임·자리·결과). 테스트 광고는 담지 않는다 | insert는 본인만 / **조회는 관리자만** / update·delete 정책 없음(금지) |
 | `toss_accounts` | 토스 `userKey` ↔ `auth.users`. 앱인토스 전용 | **정책 없음** — service_role(서버 함수)만 다룬다 |
 
 삭제 연쇄: `auth.users` → `profiles` → `scores`·`play_sessions`·`feedback`·`ad_views` 순으로
