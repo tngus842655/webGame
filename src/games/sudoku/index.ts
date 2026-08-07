@@ -1,4 +1,3 @@
-import { ensureAdminChecked, isAdmin } from '@/shared/admin'
 import { t } from '@/shared/i18n'
 import { playDrop, playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
@@ -26,9 +25,6 @@ const CELL = 72
 const GRID_W = CELL * 9
 const PAD = { y: 952, h: 116, w: 68, gap: 4, x: 38 } as const
 const MEMO = { x: 246, y: 1096, w: 228, h: 80 } as const
-// 관리자 전용 건너뛰기 버튼 — 메모 버튼 오른쪽 빈 자리 (관리자가 아니면 그리지 않으므로
-// 평소 화면은 메모 버튼만 가운데 놓인 지금 모습 그대로다)
-const SKIP = { x: 482, y: 1096, w: 202, h: 80 } as const
 
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
@@ -57,8 +53,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     draw()
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
-  // 홈을 거치지 않고 게임 주소로 바로 들어오면 아직 관리자 확인 전이다 (결과는 캐시된다)
-  void ensureAdminChecked()
   const state = createState()
   preloadSfx('clear', 'gameover', 'select', 'tap')
   let popup: { text: string; age: number } | null = null
@@ -101,9 +95,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   const onPuzzleClear = async () => {
     let points = clearPoints(state)
-    // 스트릭은 출석 표시일 뿐 점수에는 넣지 않는다 —
-    // 지난 날들의 기록이 오늘 점수에 얹히면 순위표가 실력을 재지 못한다
-    if (state.daily) state.streak = recordDailyClear().streak
+    // 오늘 데일리를 풀었다는 기록만 남긴다 (연속 일수는 화면에 쓰지 않는다).
+    // 점수에는 넣지 않는다 — 지난 날들의 기록이 오늘 점수에 얹히면
+    // 순위표가 실력을 재지 못한다
+    if (state.daily) recordDailyClear()
     playSfx('clear')
     vibrate(30)
     state.phase = 'clearing'
@@ -151,20 +146,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         playSfx('select')
         return
       }
-      // 관리자 전용 건너뛰기 — 연습 퍼즐 번호만 올린다. loadPractice는 격자·생명만
-      // 바꾸고 score는 건드리지 않으므로 건너뛴 판의 점수는 붙지 않는다.
-      // (데일리를 풀던 중이면 level 0 → 연습 1판으로 넘어간다)
-      if (
-        isAdmin.value &&
-        p.x >= SKIP.x &&
-        p.x <= SKIP.x + SKIP.w &&
-        p.y >= SKIP.y &&
-        p.y <= SKIP.y + SKIP.h
-      ) {
-        loadPractice(state, state.level + 1)
-        playDrop()
-        return
-      }
       // 숫자 패드
       if (p.y >= PAD.y && p.y <= PAD.y + PAD.h) {
         const idx = Math.floor((p.x - PAD.x) / (PAD.w + PAD.gap))
@@ -197,17 +178,14 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       labelColor: ground('#80CBC4', '#6E9E98'),
       valueColor: ground('#004D40', '#CFEAE5'),
     })
-    c.fillStyle = ground('#00796B', '#7FBDB4')
-    c.font = font(24)
-    c.textAlign = 'left'
-    const now = new Date()
-    c.fillText(
-      state.daily
-        ? t('sd.daily', { date: `${now.getMonth() + 1}/${now.getDate()}` })
-        : t('sd.practice', { n: state.level }),
-      SCORE_PANEL.left,
-      SCORE_PANEL.subY,
-    )
+    // 연습 퍼즐만 몇 판째인지 남긴다. 데일리는 날짜를 적어 봐야 플레이어가
+    // 이미 아는 것이라 비운다.
+    if (!state.daily) {
+      c.fillStyle = ground('#00796B', '#7FBDB4')
+      c.font = font(24)
+      c.textAlign = 'left'
+      c.fillText(t('sd.practice', { n: state.level }), SCORE_PANEL.left, SCORE_PANEL.subY)
+    }
     c.textAlign = 'center'
     const heartX = (i: number) => 462 + i * 42
     for (let i = 0; i < 3; i++) {
@@ -220,11 +198,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       })
     }
 
-    // 스트릭·경과 시간
+    // 경과 시간 (점수가 이것으로 갈린다)
     c.fillStyle = '#FFFFFF'
     c.font = font(26, true)
-    c.textAlign = 'left'
-    c.fillText(t('sd.streak', { n: state.streak }), GRID_X + 4, 216)
     const mm = Math.floor(state.elapsed / 60)
     const ss = String(Math.floor(state.elapsed % 60)).padStart(2, '0')
     c.textAlign = 'right'
@@ -368,28 +344,20 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.font = font(30, true)
     c.fillText(t('sd.memo'), MEMO.x + 148, MEMO.y + 52)
 
-    // 관리자 전용 건너뛰기. 옆의 메모 버튼과 헷갈리면 안 되므로 점선 테두리에
-    // 옅은 글씨로 두어 '이건 개발용'이라는 게 눌러 보기 전에 보이게 한다.
-    if (isAdmin.value) {
-      c.save()
-      c.strokeStyle = ground('#80CBC4', '#2F5B55')
-      c.setLineDash([10, 8])
-      c.lineWidth = 2
-      c.beginPath()
-      c.roundRect(SKIP.x, SKIP.y, SKIP.w, SKIP.h, 20)
-      c.stroke()
-      c.fillStyle = ground('#00796B', '#6FB3AA')
-      c.font = font(24)
-      c.textAlign = 'center'
-      c.textBaseline = 'middle'
-      c.fillText(t('admin.skipLevel'), SKIP.x + SKIP.w / 2, SKIP.y + SKIP.h / 2)
-      c.restore()
-    }
   }
 
   shell.addCleanup(detachInput)
   shell.addCleanup(() => stage.destroy())
-  return { destroy: () => shell.destroy(), getScore: () => state.score }
+  return {
+    destroy: () => shell.destroy(),
+    getScore: () => state.score,
+    // 관리자 전용 '다음 단계' — 연습 퍼즐 번호만 올린다. loadPractice는 격자·생명만
+    // 바꾸고 score를 건드리지 않는다. 데일리를 풀던 중이면 연습 1판으로 넘어간다.
+    adminSkip() {
+      if (state.phase !== 'playing') return
+      loadPractice(state, state.level + 1)
+    },
+  }
 }
 
 export default defineGame(createSession)

@@ -1,4 +1,3 @@
-import { ensureAdminChecked, isAdmin } from '@/shared/admin'
 import { t } from '@/shared/i18n'
 import { playDrop, playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
@@ -25,8 +24,6 @@ const GRID_X = 190
 const GRID_Y = 370
 const GRID_W = 510
 const BTN = { y: 1040, h: 150, w: 290, x1: 50, x2: 380 } as const
-// 관리자 전용 건너뛰기 버튼 — 그리드 아래(880)와 모드 버튼(1040) 사이 빈 자리
-const SKIP = { x: 50, y: 900, w: 620, h: 100 } as const
 
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
@@ -55,9 +52,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  // 홈을 거치지 않고 게임 주소로 바로 들어오면 아직 관리자 확인 전이다.
-  // 결과는 캐시되므로 두 번 묻지 않고, 확인 전이나 일반 사용자는 isAdmin이 false라 버튼이 없다.
-  void ensureAdminChecked()
   preloadSfx('clear', 'gameover', 'pop', 'tap')
   // 누르고 있는 동안 지나간 칸들. 확정은 손을 뗄 때 한 번에 하고, 격자 밖에서 떼면
   // 통째로 버린다. 10×10에서 한 칸이 5mm라 손가락이 칸을 통째로 덮어 이웃을 짚기 쉬운데,
@@ -199,21 +193,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
           state.mode = 'mark'
           playDrop()
         }
-        return
-      }
-      // 관리자 전용 건너뛰기 — 퍼즐 번호만 올린다. 점수도 기록도 건드리지 않으므로
-      // 건너뛴 판의 점수는 붙지 않고, 이후 게임오버 시 실제로 번 점수만 등록된다.
-      if (
-        isAdmin.value &&
-        p.x >= SKIP.x &&
-        p.x <= SKIP.x + SKIP.w &&
-        p.y >= SKIP.y &&
-        p.y <= SKIP.y + SKIP.h
-      ) {
-        loadPuzzle(state, state.level + 1)
-        stroke = null
-        aim = null
-        playDrop()
         return
       }
       const hit = cellAt(p.x, p.y)
@@ -448,28 +427,22 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     drawButton(BTN.x1, t('no.fill'), state.mode === 'fill')
     drawButton(BTN.x2, t('no.mark'), state.mode === 'mark')
 
-    // 관리자 전용 건너뛰기. 게임 버튼과 헷갈리면 안 되므로 점선 테두리에 옅은 글씨로
-    // 두어 '이건 개발용'이라는 게 눌러 보기 전에 보이게 한다.
-    if (isAdmin.value) {
-      c.save()
-      c.strokeStyle = ground('#9FA8DA', '#4E5478')
-      c.setLineDash([10, 8])
-      c.lineWidth = 2
-      c.beginPath()
-      c.roundRect(SKIP.x, SKIP.y, SKIP.w, SKIP.h, 20)
-      c.stroke()
-      c.fillStyle = ground('#5C6BC0', '#9AA3D8')
-      c.font = font(30)
-      c.textAlign = 'center'
-      c.textBaseline = 'middle'
-      c.fillText(t('admin.skipLevel'), SKIP.x + SKIP.w / 2, SKIP.y + SKIP.h / 2)
-      c.restore()
-    }
   }
 
   shell.addCleanup(detachInput)
   shell.addCleanup(() => stage.destroy())
-  return { destroy: () => shell.destroy(), getScore: () => state.score }
+  return {
+    destroy: () => shell.destroy(),
+    getScore: () => state.score,
+    // 관리자 전용 '다음 단계' — 퍼즐 번호만 올린다. loadPuzzle은 score를 건드리지
+    // 않으므로 건너뛴 판의 점수는 붙지 않고, 순위표에는 실제로 번 점수만 올라간다.
+    adminSkip() {
+      if (state.phase !== 'playing') return
+      loadPuzzle(state, state.level + 1)
+      stroke = null
+      aim = null
+    },
+  }
 }
 
 export default defineGame(createSession)
