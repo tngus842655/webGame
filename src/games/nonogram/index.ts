@@ -60,6 +60,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   void ensureAdminChecked()
   preloadSfx('clear', 'gameover', 'pop', 'tap')
   let drag: { mode: Mode; markValue: CellState; last: number } | null = null
+  // 눌렀지만 아직 확정하지 않은 칸. 10×10에서 한 칸이 5mm라 손가락이 칸을 통째로 덮어
+  // 이웃을 짚기 쉬운데, 칠하기는 한 번 틀리면 생명이 깎이고 되돌릴 수 없다. 뗄 때
+  // 확정하면 그사이 손을 밀어 고칠 수 있고, 그 칸 밖에서 떼면 없던 일이 된다.
+  let pending: { row: number; col: number } | null = null
   // 지금 손끝이 짚고 있는 칸. 10×10에서 칸이 51px이라 손가락이 칸을 통째로 가린다 —
   // 줄 띠와 힌트 강조가 손 밖으로 삐져나와야 어디를 칠하는지 보인다.
   let aim: { row: number; col: number } | null = null
@@ -127,6 +131,21 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     }
   }
 
+  // 한 칸을 지금 모드대로 확정하고, 이어서 밀면 연속 적용되도록 드래그를 연다.
+  // 칠하기가 오답이면 tryFill이 드래그를 닫는다.
+  const commitCell = (row: number, col: number) => {
+    const key = row * state.size + col
+    if (state.mode === 'fill') {
+      drag = { mode: 'fill', markValue: 0, last: key }
+      tryFill(row, col)
+      return
+    }
+    const applied = toggleMark(state, row, col)
+    if (applied === null) return
+    playDrop()
+    drag = { mode: 'mark', markValue: applied, last: key }
+  }
+
   const onPuzzleClear = async () => {
     let points = puzzlePoints(state.size) + state.lives * 100
     playSfx('clear')
@@ -169,6 +188,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         p.y <= SKIP.y + SKIP.h
       ) {
         loadPuzzle(state, state.level + 1)
+        pending = null
         drag = null
         aim = null
         playDrop()
@@ -176,25 +196,28 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       }
       const hit = cellAt(p.x, p.y)
       if (!hit) return
+      // 여기서는 짚기만 한다. 확정은 onUp(그 칸에서 뗐을 때)이나
+      // onMove(칸을 벗어나 연속 칠하기가 시작될 때)가 한다.
+      pending = hit
       aim = hit
-      if (state.mode === 'fill') {
-        drag = { mode: 'fill', markValue: 0, last: hit.row * state.size + hit.col }
-        tryFill(hit.row, hit.col)
-      } else {
-        const applied = toggleMark(state, hit.row, hit.col)
-        if (applied === null) return
-        playDrop()
-        drag = { mode: 'mark', markValue: applied, last: hit.row * state.size + hit.col }
-      }
     },
     onMove(clientX, clientY) {
-      if (!drag || state.phase !== 'playing') return
+      if ((!drag && !pending) || state.phase !== 'playing') return
       const p = stage.toBoard(clientX, clientY)
       const hit = cellAt(p.x, p.y)
-      if (!hit) return
+      // 격자 밖으로 나가면 강조를 끈다 — 지금 떼면 아무 일도 없다는 표시다
       aim = hit
+      if (!hit) return
       const key = hit.row * state.size + hit.col
-      if (key === drag.last) return
+      if (pending) {
+        // 누른 칸 안에서 미세하게 움직이는 중이면 아직 확정하지 않는다
+        if (key === pending.row * state.size + pending.col) return
+        // 다른 칸까지 밀었다 = 연속 칠하기. 누른 칸부터 확정하고 이어 간다
+        const first = pending
+        pending = null
+        commitCell(first.row, first.col)
+      }
+      if (!drag || key === drag.last) return
       drag.last = key
       if (drag.mode === 'fill') {
         tryFill(hit.row, hit.col)
@@ -207,7 +230,16 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         }
       }
     },
-    onUp() {
+    onUp(clientX, clientY) {
+      // 누른 그 칸에서 뗐을 때만 확정한다. 다른 칸이나 격자 밖에서 떼면 취소다
+      if (pending && state.phase === 'playing') {
+        const p = stage.toBoard(clientX, clientY)
+        const hit = cellAt(p.x, p.y)
+        if (hit && hit.row === pending.row && hit.col === pending.col) {
+          commitCell(hit.row, hit.col)
+        }
+      }
+      pending = null
       drag = null
       aim = null
     },
