@@ -270,8 +270,16 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   shell.addCleanup(detachInput)
   shell.addCleanup(() => stage.destroy())
-  // 시간제한 게임 — 제한 시간을 다 쓴 결과만 기록한다
-  return shell
+  // 시간제한 게임 — 제한 시간을 다 쓴 결과만 기록한다 (getScore를 두지 않는다)
+  return {
+    destroy: () => shell.destroy(),
+    // 관리자 전용 '다음 단계' — 퍼즐 번호만 올린다. loadLevel은 격자만 새로 깔고
+    // score를 건드리지 않으므로 건너뛴 판의 점수는 붙지 않는다.
+    adminSkip() {
+      if (state.phase !== 'playing') return
+      loadLevel(state, state.level + 1)
+    },
+  }
 }
 
 export default defineGame(createSession)

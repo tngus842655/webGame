@@ -253,10 +253,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // 상단: 라벨 + 스트릭 + 점수 + 공유
     c.textAlign = 'left'
-    const d = new Date()
-    const label = state.daily
-      ? t('sd.daily', { date: `${d.getMonth() + 1}/${d.getDate()}` })
-      : t('sd.practice', { n: state.practiceCount })
     // 밝은 판 위라 흰 판에 어두운 글씨를 쓴다 (공통 점수판 규격)
     drawScorePanel(c, {
       value: state.score.toLocaleString(),
@@ -266,9 +262,12 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       valueColor: ground('#263238', '#E2E8EA'),
     })
     c.textAlign = 'center'
-    c.fillStyle = '#78909C'
-    c.font = font(20, true)
-    c.fillText(`${label} · ${t('sd.streak', { n: state.streak })}`, SCORE_PANEL.cx, SCORE_PANEL.subY)
+    // 몇 단계째인지만 남긴다. 데일리는 단계가 없는 하루치 한 판이라 비운다
+    if (!state.daily) {
+      c.fillStyle = '#78909C'
+      c.font = font(20, true)
+      c.fillText(t('common.stage', { n: state.practiceCount }), SCORE_PANEL.cx, SCORE_PANEL.subY)
+    }
     if (state.dailyShare) {
       c.fillStyle = '#455A64'
       c.beginPath()
@@ -371,7 +370,16 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   shell.addCleanup(detachInput)
   shell.addCleanup(() => stage.destroy())
-  return { destroy: () => shell.destroy(), getScore: () => state.score }
+  return {
+    destroy: () => shell.destroy(),
+    getScore: () => state.score,
+    // 관리자 전용 '다음 단계' — 새 단어로 넘긴다. nextPracticeWord는 판만 다시
+    // 깔고 score를 건드리지 않으므로 건너뛴 단어의 점수는 붙지 않는다.
+    adminSkip() {
+      if (state.phase !== 'playing') return
+      nextPracticeWord(state)
+    },
+  }
 }
 
 export default defineGame(createSession)

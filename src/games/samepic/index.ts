@@ -5,7 +5,16 @@ import { attachInput } from '../pointer'
 import { createResumeGate } from '../resumeGate'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
-import { DISCS, DISC_R, GAUGE_MAX, createState, reviveWithTime, tapAt, update } from './state'
+import {
+  DISCS,
+  DISC_R,
+  GAUGE_MAX,
+  createState,
+  newRound,
+  reviveWithTime,
+  tapAt,
+  update,
+} from './state'
 import { SYMBOLS } from './symbols'
 import { drawScorePanel, font } from '../ui'
 
@@ -239,7 +248,16 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   shell.addCleanup(detachInput)
   shell.addCleanup(() => stage.destroy())
-  return { destroy: () => shell.destroy(), getScore: () => state.score }
+  return {
+    destroy: () => shell.destroy(),
+    getScore: () => state.score,
+    // 관리자 전용 '다음 단계' — newRound는 그림만 새로 깔고 score를 건드리지 않는다.
+    adminSkip() {
+      if (state.phase !== 'playing') return
+      state.round += 1
+      newRound(state)
+    },
+  }
 }
 
 export default defineGame(createSession)

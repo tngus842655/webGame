@@ -421,7 +421,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   shell.addCleanup(detachInput)
   shell.addCleanup(() => stage.destroy())
-  return { destroy: () => shell.destroy(), getScore: () => state.score }
+  return {
+    destroy: () => shell.destroy(),
+    getScore: () => state.score,
+    // 관리자 전용 '다음 단계' — 마지막 스테이지에서는 넘길 곳이 없다.
+    adminSkip() {
+      if (state.phase !== 'playing' || state.stage >= MAX_STAGE) return
+      startStage(state, state.stage + 1)
+    },
+  }
 }
 
 export default defineGame(createSession)

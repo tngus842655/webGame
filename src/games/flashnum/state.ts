@@ -52,7 +52,7 @@ function layout(count: number): Bubble[] {
   return bubbles
 }
 
-function startLevel(state: FlashState) {
+export function startLevel(state: FlashState) {
   state.bubbles = layout(bubbleCount(state.level))
   state.next = 1
   state.showSpan = exposure(state.level)

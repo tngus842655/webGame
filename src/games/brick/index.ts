@@ -232,7 +232,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   shell.addCleanup(detachInput)
   shell.addCleanup(() => renderer.destroy())
-  return { destroy: () => shell.destroy(), getScore: () => state.score }
+  return {
+    destroy: () => shell.destroy(),
+    getScore: () => state.score,
+    // 관리자 전용 '다음 단계' — advanceWave는 줄을 한 칸 내리고 새 줄을 깐다. 바닥에 닿으면 그대로 게임오버다.
+    adminSkip() {
+      if (state.phase !== 'aiming') return
+      advanceWave(state)
+    },
+  }
 }
 
 export default defineGame(createSession)

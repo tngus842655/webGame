@@ -12,6 +12,7 @@ import {
   COLS,
   LAYOUT,
   MAX_LEVEL,
+  MAX_STAGE,
   ROWS,
   cellPos,
   clearLowestItems,
@@ -351,7 +352,17 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   shell.addCleanup(detachInput)
   shell.addCleanup(() => stage.destroy())
-  return { destroy: () => shell.destroy(), getScore: () => state.score }
+  return {
+    destroy: () => shell.destroy(),
+    getScore: () => state.score,
+    // 관리자 전용 '다음 단계' — 정상 진행과 같되 클리어 보너스는 얹지 않는다. 마지막 단계에서는 넘길 곳이 없다.
+    adminSkip() {
+      if (state.phase !== 'playing' || state.stage >= MAX_STAGE) return
+      state.stage += 1
+      state.goldMade = 0
+      state.timeLeft = stageSeconds(state.stage)
+    },
+  }
 }
 
 export default defineGame(createSession)

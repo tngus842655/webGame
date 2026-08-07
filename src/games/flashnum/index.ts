@@ -5,7 +5,15 @@ import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
-import { BUBBLE_R, createState, reviveAtLevel, tapAt, update, type Bubble } from './state'
+import {
+  BUBBLE_R,
+  createState,
+  reviveAtLevel,
+  startLevel,
+  tapAt,
+  update,
+  type Bubble,
+} from './state'
 import { SCORE_PANEL, drawScorePanel, font } from '../ui'
 import { drawIconRow } from '../icons'
 
@@ -204,7 +212,16 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   shell.addCleanup(detachInput)
   shell.addCleanup(() => stage.destroy())
-  return { destroy: () => shell.destroy(), getScore: () => state.score }
+  return {
+    destroy: () => shell.destroy(),
+    getScore: () => state.score,
+    // 관리자 전용 '다음 단계' — clear는 저절로 다음 단계로 넘어가는 중이라 받지 않는다(두 번 넘어간다).
+    adminSkip() {
+      if (state.phase === 'over' || state.phase === 'clear') return
+      state.level += 1
+      startLevel(state)
+    },
+  }
 }
 
 export default defineGame(createSession)

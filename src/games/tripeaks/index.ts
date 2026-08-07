@@ -278,7 +278,16 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   shell.addCleanup(detachInput)
   shell.addCleanup(() => stage.destroy())
-  return { destroy: () => shell.destroy(), getScore: () => state.score }
+  return {
+    destroy: () => shell.destroy(),
+    getScore: () => state.score,
+    // 관리자 전용 '다음 단계' — loadStage는 카드만 새로 깔고 score를 건드리지 않는다.
+    adminSkip() {
+      if (state.phase !== 'playing') return
+      state.stage += 1
+      loadStage(state)
+    },
+  }
 }
 
 export default defineGame(createSession)

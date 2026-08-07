@@ -6,13 +6,14 @@ import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import {
+  CARD_DEFS,
   chooseReward,
   createState,
   endTurn,
   intentDamage,
   playCard,
   resolveEnemyTurn,
-  CARD_DEFS,
+  startBattle,
   type CardId,
 } from './state'
 import { drawCardArt } from './cardArt'
@@ -763,7 +764,16 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   shell.addCleanup(detachInput)
   shell.addCleanup(() => stage.destroy())
-  return { destroy: () => shell.destroy(), getScore: () => state.score }
+  return {
+    destroy: () => shell.destroy(),
+    getScore: () => state.score,
+    // 관리자 전용 '다음 단계' — 정상 진행은 보상 카드를 고른 뒤 넘어가지만 여기서는 그 단계를 건너뛴다.
+    adminSkip() {
+      if (state.phase !== 'player') return
+      state.stage += 1
+      startBattle(state)
+    },
+  }
 }
 
 export default defineGame(createSession)
