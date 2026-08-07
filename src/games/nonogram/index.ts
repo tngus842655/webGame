@@ -247,7 +247,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.fillStyle = ground('#5C6BC0', '#9AA3D8')
     c.font = font(24)
     c.textAlign = 'left'
-    c.fillText(t('no.puzzle', { n: state.level }), SCORE_PANEL.left, SCORE_PANEL.subY)
+    c.fillText(t('common.stage', { n: state.level }), SCORE_PANEL.left, SCORE_PANEL.subY)
     c.textAlign = 'center'
     const heartX = (i: number) => 462 + i * 42
     for (let i = 0; i < 3; i++) {

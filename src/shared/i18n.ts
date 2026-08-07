@@ -53,6 +53,7 @@ const en = {
   'home.ranking': 'Rankings',
   'common.back': 'Home',
   'common.tapClose': 'Tap anywhere to close',
+  'common.stage': 'Level {n}',
   // 탭에 세 개가 나란히 서므로 짧게 — 한국어는 글자가 좁아 한 낱말 더 들어간다
   'home.sectionNew': 'New',
   'home.sectionFavorites': 'Favorites',
@@ -302,7 +303,6 @@ const en = {
   'tp.stage': 'Stage {n}',
   'tp.streak': 'Streak x{n}',
   'tp.ad': '▶ Watch ad for +3 cards',
-  'no.puzzle': 'Puzzle {n}',
   'no.fill': 'Fill',
   'no.mark': 'Mark',
   'no.ad': '▶ Watch ad to continue (+1 life)',

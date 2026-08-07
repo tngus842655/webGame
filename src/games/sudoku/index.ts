@@ -178,13 +178,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       labelColor: ground('#80CBC4', '#6E9E98'),
       valueColor: ground('#004D40', '#CFEAE5'),
     })
-    // 연습 퍼즐만 몇 판째인지 남긴다. 데일리는 날짜를 적어 봐야 플레이어가
-    // 이미 아는 것이라 비운다.
+    // 몇 단계째인지만 남긴다. 데일리는 단계가 없는 하루치 한 판이고, 날짜를 적어 봐야
+    // 플레이어가 이미 아는 것이라 비운다.
     if (!state.daily) {
       c.fillStyle = ground('#00796B', '#7FBDB4')
       c.font = font(24)
       c.textAlign = 'left'
-      c.fillText(t('sd.practice', { n: state.level }), SCORE_PANEL.left, SCORE_PANEL.subY)
+      c.fillText(t('common.stage', { n: state.level }), SCORE_PANEL.left, SCORE_PANEL.subY)
     }
     c.textAlign = 'center'
     const heartX = (i: number) => 462 + i * 42
