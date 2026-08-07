@@ -59,11 +59,17 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   // 결과는 캐시되므로 두 번 묻지 않고, 확인 전이나 일반 사용자는 isAdmin이 false라 버튼이 없다.
   void ensureAdminChecked()
   preloadSfx('clear', 'gameover', 'pop', 'tap')
-  let drag: { mode: Mode; markValue: CellState; last: number } | null = null
-  // 눌렀지만 아직 확정하지 않은 칸. 10×10에서 한 칸이 5mm라 손가락이 칸을 통째로 덮어
-  // 이웃을 짚기 쉬운데, 칠하기는 한 번 틀리면 생명이 깎이고 되돌릴 수 없다. 뗄 때
-  // 확정하면 그사이 손을 밀어 고칠 수 있고, 그 칸 밖에서 떼면 없던 일이 된다.
-  let pending: { row: number; col: number } | null = null
+  // 누르고 있는 동안 지나간 칸들. 확정은 손을 뗄 때 한 번에 하고, 격자 밖에서 떼면
+  // 통째로 버린다. 10×10에서 한 칸이 5mm라 손가락이 칸을 통째로 덮어 이웃을 짚기 쉬운데,
+  // 칠하기는 한 번 틀리면 생명이 깎이고 되돌릴 수 없다 — 떼기 전까지는 무를 수 있어야 한다.
+  //
+  // 첫 칸만 미루고 나머지는 즉시 칠하는 방식도 해봤지만 못 쓴다. 안쪽 칸에서 격자 밖으로
+  // 빼려면 반드시 이웃 칸을 지나가야 해서, 그 순간 첫 칸이 확정돼 버린다. 정작 잘못
+  // 짚기 쉬운 안쪽에서 취소가 안 되고 테두리 칸에서만 됐다.
+  //
+  // 잘못 취소되면 다시 그으면 그만이지만 잘못 확정되면 생명이 날아간다. 애매하면
+  // 취소 쪽으로 기운다 — 격자 밖에서 떼면 버리는 것도 그래서다.
+  let stroke: { mode: Mode; markValue: CellState; cells: number[] } | null = null
   // 지금 손끝이 짚고 있는 칸. 10×10에서 칸이 51px이라 손가락이 칸을 통째로 가린다 —
   // 줄 띠와 힌트 강조가 손 밖으로 삐져나와야 어디를 칠하는지 보인다.
   let aim: { row: number; col: number } | null = null
@@ -113,13 +119,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     return { row, col }
   }
 
-  const tryFill = (row: number, col: number) => {
+  // 한 칸 칠하기. 오답이거나 판이 끝나면 false — 획의 남은 칸은 적용하지 않는다.
+  const fillOne = (row: number, col: number): boolean => {
     const result = applyFill(state, row, col)
-    if (result === 'filled') {
-      playSfx('pop', { gain: 0.7 })
-      if (state.remaining === 0) void onPuzzleClear()
-    } else if (result === 'miss') {
-      drag = null // 오답이면 드래그 종료
+    if (result === 'miss') {
       vibrate(60)
       state.shakeTime = 0.35
       state.lives -= 1
@@ -128,22 +131,42 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         state.phase = 'over'
         state.overTimer = 0.9
       }
+      return false
     }
+    if (result === 'filled') {
+      playSfx('pop', { gain: 0.7 })
+      if (state.remaining === 0) {
+        void onPuzzleClear()
+        return false
+      }
+    }
+    return true
   }
 
-  // 한 칸을 지금 모드대로 확정하고, 이어서 밀면 연속 적용되도록 드래그를 연다.
-  // 칠하기가 오답이면 tryFill이 드래그를 닫는다.
-  const commitCell = (row: number, col: number) => {
-    const key = row * state.size + col
-    if (state.mode === 'fill') {
-      drag = { mode: 'fill', markValue: 0, last: key }
-      tryFill(row, col)
+  // 획을 확정한다. 지나간 칸을 순서대로 적용하고, 칠하기는 첫 오답에서 멈춘다.
+  // (onPuzzleClear는 첫 await 전에 phase를 바꾸므로 이 반복 도중 판이 갈리지 않는다)
+  const commitStroke = () => {
+    if (!stroke) return
+    const size = state.size
+    if (stroke.mode === 'fill') {
+      for (const key of stroke.cells) {
+        if (!fillOne(Math.floor(key / size), key % size)) break
+      }
       return
     }
-    const applied = toggleMark(state, row, col)
-    if (applied === null) return
-    playDrop()
-    drag = { mode: 'mark', markValue: applied, last: key }
+    let changed = false
+    for (const key of stroke.cells) {
+      const row = Math.floor(key / size)
+      const col = key % size
+      const cur = state.cells[row][col]
+      // 첫 칸과 같은 방향(표시/해제)으로만 적용한다. 이미 그 값이면 건너뛰므로
+      // 같은 칸을 두 번 지나가도 도로 뒤집히지 않는다.
+      if (stroke.markValue === 2 ? cur === 0 : cur === 2) {
+        toggleMark(state, row, col)
+        changed = true
+      }
+    }
+    if (changed) playDrop()
   }
 
   const onPuzzleClear = async () => {
@@ -188,59 +211,42 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         p.y <= SKIP.y + SKIP.h
       ) {
         loadPuzzle(state, state.level + 1)
-        pending = null
-        drag = null
+        stroke = null
         aim = null
         playDrop()
         return
       }
       const hit = cellAt(p.x, p.y)
       if (!hit) return
-      // 여기서는 짚기만 한다. 확정은 onUp(그 칸에서 뗐을 때)이나
-      // onMove(칸을 벗어나 연속 칠하기가 시작될 때)가 한다.
-      pending = hit
+      // 여기서는 획을 시작만 한다. 확정은 손을 뗄 때(onUp) 한 번에.
+      // 표시 방향은 첫 칸이 정한다 — 이미 X면 지우는 획, 아니면 표시하는 획.
+      // 칠해진 칸에서 시작하는 X 획은 열지 않는다(그 칸은 바꿀 수 없다).
+      const first = state.cells[hit.row][hit.col]
+      if (state.mode === 'mark' && first === 1) return
+      stroke = {
+        mode: state.mode,
+        markValue: first === 2 ? 0 : 2,
+        cells: [hit.row * state.size + hit.col],
+      }
       aim = hit
     },
     onMove(clientX, clientY) {
-      if ((!drag && !pending) || state.phase !== 'playing') return
+      if (!stroke || state.phase !== 'playing') return
       const p = stage.toBoard(clientX, clientY)
       const hit = cellAt(p.x, p.y)
       // 격자 밖으로 나가면 강조를 끈다 — 지금 떼면 아무 일도 없다는 표시다
       aim = hit
       if (!hit) return
       const key = hit.row * state.size + hit.col
-      if (pending) {
-        // 누른 칸 안에서 미세하게 움직이는 중이면 아직 확정하지 않는다
-        if (key === pending.row * state.size + pending.col) return
-        // 다른 칸까지 밀었다 = 연속 칠하기. 누른 칸부터 확정하고 이어 간다
-        const first = pending
-        pending = null
-        commitCell(first.row, first.col)
-      }
-      if (!drag || key === drag.last) return
-      drag.last = key
-      if (drag.mode === 'fill') {
-        tryFill(hit.row, hit.col)
-      } else {
-        // 첫 셀과 같은 방향(표시/해제)으로만 연속 적용
-        const cur = state.cells[hit.row][hit.col]
-        if (drag.markValue === 2 ? cur === 0 : cur === 2) {
-          toggleMark(state, hit.row, hit.col)
-          playDrop()
-        }
-      }
+      if (key !== stroke.cells[stroke.cells.length - 1]) stroke.cells.push(key)
     },
     onUp(clientX, clientY) {
-      // 누른 그 칸에서 뗐을 때만 확정한다. 다른 칸이나 격자 밖에서 떼면 취소다
-      if (pending && state.phase === 'playing') {
+      // 격자 안에서 떼야 확정된다. 밖에서 떼면 획을 통째로 버린다
+      if (stroke && state.phase === 'playing') {
         const p = stage.toBoard(clientX, clientY)
-        const hit = cellAt(p.x, p.y)
-        if (hit && hit.row === pending.row && hit.col === pending.col) {
-          commitCell(hit.row, hit.col)
-        }
+        if (cellAt(p.x, p.y)) commitStroke()
       }
-      pending = null
-      drag = null
+      stroke = null
       aim = null
     },
   })
@@ -291,6 +297,23 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fillRect(GRID_X + spot.col * cell, GRID_Y, cell, GRID_W)
     }
 
+    const cross = (x: number, y: number) => {
+      c.strokeStyle = '#B0BEC5'
+      c.lineWidth = 4
+      c.lineCap = 'round'
+      const m = cell * 0.28
+      c.beginPath()
+      c.moveTo(x + m, y + m)
+      c.lineTo(x + cell - m, y + cell - m)
+      c.moveTo(x + cell - m, y + m)
+      c.lineTo(x + m, y + cell - m)
+      c.stroke()
+    }
+
+    // 확정 전 획. 손을 떼기 전까지는 아무것도 반영되지 않으므로, 지금 떼면 어떻게
+    // 되는지 옅게 그려 준다 — 이게 없으면 긋는 동안 화면이 죽은 것처럼 보인다.
+    const preview = stroke && !clearing ? new Set(stroke.cells) : null
+
     // 셀: 칠함 / X 표시 (완성 연출 중에는 그림만 남긴다)
     for (let row = 0; row < size; row++) {
       for (let col = 0; col < size; col++) {
@@ -303,17 +326,24 @@ function createSession(host: HTMLElement, ctx: GameContext) {
           c.roundRect(x + 2, y + 2, cell - 4, cell - 4, clearing ? cell * 0.18 : 4)
           c.fill()
         } else if (st === 2 && !clearing) {
-          c.strokeStyle = '#B0BEC5'
-          c.lineWidth = 4
-          c.lineCap = 'round'
-          const m = cell * 0.28
-          c.beginPath()
-          c.moveTo(x + m, y + m)
-          c.lineTo(x + cell - m, y + cell - m)
-          c.moveTo(x + cell - m, y + m)
-          c.lineTo(x + m, y + cell - m)
-          c.stroke()
+          cross(x, y)
         }
+        if (!preview?.has(row * size + col) || st === 1) continue
+        c.save()
+        c.globalAlpha = 0.45
+        if (stroke!.mode === 'fill') {
+          c.fillStyle = '#303F9F'
+          c.beginPath()
+          c.roundRect(x + 2, y + 2, cell - 4, cell - 4, 4)
+          c.fill()
+        } else if (stroke!.markValue === 2) {
+          if (st === 0) cross(x, y)
+        } else if (st === 2) {
+          // 지워질 X를 흰 사각으로 덮어 미리 지워 보인다
+          c.fillStyle = '#FFFFFF'
+          c.fillRect(x + 2, y + 2, cell - 4, cell - 4)
+        }
+        c.restore()
       }
     }
 
