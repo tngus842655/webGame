@@ -53,7 +53,17 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
   preloadSfx('clear', 'gameover', 'pop', 'tap')
-  let drag: { mode: Mode; markValue: CellState; last: number } | null = null
+  // 누르고 있는 동안 지나간 칸들. 확정은 손을 뗄 때 한 번에 하고, 격자 밖에서 떼면
+  // 통째로 버린다. 10×10에서 한 칸이 5mm라 손가락이 칸을 통째로 덮어 이웃을 짚기 쉬운데,
+  // 칠하기는 한 번 틀리면 생명이 깎이고 되돌릴 수 없다 — 떼기 전까지는 무를 수 있어야 한다.
+  //
+  // 첫 칸만 미루고 나머지는 즉시 칠하는 방식도 해봤지만 못 쓴다. 안쪽 칸에서 격자 밖으로
+  // 빼려면 반드시 이웃 칸을 지나가야 해서, 그 순간 첫 칸이 확정돼 버린다. 정작 잘못
+  // 짚기 쉬운 안쪽에서 취소가 안 되고 테두리 칸에서만 됐다.
+  //
+  // 잘못 취소되면 다시 그으면 그만이지만 잘못 확정되면 생명이 날아간다. 애매하면
+  // 취소 쪽으로 기운다 — 격자 밖에서 떼면 버리는 것도 그래서다.
+  let stroke: { mode: Mode; markValue: CellState; cells: number[] } | null = null
   // 지금 손끝이 짚고 있는 칸. 10×10에서 칸이 51px이라 손가락이 칸을 통째로 가린다 —
   // 줄 띠와 힌트 강조가 손 밖으로 삐져나와야 어디를 칠하는지 보인다.
   let aim: { row: number; col: number } | null = null
@@ -103,13 +113,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     return { row, col }
   }
 
-  const tryFill = (row: number, col: number) => {
+  // 한 칸 칠하기. 오답이거나 판이 끝나면 false — 획의 남은 칸은 적용하지 않는다.
+  const fillOne = (row: number, col: number): boolean => {
     const result = applyFill(state, row, col)
-    if (result === 'filled') {
-      playSfx('pop', { gain: 0.7 })
-      if (state.remaining === 0) void onPuzzleClear()
-    } else if (result === 'miss') {
-      drag = null // 오답이면 드래그 종료
+    if (result === 'miss') {
       vibrate(60)
       state.shakeTime = 0.35
       state.lives -= 1
@@ -118,7 +125,42 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         state.phase = 'over'
         state.overTimer = 0.9
       }
+      return false
     }
+    if (result === 'filled') {
+      playSfx('pop', { gain: 0.7 })
+      if (state.remaining === 0) {
+        void onPuzzleClear()
+        return false
+      }
+    }
+    return true
+  }
+
+  // 획을 확정한다. 지나간 칸을 순서대로 적용하고, 칠하기는 첫 오답에서 멈춘다.
+  // (onPuzzleClear는 첫 await 전에 phase를 바꾸므로 이 반복 도중 판이 갈리지 않는다)
+  const commitStroke = () => {
+    if (!stroke) return
+    const size = state.size
+    if (stroke.mode === 'fill') {
+      for (const key of stroke.cells) {
+        if (!fillOne(Math.floor(key / size), key % size)) break
+      }
+      return
+    }
+    let changed = false
+    for (const key of stroke.cells) {
+      const row = Math.floor(key / size)
+      const col = key % size
+      const cur = state.cells[row][col]
+      // 첫 칸과 같은 방향(표시/해제)으로만 적용한다. 이미 그 값이면 건너뛰므로
+      // 같은 칸을 두 번 지나가도 도로 뒤집히지 않는다.
+      if (stroke.markValue === 2 ? cur === 0 : cur === 2) {
+        toggleMark(state, row, col)
+        changed = true
+      }
+    }
+    if (changed) playDrop()
   }
 
   const onPuzzleClear = async () => {
@@ -127,8 +169,12 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     vibrate(30)
     state.phase = 'clearing'
     state.clearTimer = 1.4
+    // 3판에 한 번만 묻는다 — 5×5는 20초면 끝나서 매 판 물으면 1분 반 사이에 세 번
+    // 화면이 멈춘다. 보너스 시트는 광고를 안 봐도 닫아야 넘어가는 모달이라 잦으면
+    // 그 자체가 방해고, 800점짜리 제안을 반복하면 '그냥 받기'가 습관이 되어 정작
+    // 10×10 클리어의 좋은 제안까지 같이 닫힌다. 디펜스도 같은 이유로 5웨이브마다 묻는다.
     // 보너스를 묻는 동안 셸이 멈추므로 다음 퍼즐로 넘어가지 않는다
-    if (await bonus.offer(points)) points *= 2
+    if (state.level % 3 === 0 && (await bonus.offer(points))) points *= 2
     if (shell.isDestroyed()) return
     state.score = Math.min(1_000_000, state.score + points)
     popup = { text: `+${points}`, age: 0 }
@@ -151,39 +197,35 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       }
       const hit = cellAt(p.x, p.y)
       if (!hit) return
-      aim = hit
-      if (state.mode === 'fill') {
-        drag = { mode: 'fill', markValue: 0, last: hit.row * state.size + hit.col }
-        tryFill(hit.row, hit.col)
-      } else {
-        const applied = toggleMark(state, hit.row, hit.col)
-        if (applied === null) return
-        playDrop()
-        drag = { mode: 'mark', markValue: applied, last: hit.row * state.size + hit.col }
+      // 여기서는 획을 시작만 한다. 확정은 손을 뗄 때(onUp) 한 번에.
+      // 표시 방향은 첫 칸이 정한다 — 이미 X면 지우는 획, 아니면 표시하는 획.
+      // 칠해진 칸에서 시작하는 X 획은 열지 않는다(그 칸은 바꿀 수 없다).
+      const first = state.cells[hit.row][hit.col]
+      if (state.mode === 'mark' && first === 1) return
+      stroke = {
+        mode: state.mode,
+        markValue: first === 2 ? 0 : 2,
+        cells: [hit.row * state.size + hit.col],
       }
+      aim = hit
     },
     onMove(clientX, clientY) {
-      if (!drag || state.phase !== 'playing') return
+      if (!stroke || state.phase !== 'playing') return
       const p = stage.toBoard(clientX, clientY)
       const hit = cellAt(p.x, p.y)
-      if (!hit) return
+      // 격자 밖으로 나가면 강조를 끈다 — 지금 떼면 아무 일도 없다는 표시다
       aim = hit
+      if (!hit) return
       const key = hit.row * state.size + hit.col
-      if (key === drag.last) return
-      drag.last = key
-      if (drag.mode === 'fill') {
-        tryFill(hit.row, hit.col)
-      } else {
-        // 첫 셀과 같은 방향(표시/해제)으로만 연속 적용
-        const cur = state.cells[hit.row][hit.col]
-        if (drag.markValue === 2 ? cur === 0 : cur === 2) {
-          toggleMark(state, hit.row, hit.col)
-          playDrop()
-        }
-      }
+      if (key !== stroke.cells[stroke.cells.length - 1]) stroke.cells.push(key)
     },
-    onUp() {
-      drag = null
+    onUp(clientX, clientY) {
+      // 격자 안에서 떼야 확정된다. 밖에서 떼면 획을 통째로 버린다
+      if (stroke && state.phase === 'playing') {
+        const p = stage.toBoard(clientX, clientY)
+        if (cellAt(p.x, p.y)) commitStroke()
+      }
+      stroke = null
       aim = null
     },
   })
@@ -205,7 +247,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.fillStyle = ground('#5C6BC0', '#9AA3D8')
     c.font = font(24)
     c.textAlign = 'left'
-    c.fillText(t('no.puzzle', { n: state.level }), SCORE_PANEL.left, SCORE_PANEL.subY)
+    c.fillText(t('common.stage', { n: state.level }), SCORE_PANEL.left, SCORE_PANEL.subY)
     c.textAlign = 'center'
     const heartX = (i: number) => 462 + i * 42
     for (let i = 0; i < 3; i++) {
@@ -234,6 +276,23 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fillRect(GRID_X + spot.col * cell, GRID_Y, cell, GRID_W)
     }
 
+    const cross = (x: number, y: number) => {
+      c.strokeStyle = '#B0BEC5'
+      c.lineWidth = 4
+      c.lineCap = 'round'
+      const m = cell * 0.28
+      c.beginPath()
+      c.moveTo(x + m, y + m)
+      c.lineTo(x + cell - m, y + cell - m)
+      c.moveTo(x + cell - m, y + m)
+      c.lineTo(x + m, y + cell - m)
+      c.stroke()
+    }
+
+    // 확정 전 획. 손을 떼기 전까지는 아무것도 반영되지 않으므로, 지금 떼면 어떻게
+    // 되는지 옅게 그려 준다 — 이게 없으면 긋는 동안 화면이 죽은 것처럼 보인다.
+    const preview = stroke && !clearing ? new Set(stroke.cells) : null
+
     // 셀: 칠함 / X 표시 (완성 연출 중에는 그림만 남긴다)
     for (let row = 0; row < size; row++) {
       for (let col = 0; col < size; col++) {
@@ -246,17 +305,24 @@ function createSession(host: HTMLElement, ctx: GameContext) {
           c.roundRect(x + 2, y + 2, cell - 4, cell - 4, clearing ? cell * 0.18 : 4)
           c.fill()
         } else if (st === 2 && !clearing) {
-          c.strokeStyle = '#B0BEC5'
-          c.lineWidth = 4
-          c.lineCap = 'round'
-          const m = cell * 0.28
-          c.beginPath()
-          c.moveTo(x + m, y + m)
-          c.lineTo(x + cell - m, y + cell - m)
-          c.moveTo(x + cell - m, y + m)
-          c.lineTo(x + m, y + cell - m)
-          c.stroke()
+          cross(x, y)
         }
+        if (!preview?.has(row * size + col) || st === 1) continue
+        c.save()
+        c.globalAlpha = 0.45
+        if (stroke!.mode === 'fill') {
+          c.fillStyle = '#303F9F'
+          c.beginPath()
+          c.roundRect(x + 2, y + 2, cell - 4, cell - 4, 4)
+          c.fill()
+        } else if (stroke!.markValue === 2) {
+          if (st === 0) cross(x, y)
+        } else if (st === 2) {
+          // 지워질 X를 흰 사각으로 덮어 미리 지워 보인다
+          c.fillStyle = '#FFFFFF'
+          c.fillRect(x + 2, y + 2, cell - 4, cell - 4)
+        }
+        c.restore()
       }
     }
 
@@ -360,11 +426,23 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     }
     drawButton(BTN.x1, t('no.fill'), state.mode === 'fill')
     drawButton(BTN.x2, t('no.mark'), state.mode === 'mark')
+
   }
 
   shell.addCleanup(detachInput)
   shell.addCleanup(() => stage.destroy())
-  return { destroy: () => shell.destroy(), getScore: () => state.score }
+  return {
+    destroy: () => shell.destroy(),
+    getScore: () => state.score,
+    // 관리자 전용 '다음 단계' — 퍼즐 번호만 올린다. loadPuzzle은 score를 건드리지
+    // 않으므로 건너뛴 판의 점수는 붙지 않고, 순위표에는 실제로 번 점수만 올라간다.
+    adminSkip() {
+      if (state.phase !== 'playing') return
+      loadPuzzle(state, state.level + 1)
+      stroke = null
+      aim = null
+    },
+  }
 }
 
 export default defineGame(createSession)

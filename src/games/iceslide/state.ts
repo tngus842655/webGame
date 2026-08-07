@@ -191,7 +191,7 @@ function buildLevel(level: number): Level {
   return { rocks, stars, px: 0, py: 0, best: 4, starCount: 3 }
 }
 
-function loadLevel(state: IceState) {
+export function loadLevel(state: IceState) {
   const level = buildLevel(state.level)
   state.rocks = level.rocks
   state.stars = level.stars

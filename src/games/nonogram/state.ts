@@ -34,11 +34,28 @@ export function puzzlePoints(size: number): number {
   return size === 5 ? 500 : size === 8 ? 1000 : 1500
 }
 
-// 랜덤 정답 생성 (밀도 약 55%) — 전부 빈 행/열이 생기면 다시 만든다
-export function generateSolution(size: number): boolean[][] {
+// 밀도를 판마다 다시 뽑아 인상을 바꾼다. 크기가 10×10에서 멈추는 8판 이후로는
+// 판을 구분해 주는 게 이것뿐이다 — 성기면 점점이 흩어진 그림, 빽빽하면 굵은
+// 덩어리가 나온다. 폭은 판이 오를수록 넓어져 21판에 최대가 된다.
+//
+// 폭이 이만큼 커야 하는 이유: 칸을 하나씩 독립으로 뽑는 구조라 같은 밀도로
+// 만들어도 채움 칸 수가 σ≈4.5%p로 이미 출렁인다. 좁게 흔들면 그 노이즈에 묻혀
+// 옆 판과 다른 티가 안 난다(55% 중심 ±10%p로는 평균이 아예 안 움직였다).
+//
+// 중심이 55%가 아니라 58%인 것은 lineSolvable이 성긴 퍼즐을 더 많이 버리기
+// 때문이다 — 아래쪽만 눌려서 목표 46%가 실현 50%로 올라온다. 58%±12%p를 넣어야
+// 실제로 50~70%가 나온다. 더 내리지 않는 건 비용 때문이다(목표 42%면 생성이
+// 0.7ms로 는다). 위쪽은 필터가 거의 안 버려서 오히려 싸다.
+function densityForLevel(level: number): number {
+  const swing = Math.min(0.12, (level - 1) * 0.006)
+  return 0.58 + (Math.random() * 2 - 1) * swing
+}
+
+// 랜덤 정답 생성 — 전부 빈 행/열이 생기면 다시 만든다
+export function generateSolution(size: number, density: number): boolean[][] {
   for (;;) {
     const grid = Array.from({ length: size }, () =>
-      Array.from({ length: size }, () => Math.random() < 0.55),
+      Array.from({ length: size }, () => Math.random() < density),
     )
     const rowsOk = grid.every((row) => row.some(Boolean))
     const colsOk = grid[0].every((_, c) => grid.some((row) => row[c]))
@@ -123,13 +140,14 @@ function lineSolvable(solution: boolean[][], size: number): boolean {
   return known.every((row) => row.every((v) => v !== 0))
 }
 
-// 찍지 않고 풀 수 있는 퍼즐만 낸다 (10×10에서 평균 1.4회 시도, 0.2ms 남짓)
-function generateFairSolution(size: number): boolean[][] {
+// 찍지 않고 풀 수 있는 퍼즐만 낸다 (10×10 평균 1.5회 시도 0.1ms,
+// 밀도를 가장 성기게 뽑은 46%에서도 평균 3회 0.4ms — 한 프레임 안이다)
+function generateFairSolution(size: number, density: number): boolean[][] {
   for (let attempt = 0; attempt < 200; attempt++) {
-    const grid = generateSolution(size)
+    const grid = generateSolution(size, density)
     if (lineSolvable(grid, size)) return grid
   }
-  return generateSolution(size)
+  return generateSolution(size, density)
 }
 
 // 한 줄의 연속 칠 구간 길이 목록
@@ -154,7 +172,7 @@ function sameRuns(a: number[], b: number[]): boolean {
 
 export function loadPuzzle(state: NonoState, level: number) {
   const size = sizeForLevel(level)
-  const solution = generateFairSolution(size)
+  const solution = generateFairSolution(size, densityForLevel(level))
   state.level = level
   state.size = size
   state.solution = solution

@@ -12,6 +12,10 @@ export interface GameModule {
   unmount(): void
   // 진행 중 점수 — 게임오버 전에 나가도 기록이 남도록 허브가 주기적으로 읽는다 (0 = 아직 없음)
   currentScore(): number
+  // 관리자 전용 '다음 단계'를 지원하는 게임인지 (mount 뒤에 물어야 한다)
+  canAdminSkip(): boolean
+  // 점수는 그대로 두고 판만 넘긴다. 지원하지 않는 게임에서는 아무 일도 하지 않는다
+  adminSkip(): void
 }
 
 export interface GameContext {

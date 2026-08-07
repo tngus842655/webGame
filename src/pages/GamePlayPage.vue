@@ -2,6 +2,7 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { GAMES } from '@/games/registry'
+import { ensureAdminChecked, isAdmin } from '@/shared/admin'
 import { pauseRunningGame, resumeRunningGame } from '@/games/shell'
 import type { GameModule } from '@/games/types'
 import GameGuide from '@/shared/GameGuide.vue'
@@ -22,6 +23,12 @@ const host = ref<HTMLDivElement | null>(null)
 const slug = String(route.params.slug)
 const titleKey = ref<TranslationKey | null>(null)
 const guideOpen = ref(false)
+// 이 게임이 '다음 단계'를 지원하는지 (버튼은 관리자에게만 보인다)
+const canAdminSkip = ref(false)
+
+function skipLevel() {
+  game?.adminSkip()
+}
 
 // 일시정지 — 실시간 게임은 전화 한 통에 판이 날아간다.
 // 화면을 벗어나면 자동으로 멈추고, 돌아올 때는 곧바로 재개하지 않고 셋을 센다.
@@ -112,6 +119,10 @@ onMounted(async () => {
   if (disposed) return
   game = mod.default
   game.mount(host.value, createGameContext(slug))
+  // 관리자 전용 '다음 단계'. 판이 나뉘는 게임에서만 뜨고, 홈을 거치지 않고 바로
+  // 들어온 경우를 위해 여기서 한 번 확인한다 (결과는 캐시된다).
+  canAdminSkip.value = game.canAdminSkip()
+  void ensureAdminChecked()
   stopTracking = startPlayTracking(slug)
   stopScoreGuard = startScoreGuard(slug, () => game?.currentScore() ?? null)
   startBgm(bgmFor(slug))
@@ -149,9 +160,19 @@ onBeforeUnmount(() => {
   <div class="play-page">
     <div ref="host" class="game-host"></div>
     <div class="top-bar">
-      <button class="chip back-button" type="button" @click="router.push('/')">
-        <UiIcon name="back" />{{ t('common.back') }}
-      </button>
+      <div class="top-left">
+        <button class="chip back-button" type="button" @click="router.push('/')">
+          <UiIcon name="back" />{{ t('common.back') }}
+        </button>
+        <button
+          v-if="isAdmin && canAdminSkip"
+          class="chip skip-button"
+          type="button"
+          @click="skipLevel"
+        >
+          {{ t('admin.skipLevel') }}
+        </button>
+      </div>
       <button
         class="chip icon-button"
         type="button"
@@ -243,9 +264,28 @@ onBeforeUnmount(() => {
     background-color 0.1s ease;
 }
 
-.back-button {
-  /* 뒤로는 왼쪽 끝, 멈춤·도움말은 오른쪽 끝으로 (버튼 길이가 언어마다 달라도) */
+/* 왼쪽 묶음은 왼쪽 끝, 멈춤·도움말은 오른쪽 끝으로 (버튼 길이가 언어마다 달라도) */
+.top-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-right: auto;
+}
+
+/* 관리자 전용이라 평소에는 없는 버튼이다. 게임 조작이 아니라는 게 보이도록
+   같은 칩 모양을 쓰되 글씨를 옅게 둔다. */
+.skip-button {
+  pointer-events: auto;
+  color: var(--ink-muted);
+  font-weight: 600;
+}
+
+.skip-button:active {
+  background: rgb(255 255 255 / 0.98);
+  transform: scale(0.95);
+}
+
+.back-button {
   gap: 4px;
   padding-left: 10px;
   cursor: pointer;

@@ -91,6 +91,8 @@ export interface GameSession {
   // 지금까지의 점수 (게임오버 시 제출하는 값과 같은 식) — 중도 이탈 기록 보존에 쓰인다.
   // 제한 시간을 다 써야 결과가 확정되는 게임은 생략한다 = 완주했을 때만 기록
   getScore?(): number
+  // 관리자 전용 '다음 단계' — 판이 나뉘는 게임만 구현한다. 점수는 건드리지 않는다
+  adminSkip?(): void
 }
 
 // GameModule의 mount/unmount 보일러플레이트 제거용
@@ -108,6 +110,12 @@ export function defineGame(
     },
     currentScore() {
       return session?.getScore?.() ?? 0
+    },
+    canAdminSkip() {
+      return !!session?.adminSkip
+    },
+    adminSkip() {
+      session?.adminSkip?.()
     },
   }
 }
