@@ -34,8 +34,8 @@
 | `20260806500000_promotion_failures_dedup.sql` | 실패 기록을 (식별키, 단계, 코드) 한 줄로 묶고 횟수를 센다 | ✅ |
 | `20260806600000_promotion_state.sql` | 프로모션 종료를 앱이 알게 한다 | ✅ |
 | `20260806700000_promotion_end_manual.sql` | 프로모션 종료 스위치를 클라이언트 손에서 뺀다 | ✅ |
-| `20260807000000_ad_views_medium.sql` | `ad_views.medium` 컬럼 — 매체 구분, `get_ad_stats()` 재정의 | ⬜ **실행 필요** |
-| `20260807100000_ad_views_purge_untagged.sql` | 매체 없는 기존 광고 기록 삭제 (위 파일 다음에) | ⬜ **실행 필요** |
+| `20260807000000_ad_views_medium.sql` | `ad_views.medium` 컬럼 — 매체 구분, `get_ad_stats()` 재정의 | ✅ 2026-08-07 |
+| `20260807100000_ad_views_purge_untagged.sql` | 매체 없는 기존 광고 기록 삭제 (위 파일 다음에) | ✅ 2026-08-07 |
 
 ## 테이블
 
