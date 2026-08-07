@@ -21,6 +21,7 @@
 ## 다음 버전 올릴 때 (평소에 보는 곳)
 
 ```bash
+dist 폴더, minigame30.ait 삭제(이전빌드정보)
 npm run build:toss     # 루트에 minigame30.ait 생성 (약 11MB)
 ```
 
