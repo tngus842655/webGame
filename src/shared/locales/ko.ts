@@ -30,6 +30,7 @@ const dict: FullDict = {
   'admin.featured': '신규',
   'admin.hidden': '숨김',
   'admin.order': '순서',
+  'admin.skipLevel': '관리자 · 다음 퍼즐',
   'admin.saveFailed': '저장하지 못했어요.',
   'admin.featuredMax': '신규 칸에는 {n}개까지 올라갑니다. 하나를 먼저 내려주세요.',
   'admin.rank': '{n}위',

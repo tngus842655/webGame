@@ -78,6 +78,7 @@ const en = {
   'admin.featured': 'New',
   'admin.hidden': 'Hide',
   'admin.order': 'Order',
+  'admin.skipLevel': 'Admin · next puzzle',
   'admin.saveFailed': 'Could not save.',
   'admin.featuredMax': 'The New shelf holds {n} games. Uncheck one first.',
   'admin.rank': '#{n}',
