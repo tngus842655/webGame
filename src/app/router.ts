@@ -8,6 +8,7 @@ import AdminTrashPage from '@/pages/AdminTrashPage.vue'
 import AdminVotesPage from '@/pages/AdminVotesPage.vue'
 import TrashPage from '@/pages/TrashPage.vue'
 import GamePlayPage from '@/pages/GamePlayPage.vue'
+import GamesPage from '@/pages/GamesPage.vue'
 import RankingHubPage from '@/pages/RankingHubPage.vue'
 import RankingPage from '@/pages/RankingPage.vue'
 import SettingsPage from '@/pages/SettingsPage.vue'
@@ -27,6 +28,7 @@ export const router = createRouter({
   routes: [
     { path: '/', component: HomePage },
     { path: '/play/:slug', component: GamePlayPage },
+    { path: '/games', component: GamesPage },
     { path: '/ranking', component: RankingHubPage },
     { path: '/ranking/:slug', component: RankingPage },
     { path: '/settings', component: SettingsPage },
