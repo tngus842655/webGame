@@ -9,7 +9,7 @@ let keptList: ListKey | null = null
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { dailySeed } from '@/games/daily'
+import { dailySeed, todayKey } from '@/games/daily'
 import { GAMES } from '@/games/registry'
 import GameCard from '@/shared/GameCard.vue'
 import GameIcon from '@/shared/GameIcon.vue'
@@ -96,24 +96,53 @@ const ranked = computed(() => cards.value.filter((card) => !featured.value.has(c
 // 이미 앞에 세운다)에서 최근 플레이한 게임을 빼고, 남은 상위 후보 중 날짜로 하나를
 // 고른다. 하루 동안은 같은 게임이 서고, 자정이 지나면 다음 후보로 넘어간다.
 const HERO_POOL = 5
+const HERO_KEY = 'webgame:heroPick'
 
-const heroGame = computed(() => {
+// 고른 게임을 날짜와 함께 적어 둔다. 후보에서 최근 플레이한 게임을 빼는데 그 목록은
+// 한 판 할 때마다 바뀌므로, 홈에 돌아올 때마다 다시 뽑으면 한 판 하고 나올 때마다
+// 다른 게임이 선다 — 그건 오늘의 추천이 아니라 그냥 무작위다.
+function todayHero(): string | null {
+  try {
+    const saved = JSON.parse(localStorage.getItem(HERO_KEY) ?? 'null') as {
+      day?: string
+      slug?: string
+    } | null
+    // 적어둔 게임이 그새 휴지통으로 갔으면 목록에 없다 — 그때는 다시 고른다
+    if (saved?.day === todayKey() && cards.value.some((card) => card.slug === saved.slug)) {
+      return saved.slug ?? null
+    }
+  } catch {
+    // 적어둔 것이 깨졌으면 새로 고르면 그만이다
+  }
   const pool = cards.value.filter((card) => !recents.value.includes(card.slug))
   const picks = (pool.length > 0 ? pool : cards.value).slice(0, HERO_POOL)
-  return picks.length > 0 ? picks[dailySeed() % picks.length] : null
-})
+  const slug = picks[dailySeed() % picks.length]?.slug ?? null
+  if (slug) localStorage.setItem(HERO_KEY, JSON.stringify({ day: todayKey(), slug }))
+  return slug
+}
 
-// 추천 이유 — 데이터로 말할 수 있는 것만 말한다. 신규 > 인기 1위 > 안 해본 게임 순.
+const heroSlug = ref(todayHero())
+const heroGame = computed(() => cards.value.find((card) => card.slug === heroSlug.value) ?? null)
+
+// 추천 이유 — 데이터로 말할 수 있는 것만 말한다. 위에서부터 가리는 힘이 센 순서다:
+// 관리자가 올린 신규 > 인기 1위 > 안 해봤다 > 인기 상위 > 내 순위 > 오랜만.
 // 순위는 화면에 선 게임끼리 매긴다 — 휴지통 게임이 1위를 쥐고 있으면 아무도 1위가 못 된다.
 const heroRanks = computed(() => popularityRanks(cards.value))
+
+// '지금 몇 위' 라고 말해줄 만한 데까지. 그 밖은 순위를 밝혀도 자랑이 되지 않는다.
+const HERO_RISING = 5
 
 const heroReason = computed(() => {
   const game = heroGame.value
   if (!game) return ''
+  const rank = heroRanks.value.get(game.slug)
   if (featured.value.has(game.slug)) return t('home.reasonNew')
-  if (heroRanks.value.get(game.slug) === 1) return t('home.reasonTop')
+  if (rank === 1) return t('home.reasonTop')
   if (game.best === null && !game.stat) return t('home.reasonTry')
-  return t('home.reasonPopular')
+  if (rank !== undefined && rank <= HERO_RISING) return t('home.reasonRising', { n: rank })
+  if (game.stat) return t('home.reasonRank', { n: game.stat.rank })
+  // 최근 플레이한 게임은 후보에서 빠지므로, 기록이 남아 있다면 한동안 손을 뗀 게임이다
+  return t('home.reasonBack')
 })
 
 // 인기 칸 — 추천으로 올라간 게임은 빼고 다음 순위로 채운다. 같은 화면에 같은
