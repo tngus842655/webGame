@@ -19,7 +19,6 @@ defineProps<{
     | 'sparkle'
     | 'gamepad'
     | 'clock'
-    | 'users'
     | 'dice'
     | 'play'
     | 'check'
@@ -128,15 +127,6 @@ defineProps<{
     <g v-else-if="name === 'clock'">
       <circle cx="12" cy="12" r="8.5" />
       <path d="M12 7.1V12l3.4 2" />
-    </g>
-
-    <!-- 앞사람 하나에 뒷사람 어깨만 걸친다. 13px에서는 둘 다 그리면 뭉치므로
-         뒤쪽은 머리와 어깨선만 남겼다 (제목표 아이콘들과 같이 면으로 채운다). -->
-    <g v-else-if="name === 'users'" fill="currentColor" stroke="none">
-      <circle cx="9.3" cy="7.9" r="3.7" />
-      <path d="M9.3 12.7c-3.6 0-6.5 2.1-6.5 4.7v2.2h13v-2.2c0-2.6-2.9-4.7-6.5-4.7z" />
-      <circle cx="17.5" cy="8.9" r="2.8" />
-      <path d="M17.5 13.2c-1 0-1.9.2-2.7.6 1.5 1.1 2.5 2.7 2.5 4.4v1.4h4.4v-1.8c0-2.5-1.9-4.6-4.2-4.6z" />
     </g>
 
     <g v-else-if="name === 'dice'">

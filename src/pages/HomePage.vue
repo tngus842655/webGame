@@ -21,7 +21,6 @@ import UiIcon from '@/shared/UiIcon.vue'
 import {
   featuredSlugs,
   fetchMyStats,
-  gamePlayers,
   hasCachedFlags,
   getLocalBest,
   popularityRanks,
@@ -99,14 +98,6 @@ const heroGame = computed(() => {
   const picks = (pool.length > 0 ? pool : cards.value).slice(0, HERO_POOL)
   return picks.length > 0 ? picks[dailySeed() % picks.length] : null
 })
-
-// 이 게임을 최근 7일 동안 한 사람 수. 인기 순서와 같이 캐시에서 읽어 첫 렌더에 쓴다 —
-// 서버 응답을 기다렸다 끼워 넣으면 줄이 늘면서 플레이 버튼이 손 밑에서 내려간다.
-const players = ref(gamePlayers())
-
-const heroPlayers = computed(() =>
-  heroGame.value ? (players.value.get(heroGame.value.slug) ?? 0) : 0,
-)
 
 // 추천 이유 — 데이터로 말할 수 있는 것만 말한다. 신규 > 인기 1위 > 안 해본 게임 순.
 // 순위는 화면에 선 게임끼리 매긴다 — 휴지통 게임이 1위를 쥐고 있으면 아무도 1위가 못 된다.
@@ -198,7 +189,6 @@ onMounted(async () => {
   const statBySlug = new Map(myStats.map((stat) => [stat.game_slug, stat]))
   if (firstRun) {
     featured.value = featuredSlugs()
-    players.value = gamePlayers()
     cards.value = sortByPopularity(GAMES).map((game) => ({
       ...game,
       best: getLocalBest(game.slug),
@@ -235,39 +225,35 @@ onMounted(async () => {
       <UiIcon name="chevron" />
     </RouterLink>
 
-    <!-- 오늘의 추천 — 이 화면의 주인공이되 화면을 다 쓰지는 않는다. 아이콘 옆에
-         이름·이유·플레이 수를 눕혀 높이를 줄이고, 강조는 바로 플레이 버튼에 몰아준다.
+    <!-- 오늘의 추천 — 이 화면의 주인공이되 화면을 다 쓰지는 않는다. 왼쪽에 큰
+         아이콘, 오른쪽에 이름·이유·버튼을 세워 높이를 줄인다.
          랜덤은 두 번째 길이라 글자를 떼고 주사위만 버튼 오른쪽에 붙인다. -->
     <section v-if="heroGame" class="shelf hero">
       <h2><UiIcon name="star-fill" />{{ t('home.heroTitle') }}</h2>
-      <div class="hero-game">
+      <div class="hero-body">
         <span class="hero-thumb"><GameIcon :slug="heroGame.slug" /></span>
-        <span class="hero-info">
+        <div class="hero-info">
           <strong class="hero-name">{{ t(heroGame.titleKey) }}</strong>
           <span class="hero-reason">{{ heroReason }}</span>
-          <!-- 아직 아무도 안 한 게임은 줄째로 뺀다 — '0명이 플레이'는 추천을 무너뜨린다 -->
-          <span v-if="heroPlayers > 0" class="hero-stat">
-            <UiIcon name="users" />{{ t('home.heroPlayers', { n: heroPlayers.toLocaleString() }) }}
-          </span>
-        </span>
-      </div>
-      <div class="hero-actions">
-        <button
-          type="button"
-          class="hero-play"
-          :aria-label="t(heroGame.titleKey)"
-          @click="play(heroGame.slug)"
-        >
-          <UiIcon name="play" />{{ t('home.heroPlay') }}
-        </button>
-        <button
-          type="button"
-          class="hero-dice"
-          :aria-label="t('home.random')"
-          @click="playRandom"
-        >
-          <UiIcon name="dice" />
-        </button>
+          <div class="hero-actions">
+            <button
+              type="button"
+              class="hero-play"
+              :aria-label="t(heroGame.titleKey)"
+              @click="play(heroGame.slug)"
+            >
+              <UiIcon name="play" />{{ t('home.heroPlay') }}
+            </button>
+            <button
+              type="button"
+              class="hero-dice"
+              :aria-label="t('home.random')"
+              @click="playRandom"
+            >
+              <UiIcon name="dice" />
+            </button>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -532,8 +518,10 @@ onMounted(async () => {
   box-shadow: 0 3px 8px rgb(216 105 0 / 0.34);
 }
 
-/* 아이콘 옆에 이름·이유·플레이 수를 눕힌다 — 세로로 쌓는 것보다 한 뼘 넘게 낮다 */
-.hero-game {
+/* 왼쪽에 큰 아이콘, 오른쪽에 이름·이유·버튼. 아이콘 높이가 오른쪽 세 줄과
+   맞아떨어져 한 덩어리로 읽힌다. 아이콘은 화면 폭을 따라 같이 줄어든다 —
+   좁은 기기에서 아이콘이 버티면 버튼 글자가 설 자리가 없다. */
+.hero-body {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -544,22 +532,23 @@ onMounted(async () => {
   flex: none;
   display: grid;
   place-items: center;
-  width: 80px;
-  height: 80px;
+  width: clamp(72px, 24vw, 96px);
+  height: clamp(72px, 24vw, 96px);
   padding: 4px;
-  border-radius: 23px;
+  border-radius: 26px;
   background: linear-gradient(#fffdf6, #fff2d4);
   box-shadow: var(--shadow-card);
 }
 
 .hero-info {
   display: flex;
+  flex: 1;
   flex-direction: column;
   min-width: 0;
 }
 
 .hero-name {
-  font-size: 21px;
+  font-size: 20px;
   font-weight: 800;
   line-height: 1.2;
   letter-spacing: -0.03em;
@@ -569,39 +558,19 @@ onMounted(async () => {
 
 .hero-reason {
   margin-top: 3px;
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1.35;
   color: #b06c1f;
   word-break: keep-all;
 }
 
-/* 위의 가는 선은 이 줄과 한 몸이다 — 사람 수가 없으면 선도 같이 사라진다 */
-.hero-stat {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-top: 9px;
-  padding-top: 9px;
-  border-top: 1px solid rgb(186 138 62 / 0.24);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ink-faint);
-}
-
-.hero-stat svg {
-  flex: none;
-  width: 13px;
-  height: 13px;
-}
-
-/* 바로 플레이가 줄을 채우고, 주사위는 오른쪽 끝에 정사각형으로 붙는다 */
+/* 바로 플레이가 남은 줄을 채우고, 주사위는 오른쪽 끝에 정사각형으로 붙는다 */
 .hero-actions {
   display: flex;
   align-items: center;
-  gap: 9px;
-  width: 100%;
-  margin-top: 15px;
+  gap: 8px;
+  margin-top: 12px;
 }
 
 /* 이 화면에서 가장 눈에 띄어야 하는 것 — 게임 아이콘보다도 이 버튼이다.
@@ -612,19 +581,21 @@ onMounted(async () => {
   min-width: 0;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  height: 50px;
+  gap: 7px;
+  height: 46px;
+  padding: 0 10px;
   border: none;
-  border-radius: 25px;
+  border-radius: 23px;
   background: linear-gradient(#ffb454, #f28e30);
   box-shadow:
     0 4px 0 #c96f18,
-    0 8px 18px rgb(201 111 24 / 0.3);
+    0 7px 16px rgb(201 111 24 / 0.28);
   color: #fff;
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 800;
   letter-spacing: -0.02em;
   white-space: nowrap;
+  overflow: hidden;
   text-shadow: 0 1px 0 rgb(140 68 8 / 0.32);
   cursor: pointer;
   transition:
@@ -641,8 +612,8 @@ onMounted(async () => {
 
 .hero-play svg {
   flex: none;
-  width: 15px;
-  height: 15px;
+  width: 13px;
+  height: 13px;
 }
 
 /* 글자를 뗀 자리 — 주사위 하나로 무슨 버튼인지 읽히도록 판을 정사각으로 두고,
@@ -651,10 +622,10 @@ onMounted(async () => {
   display: grid;
   flex: none;
   place-items: center;
-  width: 50px;
-  height: 50px;
+  width: 46px;
+  height: 46px;
   border: none;
-  border-radius: 25px;
+  border-radius: 23px;
   background: var(--surface);
   box-shadow:
     inset 0 0 0 1.5px var(--line),
@@ -669,20 +640,28 @@ onMounted(async () => {
 }
 
 .hero-dice svg {
-  width: 21px;
-  height: 21px;
+  width: 20px;
+  height: 20px;
 }
 
-/* 화면이 좁고 낱말이 긴 언어(프랑스어·인도네시아어)에서는 버튼 글자가 넘친다.
-   주사위를 한 치수 줄이고 글자도 한 단계 내려 한 줄을 지킨다. */
+/* 아주 좁은 기기에서는 오른쪽 칸이 버튼 글자를 다 못 받는다.
+   여백과 주사위를 한 치수씩 덜어 한 줄을 지킨다. */
 @media (max-width: 340px) {
+  .hero {
+    padding: 26px 10px 18px;
+  }
+
+  .hero-body {
+    gap: 11px;
+  }
+
   .hero-play {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .hero-dice {
-    width: 46px;
-    height: 46px;
+    width: 42px;
+    height: 42px;
   }
 }
 
@@ -949,9 +928,5 @@ onMounted(async () => {
 
 [data-theme='dark'] .hero-reason {
   color: #e6a94f;
-}
-
-[data-theme='dark'] .hero-stat {
-  border-top-color: rgb(255 213 130 / 0.18);
 }
 </style>

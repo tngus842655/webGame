@@ -16,7 +16,6 @@ const dict: CoreDict = {
   'home.sectionRecent': 'Son oynananlar',
   'home.heroTitle': 'Günün oyunu',
   'home.heroPlay': 'Hemen oyna',
-  'home.heroPlayers': 'Bu hafta {n} oyuncu',
   'home.reasonNew': 'Yeni eklendi',
   'home.reasonTop': 'Şu an en çok oynanan',
   'home.reasonTry': 'Henüz denemedin',

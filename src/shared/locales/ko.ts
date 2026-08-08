@@ -16,7 +16,6 @@ const dict: FullDict = {
   'home.sectionRecent': '최근 플레이',
   'home.heroTitle': '오늘의 추천',
   'home.heroPlay': '바로 플레이',
-  'home.heroPlayers': '이번 주 {n}명이 플레이했어요',
   'home.reasonNew': '새로 나온 게임이에요',
   'home.reasonTop': '지금 가장 많이 하는 게임이에요',
   'home.reasonTry': '아직 안 해본 게임이에요',
