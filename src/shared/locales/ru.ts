@@ -15,7 +15,7 @@ const dict: CoreDict = {
   'home.sectionPopular': 'Сейчас популярно',
   'home.sectionRecent': 'Недавние',
   'home.heroTitle': 'Игра дня',
-  'home.heroPlay': 'Играть',
+  'home.heroPlay': 'Играть сейчас',
   'home.reasonNew': 'Совсем новая игра',
   'home.reasonTop': 'Сейчас играют больше всего',
   'home.reasonTry': 'Вы её ещё не пробовали',

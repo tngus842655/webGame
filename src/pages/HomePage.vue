@@ -226,8 +226,7 @@ onMounted(async () => {
     </RouterLink>
 
     <!-- 오늘의 추천 — 이 화면의 주인공이되 화면을 다 쓰지는 않는다. 왼쪽에 큰
-         아이콘, 오른쪽에 이름·이유·버튼을 세워 높이를 줄인다.
-         랜덤은 두 번째 길이라 글자를 떼고 주사위만 버튼 오른쪽에 붙인다. -->
+         아이콘, 오른쪽에 이름·이유·버튼을 세워 높이를 줄인다. -->
     <section v-if="heroGame" class="shelf hero">
       <h2><UiIcon name="star-fill" />{{ t('home.heroTitle') }}</h2>
       <div class="hero-body">
@@ -235,24 +234,14 @@ onMounted(async () => {
         <div class="hero-info">
           <strong class="hero-name">{{ t(heroGame.titleKey) }}</strong>
           <span class="hero-reason">{{ heroReason }}</span>
-          <div class="hero-actions">
-            <button
-              type="button"
-              class="hero-play"
-              :aria-label="t(heroGame.titleKey)"
-              @click="play(heroGame.slug)"
-            >
-              <UiIcon name="play" />{{ t('home.heroPlay') }}
-            </button>
-            <button
-              type="button"
-              class="hero-dice"
-              :aria-label="t('home.random')"
-              @click="playRandom"
-            >
-              <UiIcon name="dice" />
-            </button>
-          </div>
+          <button
+            type="button"
+            class="hero-play"
+            :aria-label="t(heroGame.titleKey)"
+            @click="play(heroGame.slug)"
+          >
+            <UiIcon name="play" />{{ t('home.heroPlay') }}
+          </button>
         </div>
       </div>
     </section>
@@ -339,9 +328,14 @@ onMounted(async () => {
     </section>
 
     <!-- 게임 둘러보기 — 전체를 다 세우면 둘러보기가 아니라 벽이 된다.
-         맛보기 여섯 장만 두고, 나머지는 전체보기 화면으로 보낸다. -->
+         맛보기 여섯 장만 두고, 나머지는 전체보기 화면으로 보낸다.
+         고를 마음이 없는 사람을 위한 랜덤은 이 칸의 제목줄 반대편에 둔다 —
+         고르는 자리 옆이라야 '안 고르고 들어가기'로 읽힌다. -->
     <section v-if="browseGames.length > 0" class="shelf browse">
       <h2><UiIcon name="gamepad" />{{ t('home.sectionBrowse') }}</h2>
+      <button type="button" class="browse-random" @click="playRandom">
+        <UiIcon name="dice" />{{ t('home.random') }}
+      </button>
       <div class="pad">
         <div class="game-grid">
           <GameCard
@@ -565,24 +559,17 @@ onMounted(async () => {
   word-break: keep-all;
 }
 
-/* 바로 플레이가 남은 줄을 채우고, 주사위는 오른쪽 끝에 정사각형으로 붙는다 */
-.hero-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 12px;
-}
-
 /* 이 화면에서 가장 눈에 띄어야 하는 것 — 게임 아이콘보다도 이 버튼이다.
-   눌리면 아래 턱이 줄면서 실제로 내려앉는다 (게임 팝업 버튼과 같은 결) */
+   눌리면 아래 턱이 줄면서 실제로 내려앉는다 (게임 팝업 버튼과 같은 결).
+   flex-grow가 아니라 width로 채운다 — 세로로 쌓는 칸이라 grow는 키를 늘린다. */
 .hero-play {
   display: inline-flex;
-  flex: 1;
-  min-width: 0;
+  width: 100%;
   align-items: center;
   justify-content: center;
   gap: 7px;
   height: 46px;
+  margin-top: 12px;
   padding: 0 10px;
   border: none;
   border-radius: 23px;
@@ -616,36 +603,8 @@ onMounted(async () => {
   height: 13px;
 }
 
-/* 글자를 뗀 자리 — 주사위 하나로 무슨 버튼인지 읽히도록 판을 정사각으로 두고,
-   턱은 주지 않는다. 바로 플레이와 같은 무게로 보이면 안 된다. */
-.hero-dice {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 46px;
-  height: 46px;
-  border: none;
-  border-radius: 23px;
-  background: var(--surface);
-  box-shadow:
-    inset 0 0 0 1.5px var(--line),
-    var(--shadow-card);
-  color: var(--ink-muted);
-  cursor: pointer;
-  transition: transform 0.09s ease;
-}
-
-.hero-dice:active {
-  transform: scale(0.94);
-}
-
-.hero-dice svg {
-  width: 20px;
-  height: 20px;
-}
-
 /* 아주 좁은 기기에서는 오른쪽 칸이 버튼 글자를 다 못 받는다.
-   여백과 주사위를 한 치수씩 덜어 한 줄을 지킨다. */
+   여백을 한 치수 덜고 글자도 한 단계 내려 한 줄을 지킨다. */
 @media (max-width: 340px) {
   .hero {
     padding: 26px 10px 18px;
@@ -657,11 +616,6 @@ onMounted(async () => {
 
   .hero-play {
     font-size: 14px;
-  }
-
-  .hero-dice {
-    width: 42px;
-    height: 42px;
   }
 }
 
@@ -801,6 +755,42 @@ onMounted(async () => {
 .browse h2 {
   background: var(--ink-muted);
   box-shadow: 0 2px 6px rgb(141 110 99 / 0.3);
+}
+
+/* 제목표 반대편에 같은 캡슐로 앉는다. 제목은 판을 채운 이름표, 이쪽은 테만
+   두른 버튼이라 같은 줄에 서도 누르는 것과 읽는 것이 갈린다.
+   위치는 제목표(top -12, 높이 23)와 세로 가운데를 맞춘 값이다. */
+.browse-random {
+  position: absolute;
+  top: -14px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 13px;
+  border: none;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow:
+    inset 0 0 0 1.5px var(--line),
+    var(--shadow-card);
+  color: var(--ink-muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.09s ease;
+}
+
+.browse-random:active {
+  transform: scale(0.95);
+}
+
+.browse-random svg {
+  width: 14px;
+  height: 14px;
 }
 
 /* 카드 아래 한 줄 전부가 과녁 — 목록 끝에서 자연스럽게 전체보기로 이어진다 */

@@ -15,7 +15,7 @@ const dict: CoreDict = {
   'home.sectionPopular': 'Populer saat ini',
   'home.sectionRecent': 'Baru dimainkan',
   'home.heroTitle': 'Pilihan hari ini',
-  'home.heroPlay': 'Main',
+  'home.heroPlay': 'Main sekarang',
   'home.reasonNew': 'Baru saja ditambahkan',
   'home.reasonTop': 'Paling banyak dimainkan sekarang',
   'home.reasonTry': 'Belum pernah kamu coba',

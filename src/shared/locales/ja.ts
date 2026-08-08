@@ -15,7 +15,7 @@ const dict: CoreDict = {
   'home.sectionPopular': 'いま人気のゲーム',
   'home.sectionRecent': '最近プレイ',
   'home.heroTitle': '本日のおすすめ',
-  'home.heroPlay': 'プレイ',
+  'home.heroPlay': '今すぐプレイ',
   'home.reasonNew': '追加されたばかりのゲームです',
   'home.reasonTop': 'いま一番遊ばれています',
   'home.reasonTry': 'まだ遊んでいないゲームです',
