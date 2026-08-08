@@ -91,16 +91,16 @@ onBeforeUnmount(() => clearTimeout(noticeTimer))
 </template>
 
 <style scoped>
-/* 멈춤·도움말과 같은 재질이되 한 치수 작다 — 판을 굴리는 버튼이 아니라
-   판이 끝나고 눌러도 되는 것이라, 그 줄과 나란히 서되 앞서지는 않아야 한다. */
+/* 크기·간격은 바로 위 줄(멈춤·도움말)과 같은 값이다 — 38 + 8 + 38.
+   두 화살표가 그 두 버튼 밑에 정확히 한 칸씩 들어가고, 판의 양 끝도 거기서 끊긴다.
+   재질만 같고 아이콘은 옅게 둔다: 나란히 서되 앞서지는 않아야 하는 줄이다. */
 .vote {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 2px;
-  height: 36px;
-  padding: 0 4px;
-  border-radius: 18px;
+  gap: 8px;
+  height: 38px;
+  border-radius: 19px;
   background: rgb(255 255 255 / 0.82);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
@@ -111,8 +111,8 @@ onBeforeUnmount(() => clearTimeout(noticeTimer))
   position: relative;
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
+  width: 38px;
+  height: 38px;
   padding: 0;
   border: none;
   border-radius: 50%;
@@ -130,8 +130,8 @@ onBeforeUnmount(() => clearTimeout(noticeTimer))
 }
 
 .vote-btn svg {
-  width: 17px;
-  height: 17px;
+  width: 18px;
+  height: 18px;
 }
 
 /* 투표하면 화살표 속이 차고 그 뒤로 옅은 동그라미가 깔린다 —
@@ -156,9 +156,9 @@ onBeforeUnmount(() => clearTimeout(noticeTimer))
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 26px;
-  height: 26px;
-  margin: -13px 0 0 -13px;
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
   border-radius: 50%;
   background: currentColor;
   pointer-events: none;

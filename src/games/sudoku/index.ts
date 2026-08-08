@@ -183,8 +183,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (!state.daily) {
       c.fillStyle = ground('#00796B', '#7FBDB4')
       c.font = font(24)
-      c.textAlign = 'right'
-      c.fillText(t('common.stage', { n: state.level }), SCORE_PANEL.right, SCORE_PANEL.subY)
+      // 판 오른쪽 끝도 좋아요·싫어요 줄이 스치는 자리라 가운데로 (아이스슬라이드와 같은 자리)
+      c.textAlign = 'center'
+      c.fillText(t('common.stage', { n: state.level }), SCORE_PANEL.cx, SCORE_PANEL.subY)
     }
     c.textAlign = 'center'
     // 하트와 단계 표시를 맞바꿨다 — 오른쪽 위는 멈춤·도움말 아래로 내려온
