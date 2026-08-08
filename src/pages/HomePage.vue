@@ -279,8 +279,9 @@ onMounted(async () => {
       <p v-else class="empty">{{ t('home.recentEmpty') }}</p>
     </section>
 
-    <!-- 탐색 메뉴 — 기능은 그대로, 시각적 무게만 내린다. 신규·즐겨찾기는 눌러서
-         여닫는 목록이고, 게임 전체보기는 전체 목록 화면으로 가는 길이다. -->
+    <!-- 탐색 메뉴 — 기능은 그대로, 시각적 무게만 내린다. 눌러서 여닫는 목록 둘뿐이다.
+         전체보기 입구는 아래 둘러보기 칸 끝에 한 번만 둔다 — 한 화면에 같은 문이
+         둘이면 다른 곳으로 가는 줄 알고 둘 다 눌러 보게 된다. -->
     <div class="explore">
       <button
         v-for="item in LISTS"
@@ -292,9 +293,6 @@ onMounted(async () => {
       >
         <UiIcon :name="item.icon" /><span>{{ t(item.labelKey) }}</span>
       </button>
-      <RouterLink class="explore-all" to="/games">
-        <span>{{ t('home.sectionAll') }}</span><UiIcon name="chevron" />
-      </RouterLink>
     </div>
 
     <section v-if="openList" class="shelf panel">
@@ -670,8 +668,7 @@ onMounted(async () => {
 }
 
 /* ── 탐색 메뉴 ─────────────────────────────────────── */
-/* 캡슐 탭이었던 자리. 메인 콘텐츠와 경쟁하지 않도록 글자만 남긴다.
-   신규·즐겨찾기는 여닫는 목록이고, 오른쪽 전체보기는 화면 이동이다. */
+/* 캡슐 탭이었던 자리. 메인 콘텐츠와 경쟁하지 않도록 글자만 남긴다. */
 .explore {
   display: flex;
   align-items: center;
@@ -680,8 +677,8 @@ onMounted(async () => {
   padding: 0 6px;
 }
 
-.explore button,
-.explore-all {
+.explore button {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -709,10 +706,6 @@ onMounted(async () => {
   height: 13px;
 }
 
-.explore button {
-  position: relative;
-}
-
 .explore button[aria-expanded='true'] {
   color: var(--ink);
 }
@@ -728,21 +721,6 @@ onMounted(async () => {
   border-radius: 2px;
   background: linear-gradient(#ffa22b, #ee6c00);
   transform: translateX(-50%);
-}
-
-/* 전체보기는 오른쪽 끝 — 화살표가 목록 여닫기가 아니라 화면 이동임을 말한다 */
-.explore-all {
-  gap: 2px;
-  margin-left: auto;
-}
-
-.explore-all:active {
-  color: var(--ink);
-}
-
-.explore-all svg {
-  width: 12px;
-  height: 12px;
 }
 
 /* ── 게임 둘러보기 ─────────────────────────────────── */
