@@ -435,13 +435,6 @@ export function clearLines(state: ReflectState): boolean {
   return true
 }
 
-// 이 단계를 받았을 때로 되돌린다 — 씨앗이 같아 배치는 그대로이고 그은 선·실패 기록·궤적이 지워진다
-export function resetStage(state: ReflectState): boolean {
-  if (state.phase !== 'placing') return false
-  loadLevel(state)
-  return true
-}
-
 // 화살표로 단계 이동 — 발사 중에는 막는다
 export function selectStage(state: ReflectState, level: number): boolean {
   if (state.phase !== 'placing' || level < 1 || level === state.level) return false

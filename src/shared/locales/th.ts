@@ -311,10 +311,6 @@ const dict: CoreDict = {
   'rf.abort': '↺ วางเส้นใหม่',
   'rf.clear': 'เข้าเป้า!',
   'rf.adHint': '▶ ดูโฆษณาเพื่อดูเส้นทาง',
-  'rf.resetAsk': 'เริ่มด่านนี้ใหม่ไหม',
-  'rf.resetBody': 'เส้นที่วาดไว้จะถูกลบทั้งหมด',
-  'rf.resetYes': 'เริ่มใหม่',
-  'rf.resetNo': 'ยกเลิก',
 }
 
 export default dict

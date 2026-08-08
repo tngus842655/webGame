@@ -387,10 +387,6 @@ const dict: FullDict = {
   'rf.abort': '↺ 다시 놓기',
   'rf.clear': '골인!',
   'rf.adHint': '▶ 광고 보고 경로 미리보기',
-  'rf.resetAsk': '이 단계를 처음부터 할까요?',
-  'rf.resetBody': '그어 둔 선이 모두 지워집니다.',
-  'rf.resetYes': '처음부터',
-  'rf.resetNo': '취소',
 }
 
 export default dict

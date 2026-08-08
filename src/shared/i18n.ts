@@ -439,10 +439,6 @@ const en = {
   'rf.abort': '↺ Redo lines',
   'rf.clear': 'Goal!',
   'rf.adHint': '▶ Watch ad to see the path',
-  'rf.resetAsk': 'Start this stage over?',
-  'rf.resetBody': 'Every line you drew will be erased.',
-  'rf.resetYes': 'Start over',
-  'rf.resetNo': 'Cancel',
 }
 
 export type TranslationKey = keyof typeof en

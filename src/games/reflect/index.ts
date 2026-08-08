@@ -4,7 +4,7 @@ import type { GameContext } from '../types'
 import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
-import { createSheet, drawScorePanel, font } from '../ui'
+import { drawScorePanel, font } from '../ui'
 import {
   AD_AFTER_FAILS,
   BALL_R,
@@ -20,17 +20,15 @@ import {
   launch,
   previewPath,
   removeLineAt,
-  resetStage,
   segDist,
   selectStage,
   update,
   type Seg,
 } from './state'
 
-// 하단 한 줄: 선 지우기 · 발사 · 단계 초기화
-const CLEAR_BTN = { x: 44, y: 1096, w: 96, h: 96 } as const
+// 하단 한 줄: 발사(가운데) 옆에 선 지우기
 const START_BTN = { x: 160, y: 1096, w: 400, h: 96 } as const
-const RESET_BTN = { x: 580, y: 1096, w: 96, h: 96 } as const
+const CLEAR_BTN = { x: 580, y: 1096, w: 96, h: 96 } as const
 const AD_BTN = { x: 140, y: 1006, w: 440, h: 74 } as const
 // 단계 스테퍼는 점수판 안에 든다 — 큰 숫자가 곧 지금 단계다
 const PREV_BTN = { x: 156, y: 62, w: 76, h: 72 } as const
@@ -124,29 +122,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (preview) preview = previewPath(state)
   }
 
-  // 초기화는 한 번 더 묻는다 — 세 개까지 공들여 놓은 선이 손가락 한 번에 사라지면 곤란하다.
-  // 묻는 동안에는 셸을 멈춘다 (클리어 보너스 시트와 같은 방식)
-  const resetSheet = createSheet(
-    shell.wrapper,
-    `<p data-title class="gui-title"></p>
-     <p data-body class="gui-reason"></p>
-     <button data-yes class="btn btn--amber" type="button"></button>
-     <button data-no class="btn btn--ghost" type="button"></button>`,
-  )
-
-  const closeReset = (confirmed: boolean) => {
-    resetSheet.close()
-    shell.resume()
-    if (!confirmed || !resetStage(state)) return
-    dropPreview()
-    playSfx('whoosh', { rate: 0.62 })
-    vibrate(20)
-  }
-
-  resetSheet.find('[data-yes]')?.addEventListener('click', () => closeReset(true))
-  resetSheet.find('[data-no]')?.addEventListener('click', () => closeReset(false))
-
-  // 선 지우기는 묻지 않는다 — 다시 그으면 그만이고, 배치를 고치는 동안 자주 누르는 버튼이다
+  // 선 지우기는 묻지 않는다 — 다시 그으면 그만이고, 배치를 고치는 동안 자주 누르는 버튼이다.
+  // 실패 기록과 직전 궤적은 남긴다 (왜 빗나갔는지 보면서 다시 놓으라고)
   const canClear = () => state.phase === 'placing' && state.lines.length > 0
 
   const tapClear = () => {
@@ -154,23 +131,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     refreshPreview()
     playSfx('pop', { rate: 0.85 })
     vibrate(10)
-  }
-
-  const canReset = () =>
-    state.phase === 'placing' && (state.lines.length > 0 || state.fails > 0)
-
-  const askReset = () => {
-    if (!canReset()) return
-    const set = (selector: string, key: 'rf.resetAsk' | 'rf.resetBody' | 'rf.resetYes' | 'rf.resetNo') => {
-      const node = resetSheet.find(selector)
-      if (node) node.textContent = t(key)
-    }
-    set('[data-title]', 'rf.resetAsk')
-    set('[data-body]', 'rf.resetBody')
-    set('[data-yes]', 'rf.resetYes')
-    set('[data-no]', 'rf.resetNo')
-    shell.pause()
-    resetSheet.open()
   }
 
   // 광고 버튼이 보이는 조건. 몇 번 헤맨 뒤에만 나온다 —
@@ -266,10 +226,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       }
       if (canClear() && hitBtn(CLEAR_BTN, p.x, p.y)) {
         tapClear()
-        return
-      }
-      if (canReset() && hitBtn(RESET_BTN, p.x, p.y)) {
-        askReset()
         return
       }
       if (adReady() && hitBtn(AD_BTN, p.x, p.y)) {
@@ -664,35 +620,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.restore()
   }
 
-  // 단계 초기화 — 글자 없이 되돌림 화살표 하나. 지울 것이 있을 때만 보인다
-  const drawResetButton = (c: CanvasRenderingContext2D) => {
-    if (!canReset()) return
-    const cx = RESET_BTN.x + RESET_BTN.w / 2
-    const cy = RESET_BTN.y + RESET_BTN.h / 2
-    const head = Math.PI * 0.62
-    c.save()
-    btnPlate(c, RESET_BTN)
-    c.strokeStyle = '#FFFFFF'
-    c.lineWidth = 5
-    c.lineCap = 'round'
-    c.beginPath()
-    c.arc(cx, cy, 18, head, Math.PI * 0.24)
-    c.stroke()
-    // 화살촉 — 호가 시작하는 자리에 접선 방향으로 세운다
-    const hx = cx + Math.cos(head) * 18
-    const hy = cy + Math.sin(head) * 18
-    c.translate(hx, hy)
-    c.rotate(head - Math.PI / 2)
-    c.fillStyle = '#FFFFFF'
-    c.beginPath()
-    c.moveTo(0, -11)
-    c.lineTo(-8, 5)
-    c.lineTo(8, 5)
-    c.closePath()
-    c.fill()
-    c.restore()
-  }
-
   const drawStartButton = (c: CanvasRenderingContext2D) => {
     const running = state.phase === 'running'
     c.fillStyle = running ? 'rgb(255 255 255 / 0.16)' : '#43A047'
@@ -759,7 +686,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     drawAdButton(c)
     drawClearButton(c)
     drawStartButton(c)
-    drawResetButton(c)
     drawTutorial(c)
 
     if (state.clearFlash > 0) {

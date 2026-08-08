@@ -311,10 +311,6 @@ const dict: CoreDict = {
   'rf.abort': '↺ Yeniden çiz',
   'rf.clear': 'Gol!',
   'rf.adHint': '▶ Reklam: yörüngeyi gör',
-  'rf.resetAsk': 'Bu bölüme baştan başlansın mı?',
-  'rf.resetBody': 'Çizdiğin tüm çizgiler silinecek.',
-  'rf.resetYes': 'Baştan başla',
-  'rf.resetNo': 'Vazgeç',
 }
 
 export default dict

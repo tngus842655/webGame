@@ -311,10 +311,6 @@ const dict: CoreDict = {
   'rf.abort': '↺ Gambar ulang',
   'rf.clear': 'Gol!',
   'rf.adHint': '▶ Iklan: lihat jalur bola',
-  'rf.resetAsk': 'Ulangi level ini dari awal?',
-  'rf.resetBody': 'Semua garis yang kamu gambar akan dihapus.',
-  'rf.resetYes': 'Ulangi',
-  'rf.resetNo': 'Batal',
 }
 
 export default dict

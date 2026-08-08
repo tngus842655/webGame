@@ -311,10 +311,6 @@ const dict: CoreDict = {
   'rf.abort': '↺ 重新画线',
   'rf.clear': '进球！',
   'rf.adHint': '▶ 看广告预览路线',
-  'rf.resetAsk': '要从头开始这一关吗？',
-  'rf.resetBody': '画过的线会全部清除。',
-  'rf.resetYes': '重新开始',
-  'rf.resetNo': '取消',
 }
 
 export default dict

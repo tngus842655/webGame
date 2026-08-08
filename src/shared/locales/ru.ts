@@ -311,10 +311,6 @@ const dict: CoreDict = {
   'rf.abort': '↺ Перерисовать',
   'rf.clear': 'Гол!',
   'rf.adHint': '▶ Реклама: показать путь',
-  'rf.resetAsk': 'Начать уровень заново?',
-  'rf.resetBody': 'Все нарисованные линии будут стёрты.',
-  'rf.resetYes': 'Заново',
-  'rf.resetNo': 'Отмена',
 }
 
 export default dict
