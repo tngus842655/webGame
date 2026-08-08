@@ -17,9 +17,9 @@ const ko: Record<string, Guide> = {
     score: '과일이 커질수록 점수가 크게 오릅니다.',
   },
   blockblast: {
-    goal: '블록을 놓아 가로나 세로 한 줄을 채우면 사라집니다. 남은 블록을 놓을 자리가 없으면 끝이에요. 데일리는 그날 하루 모두에게 같은 블록 순서가 나옵니다.',
-    how: '아래 블록 세 개 중 하나를 끌어다 격자에 놓으세요. 왼쪽 위 칩을 누르면 데일리와 자유 모드를 오갑니다.',
-    score: '한 번에 여러 줄을 지우거나 연달아 지울수록 많이 받고, 판을 완전히 비우면 보너스가 붙습니다. 데일리에서 1,000점을 넘긴 날은 연속 기록이 이어집니다.',
+    goal: '블록을 놓아 가로나 세로 한 줄을 채우면 사라집니다. 남은 블록을 놓을 자리가 없으면 끝이에요.',
+    how: '아래 블록 세 개 중 하나를 끌어다 격자에 놓으세요.',
+    score: '한 번에 여러 줄을 지우거나 연달아 지울수록 많이 받고, 판을 완전히 비우면 보너스가 붙습니다.',
   },
   brick: {
     goal: '공을 튕겨 벽돌을 부수세요. 벽돌이 바닥까지 내려오면 끝입니다.',
@@ -175,9 +175,9 @@ const en: Record<string, Guide> = {
     score: 'Bigger fruits are worth far more.',
   },
   blockblast: {
-    goal: 'Fill a full row or column to clear it. When no block fits, the run ends. The daily run deals everyone the same block order all day.',
-    how: 'Drag one of the three blocks onto the grid. Tap the chip at the top left to move between the daily run and free play.',
-    score: 'Clearing several lines at once — or on back-to-back moves — pays more, and emptying the board entirely adds a bonus. Passing 1,000 points on the daily run keeps your streak going.',
+    goal: 'Fill a full row or column to clear it. When no block fits, the run ends.',
+    how: 'Drag one of the three blocks onto the grid.',
+    score: 'Clearing several lines at once — or on back-to-back moves — pays more, and emptying the board entirely adds a bonus.',
   },
   brick: {
     goal: 'Bounce the ball to break bricks. If bricks reach the bottom, the run ends.',
@@ -333,9 +333,9 @@ const ja: Record<string, Guide> = {
     score: '果物が大きいほど点数が大きく上がります。',
   },
   blockblast: {
-    goal: 'ブロックを置いて縦か横の1列を埋めると消えます。置く場所がなくなると終了です。デイリーはその日一日、みんな同じブロック順です。',
-    how: '下の3つのブロックから1つをドラッグして盤面に置きます。左上のチップを押すとデイリーとフリープレイを切り替えられます。',
-    score: '一度に複数の列を消すほど、続けて消すほど高得点です。盤面を空にするとボーナスがつきます。デイリーで1,000点を超えた日は連続記録が伸びます。',
+    goal: 'ブロックを置いて縦か横の1列を埋めると消えます。置く場所がなくなると終了です。',
+    how: '下の3つのブロックから1つをドラッグして盤面に置きます。',
+    score: '一度に複数の列を消すほど、続けて消すほど高得点です。盤面を空にするとボーナスがつきます。',
   },
   brick: {
     goal: 'ボールを弾ませてブロックを壊します。ブロックが下まで来ると終了です。',
@@ -491,9 +491,9 @@ const zhCN: Record<string, Guide> = {
     score: '水果越大，分数越高。',
   },
   blockblast: {
-    goal: '放置方块填满一整行或一整列即可消除。没有地方放就结束。每日挑战一整天给所有人相同的方块顺序。',
-    how: '把下方三个方块中的一个拖到格子上。点左上角的标签可在每日挑战和自由模式之间切换。',
-    score: '一次消除多行、连续消除都能得更多分，把整个棋盘清空还有额外奖励。每日挑战中超过 1,000 分就能延续连续记录。',
+    goal: '放置方块填满一整行或一整列即可消除。没有地方放就结束。',
+    how: '把下方三个方块中的一个拖到格子上。',
+    score: '一次消除多行、连续消除都能得更多分，把整个棋盘清空还有额外奖励。',
   },
   brick: {
     goal: '弹球打砖块。砖块落到底部就结束。',
@@ -649,9 +649,9 @@ const es: Record<string, Guide> = {
     score: 'Las frutas grandes valen mucho más.',
   },
   blockblast: {
-    goal: 'Completa una fila o columna para borrarla. Si no cabe ningún bloque, se acaba. El reto diario reparte el mismo orden de bloques a todo el mundo durante ese día.',
-    how: 'Arrastra uno de los tres bloques a la cuadrícula. Toca la etiqueta de arriba a la izquierda para pasar del reto diario al modo libre.',
-    score: 'Borrar varias líneas a la vez, o en jugadas seguidas, da más puntos, y vaciar el tablero entero suma un extra. Superar los 1.000 puntos en el reto diario mantiene tu racha.',
+    goal: 'Completa una fila o columna para borrarla. Si no cabe ningún bloque, se acaba.',
+    how: 'Arrastra uno de los tres bloques a la cuadrícula.',
+    score: 'Borrar varias líneas a la vez, o en jugadas seguidas, da más puntos, y vaciar el tablero entero suma un extra.',
   },
   brick: {
     goal: 'Rebota la bola para romper ladrillos. Si los ladrillos llegan abajo, se acaba.',
@@ -807,9 +807,9 @@ const ptBR: Record<string, Guide> = {
     score: 'Frutas maiores valem muito mais.',
   },
   blockblast: {
-    goal: 'Complete uma linha ou coluna para limpá-la. Se nenhum bloco couber, acaba. O desafio diário dá a mesma ordem de blocos para todo mundo durante o dia.',
-    how: 'Arraste um dos três blocos para a grade. Toque na etiqueta no canto superior esquerdo para alternar entre o desafio diário e o modo livre.',
-    score: 'Limpar várias linhas de uma vez, ou em jogadas seguidas, rende mais, e esvaziar o tabuleiro inteiro dá bônus. Passar de 1.000 pontos no desafio diário mantém sua sequência.',
+    goal: 'Complete uma linha ou coluna para limpá-la. Se nenhum bloco couber, acaba.',
+    how: 'Arraste um dos três blocos para a grade.',
+    score: 'Limpar várias linhas de uma vez, ou em jogadas seguidas, rende mais, e esvaziar o tabuleiro inteiro dá bônus.',
   },
   brick: {
     goal: 'Rebata a bola para quebrar os tijolos. Se os tijolos chegarem ao fundo, acaba.',
@@ -965,9 +965,9 @@ const fr: Record<string, Guide> = {
     score: 'Les gros fruits rapportent bien plus.',
   },
   blockblast: {
-    goal: 'Remplis une ligne ou une colonne pour l\'effacer. Si aucun bloc ne rentre, la partie est finie. Le défi quotidien distribue le même ordre de blocs à tout le monde ce jour-là.',
-    how: 'Fais glisser un des trois blocs sur la grille. Touche la pastille en haut à gauche pour passer du défi quotidien à la partie libre.',
-    score: 'Effacer plusieurs lignes d\'un coup, ou sur des coups d\'affilée, rapporte plus, et vider entièrement la grille ajoute un bonus. Dépasser 1 000 points au défi quotidien prolonge ta série.',
+    goal: 'Remplis une ligne ou une colonne pour l\'effacer. Si aucun bloc ne rentre, la partie est finie.',
+    how: 'Fais glisser un des trois blocs sur la grille.',
+    score: 'Effacer plusieurs lignes d\'un coup, ou sur des coups d\'affilée, rapporte plus, et vider entièrement la grille ajoute un bonus.',
   },
   brick: {
     goal: 'Fais rebondir la balle pour casser les briques. Si elles atteignent le bas, la partie est finie.',
@@ -1123,9 +1123,9 @@ const de: Record<string, Guide> = {
     score: 'Größere Früchte bringen deutlich mehr.',
   },
   blockblast: {
-    goal: 'Füll eine ganze Reihe oder Spalte, um sie zu löschen. Passt kein Block mehr, ist Schluss. Die tägliche Runde gibt an dem Tag allen dieselbe Blockreihenfolge.',
-    how: 'Zieh einen der drei Blöcke auf das Gitter. Tipp oben links auf den Chip, um zwischen täglicher Runde und freiem Spiel zu wechseln.',
-    score: 'Mehrere Reihen auf einmal oder in aufeinanderfolgenden Zügen bringen mehr, und ein komplett leeres Feld gibt einen Bonus. Über 1.000 Punkte in der täglichen Runde halten deine Serie am Leben.',
+    goal: 'Füll eine ganze Reihe oder Spalte, um sie zu löschen. Passt kein Block mehr, ist Schluss.',
+    how: 'Zieh einen der drei Blöcke auf das Gitter.',
+    score: 'Mehrere Reihen auf einmal oder in aufeinanderfolgenden Zügen bringen mehr, und ein komplett leeres Feld gibt einen Bonus.',
   },
   brick: {
     goal: 'Lass den Ball abprallen und zerschlag die Steine. Erreichen die Steine den Boden, ist Schluss.',
@@ -1281,9 +1281,9 @@ const ru: Record<string, Guide> = {
     score: 'Крупные фрукты стоят гораздо больше.',
   },
   blockblast: {
-    goal: 'Заполните целый ряд или столбец, чтобы очистить его. Если ни один блок не помещается, игра заканчивается. В ежедневной партии всем весь день выпадает один и тот же порядок блоков.',
-    how: 'Перетащите один из трёх блоков на поле. Нажмите на плашку слева вверху, чтобы переключиться между ежедневной партией и свободной игрой.',
-    score: 'Очистка нескольких линий сразу или ходами подряд приносит больше, а полностью пустое поле даёт бонус. Более 1 000 очков в ежедневной партии продлевают вашу серию.',
+    goal: 'Заполните целый ряд или столбец, чтобы очистить его. Если ни один блок не помещается, игра заканчивается.',
+    how: 'Перетащите один из трёх блоков на поле.',
+    score: 'Очистка нескольких линий сразу или ходами подряд приносит больше, а полностью пустое поле даёт бонус.',
   },
   brick: {
     goal: 'Отбивайте мяч и разбивайте кирпичи. Если кирпичи дойдут до низа, игра заканчивается.',
@@ -1439,9 +1439,9 @@ const id: Record<string, Guide> = {
     score: 'Buah yang lebih besar bernilai jauh lebih tinggi.',
   },
   blockblast: {
-    goal: 'Isi satu baris atau kolom penuh untuk menghapusnya. Kalau tidak ada blok yang muat, permainan berakhir. Tantangan harian memberi urutan blok yang sama untuk semua orang sepanjang hari itu.',
-    how: 'Seret salah satu dari tiga blok ke papan. Ketuk label di kiri atas untuk berpindah antara tantangan harian dan main bebas.',
-    score: 'Menghapus beberapa baris sekaligus atau berturut-turut memberi lebih banyak nilai, dan mengosongkan papan memberi bonus. Melewati 1.000 poin di tantangan harian menjaga rentetanmu.',
+    goal: 'Isi satu baris atau kolom penuh untuk menghapusnya. Kalau tidak ada blok yang muat, permainan berakhir.',
+    how: 'Seret salah satu dari tiga blok ke papan.',
+    score: 'Menghapus beberapa baris sekaligus atau berturut-turut memberi lebih banyak nilai, dan mengosongkan papan memberi bonus.',
   },
   brick: {
     goal: 'Pantulkan bola untuk memecah bata. Kalau bata sampai ke bawah, permainan berakhir.',
@@ -1597,9 +1597,9 @@ const vi: Record<string, Guide> = {
     score: 'Quả càng lớn điểm càng cao.',
   },
   blockblast: {
-    goal: 'Lấp đầy một hàng hoặc một cột để xóa nó. Không còn chỗ đặt khối là kết thúc. Lượt hằng ngày cho mọi người cùng một thứ tự khối trong suốt ngày hôm đó.',
-    how: 'Kéo một trong ba khối bên dưới vào lưới. Chạm vào nhãn ở góc trên bên trái để chuyển giữa lượt hằng ngày và chơi tự do.',
-    score: 'Xóa nhiều hàng cùng lúc hoặc xóa liên tiếp được nhiều điểm hơn, và dọn sạch cả bàn sẽ có thưởng. Vượt 1.000 điểm ở lượt hằng ngày sẽ nối tiếp chuỗi của bạn.',
+    goal: 'Lấp đầy một hàng hoặc một cột để xóa nó. Không còn chỗ đặt khối là kết thúc.',
+    how: 'Kéo một trong ba khối bên dưới vào lưới.',
+    score: 'Xóa nhiều hàng cùng lúc hoặc xóa liên tiếp được nhiều điểm hơn, và dọn sạch cả bàn sẽ có thưởng.',
   },
   brick: {
     goal: 'Nảy bóng để phá gạch. Gạch xuống tới đáy là kết thúc.',
@@ -1755,9 +1755,9 @@ const th: Record<string, Guide> = {
     score: 'ผลไม้ยิ่งใหญ่ยิ่งได้คะแนนสูง',
   },
   blockblast: {
-    goal: 'วางบล็อกให้เต็มแถวหรือคอลัมน์เพื่อล้างออก ถ้าไม่มีที่วางบล็อกก็จบ โหมดรายวันจะให้ลำดับบล็อกเหมือนกันกับทุกคนตลอดวันนั้น',
-    how: 'ลากบล็อกหนึ่งในสามอันด้านล่างลงบนตาราง แตะป้ายมุมบนซ้ายเพื่อสลับระหว่างโหมดรายวันกับเล่นอิสระ',
-    score: 'ล้างหลายแถวพร้อมกันหรือล้างต่อเนื่องได้คะแนนมากกว่า และถ้าเคลียร์กระดานหมดจะได้โบนัส วันไหนทำเกิน 1,000 คะแนนในโหมดรายวันก็จะต่อสถิติต่อเนื่องไปได้',
+    goal: 'วางบล็อกให้เต็มแถวหรือคอลัมน์เพื่อล้างออก ถ้าไม่มีที่วางบล็อกก็จบ',
+    how: 'ลากบล็อกหนึ่งในสามอันด้านล่างลงบนตาราง',
+    score: 'ล้างหลายแถวพร้อมกันหรือล้างต่อเนื่องได้คะแนนมากกว่า และถ้าเคลียร์กระดานหมดจะได้โบนัส',
   },
   brick: {
     goal: 'กระดอนลูกบอลเพื่อทุบอิฐ ถ้าอิฐลงมาถึงพื้นก็จบ',
@@ -1913,9 +1913,9 @@ const tr: Record<string, Guide> = {
     score: 'Büyük meyveler çok daha fazla değer.',
   },
   blockblast: {
-    goal: 'Bir satırı ya da sütunu tamamen doldurup temizle. Hiçbir blok sığmazsa oyun biter. Günlük tur o gün boyunca herkese aynı blok sırasını verir.',
-    how: 'Alttaki üç bloktan birini ızgaraya sürükle. Sol üstteki etikete dokunarak günlük tur ile serbest oyun arasında geçiş yap.',
-    score: 'Aynı anda ya da arka arkaya birden fazla satır temizlemek daha çok kazandırır, tahtayı tamamen boşaltmak ise bonus verir. Günlük turda 1.000 puanı geçtiğin gün serin devam eder.',
+    goal: 'Bir satırı ya da sütunu tamamen doldurup temizle. Hiçbir blok sığmazsa oyun biter.',
+    how: 'Alttaki üç bloktan birini ızgaraya sürükle.',
+    score: 'Aynı anda ya da arka arkaya birden fazla satır temizlemek daha çok kazandırır, tahtayı tamamen boşaltmak ise bonus verir.',
   },
   brick: {
     goal: 'Topu sektirip tuğlaları kır. Tuğlalar alta ulaşırsa oyun biter.',

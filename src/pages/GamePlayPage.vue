@@ -6,6 +6,7 @@ import { ensureAdminChecked, isAdmin } from '@/shared/admin'
 import { pauseRunningGame, resumeRunningGame } from '@/games/shell'
 import type { GameModule } from '@/games/types'
 import GameGuide from '@/shared/GameGuide.vue'
+import GameVote from '@/shared/GameVote.vue'
 import { setBackHandler } from '@/shared/backButton'
 import { createGameContext } from '@/shared/gameContext'
 import { t, type TranslationKey } from '@/shared/i18n'
@@ -191,6 +192,8 @@ onBeforeUnmount(() => {
       </button>
     </div>
 
+    <GameVote class="vote-row" :slug="slug" />
+
     <!-- 멈춤 화면 -->
     <div v-if="paused" class="pause-scrim">
       <div class="pause-sheet">
@@ -242,6 +245,14 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 8px;
   pointer-events: none;
+}
+
+/* 좋아요·싫어요는 멈춤·도움말 바로 아래에 붙는다 (줄 높이 38 + 사이 8).
+   .top-bar 안에 넣으면 그 줄이 두 줄이 되면서 왼쪽 뒤로가기까지 같이 내려앉는다. */
+.vote-row {
+  position: absolute;
+  top: 56px;
+  right: 10px;
 }
 
 .chip {

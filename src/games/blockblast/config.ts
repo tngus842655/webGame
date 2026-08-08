@@ -13,8 +13,11 @@ export const LAYOUT = {
   traySlots: [160, 360, 560],
   trayScale: 0.45,
   dragLift: 100, // 드래그 중 손가락 위로 띄우는 높이
-  modeChip: { x: 40, y: 50, w: 172, h: 72 }, // 데일리↔자유 전환 칩 (점수판 왼쪽)
-  infoY: 200, // 스트릭·목표·최고 기록 안내줄 (점수판과 보드 사이)
+  // 연속 클리어 배지 중심. 오른쪽 위(560, 88)에 있었는데 그 자리를 멈춤·도움말과
+  // 그 아래 좋아요·싫어요 줄(GamePlayPage)이 쓴다. 그 줄 아래는 보드(y 240)까지
+  // 50px밖에 안 남아 배지(60, 튀어오를 때 75)가 들어가지 않아서 왼쪽으로 옮겼다 —
+  // 점수판 왼쪽의 빈 자리다.
+  streakBadge: { x: 104, y: 170 },
 } as const
 
 export interface BlockColor {
@@ -73,10 +76,4 @@ export const SCORING = {
   lineBase: 46, // 줄 점수 = lineBase × 줄수² (1줄 46, 2줄 184, 3줄 414)
   streakBonus: 23, // 연속 클리어 보너스 = (streak-1) × streakBonus
   allClear: 300, // 보드를 완전히 비우면 (2줄 184와 3줄 414 사이 — 잭팟이되 줄 점수를 안 넘게)
-} as const
-
-export const DAILY = {
-  // 스트릭 인정 목표 점수 — 시뮬레이션 초보 정책 중앙값이 950이라,
-  // 규칙만 익히면 닿고 첫 판부터는 안 닿는 높이로 잡았다 (GAME_BALANCE.md 4장)
-  target: 1000,
 } as const
