@@ -30,14 +30,24 @@ function addDays(d: Date, n: number): Date {
   return next
 }
 
+function startOfToday(): Date {
+  const now = new Date()
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate())
+}
+
 /**
  * 고른 탭이 가리키는 달력 구간. 양끝 모두 '그 날 00:00'이고 끝날도 구간에 든다.
  * 누적이면 null — 자를 것이 없다는 뜻이다.
+ *
+ * 오늘이 언제인지를 인자로 받는다. 통계 화면은 이 값을 ref로 들고 있어야 자정이
+ * 지났을 때 화면이 따라온다 (아래 statsToday 참고).
  */
-export function periodRange(period: Period, half: Half): { first: Date; last: Date } | null {
+export function periodRange(
+  period: Period,
+  half: Half,
+  today: Date = startOfToday(),
+): { first: Date; last: Date } | null {
   if (period === 'all') return null
-  const now = new Date()
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
 
   if (period === 'daily') {
     const day = half === 'curr' ? today : addDays(today, -1)
@@ -81,16 +91,32 @@ watch(statsPeriod, () => {
   statsHalf.value = 'curr'
 })
 
+// '지금'은 반응형이 아니다. 아래 computed 안에서 그냥 new Date()를 부르면 한 번 계산한
+// 값이 그대로 굳어, 통계 화면을 켜둔 채 자정이 지나도 탭은 '오늘'인데 어제 숫자가 나온다.
+// 서버가 매 요청마다 now()로 자르던 때는 없던 문제라, 날짜를 ref로 들고 다시 본다.
+const statsToday = ref(startOfToday())
+
+export function refreshStatsToday(): void {
+  const now = startOfToday()
+  // 날이 그대로면 손대지 않는다 — 새 Date를 넣으면 볼 때마다 조회가 한 번씩 더 나간다
+  if (now.getTime() !== statsToday.value.getTime()) statsToday.value = now
+}
+
+// 앱을 내려놨다 다시 열었을 때. 화면 안에서 오가는 경우는 StatsPeriodTabs가 받는다.
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) refreshStatsToday()
+})
+
 /**
  * RPC에 넘길 절대 시각 구간. 보는 사람의 시간대로 계산한 자정이 그대로 실려 가므로
  * 서버는 시간대를 따로 알 필요가 없다. `to`는 끝을 포함하지 않는다(끝날 다음 자정).
  */
 export const statsRange = computed<{ from: string | null; to: string | null }>(() => {
-  const range = periodRange(statsPeriod.value, statsHalf.value)
+  const range = periodRange(statsPeriod.value, statsHalf.value, statsToday.value)
   if (!range) return { from: null, to: null }
   return { from: range.first.toISOString(), to: addDays(range.last, 1).toISOString() }
 })
 
 export const statsCaption = computed(() =>
-  formatPeriodCaption(periodRange(statsPeriod.value, statsHalf.value)),
+  formatPeriodCaption(periodRange(statsPeriod.value, statsHalf.value, statsToday.value)),
 )

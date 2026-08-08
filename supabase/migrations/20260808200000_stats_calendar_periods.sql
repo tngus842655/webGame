@@ -9,11 +9,13 @@
 -- timestamptz로 실려 오므로 서버는 시간대를 따로 알 필요가 없다.
 -- p_from은 구간에 들고 p_to는 들지 않는다(끝날 다음 자정). 둘 다 null이면 전체 누적.
 --
--- 인자가 바뀌므로 create or replace로는 안 되고 옛 함수를 지운 뒤 다시 만든다.
+-- 인자가 바뀌었으므로 옛 (int) 함수는 따로 지운다 — 이름이 같아도 인자가 다르면 별개
+-- 함수라, 그냥 두면 둘 다 남아 PostgREST가 어느 쪽을 부를지 헷갈린다. 새 함수 쪽은
+-- create or replace라 두 번째 실행에서도 그대로 덮어쓴다(맨 create면 42723으로 죽는다).
 
 -- ── 게임별 지표 ─────────────────────────────────────────────
 drop function if exists public.get_game_stats(int);
-create function public.get_game_stats(
+create or replace function public.get_game_stats(
   p_from timestamptz default null,
   p_to timestamptz default null
 )
@@ -69,7 +71,7 @@ $$;
 -- ── 구간 전체의 이용자 수 ───────────────────────────────────
 -- 게임별 인원은 서로 겹쳐서 더할 수도 최댓값을 쓸 수도 없다 — 따로 센다
 drop function if exists public.get_total_players(int);
-create function public.get_total_players(
+create or replace function public.get_total_players(
   p_from timestamptz default null,
   p_to timestamptz default null
 )
@@ -96,7 +98,7 @@ $$;
 
 -- ── 이용자별 게임 이용 현황 ─────────────────────────────────
 drop function if exists public.get_player_stats(int);
-create function public.get_player_stats(
+create or replace function public.get_player_stats(
   p_from timestamptz default null,
   p_to timestamptz default null
 )
@@ -150,7 +152,7 @@ $$;
 
 -- ── 리워드 광고 호출 현황 ───────────────────────────────────
 drop function if exists public.get_ad_stats(int);
-create function public.get_ad_stats(
+create or replace function public.get_ad_stats(
   p_from timestamptz default null,
   p_to timestamptz default null
 )

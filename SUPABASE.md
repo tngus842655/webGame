@@ -66,11 +66,11 @@
 | `get_total_players(p_from, p_to)` | 관리자 통계 | `is_admin()` 아니면 `forbidden` |
 | `get_player_stats(p_from, p_to)` | 관리자 통계 → 이용자별 상세 | `is_admin()` 아니면 `forbidden` |
 | `get_ad_stats(p_from, p_to)` | 관리자 통계 → 광고 현황 | `is_admin()` 아니면 `forbidden` |
+| `is_admin()` | 라우트 가드, 다른 함수의 권한 검사 | 공개 (결과만 boolean) |
+| `delete_my_account()` | 계정 삭제 화면 | `authenticated`만. `auth.uid()` 본인 것만 지운다 |
 
 통계 네 함수의 기간은 화면이 보는 사람의 시간대로 계산한 절대 시각 구간이다.
 `p_from`은 구간에 들고 `p_to`는 들지 않으며, 둘 다 null이면 전체 누적이다.
-| `is_admin()` | 라우트 가드, 다른 함수의 권한 검사 | 공개 (결과만 boolean) |
-| `delete_my_account()` | 계정 삭제 화면 | `authenticated`만. `auth.uid()` 본인 것만 지운다 |
 
 트리거로만 도는 함수는 클라이언트가 직접 부르지 않는다 — `handle_new_user()`(가입 시 프로필 생성),
 `check_score_rate_limit()`·`check_session_rate_limit()`·`check_feedback_rate_limit()`·`check_ad_view_rate_limit()`(분당 제출 상한).

@@ -1,8 +1,20 @@
 <script setup lang="ts">
 // 통계 세 화면(/stats, /stats/players, /stats/ads)이 함께 쓰는 기간 탭.
 // 고른 값은 화면이 아니라 모듈이 들고 있어, 상세로 들어갔다 나와도 그대로다.
-import { HALVES, PERIODS, statsCaption, statsHalf, statsPeriod } from './adminPeriod'
+import { onMounted } from 'vue'
+import {
+  HALVES,
+  PERIODS,
+  refreshStatsToday,
+  statsCaption,
+  statsHalf,
+  statsPeriod,
+} from './adminPeriod'
 import { t } from './i18n'
+
+// 세 화면을 오가는 사이에 자정이 지날 수 있다. 고른 기간은 모듈이 들고 있어서
+// 화면을 새로 그려도 저절로 다시 계산되지 않으므로, 들어설 때 날짜를 다시 본다.
+onMounted(refreshStatsToday)
 </script>
 
 <template>

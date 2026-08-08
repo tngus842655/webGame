@@ -237,6 +237,7 @@ function pct(n: number, total: number): string {
   margin-bottom: 14px;
 }
 
+/* 바로 위 기간 탭(StatsPeriodTabs)과 같은 크기여야 두 줄이 한 벌로 읽힌다 */
 .tabs button {
   flex: 1;
   padding: 10px 0;
@@ -244,6 +245,8 @@ function pct(n: number, total: number): string {
   border-radius: 12px;
   background: var(--surface);
   color: var(--ink-faint);
+  font: inherit;
+  font-size: 13.5px;
   cursor: pointer;
 }
 
