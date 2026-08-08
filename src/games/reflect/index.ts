@@ -1,19 +1,19 @@
 import { t } from '@/shared/i18n'
-import { playGameOver, playSfx, preloadSfx, vibrate } from '@/shared/sound'
+import { playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
-import { createGameOverOverlay } from '../overlay'
+import { createClearBonus } from '../clearBonus'
 import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
-import { SCORE_PANEL, drawScorePanel, font } from '../ui'
+import { drawScorePanel, font } from '../ui'
 import {
   BALL_R,
   BOARD,
+  BONUS_TRIES,
   MIN_LINE_LEN,
   RUN_LIMIT,
-  TRIES_PER_LEVEL,
   abortRun,
-  addTries,
+  addBonus,
   capLine,
   commitLine,
   createState,
@@ -21,11 +21,21 @@ import {
   launch,
   removeLineAt,
   segDist,
+  selectStage,
   update,
   type Seg,
 } from './state'
 
 const START_BTN = { x: 160, y: 1096, w: 400, h: 96 } as const
+const PREV_BTN = { x: 196, y: 170, w: 76, h: 56 } as const
+const NEXT_BTN = { x: 448, y: 170, w: 76, h: 56 } as const
+// 도달한 최고 판 — 계정 없이도 이어가도록 즐겨찾기와 같은 localStorage에 둔다
+const STAGE_KEY = 'webgame:reflectStage'
+
+function loadMaxStage(): number {
+  const n = Number(localStorage.getItem(STAGE_KEY))
+  return Number.isFinite(n) && n >= 1 ? Math.floor(n) : 1
+}
 
 // 제도판 위에 선을 긋는 분위기 — 어두운 판이라 두 테마에서 같은 얼굴이다
 const INK = {
@@ -64,68 +74,47 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       clearGlow = 1
       burst(prevGoal.x, prevGoal.y, 26, 320, INK.goal)
       goalRing = { x: prevGoal.x, y: prevGoal.y, age: 0 }
+      // update()가 이미 다음 판으로 넘겼으므로 지금 level이 곧 새 도달점이다
+      if (state.level > maxStage) {
+        maxStage = state.level
+        localStorage.setItem(STAGE_KEY, String(maxStage))
+      }
+      // 점수를 준 클리어만 센다 — 지나온 판을 다시 깨는 것으로 광고 차례를 당기지 않는다.
+      // 3판에 한 번만 묻는 것은 네모로직과 같은 기준이고, 시트가 뜨는 동안 셸이 멈춘다
+      if (state.clearGain > 0) {
+        clears += 1
+        if (clears % 3 === 0) void offerDouble(state.clearGain)
+      }
     }
     if (events.failed) {
       playSfx('fail')
       vibrate(60)
       const end = state.lastPath[state.lastPath.length - 1]
       if (end) burst(end.x, end.y, 14, 210, '#EF5350')
-      if (state.phase === 'over') failFlash = 1
     }
     // 클리어 연출이 새 판 좌표를 쓰지 않도록 매 프레임 현재 목표를 기억해 둔다
     prevGoal = { x: state.goal.x, y: state.goal.y }
-    if (state.phase === 'over' && state.overTimer > 0) {
-      state.overTimer -= dt
-      if (state.overTimer <= 0) void gameOver()
-    }
     stepEffects(dt)
     draw()
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
-  const state = createState()
-  preloadSfx('clear', 'fail', 'gameover', 'impact', 'pop', 'select', 'shoot', 'whoosh')
+  let maxStage = loadMaxStage()
+  const state = createState(maxStage)
+  preloadSfx('clear', 'fail', 'impact', 'pop', 'select', 'shoot', 'tap', 'whoosh')
+  const bonus = createClearBonus(shell, ctx, 'reflect-clear')
+  let clears = 0
 
   const sparks: Spark[] = []
   let goalRing: { x: number; y: number; age: number } | null = null
   let prevGoal = { x: state.goal.x, y: state.goal.y }
   let clearGlow = 0
-  let failFlash = 0
   let blockedFlash = 0 // 공 자리를 덮는 선을 거절했다는 표시
   let drag: { x1: number; y1: number; x2: number; y2: number; moved: boolean } | null = null
-  let adTriesUsed = false
 
-  const overlay = createGameOverOverlay(shell.wrapper, {
-    adLabelKey: 'rf.ad',
-    onRetry() {
-      if (state.phase !== 'over') return
-      adTriesUsed = false
-      Object.assign(state, createState())
-      sparks.length = 0
-      goalRing = null
-      drag = null
-      overlay.hide()
-    },
-    onContinue() {
-      void continueWithAd()
-    },
-  })
-
-  async function continueWithAd() {
-    if (state.phase !== 'over' || adTriesUsed) return
-    const rewarded = await ctx.showRewardAd('reflect-tries')
-    if (shell.isDestroyed() || !rewarded || state.phase !== 'over') return
-    adTriesUsed = true
-    addTries(state, 3)
-    overlay.hide()
-  }
-
-  async function gameOver() {
-    playGameOver()
-    vibrate(120)
-    const prevBest = await ctx.getBestScore()
-    void ctx.submitScore(state.score)
-    if (shell.isDestroyed() || state.phase !== 'over') return
-    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adTriesUsed, 'over.byLives')
+  async function offerDouble(points: number) {
+    if (!(await bonus.offer(points))) return
+    if (shell.isDestroyed()) return
+    addBonus(state, points)
   }
 
   const burst = (x: number, y: number, count: number, speed: number, color: string) => {
@@ -147,7 +136,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   const stepEffects = (dt: number) => {
     clearGlow = Math.max(0, clearGlow - dt * 1.4)
-    failFlash = Math.max(0, failFlash - dt * 2)
     blockedFlash = Math.max(0, blockedFlash - dt * 2.5)
     if (goalRing) {
       goalRing.age += dt
@@ -171,6 +159,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     x >= BOARD.x && x <= BOARD.x + BOARD.w && y >= BOARD.y && y <= BOARD.y + BOARD.h
   const clampX = (x: number) => Math.max(BOARD.x + 4, Math.min(BOARD.x + BOARD.w - 4, x))
   const clampY = (y: number) => Math.max(BOARD.y + 4, Math.min(BOARD.y + BOARD.h - 4, y))
+  const hitBtn = (r: { x: number; y: number; w: number; h: number }, x: number, y: number) =>
+    x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h
 
   const tapStart = () => {
     if (state.phase === 'placing') {
@@ -186,13 +176,17 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const detachInput = attachInput(stage.canvas, {
     onDown(clientX, clientY) {
       const p = stage.toBoard(clientX, clientY)
-      if (
-        p.x >= START_BTN.x &&
-        p.x <= START_BTN.x + START_BTN.w &&
-        p.y >= START_BTN.y &&
-        p.y <= START_BTN.y + START_BTN.h
-      ) {
+      if (hitBtn(START_BTN, p.x, p.y)) {
         tapStart()
+        return
+      }
+      // 판 이동 화살표 — 깨서 열어 둔 판(maxStage) 안에서만 오간다
+      if (state.phase === 'placing' && hitBtn(PREV_BTN, p.x, p.y)) {
+        if (state.level > 1 && selectStage(state, state.level - 1)) playSfx('tap')
+        return
+      }
+      if (state.phase === 'placing' && hitBtn(NEXT_BTN, p.x, p.y)) {
+        if (state.level < maxStage && selectStage(state, state.level + 1)) playSfx('tap')
         return
       }
       if (state.phase !== 'placing' || !inBoard(p.x, p.y)) return
@@ -456,33 +450,58 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.fillRect(BOARD.x, BOARD.y - 10, BOARD.w * left, 6)
   }
 
-  const drawHud = (c: CanvasRenderingContext2D) => {
-    drawScorePanel(c, { value: state.score.toLocaleString(), sub: true })
-    c.font = font(20)
-    c.textAlign = 'center'
-    c.fillStyle = 'rgb(255 255 255 / 0.6)'
-    c.fillText(t('rf.level', { n: state.level }), SCORE_PANEL.cx, SCORE_PANEL.subY)
+  const drawChevron = (
+    c: CanvasRenderingContext2D,
+    btn: { x: number; y: number; w: number; h: number },
+    dir: 1 | -1,
+    enabled: boolean,
+  ) => {
+    const cx = btn.x + btn.w / 2
+    const cy = btn.y + btn.h / 2
+    c.strokeStyle = enabled ? '#FFFFFF' : 'rgb(255 255 255 / 0.18)'
+    c.lineWidth = 6
+    c.lineCap = 'round'
+    c.lineJoin = 'round'
+    c.beginPath()
+    c.moveTo(cx - dir * 7, cy - 13)
+    c.lineTo(cx + dir * 7, cy)
+    c.lineTo(cx - dir * 7, cy + 13)
+    c.stroke()
+  }
 
-    // 왼쪽: 남은 시도 = 공 모양 점 (목숨 관용 표현이라 글자가 없어도 읽힌다)
-    for (let i = 0; i < TRIES_PER_LEVEL; i++) {
-      const x = 46 + i * 40
-      const y = 202
-      if (i < state.tries) {
-        const g = c.createRadialGradient(x - 3, y - 4, 1, x, y, 13)
-        g.addColorStop(0, '#FFF3E0')
-        g.addColorStop(0.6, '#FFB74D')
-        g.addColorStop(1, '#F57C00')
+  const drawHud = (c: CanvasRenderingContext2D) => {
+    drawScorePanel(c, { value: state.score.toLocaleString() })
+
+    // 판 스테퍼 ‹ {n}판 › — 깨서 열어 둔 판 안에서 자유롭게 오간다
+    const placing = state.phase === 'placing'
+    c.fillStyle = '#FFFFFF'
+    c.font = font(30, true)
+    c.textAlign = 'center'
+    c.textBaseline = 'middle'
+    c.fillText(t('rf.level', { n: state.level }), 360, 199)
+    c.textBaseline = 'alphabetic'
+    drawChevron(c, PREV_BTN, -1, placing && state.level > 1)
+    drawChevron(c, NEXT_BTN, 1, placing && state.level < maxStage)
+
+    // 왼쪽: 남은 보너스 몫 — 실패할 때마다 다이아가 하나씩 꺼진다
+    for (let i = 0; i < BONUS_TRIES; i++) {
+      const x = 48 + i * 40
+      const y = 198
+      c.save()
+      c.translate(x, y)
+      c.rotate(Math.PI / 4)
+      if (i < BONUS_TRIES - state.fails) {
+        const g = c.createLinearGradient(-9, -9, 9, 9)
+        g.addColorStop(0, '#FFE082')
+        g.addColorStop(1, '#FFA000')
         c.fillStyle = g
-        c.beginPath()
-        c.arc(x, y, 13, 0, Math.PI * 2)
-        c.fill()
+        c.fillRect(-9, -9, 18, 18)
       } else {
-        c.strokeStyle = 'rgb(255 255 255 / 0.25)'
+        c.strokeStyle = 'rgb(255 255 255 / 0.22)'
         c.lineWidth = 2.5
-        c.beginPath()
-        c.arc(x, y, 12, 0, Math.PI * 2)
-        c.stroke()
+        c.strokeRect(-8, -8, 16, 16)
       }
+      c.restore()
     }
     // 오른쪽: 그을 수 있는 선 자리 — 밝은 빗금이 남은 몫이다
     for (let i = 0; i < state.maxLines; i++) {
@@ -492,14 +511,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.lineWidth = 6
       c.lineCap = 'round'
       c.beginPath()
-      c.moveTo(x - 12, 212)
-      c.lineTo(x + 12, 192)
+      c.moveTo(x - 12, 208)
+      c.lineTo(x + 12, 188)
       c.stroke()
     }
   }
 
   const drawStartButton = (c: CanvasRenderingContext2D) => {
-    if (state.phase === 'over') return
     const running = state.phase === 'running'
     c.fillStyle = running ? 'rgb(255 255 255 / 0.16)' : '#43A047'
     c.beginPath()
@@ -559,10 +577,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fillStyle = `rgb(210 255 235 / ${clearGlow * 0.22})`
       c.fillRect(0, 0, 720, 1280)
     }
-    if (failFlash > 0) {
-      c.fillStyle = `rgb(239 83 80 / ${failFlash * 0.16})`
-      c.fillRect(0, 0, 720, 1280)
-    }
 
     drawHud(c)
     drawStartButton(c)
@@ -576,7 +590,12 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fillStyle = '#69F0AE'
       c.font = font(40, true)
       c.textAlign = 'center'
-      c.fillText(t('rf.clear', { n: state.clearGain }), 360, 676)
+      // 지나온 판을 다시 깬 것은 점수가 없다 — 없는 +0을 적지 않는다
+      c.fillText(
+        state.clearGain > 0 ? t('rf.clear', { n: state.clearGain }) : t('rf.again'),
+        360,
+        676,
+      )
       c.restore()
     }
   }
@@ -586,11 +605,14 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   return {
     destroy: () => shell.destroy(),
     getScore: () => state.score,
-    // 관리자 전용 '다음 단계' — 클리어 점수 없이 판만 넘긴다
+    // 관리자 전용 '다음 단계' — 클리어 점수 없이 판만 넘기고, 넘긴 데까지 열어 준다
     adminSkip() {
-      if (state.phase === 'over') return
       state.level += 1
       loadLevel(state)
+      if (state.level > maxStage) {
+        maxStage = state.level
+        localStorage.setItem(STAGE_KEY, String(maxStage))
+      }
     },
   }
 }

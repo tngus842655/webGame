@@ -11,7 +11,7 @@ export const BOARD = { x: 24, y: 230, w: 672, h: 820 } as const
 // 밸런스 상수 — 조절은 전부 여기서
 export const BALL_R = 14
 export const BALL_SPEED = 520
-export const TRIES_PER_LEVEL = 3
+export const BONUS_TRIES = 3 // 시도는 무제한이지만, 이 횟수 안에 깨면 남은 만큼 보너스
 export const RUN_LIMIT = 10 // 시도당 제한 시간(초) — 골에 못 가고 계속 돌면 실패
 export const MIN_LINE_LEN = 44
 export const MAX_LINE_LEN = 250
@@ -127,6 +127,20 @@ export interface LevelDef {
   solution: Seg[] // 역산에 쓴 가상 선 — 이 배치가 곧 정답이라는 증거 (시뮬레이션 검증에도 쓴다)
 }
 
+// 판은 레벨 번호를 씨앗으로 만든다 — 12판은 언제 들어와도, 누구에게도 같은 12판이다.
+// 무작위로 두면 되돌아간 판이 다른 배치로 나와 '판 선택'이 말이 안 되고,
+// 순위도 저마다 다른 문제를 푼 결과가 된다.
+function seeded(seed: number): () => number {
+  let a = seed * 0x9e3779b1 + 0x6d2b79f5
+  return () => {
+    a |= 0
+    a = (a + 0x6d2b79f5) | 0
+    let t = Math.imul(a ^ (a >>> 15), 1 | a)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
 function paramsFor(level: number) {
   return {
     wallCount: level <= 2 ? 0 : Math.min(6, 1 + Math.floor((level - 3) / 2)),
@@ -136,8 +150,6 @@ function paramsFor(level: number) {
     minBounces: Math.min(6, 1 + Math.floor(level / 3)),
   }
 }
-
-const rand = (a: number, b: number) => a + Math.random() * (b - a)
 
 function randomSeg(cx: number, cy: number, len: number, angle: number): Seg {
   const dx = (Math.cos(angle) * len) / 2
@@ -208,6 +220,8 @@ function naturalHitsGoal(spawn: Spawn, walls: Seg[], goal: Goal): boolean {
 
 export function buildLevel(level: number): LevelDef {
   const p = paramsFor(level)
+  const next = seeded(level)
+  const rand = (a: number, b: number) => a + next() * (b - a)
   for (let attempt = 0; attempt < 80; attempt++) {
     // 1) 고정 벽 — 겹치거나 뭉치면 그 벽만 다시 뽑고, 자리가 안 나면 건너뛴다.
     //    (벽 수가 많은 레벨에서 한 벽 때문에 판 전체를 버리면 폴백이 급증한다)
@@ -298,13 +312,16 @@ export function buildLevel(level: number): LevelDef {
 
 // ─── 진행 상태 ───
 
-export type Phase = 'placing' | 'running' | 'over'
+export type Phase = 'placing' | 'running'
 
 export interface ReflectState {
   phase: Phase
   level: number
   score: number
-  tries: number
+  // 점수를 준 가장 깊은 판. 지나온 판을 다시 깨는 것은 연습이지 점수가 아니다 —
+  // 그러지 않으면 1판을 반복해서 도는 것이 가장 빠른 점수 벌이가 되어 순위가 인내심 대결이 된다
+  deepest: number
+  fails: number // 이 판에서 실패한 발사 수 — 적게 깰수록 보너스가 커진다
   walls: Seg[]
   lines: Seg[]
   maxLines: number
@@ -316,7 +333,6 @@ export interface ReflectState {
   lastPath: Array<{ x: number; y: number }> // 직전 실패 궤적 — 희미하게 남겨 원인 분석을 돕는다
   clearFlash: number
   clearGain: number
-  overTimer: number
   playTime: number
 }
 
@@ -329,18 +345,20 @@ export function loadLevel(state: ReflectState) {
   state.lines = []
   state.runPath = []
   state.lastPath = []
-  state.tries = TRIES_PER_LEVEL
+  state.fails = 0
   state.ball = { x: def.spawn.x, y: def.spawn.y, vx: 0, vy: 0 }
   state.runTime = 0
   state.phase = 'placing'
 }
 
-export function createState(): ReflectState {
+export function createState(startLevel: number): ReflectState {
+  const level = Math.max(1, Math.floor(startLevel))
   const state: ReflectState = {
     phase: 'placing',
-    level: 1,
+    level,
     score: 0,
-    tries: TRIES_PER_LEVEL,
+    deepest: level - 1,
+    fails: 0,
     walls: [],
     lines: [],
     maxLines: 1,
@@ -352,7 +370,6 @@ export function createState(): ReflectState {
     lastPath: [],
     clearFlash: 0,
     clearGain: 0,
-    overTimer: 0,
     playTime: 0,
   }
   loadLevel(state)
@@ -378,8 +395,12 @@ export function update(state: ReflectState, dt: number): TickEvents {
   if (state.runPath.length > 700) state.runPath.shift()
 
   if (ev.goalHit) {
-    state.clearGain = 100 + state.level * 20 + state.tries * 50
+    const fresh = state.level > state.deepest
+    state.clearGain = fresh
+      ? 100 + state.level * 20 + Math.max(0, BONUS_TRIES - state.fails) * 50
+      : 0
     state.score = Math.min(SCORE_CAP, state.score + state.clearGain)
+    state.deepest = Math.max(state.deepest, state.level)
     state.clearFlash = 1.3
     state.level += 1
     loadLevel(state)
@@ -394,7 +415,7 @@ export function update(state: ReflectState, dt: number): TickEvents {
 }
 
 export function launch(state: ReflectState): boolean {
-  if (state.phase !== 'placing' || state.tries <= 0) return false
+  if (state.phase !== 'placing') return false
   state.ball = {
     x: state.spawn.x,
     y: state.spawn.y,
@@ -408,23 +429,33 @@ export function launch(state: ReflectState): boolean {
 }
 
 function failRun(state: ReflectState) {
-  state.tries -= 1
+  state.fails += 1
   state.lastPath = state.runPath
   state.runPath = []
   state.ball = { x: state.spawn.x, y: state.spawn.y, vx: 0, vy: 0 }
-  if (state.tries <= 0) {
-    state.phase = 'over'
-    state.overTimer = 0.8
-  } else {
-    state.phase = 'placing'
-  }
+  state.phase = 'placing'
 }
 
-// 발사 중 '다시 놓기' — 기다릴 필요 없이 접는다. 시간 초과 실패와 똑같이 시도를 쓴다
+// 발사 중 '다시 놓기' — 기다릴 필요 없이 접는다. 시간 초과와 똑같이 실패로 센다
 export function abortRun(state: ReflectState): boolean {
   if (state.phase !== 'running') return false
   failRun(state)
   return true
+}
+
+// 화살표로 판 이동 — 발사 중에는 막는다. 판은 매번 새로 생성되므로 되돌아가도 새 배치다
+export function selectStage(state: ReflectState, level: number): boolean {
+  if (state.phase !== 'placing' || level < 1 || level === state.level) return false
+  state.level = level
+  loadLevel(state)
+  return true
+}
+
+// 클리어 보너스(광고 2배) — 방금 얻은 만큼 한 번 더 받고 같은 연출을 다시 띄운다
+export function addBonus(state: ReflectState, points: number) {
+  state.score = Math.min(SCORE_CAP, state.score + points)
+  state.clearGain = points
+  state.clearFlash = 1.3
 }
 
 // 끝점 사이 길이를 상한까지만 허용 — 미리보기와 확정이 같은 규칙을 쓴다
@@ -452,8 +483,3 @@ export function removeLineAt(state: ReflectState, x: number, y: number): boolean
   return true
 }
 
-// 광고 보상: 시도를 받고 같은 판을 이어서 푼다
-export function addTries(state: ReflectState, count: number) {
-  state.tries += count
-  state.phase = 'placing'
-}

@@ -310,7 +310,7 @@ const dict: CoreDict = {
   'rf.start': '発射',
   'rf.abort': '↺ 引き直す',
   'rf.clear': 'ゴール！ +{n}',
-  'rf.ad': '▶ 広告を見て挑戦+3回',
+  'rf.again': 'ゴール！',
 }
 
 export default dict

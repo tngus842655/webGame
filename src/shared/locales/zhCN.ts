@@ -310,7 +310,7 @@ const dict: CoreDict = {
   'rf.start': '发射',
   'rf.abort': '↺ 重新画线',
   'rf.clear': '进球！+{n}',
-  'rf.ad': '▶ 看广告再得3次机会',
+  'rf.again': '进球！',
 }
 
 export default dict
