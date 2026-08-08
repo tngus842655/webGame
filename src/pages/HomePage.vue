@@ -1,13 +1,13 @@
 <script lang="ts">
-type TabKey = 'new' | 'favorite' | 'all'
+type ListKey = 'new' | 'favorite'
 
-// 게임에 들어갔다 나오면 홈은 새로 만들어진다. 고른 탭은 컴포넌트 밖에 둬야
-// 그 사이를 건너뛴다. 앱을 껐다 켜면 기본값으로 돌아간다.
-let keptTab: TabKey = 'all'
+// 게임에 들어갔다 나오면 홈은 새로 만들어진다. 열어둔 목록은 컴포넌트 밖에 둬야
+// 그 사이를 건너뛴다. 앱을 껐다 켜면 닫힌 채로 돌아간다.
+let keptList: ListKey | null = null
 </script>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { dailySeed } from '@/games/daily'
 import { GAMES } from '@/games/registry'
@@ -118,6 +118,16 @@ const top3 = computed(() =>
   ranked.value.filter((card) => card.slug !== heroGame.value?.slug).slice(0, 3),
 )
 
+// 게임 둘러보기 — 홈은 맛보기 여섯 장만 세운다. 추천·인기에 이미 선 게임을 빼고
+// 다음 순서(신규 먼저, 그다음 인기순)로 채우며, 전체 목록은 /games 화면이 맡는다.
+const BROWSE_COUNT = 6
+
+const browseGames = computed(() => {
+  const shown = new Set(top3.value.map((card) => card.slug))
+  if (heroGame.value) shown.add(heroGame.value.slug)
+  return cards.value.filter((card) => !shown.has(card.slug)).slice(0, BROWSE_COUNT)
+})
+
 // 최근에 담은 것이 앞 (library가 새 슬러그를 앞에 넣는다)
 const favoriteGames = computed(() => {
   const order = new Map(favorites.value.map((slug, index) => [slug, index]))
@@ -132,19 +142,19 @@ const recentGames = computed(() => {
   return recents.value.flatMap((slug) => bySlug.get(slug) ?? [])
 })
 
-const TABS: Array<{ key: TabKey; labelKey: TranslationKey; icon: 'sparkle' | 'star' | 'gamepad' }> =
-  [
-    { key: 'new', labelKey: 'home.sectionNew', icon: 'sparkle' },
-    { key: 'favorite', labelKey: 'home.sectionFavorites', icon: 'star' },
-    { key: 'all', labelKey: 'home.sectionAll', icon: 'gamepad' },
-  ]
+const LISTS: Array<{ key: ListKey; labelKey: TranslationKey; icon: 'sparkle' | 'star' }> = [
+  { key: 'new', labelKey: 'home.sectionNew', icon: 'sparkle' },
+  { key: 'favorite', labelKey: 'home.sectionFavorites', icon: 'star' },
+]
 
-// 게임을 다녀오면 보던 탭으로 돌아온다. 처음 켰을 때의 기본은 '게임 전체보기' —
-// 셋 중 유일하게 항상 차 있다 (신규는 관리자가 안 올렸을 수 있고, 즐겨찾기는 비어 있다).
-const tab = ref<TabKey>(keptTab)
-watch(tab, (key) => {
-  keptTab = key
-})
+// 눌러서 여닫는 목록. 기본은 닫힘 — 홈은 선별된 것만 보여주고, 찾는 사람에게만 편다.
+// 같은 것을 한 번 더 누르면 닫힌다.
+const openList = ref<ListKey | null>(keptList)
+
+function toggleList(key: ListKey) {
+  openList.value = openList.value === key ? null : key
+  keptList = openList.value
+}
 
 // 서른 개가 넘으니 뭘 할지 못 정하는 사람이 있다. 아무거나 눌러 바로 들어가게 한다.
 // 후보는 지금 즐길 수 있는 게임 전부다 — 인기 셋도 뽑힌다.
@@ -215,14 +225,18 @@ onMounted(async () => {
       <UiIcon name="chevron" />
     </RouterLink>
 
-    <!-- 오늘의 추천 — 이 화면의 주인공. 구경이 아니라 시작이 기본 행동이 되도록
-         가장 큰 CTA를 여기에 둔다. 랜덤은 두 번째 길이라 반 층 아래 세운다. -->
+    <!-- 오늘의 추천 — 이 화면의 주인공이되 화면을 다 쓰지는 않는다. 아이콘 옆에
+         이름·이유를 눕혀 높이를 줄이고, 강조는 바로 플레이 버튼 하나에 몰아준다.
+         랜덤은 두 번째 길이라 반 층 아래 세운다. -->
     <section v-if="heroGame" class="shelf hero">
       <h2><UiIcon name="star-fill" />{{ t('home.heroTitle') }}</h2>
-      <div class="hero-thumb"><GameIcon :slug="heroGame.slug" /></div>
-      <strong class="hero-name">{{ t(heroGame.titleKey) }}</strong>
-      <p class="hero-reason">{{ heroReason }}</p>
-      <small class="hero-score">{{ scoreLabel(heroGame) }}</small>
+      <div class="hero-game">
+        <span class="hero-thumb"><GameIcon :slug="heroGame.slug" /></span>
+        <span class="hero-info">
+          <strong class="hero-name">{{ t(heroGame.titleKey) }}</strong>
+          <span class="hero-reason">{{ heroReason }}</span>
+        </span>
+      </div>
       <button
         type="button"
         class="hero-play"
@@ -269,25 +283,26 @@ onMounted(async () => {
       <p v-else class="empty">{{ t('home.recentEmpty') }}</p>
     </section>
 
-    <!-- 탐색 메뉴 — 기능은 그대로, 시각적 무게만 내린다. 추천·인기와 경쟁하지 않도록
-         판 없이 글자만 남기고, 고른 것 밑에 짧은 줄을 긋는다. -->
-    <div class="explore" role="tablist">
+    <!-- 탐색 메뉴 — 기능은 그대로, 시각적 무게만 내린다. 신규·즐겨찾기는 눌러서
+         여닫는 목록이고, 게임 전체보기는 전체 목록 화면으로 가는 길이다. -->
+    <div class="explore">
       <button
-        v-for="item in TABS"
+        v-for="item in LISTS"
         :key="item.key"
         type="button"
-        role="tab"
-        :id="`tab-${item.key}`"
-        :aria-selected="tab === item.key"
+        :aria-expanded="openList === item.key"
         :aria-controls="`panel-${item.key}`"
-        @click="tab = item.key"
+        @click="toggleList(item.key)"
       >
         <UiIcon :name="item.icon" /><span>{{ t(item.labelKey) }}</span>
       </button>
+      <RouterLink class="explore-all" to="/games">
+        <span>{{ t('home.sectionAll') }}</span><UiIcon name="chevron" />
+      </RouterLink>
     </div>
 
-    <section class="shelf panel">
-      <div v-show="tab === 'new'" id="panel-new" role="tabpanel" aria-labelledby="tab-new" class="pad">
+    <section v-if="openList" class="shelf panel">
+      <div v-show="openList === 'new'" id="panel-new" class="pad">
         <div v-if="fresh.length > 0" class="game-grid">
           <GameCard
             v-for="game in fresh"
@@ -301,13 +316,7 @@ onMounted(async () => {
         <p v-else class="empty">{{ t('home.newEmpty') }}</p>
       </div>
 
-      <div
-        v-show="tab === 'favorite'"
-        id="panel-favorite"
-        role="tabpanel"
-        aria-labelledby="tab-favorite"
-        class="pad"
-      >
+      <div v-show="openList === 'favorite'" id="panel-favorite" class="pad">
         <div v-if="favoriteGames.length > 0" class="game-grid">
           <GameCard
             v-for="game in favoriteGames"
@@ -320,12 +329,16 @@ onMounted(async () => {
         </div>
         <p v-else class="empty">{{ t('home.favoritesEmpty') }}</p>
       </div>
+    </section>
 
-      <!-- 전체보기라는 이름값을 하도록 신규·인기 셋도 빼지 않고 전부 세운다 -->
-      <div v-show="tab === 'all'" id="panel-all" role="tabpanel" aria-labelledby="tab-all" class="pad">
+    <!-- 게임 둘러보기 — 전체를 다 세우면 둘러보기가 아니라 벽이 된다.
+         맛보기 여섯 장만 두고, 나머지는 전체보기 화면으로 보낸다. -->
+    <section v-if="browseGames.length > 0" class="shelf browse">
+      <h2><UiIcon name="gamepad" />{{ t('home.sectionBrowse') }}</h2>
+      <div class="pad">
         <div class="game-grid">
           <GameCard
-            v-for="game in cards"
+            v-for="game in browseGames"
             :key="game.slug"
             favoritable
             :slug="game.slug"
@@ -334,6 +347,9 @@ onMounted(async () => {
           />
         </div>
       </div>
+      <RouterLink class="browse-all" to="/games">
+        {{ t('home.sectionAll') }}<UiIcon name="chevron" />
+      </RouterLink>
     </section>
 
     <RouterLink v-if="trashCount > 0" class="trash-entry" to="/trash">
@@ -474,13 +490,13 @@ onMounted(async () => {
 }
 
 /* ── 오늘의 추천 ───────────────────────────────────── */
-/* 화면의 주인공. 위쪽에서 빛이 떨어지는 금빛 판은 여기 하나만 쓴다 —
+/* 화면의 주인공이되 화면을 다 쓰지는 않는다. 금빛 판은 여기 하나만 쓴다 —
    두 곳이 같이 빛나면 둘 다 안 빛난다. */
 .hero {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 30px 16px 20px;
+  padding: 24px 16px 12px;
   border-color: #f2ba62;
   background:
     radial-gradient(130% 80% at 50% -25%, rgb(255 255 255 / 0.92), rgb(255 255 255 / 0) 62%),
@@ -488,7 +504,6 @@ onMounted(async () => {
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.9),
     0 6px 18px rgb(176 122 40 / 0.13);
-  text-align: center;
 }
 
 .hero h2 {
@@ -496,20 +511,35 @@ onMounted(async () => {
   box-shadow: 0 3px 8px rgb(216 105 0 / 0.34);
 }
 
+/* 아이콘 옆에 이름·이유를 눕힌다 — 세로로 쌓는 것보다 한 뼘 넘게 낮다 */
+.hero-game {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  max-width: 100%;
+}
+
 .hero-thumb {
+  flex: none;
   display: grid;
   place-items: center;
-  width: 92px;
-  height: 92px;
-  padding: 4px;
-  border-radius: 26px;
+  width: 58px;
+  height: 58px;
+  padding: 3px;
+  border-radius: 17px;
   background: linear-gradient(#fffdf6, #fff2d4);
   box-shadow: var(--shadow-card);
-  margin-bottom: 10px;
+}
+
+.hero-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .hero-name {
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 800;
   line-height: 1.25;
   letter-spacing: -0.02em;
@@ -518,21 +548,10 @@ onMounted(async () => {
 }
 
 .hero-reason {
-  margin: 3px 0 0;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   color: #b06c1f;
   word-break: keep-all;
-}
-
-/* 서버 순위가 도착하기 전에도 버튼이 내려앉지 않도록 한 줄을 비워둔다 */
-.hero-score {
-  min-height: 15px;
-  margin-top: 2px;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 15px;
-  color: var(--ink-faint);
 }
 
 /* 이 화면에서 가장 눈에 띄어야 하는 것 — 게임 아이콘보다도 이 버튼이다.
@@ -541,18 +560,18 @@ onMounted(async () => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  width: min(100%, 260px);
-  height: 52px;
-  margin-top: 14px;
+  gap: 7px;
+  width: min(100%, 240px);
+  height: 46px;
+  margin-top: 13px;
   border: none;
-  border-radius: 26px;
+  border-radius: 23px;
   background: linear-gradient(#ffb454, #f28e30);
   box-shadow:
-    0 5px 0 #c96f18,
-    0 9px 20px rgb(201 111 24 / 0.32);
+    0 4px 0 #c96f18,
+    0 8px 18px rgb(201 111 24 / 0.3);
   color: #fff;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 800;
   letter-spacing: -0.01em;
   text-shadow: 0 1px 0 rgb(140 68 8 / 0.32);
@@ -563,30 +582,30 @@ onMounted(async () => {
 }
 
 .hero-play:active {
-  transform: translateY(4px);
+  transform: translateY(3px);
   box-shadow:
     0 1px 0 #c96f18,
     0 3px 8px rgb(201 111 24 / 0.26);
 }
 
 .hero-play svg {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
 }
 
 /* 옆에 서지 않고 아래에 선다 — 바로 플레이와 같은 무게로 보이지 않게 판도 턱도 없다 */
 .hero-random {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 36px;
-  margin-top: 10px;
-  padding: 0 16px;
+  gap: 5px;
+  height: 30px;
+  margin-top: 4px;
+  padding: 0 14px;
   border: none;
-  border-radius: 18px;
+  border-radius: 15px;
   background: none;
   color: var(--ink-muted);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
   transition: transform 0.09s ease;
@@ -597,8 +616,8 @@ onMounted(async () => {
 }
 
 .hero-random svg {
-  width: 15px;
-  height: 15px;
+  width: 14px;
+  height: 14px;
 }
 
 /* 인기 칸 — 추천보다 한 층 낮춘다. 제목표의 불꽃과 카드 메달이 이미 말하고
@@ -652,23 +671,23 @@ onMounted(async () => {
 }
 
 /* ── 탐색 메뉴 ─────────────────────────────────────── */
-/* 캡슐 탭이었던 자리. 메인 콘텐츠와 시각적으로 경쟁하지 않도록 글자만 남긴다. */
+/* 캡슐 탭이었던 자리. 메인 콘텐츠와 경쟁하지 않도록 글자만 남긴다.
+   신규·즐겨찾기는 여닫는 목록이고, 오른쪽 전체보기는 화면 이동이다. */
 .explore {
   display: flex;
-  gap: 4px;
-  margin-bottom: 10px;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: 20px;
   padding: 0 6px;
 }
 
-.explore button {
-  position: relative;
+.explore button,
+.explore-all {
   display: flex;
-  flex: 1 1 auto;
   align-items: center;
-  justify-content: center;
   gap: 5px;
   min-width: 0;
-  padding: 9px 4px 13px;
+  padding: 9px 8px 12px;
   border: none;
   background: none;
   color: var(--ink-faint);
@@ -679,7 +698,7 @@ onMounted(async () => {
   transition: color 0.14s ease;
 }
 
-.explore button span {
+.explore span {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -691,15 +710,19 @@ onMounted(async () => {
   height: 13px;
 }
 
-.explore button[aria-selected='true'] {
+.explore button {
+  position: relative;
+}
+
+.explore button[aria-expanded='true'] {
   color: var(--ink);
 }
 
-/* 고른 탭 밑에만 짧은 줄 — 판을 채우는 것보다 조용하고, 그래도 자리는 분명하다 */
-.explore button[aria-selected='true']::after {
+/* 열린 목록 밑에만 짧은 줄 — 판을 채우는 것보다 조용하고, 그래도 자리는 분명하다 */
+.explore button[aria-expanded='true']::after {
   content: '';
   position: absolute;
-  bottom: 4px;
+  bottom: 3px;
   left: 50%;
   width: 22px;
   height: 3px;
@@ -708,14 +731,53 @@ onMounted(async () => {
   transform: translateX(-50%);
 }
 
-/* 화면 크게를 올린 기기는 한 줄에 아이콘과 글자가 다 들어가지 않는다.
-   글자를 자르느니 아이콘을 위로 올린다 (러시아어·독일어도 여기서 살아난다). */
-@media (max-width: 330px) {
-  .explore button {
-    flex-direction: column;
-    gap: 2px;
-    padding: 8px 2px 13px;
-  }
+/* 전체보기는 오른쪽 끝 — 화살표가 목록 여닫기가 아니라 화면 이동임을 말한다 */
+.explore-all {
+  gap: 2px;
+  margin-left: auto;
+}
+
+.explore-all:active {
+  color: var(--ink);
+}
+
+.explore-all svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* ── 게임 둘러보기 ─────────────────────────────────── */
+.browse {
+  padding: 22px 0 6px;
+  border-color: var(--line);
+  background: var(--surface-soft);
+}
+
+.browse h2 {
+  background: var(--ink-muted);
+  box-shadow: 0 2px 6px rgb(141 110 99 / 0.3);
+}
+
+/* 카드 아래 한 줄 전부가 과녁 — 목록 끝에서 자연스럽게 전체보기로 이어진다 */
+.browse-all {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  margin-top: 2px;
+  padding: 12px 0;
+  color: var(--ink-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.browse-all:active {
+  color: var(--ink);
+}
+
+.browse-all svg {
+  width: 13px;
+  height: 13px;
 }
 
 /* ── 최근 플레이 ───────────────────────────────────── */
