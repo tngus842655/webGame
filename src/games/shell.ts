@@ -93,6 +93,8 @@ export interface GameSession {
   getScore?(): number
   // 관리자 전용 '다음 단계' — 판이 나뉘는 게임만 구현한다. 점수는 건드리지 않는다
   adminSkip?(): void
+  // 관리자 전용 '진도 초기화' — 기기에 진도를 저장하는 게임만 구현한다
+  adminReset?(): void
 }
 
 // GameModule의 mount/unmount 보일러플레이트 제거용
@@ -116,6 +118,12 @@ export function defineGame(
     },
     adminSkip() {
       session?.adminSkip?.()
+    },
+    canAdminReset() {
+      return !!session?.adminReset
+    },
+    adminReset() {
+      session?.adminReset?.()
     },
   }
 }

@@ -21,6 +21,13 @@ export function updateLocalBest(slug: string, score: number): void {
   if (score > (getLocalBest(slug) ?? 0)) localStorage.setItem(bestKey(slug), String(score))
 }
 
+// 이 기기에 남은 최고 기록을 지운다 (관리자 초기화 전용).
+// 서버에 남은 기록은 다음 진입의 syncLocalBests가 다시 끌어오므로, 완전히 지우려면
+// scores 표에서 그 행을 지워야 한다 — 앱에서는 막혀 있고(RLS) 대시보드에서 한다.
+export function clearLocalBest(slug: string): void {
+  localStorage.removeItem(bestKey(slug))
+}
+
 // 진행 중 점수 저널 — 제출을 못 하고 앱이 종료돼도 다음 실행에서 올린다 { slug: score }
 const PENDING_KEY = 'webgame:pendingScores'
 

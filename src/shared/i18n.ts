@@ -89,6 +89,8 @@ const en = {
   'admin.hidden': 'Hide',
   'admin.order': 'Order',
   'admin.skipLevel': 'Next level',
+  'admin.resetProgress': 'Reset progress',
+  'admin.resetConfirm': 'Tap again to reset',
   'admin.saveFailed': 'Could not save.',
   'admin.featuredMax': 'The New menu holds {n} games. Uncheck one first.',
   'admin.rank': '#{n}',

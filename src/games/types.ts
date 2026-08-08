@@ -16,6 +16,11 @@ export interface GameModule {
   canAdminSkip(): boolean
   // 점수는 그대로 두고 판만 넘긴다. 지원하지 않는 게임에서는 아무 일도 하지 않는다
   adminSkip(): void
+  // 관리자 전용 '진도 초기화'를 지원하는 게임인지 (mount 뒤에 물어야 한다).
+  // 기기에 진도를 저장해 두는 게임에서만 참이다 — 테스트로 올려둔 단계를 되돌릴 길이 필요하다
+  canAdminReset(): boolean
+  // 저장해 둔 진도와 이 기기의 최고 기록을 지우고 처음부터. 지원하지 않으면 아무 일도 하지 않는다
+  adminReset(): void
 }
 
 export interface GameContext {

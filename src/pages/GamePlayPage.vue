@@ -26,9 +26,27 @@ const titleKey = ref<TranslationKey | null>(null)
 const guideOpen = ref(false)
 // 이 게임이 '다음 단계'를 지원하는지 (버튼은 관리자에게만 보인다)
 const canAdminSkip = ref(false)
+// 진도를 기기에 저장하는 게임만 '진도 초기화'를 지원한다
+const canAdminReset = ref(false)
+// 되돌릴 수 없는 일이라 두 번 눌러야 실행된다 (첫 탭은 칩 문구만 바꾼다)
+const resetArmed = ref(false)
+let resetArmId = 0
 
 function skipLevel() {
   game?.adminSkip()
+}
+
+function resetProgress() {
+  if (!resetArmed.value) {
+    resetArmed.value = true
+    resetArmId = window.setTimeout(() => {
+      resetArmed.value = false
+    }, 3000)
+    return
+  }
+  clearTimeout(resetArmId)
+  resetArmed.value = false
+  game?.adminReset()
 }
 
 // 일시정지 — 실시간 게임은 전화 한 통에 판이 날아간다.
@@ -123,6 +141,7 @@ onMounted(async () => {
   // 관리자 전용 '다음 단계'. 판이 나뉘는 게임에서만 뜨고, 홈을 거치지 않고 바로
   // 들어온 경우를 위해 여기서 한 번 확인한다 (결과는 캐시된다).
   canAdminSkip.value = game.canAdminSkip()
+  canAdminReset.value = game.canAdminReset()
   void ensureAdminChecked()
   stopTracking = startPlayTracking(slug)
   stopScoreGuard = startScoreGuard(slug, () => game?.currentScore() ?? null)
@@ -142,6 +161,7 @@ onBeforeUnmount(() => {
   disposed = true
   setBackHandler(null)
   clearInterval(pollId)
+  clearTimeout(resetArmId)
   // 다음 게임이 이전 게임의 기록을 달고 뜨지 않도록 (첫 갱신까지 250ms가 뜬다)
   setHudBest(null, 0)
   stopCountdown()
@@ -172,6 +192,14 @@ onBeforeUnmount(() => {
           @click="skipLevel"
         >
           {{ t('admin.skipLevel') }}
+        </button>
+        <button
+          v-if="isAdmin && canAdminReset"
+          class="chip skip-button"
+          type="button"
+          @click="resetProgress"
+        >
+          {{ resetArmed ? t('admin.resetConfirm') : t('admin.resetProgress') }}
         </button>
       </div>
       <button

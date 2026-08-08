@@ -40,6 +40,8 @@ const dict: FullDict = {
   'admin.hidden': '숨김',
   'admin.order': '순서',
   'admin.skipLevel': '다음 단계',
+  'admin.resetProgress': '진도 초기화',
+  'admin.resetConfirm': '한 번 더 누르면 초기화',
   'admin.saveFailed': '저장하지 못했어요.',
   'admin.featuredMax': '신규 게임 메뉴에는 {n}개까지 올라갑니다. 하나를 먼저 내려주세요.',
   'admin.rank': '{n}위',

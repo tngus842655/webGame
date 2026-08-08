@@ -1,10 +1,11 @@
 import { t } from '@/shared/i18n'
+import { clearLocalBest } from '@/shared/scores'
 import { playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
 import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
-import { drawScorePanel, font } from '../ui'
+import { drawScorePanel, font, setHudBest } from '../ui'
 import {
   AD_AFTER_FAILS,
   BALL_R,
@@ -710,6 +711,17 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     // 관리자 전용 '다음 단계' — 넘긴 단계는 깬 것으로 세지 않는다 (기록은 그대로)
     adminSkip() {
       state.level += 1
+      loadLevel(state)
+      dropPreview()
+    },
+    // 관리자 전용 '진도 초기화' — 테스트로 올려둔 단계를 1단계로 되돌린다.
+    // 이 기기의 최고 기록도 함께 지운다 (점수 시절에 쌓인 값이 단계 옆에 남아 있으면 헷갈린다)
+    adminReset() {
+      cleared = 0
+      localStorage.removeItem(STAGE_KEY)
+      clearLocalBest('reflect')
+      setHudBest(null, 0)
+      state.level = 1
       loadLevel(state)
       dropPreview()
     },
