@@ -162,5 +162,7 @@ export const GAMES: GameMeta[] = [
     slug: 'reflect',
     titleKey: 'game.reflect',
     loader: () => import('./reflect'),
+    // 점수가 없는 게임 — 기록은 스스로 깬 최고 단계다
+    recordUnit: 'stage',
   },
 ]

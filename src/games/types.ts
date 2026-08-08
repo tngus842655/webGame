@@ -4,6 +4,9 @@ export interface GameMeta {
   slug: string
   titleKey: TranslationKey // 표시할 때 t()로 변환
   loader: () => Promise<{ default: GameModule }>
+  // 기록을 점수가 아닌 단위로 세는 게임(한 줄로 골인 = 깬 단계). DB에는 같은 칼럼에
+  // 그 숫자가 그대로 들어가고, 랭킹·홈이 '점' 대신 이 단위로 읽어 준다
+  recordUnit?: 'stage'
 }
 
 export interface GameModule {

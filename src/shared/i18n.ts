@@ -50,6 +50,7 @@ const STORAGE_KEY = 'webgame:locale'
 const en = {
   'home.best': 'Best {n}',
   'home.myRank': '{score} pts (#{rank})',
+  'home.myRankStage': '{score} (#{rank})',
   'home.ranking': 'Rankings',
   'common.back': 'Home',
   'common.tapClose': 'Tap anywhere to close',
@@ -167,6 +168,7 @@ const en = {
   'ranking.error': "Couldn't load rankings. Please try again later.",
   'ranking.empty': 'No records yet. Be the first!',
   'ranking.unknown': 'Unknown game',
+  'rank.stage': 'Stage {n}',
   'settings.title': 'Settings',
   'settings.nickname': 'Nickname',
   'settings.nicknameHint': 'Shown on the rankings.',
@@ -254,6 +256,7 @@ const en = {
   'guide.goal': 'Goal',
   'guide.how': 'Controls',
   'guide.score': 'Scoring',
+  'guide.record': 'Record',
   'guide.close': 'Got it',
   'over.title': 'Game Over',
   'over.bestScore': 'Best {n}',

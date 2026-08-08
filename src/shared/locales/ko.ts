@@ -4,6 +4,7 @@ import type { FullDict } from '../i18n'
 const dict: FullDict = {
   'home.best': '최고 {n}',
   'home.myRank': '{score}점 ({rank}등)',
+  'home.myRankStage': '{score}단계 ({rank}등)',
   'home.ranking': '랭킹 보기',
   'common.back': '홈',
   'common.tapClose': '아무 곳이나 눌러 닫기',
@@ -117,6 +118,7 @@ const dict: FullDict = {
   'ranking.error': '랭킹을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.',
   'ranking.empty': '아직 기록이 없습니다. 첫 기록의 주인공이 되어보세요!',
   'ranking.unknown': '알 수 없는 게임',
+  'rank.stage': '{n}단계',
   'settings.title': '설정',
   'settings.nickname': '닉네임',
   'settings.nicknameHint': '랭킹에 표시되는 이름입니다.',
@@ -202,6 +204,7 @@ const dict: FullDict = {
   'guide.goal': '목표',
   'guide.how': '조작',
   'guide.score': '점수',
+  'guide.record': '기록',
   'guide.close': '확인',
   'over.title': '게임 오버',
   'over.bestScore': '최고 기록 {n}',

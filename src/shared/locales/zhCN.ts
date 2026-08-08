@@ -4,6 +4,7 @@ import type { CoreDict } from '../i18n'
 const dict: CoreDict = {
   'home.best': '最高 {n}',
   'home.myRank': '{score}分 (第{rank}名)',
+  'home.myRankStage': '第 {score} 关（第 {rank} 名）',
   'home.ranking': '排行榜',
   'common.back': '首页',
   'common.tapClose': '点击任意处关闭',
@@ -37,6 +38,7 @@ const dict: CoreDict = {
   'ranking.error': '无法加载排行榜，请稍后再试。',
   'ranking.empty': '暂无记录，来创造第一个吧！',
   'ranking.unknown': '未知游戏',
+  'rank.stage': '第 {n} 关',
   'settings.title': '设置',
   'settings.nickname': '昵称',
   'settings.nicknameHint': '显示在排行榜上的名字。',
@@ -134,6 +136,7 @@ const dict: CoreDict = {
   'guide.goal': '目标',
   'guide.how': '操作',
   'guide.score': '得分',
+  'guide.record': '记录',
   'guide.close': '知道了',
   'hud.score': '得分',
   'brick.wave': '第 {n} 波',

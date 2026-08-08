@@ -4,6 +4,7 @@ import type { CoreDict } from '../i18n'
 const dict: CoreDict = {
   'home.best': 'สถิติ {n}',
   'home.myRank': '{score} คะแนน (อันดับ {rank})',
+  'home.myRankStage': 'ด่าน {score} (อันดับ {rank})',
   'home.ranking': 'อันดับ',
   'common.back': 'หน้าแรก',
   'common.tapClose': 'แตะเพื่อปิด',
@@ -37,6 +38,7 @@ const dict: CoreDict = {
   'ranking.error': 'โหลดอันดับไม่สำเร็จ ลองใหม่ภายหลัง',
   'ranking.empty': 'ยังไม่มีสถิติ มาเป็นคนแรกกัน!',
   'ranking.unknown': 'เกมที่ไม่รู้จัก',
+  'rank.stage': 'ด่าน {n}',
   'settings.title': 'ตั้งค่า',
   'settings.nickname': 'ชื่อเล่น',
   'settings.nicknameHint': 'ชื่อที่แสดงในอันดับ',
@@ -134,6 +136,7 @@ const dict: CoreDict = {
   'guide.goal': 'เป้าหมาย',
   'guide.how': 'การควบคุม',
   'guide.score': 'คะแนน',
+  'guide.record': 'สถิติ',
   'guide.close': 'เข้าใจแล้ว',
   'hud.score': 'คะแนน',
   'brick.wave': 'เวฟ {n}',

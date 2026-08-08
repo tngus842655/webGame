@@ -34,8 +34,10 @@ const AD_BTN = { x: 140, y: 1006, w: 440, h: 74 } as const
 // 단계 스테퍼는 점수판 안에 든다 — 큰 숫자가 곧 지금 단계다
 const PREV_BTN = { x: 156, y: 62, w: 76, h: 72 } as const
 const NEXT_BTN = { x: 488, y: 62, w: 76, h: 72 } as const
-// 스스로 깬 최고 단계 = 이 게임의 기록. 계정 없이도 이어가도록 즐겨찾기와 같은 localStorage에 둔다
-const STAGE_KEY = 'webgame:reflectStage'
+// 스스로 깬 최고 단계 = 이 게임의 기록. 계정 없이도 이어가도록 localStorage에 둔다.
+// 'webgame:progress:' 접두사를 쓰는 이유는 계정을 갈아탈 때 auth.ts가 이 값을 지우기 때문이다 —
+// 진도가 곧 랭킹 값이라 남의 계정에서 깬 단계를 물려받으면 안 된다
+const STAGE_KEY = 'webgame:progress:reflect'
 
 function loadCleared(): number {
   const n = Number(localStorage.getItem(STAGE_KEY))
