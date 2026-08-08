@@ -2,8 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { ensureAdminChecked } from '@/shared/admin'
 import HomePage from '@/pages/HomePage.vue'
 import AdminPage from '@/pages/AdminPage.vue'
+import AdminFeaturedPage from '@/pages/AdminFeaturedPage.vue'
 import AdminFeedbackPage from '@/pages/AdminFeedbackPage.vue'
 import AdminTrashPage from '@/pages/AdminTrashPage.vue'
+import AdminVotesPage from '@/pages/AdminVotesPage.vue'
 import TrashPage from '@/pages/TrashPage.vue'
 import GamePlayPage from '@/pages/GamePlayPage.vue'
 import RankingHubPage from '@/pages/RankingHubPage.vue'
@@ -34,6 +36,8 @@ export const router = createRouter({
     { path: '/admin', component: AdminPage, meta: { admin: true } },
     { path: '/admin/trash', component: AdminTrashPage, meta: { admin: true } },
     { path: '/admin/feedback', component: AdminFeedbackPage, meta: { admin: true } },
+    { path: '/admin/featured', component: AdminFeaturedPage, meta: { admin: true } },
+    { path: '/admin/votes', component: AdminVotesPage, meta: { admin: true } },
     { path: '/trash', component: TrashPage },
     { path: '/notes', component: DevNotesPage },
     { path: '/feedback', component: FeedbackPage },

@@ -54,3 +54,25 @@ export async function saveVote(slug: string, vote: VoteValue | null): Promise<vo
   if (error) throw error
   localStorage.setItem(storeKey(slug), JSON.stringify({ day, vote }))
 }
+
+export interface VoteStat {
+  slug: string
+  up: number
+  down: number
+}
+
+// 관리자만 통과한다 (get_game_vote_stats()의 첫 줄이 막는다).
+// 기간은 vote_day 기준의 yyyy-mm-dd 양끝 포함 구간이고, 둘 다 null이면 전체 누적이다.
+export async function fetchVoteStats(
+  start: string | null,
+  end: string | null,
+): Promise<VoteStat[]> {
+  const sb = await getSupabase()
+  const { data, error } = await sb.rpc('get_game_vote_stats', { p_start: start, p_end: end })
+  if (error) throw error
+  return ((data ?? []) as Array<{ game_slug: string; up: number; down: number }>).map((row) => ({
+    slug: row.game_slug,
+    up: Number(row.up),
+    down: Number(row.down),
+  }))
+}
