@@ -4,6 +4,7 @@ import type { CoreDict } from '../i18n'
 const dict: CoreDict = {
   'home.best': 'Terbaik {n}',
   'home.myRank': '{score} poin (#{rank})',
+  'home.myRankStage': 'Level {score} (#{rank})',
   'home.ranking': 'Peringkat',
   'common.back': 'Beranda',
   'common.tapClose': 'Ketuk untuk menutup',
@@ -37,6 +38,7 @@ const dict: CoreDict = {
   'ranking.error': 'Gagal memuat peringkat. Coba lagi nanti.',
   'ranking.empty': 'Belum ada rekor. Jadilah yang pertama!',
   'ranking.unknown': 'Game tidak dikenal',
+  'rank.stage': 'Level {n}',
   'settings.title': 'Pengaturan',
   'settings.nickname': 'Nama panggilan',
   'settings.nicknameHint': 'Nama yang tampil di peringkat.',
@@ -134,6 +136,7 @@ const dict: CoreDict = {
   'guide.goal': 'Tujuan',
   'guide.how': 'Kontrol',
   'guide.score': 'Skor',
+  'guide.record': 'Rekor',
   'guide.close': 'Mengerti',
   'hud.score': 'Skor',
   'brick.wave': 'Gelombang {n}',
@@ -305,6 +308,12 @@ const dict: CoreDict = {
   'game.bamboo': 'Panjat Bambu',
   'bm.height': '{n} ruas',
   'bm.ad': '▶ Tonton iklan, isi waktu, lanjut',
+  'game.reflect': 'Gol Satu Garis',
+  'rf.stage': 'Level {n}',
+  'rf.start': 'Luncurkan',
+  'rf.abort': '↺ Gambar ulang',
+  'rf.clear': 'Gol!',
+  'rf.adHint': '▶ Iklan: lihat jalur bola',
 }
 
 export default dict

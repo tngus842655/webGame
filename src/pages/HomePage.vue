@@ -59,14 +59,18 @@ const promoNote = computed(() =>
 )
 
 // 기록이 없어도 빈 문자열을 반환해 한 줄을 차지한다 (CSS에서 높이 확보)
-function scoreLabel(card: { best: number | null; stat: MyGameStat | null }): string {
+function scoreLabel(card: { slug: string; best: number | null; stat: MyGameStat | null }): string {
+  // 점수가 아니라 단계로 겨루는 게임은 '점'을 붙이지 않는다 (registry의 recordUnit)
+  const stage = GAMES.find((g) => g.slug === card.slug)?.recordUnit === 'stage'
   if (card.stat) {
-    return t('home.myRank', {
+    return t(stage ? 'home.myRankStage' : 'home.myRank', {
       score: card.stat.best_score.toLocaleString(),
       rank: card.stat.rank,
     })
   }
-  return card.best === null ? '' : t('home.best', { n: card.best.toLocaleString() })
+  if (card.best === null) return ''
+  const n = card.best.toLocaleString()
+  return t('home.best', { n: stage ? t('rank.stage', { n }) : n })
 }
 
 function play(slug: string) {

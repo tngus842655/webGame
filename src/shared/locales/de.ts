@@ -4,6 +4,7 @@ import type { CoreDict } from '../i18n'
 const dict: CoreDict = {
   'home.best': 'Bestwert {n}',
   'home.myRank': '{score} Pkt. (Platz {rank})',
+  'home.myRankStage': 'Level {score} (#{rank})',
   'home.ranking': 'Rangliste',
   'common.back': 'Start',
   'common.tapClose': 'Zum Schließen tippen',
@@ -37,6 +38,7 @@ const dict: CoreDict = {
   'ranking.error': 'Rangliste konnte nicht geladen werden. Später erneut versuchen.',
   'ranking.empty': 'Noch keine Einträge. Sei der Erste!',
   'ranking.unknown': 'Unbekanntes Spiel',
+  'rank.stage': 'Level {n}',
   'settings.title': 'Einstellungen',
   'settings.nickname': 'Spitzname',
   'settings.nicknameHint': 'Name in der Rangliste.',
@@ -134,6 +136,7 @@ const dict: CoreDict = {
   'guide.goal': 'Ziel',
   'guide.how': 'Steuerung',
   'guide.score': 'Punkte',
+  'guide.record': 'Rekord',
   'guide.close': 'Alles klar',
   'hud.score': 'Punkte',
   'brick.wave': 'Welle {n}',
@@ -305,6 +308,12 @@ const dict: CoreDict = {
   'game.bamboo': 'Bambus-Klettern',
   'bm.height': '{n} Knoten',
   'bm.ad': '▶ Werbung ansehen: Zeit auffüllen',
+  'game.reflect': 'Ein-Strich-Tor',
+  'rf.stage': 'Level {n}',
+  'rf.start': 'Start',
+  'rf.abort': '↺ Neu zeichnen',
+  'rf.clear': 'Tor!',
+  'rf.adHint': '▶ Werbung: Flugbahn zeigen',
 }
 
 export default dict

@@ -166,6 +166,11 @@ const ko: Record<string, Guide> = {
     how: '화면 좌우 절반 중 가지가 없는 쪽을 탭하면 한 마디 오릅니다.',
     score: '한 마디에 10점. 오를 때마다 시간이 조금 채워지므로 쉬면 그만큼 줄어듭니다.',
   },
+  reflect: {
+    goal: '공은 발사하면 스스로 굴러갑니다. 선을 그어 공을 튕겨서 초록 고리에 넣으세요.',
+    how: '빈 곳을 끌면 선이 그어지고, 그은 선은 탭해서 지웁니다. 실패해도 몇 번이든 다시 쏠 수 있고, 단계 양옆 화살표로 지나온 단계를 오갑니다.',
+    score: '기록은 깬 단계입니다. 멀리 갈수록 순위가 올라갑니다.',
+  },
 }
 
 const en: Record<string, Guide> = {
@@ -323,6 +328,11 @@ const en: Record<string, Guide> = {
     goal: 'Climb the bamboo while dodging branches. Hit one, or let the time bar empty, and the run ends.',
     how: 'Tap the left or right half — whichever side has no branch — to climb one joint.',
     score: '10 per joint. Each climb tops the time bar up a little, so pausing drains it.',
+  },
+  reflect: {
+    goal: 'The ball rolls on its own once launched. Draw lines to bounce it into the green ring.',
+    how: 'Drag on empty space to draw a line, tap a line to erase it. Retry as many times as you like, and use the arrows beside the stage number to revisit earlier stages.',
+    score: 'Your record is the stage you reached. Get further to climb the rankings.',
   },
 }
 
@@ -482,6 +492,11 @@ const ja: Record<string, Guide> = {
     how: '画面の左右半分のうち枝がない側をタップすると1節のぼります。',
     score: '1節10点。のぼるたびに時間が少し足されるので、休むと減っていきます。',
   },
+  reflect: {
+    goal: '発射したボールはひとりでに転がります。線を引いて跳ね返し、緑のリングに入れましょう。',
+    how: '何もない所をドラッグすると線が引け、引いた線はタップで消せます。何度でも撃ち直せて、ステージ番号の横の矢印で通ったステージを行き来できます。',
+    score: '記録は到達ステージです。先へ進むほど順位が上がります。',
+  },
 }
 
 const zhCN: Record<string, Guide> = {
@@ -639,6 +654,11 @@ const zhCN: Record<string, Guide> = {
     goal: '避开竹枝往上爬。撞到枝条或时间条耗尽就结束。',
     how: '点击屏幕左右半边中没有竹枝的一侧，就往上爬一节。',
     score: '每节10分。每爬一节会补一点时间，所以停下来就会减少。',
+  },
+  reflect: {
+    goal: '发射后小球会自己滚动。画线让它反弹，滚进绿色圆环。',
+    how: '在空白处拖动画线，点击已画的线可以删除。失败了可以无限重试，用关卡号两侧的箭头能回到走过的关卡。',
+    score: '记录就是通关的关卡数，走得越远排名越高。',
   },
 }
 
@@ -798,6 +818,11 @@ const es: Record<string, Guide> = {
     how: 'Toca la mitad izquierda o derecha, la que no tenga rama, para subir un nudo.',
     score: '10 por nudo. Cada subida rellena un poco el tiempo, así que pararse lo consume.',
   },
+  reflect: {
+    goal: 'La bola rueda sola al lanzarla. Dibuja líneas para hacerla rebotar hasta el aro verde.',
+    how: 'Arrastra en un espacio vacío para dibujar una línea; tócala para borrarla. Reintenta cuantas veces quieras y usa las flechas junto al número de nivel para volver a niveles anteriores.',
+    score: 'Tu récord es el nivel al que llegaste. Cuanto más avances, mejor puesto.',
+  },
 }
 
 const ptBR: Record<string, Guide> = {
@@ -955,6 +980,11 @@ const ptBR: Record<string, Guide> = {
     goal: 'Suba o bambu desviando dos galhos. Se bater num galho ou a barra de tempo zerar, a partida acaba.',
     how: 'Toque na metade esquerda ou direita — a que não tem galho — para subir um nó.',
     score: '10 por nó. Cada subida repõe um pouco de tempo, então parar consome.',
+  },
+  reflect: {
+    goal: 'A bola rola sozinha ao ser lançada. Desenhe linhas para rebatê-la até o anel verde.',
+    how: 'Arraste num espaço vazio para desenhar uma linha; toque nela para apagar. Tente de novo quantas vezes quiser e use as setas ao lado do número da fase para voltar a fases anteriores.',
+    score: 'Seu recorde é a fase que você alcançou. Quanto mais longe, melhor a posição.',
   },
 }
 
@@ -1114,6 +1144,11 @@ const fr: Record<string, Guide> = {
     how: 'Touche la moitié gauche ou droite — celle sans branche — pour monter d\'un nœud.',
     score: '10 par nœud. Chaque montée remplit un peu la jauge, donc s\'arrêter la vide.',
   },
+  reflect: {
+    goal: 'La balle roule toute seule une fois lancée. Trace des traits pour la faire rebondir jusqu\'à l\'anneau vert.',
+    how: 'Glisse sur une zone vide pour tracer un trait, touche-le pour l\'effacer. Réessaie autant que tu veux, et les flèches près du numéro de niveau ramènent aux niveaux passés.',
+    score: 'Ton record, c\'est le niveau atteint. Va plus loin pour monter au classement.',
+  },
 }
 
 const de: Record<string, Guide> = {
@@ -1271,6 +1306,11 @@ const de: Record<string, Guide> = {
     goal: 'Klettere den Bambus hoch und weiche Ästen aus. Ein Treffer oder eine leere Zeitleiste beendet die Runde.',
     how: 'Tippe die linke oder rechte Hälfte an – die ohne Ast – um einen Knoten höher zu steigen.',
     score: '10 pro Knoten. Jeder Aufstieg füllt die Zeitleiste ein wenig, Pausen leeren sie.',
+  },
+  reflect: {
+    goal: 'Die Kugel rollt nach dem Start von selbst. Zeichne Striche, damit sie in den grünen Ring prallt.',
+    how: 'Ziehe auf freier Fläche, um einen Strich zu zeichnen; tippe ihn an, um ihn zu löschen. Versuche es beliebig oft und wechsle mit den Pfeilen neben der Levelnummer zu früheren Leveln.',
+    score: 'Dein Rekord ist das erreichte Level. Je weiter du kommst, desto besser die Platzierung.',
   },
 }
 
@@ -1430,6 +1470,11 @@ const ru: Record<string, Guide> = {
     how: 'Нажимайте на ту половину экрана, где нет ветки, — так подниметесь на одно колено.',
     score: '10 за колено. Каждый подъём немного пополняет время, поэтому пауза его тратит.',
   },
+  reflect: {
+    goal: 'После запуска шар катится сам. Рисуйте линии, чтобы отбить его в зелёное кольцо.',
+    how: 'Проведите по пустому месту, чтобы нарисовать линию; нажмите на неё, чтобы стереть. Пробуйте сколько угодно раз, а стрелки рядом с номером уровня возвращают к пройденным уровням.',
+    score: 'Ваш результат — достигнутый уровень. Чем дальше пройдёте, тем выше место.',
+  },
 }
 
 const id: Record<string, Guide> = {
@@ -1587,6 +1632,11 @@ const id: Record<string, Guide> = {
     goal: 'Panjat bambu sambil menghindari dahan. Kena dahan atau bar waktu habis berarti tamat.',
     how: 'Ketuk separuh kiri atau kanan — yang tidak ada dahannya — untuk naik satu ruas.',
     score: '10 per ruas. Setiap panjatan mengisi sedikit waktu, jadi berhenti berarti menyusut.',
+  },
+  reflect: {
+    goal: 'Setelah diluncurkan, bola menggelinding sendiri. Gambar garis untuk memantulkannya ke cincin hijau.',
+    how: 'Seret di tempat kosong untuk menggambar garis; ketuk garis untuk menghapusnya. Coba lagi sesukanya, dan panah di samping nomor level membawa kembali ke level yang sudah dilewati.',
+    score: 'Rekormu adalah level yang kamu capai. Makin jauh, makin tinggi peringkatnya.',
   },
 }
 
@@ -1746,6 +1796,11 @@ const vi: Record<string, Guide> = {
     how: 'Chạm nửa trái hoặc nửa phải màn hình — bên không có cành — để leo lên một đốt.',
     score: '10 điểm mỗi đốt. Mỗi lần leo được hồi chút thời gian, nên dừng lại là bị trừ.',
   },
+  reflect: {
+    goal: 'Bóng tự lăn sau khi phóng. Hãy vẽ những đường chắn để bóng bật vào vòng tròn xanh.',
+    how: 'Kéo trên chỗ trống để vẽ đường, chạm vào đường đã vẽ để xoá. Thử lại bao nhiêu lần tùy thích, và dùng mũi tên cạnh số màn để quay lại các màn đã qua.',
+    score: 'Thành tích của bạn là màn đã đạt tới. Đi càng xa, thứ hạng càng cao.',
+  },
 }
 
 const th: Record<string, Guide> = {
@@ -1904,6 +1959,11 @@ const th: Record<string, Guide> = {
     how: 'แตะครึ่งซ้ายหรือขวาที่ไม่มีกิ่งเพื่อปีนขึ้นหนึ่งปล้อง',
     score: 'ปล้องละ 10 คะแนน ทุกครั้งที่ปีนจะเติมเวลาเล็กน้อย ดังนั้นหยุดพักคือเวลาลด',
   },
+  reflect: {
+    goal: 'ลูกบอลจะกลิ้งเองเมื่อปล่อย ลากเส้นให้ลูกบอลสะท้อนเข้าวงแหวนสีเขียว',
+    how: 'ลากบนพื้นที่ว่างเพื่อวาดเส้น แตะเส้นที่วาดเพื่อลบ ลองใหม่ได้ไม่จำกัด และใช้ลูกศรข้างหมายเลขด่านเพื่อย้อนไปด่านที่ผ่านแล้ว',
+    score: 'สถิติของคุณคือด่านที่ไปถึง ยิ่งไปไกลอันดับยิ่งสูง',
+  },
 }
 
 const tr: Record<string, Guide> = {
@@ -2061,6 +2121,11 @@ const tr: Record<string, Guide> = {
     goal: 'Dallardan kaçarak bambuya tırman. Bir dala çarparsan ya da süre biterse oyun sona erer.',
     how: 'Bir boğum yükselmek için ekranın dalsız olan yarısına dokun.',
     score: 'Boğum başına 10 puan. Her tırmanış süreyi biraz doldurur, durmak ise tüketir.',
+  },
+  reflect: {
+    goal: 'Top fırlatıldıktan sonra kendi kendine yuvarlanır. Çizgiler çizerek onu yeşil halkaya sektir.',
+    how: 'Boş alanda sürükleyerek çizgi çiz; silmek için çizgiye dokun. İstediğin kadar yeniden dene, bölüm numarasının yanındaki oklarla geçtiğin bölümlere dönebilirsin.',
+    score: 'Rekorun ulaştığın bölümdür. Ne kadar ilerlersen sıralaman o kadar yükselir.',
   },
 }
 const TABLES: Record<Locale, Record<string, Guide>> = {

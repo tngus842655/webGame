@@ -4,6 +4,7 @@ import type { FullDict } from '../i18n'
 const dict: FullDict = {
   'home.best': '최고 {n}',
   'home.myRank': '{score}점 ({rank}등)',
+  'home.myRankStage': '{score}단계 ({rank}등)',
   'home.ranking': '랭킹 보기',
   'common.back': '홈',
   'common.tapClose': '아무 곳이나 눌러 닫기',
@@ -40,6 +41,8 @@ const dict: FullDict = {
   'admin.hidden': '숨김',
   'admin.order': '순서',
   'admin.skipLevel': '다음 단계',
+  'admin.resetProgress': '진도 초기화',
+  'admin.resetConfirm': '한 번 더 누르면 초기화',
   'admin.saveFailed': '저장하지 못했어요.',
   'admin.featuredMax': '신규 게임 메뉴에는 {n}개까지 올라갑니다. 하나를 먼저 내려주세요.',
   'admin.rank': '{n}위',
@@ -115,6 +118,7 @@ const dict: FullDict = {
   'ranking.error': '랭킹을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.',
   'ranking.empty': '아직 기록이 없습니다. 첫 기록의 주인공이 되어보세요!',
   'ranking.unknown': '알 수 없는 게임',
+  'rank.stage': '{n}단계',
   'settings.title': '설정',
   'settings.nickname': '닉네임',
   'settings.nicknameHint': '랭킹에 표시되는 이름입니다.',
@@ -200,6 +204,7 @@ const dict: FullDict = {
   'guide.goal': '목표',
   'guide.how': '조작',
   'guide.score': '점수',
+  'guide.record': '기록',
   'guide.close': '확인',
   'over.title': '게임 오버',
   'over.bestScore': '최고 기록 {n}',
@@ -381,6 +386,12 @@ const dict: FullDict = {
   'game.bamboo': '대나무 타기',
   'bm.height': '{n}마디',
   'bm.ad': '▶ 광고 보고 시간 채워 이어하기',
+  'game.reflect': '한 줄로 골인',
+  'rf.stage': '{n}단계',
+  'rf.start': '발사',
+  'rf.abort': '↺ 다시 놓기',
+  'rf.clear': '골인!',
+  'rf.adHint': '▶ 광고 보고 경로 미리보기',
 }
 
 export default dict

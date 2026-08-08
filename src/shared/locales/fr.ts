@@ -4,6 +4,7 @@ import type { CoreDict } from '../i18n'
 const dict: CoreDict = {
   'home.best': 'Record {n}',
   'home.myRank': '{score} pts (nº {rank})',
+  'home.myRankStage': 'Niveau {score} (#{rank})',
   'home.ranking': 'Classement',
   'common.back': 'Accueil',
   'common.tapClose': 'Touchez pour fermer',
@@ -37,6 +38,7 @@ const dict: CoreDict = {
   'ranking.error': 'Impossible de charger le classement. Réessayez plus tard.',
   'ranking.empty': "Aucun record pour l'instant. Soyez le premier !",
   'ranking.unknown': 'Jeu inconnu',
+  'rank.stage': 'Niveau {n}',
   'settings.title': 'Paramètres',
   'settings.nickname': 'Pseudo',
   'settings.nicknameHint': 'Nom affiché dans le classement.',
@@ -134,6 +136,7 @@ const dict: CoreDict = {
   'guide.goal': 'Objectif',
   'guide.how': 'Contrôles',
   'guide.score': 'Score',
+  'guide.record': 'Record',
   'guide.close': 'Compris',
   'hud.score': 'Score',
   'brick.wave': 'Vague {n}',
@@ -305,6 +308,12 @@ const dict: CoreDict = {
   'game.bamboo': 'Grimpe au Bambou',
   'bm.height': '{n} nœuds',
   'bm.ad': '▶ Pub pour refaire le plein de temps',
+  'game.reflect': "But d'un Trait",
+  'rf.stage': 'Niv. {n}',
+  'rf.start': 'Lancer',
+  'rf.abort': '↺ Retracer',
+  'rf.clear': 'But !',
+  'rf.adHint': '▶ Pub : voir la trajectoire',
 }
 
 export default dict

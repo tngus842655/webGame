@@ -4,6 +4,7 @@ import type { CoreDict } from '../i18n'
 const dict: CoreDict = {
   'home.best': 'Kỷ lục {n}',
   'home.myRank': '{score} điểm (hạng {rank})',
+  'home.myRankStage': 'Màn {score} (#{rank})',
   'home.ranking': 'Bảng xếp hạng',
   'common.back': 'Trang chủ',
   'common.tapClose': 'Chạm để đóng',
@@ -37,6 +38,7 @@ const dict: CoreDict = {
   'ranking.error': 'Không tải được bảng xếp hạng. Thử lại sau.',
   'ranking.empty': 'Chưa có kỷ lục. Hãy là người đầu tiên!',
   'ranking.unknown': 'Game không xác định',
+  'rank.stage': 'Màn {n}',
   'settings.title': 'Cài đặt',
   'settings.nickname': 'Biệt danh',
   'settings.nicknameHint': 'Tên hiển thị trên bảng xếp hạng.',
@@ -134,6 +136,7 @@ const dict: CoreDict = {
   'guide.goal': 'Mục tiêu',
   'guide.how': 'Điều khiển',
   'guide.score': 'Điểm',
+  'guide.record': 'Thành tích',
   'guide.close': 'Đã hiểu',
   'hud.score': 'Điểm',
   'brick.wave': 'Đợt {n}',
@@ -305,6 +308,12 @@ const dict: CoreDict = {
   'game.bamboo': 'Leo Tre',
   'bm.height': '{n} đốt',
   'bm.ad': '▶ Xem quảng cáo để đầy thời gian và tiếp tục',
+  'game.reflect': 'Một Nét Ghi Bàn',
+  'rf.stage': 'Màn {n}',
+  'rf.start': 'Phóng',
+  'rf.abort': '↺ Vẽ lại',
+  'rf.clear': 'Vào đích!',
+  'rf.adHint': '▶ Quảng cáo: xem đường đi',
 }
 
 export default dict

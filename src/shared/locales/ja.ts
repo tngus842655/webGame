@@ -4,6 +4,7 @@ import type { CoreDict } from '../i18n'
 const dict: CoreDict = {
   'home.best': 'ベスト {n}',
   'home.myRank': '{score}点 ({rank}位)',
+  'home.myRankStage': '{score}ステージ ({rank}位)',
   'home.ranking': 'ランキング',
   'common.back': 'ホーム',
   'common.tapClose': 'タップして閉じる',
@@ -37,6 +38,7 @@ const dict: CoreDict = {
   'ranking.error': 'ランキングを読み込めませんでした。後でもう一度お試しください。',
   'ranking.empty': 'まだ記録がありません。最初の記録を作ろう！',
   'ranking.unknown': '不明なゲーム',
+  'rank.stage': '{n}ステージ',
   'settings.title': '設定',
   'settings.nickname': 'ニックネーム',
   'settings.nicknameHint': 'ランキングに表示される名前です。',
@@ -134,6 +136,7 @@ const dict: CoreDict = {
   'guide.goal': '目標',
   'guide.how': '操作',
   'guide.score': 'スコア',
+  'guide.record': '記録',
   'guide.close': 'OK',
   'hud.score': 'スコア',
   'brick.wave': 'ウェーブ {n}',
@@ -305,6 +308,12 @@ const dict: CoreDict = {
   'game.bamboo': '竹のぼり',
   'bm.height': '{n}節',
   'bm.ad': '▶ 広告を見て時間を満たして続ける',
+  'game.reflect': '一筆ゴール',
+  'rf.stage': '{n}面',
+  'rf.start': '発射',
+  'rf.abort': '↺ 引き直す',
+  'rf.clear': 'ゴール！',
+  'rf.adHint': '▶ 広告を見て軌道プレビュー',
 }
 
 export default dict

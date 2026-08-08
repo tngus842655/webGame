@@ -11,6 +11,12 @@ const route = useRoute()
 const slug = String(route.params.slug)
 const game = GAMES.find((g) => g.slug === slug)
 
+// 점수가 아니라 단계로 겨루는 게임은 숫자 옆에 단위를 붙인다 (registry의 recordUnit)
+function record(value: number): string {
+  const n = value.toLocaleString()
+  return game?.recordUnit === 'stage' ? t('rank.stage', { n }) : n
+}
+
 const period = ref<'week' | 'all'>('week')
 const entries = ref<LeaderboardEntry[]>([])
 const loading = ref(true)
@@ -59,7 +65,7 @@ watch(period, load)
       <li v-for="(entry, i) in entries" :key="entry.user_id" :class="{ me: entry.user_id === myUserId }">
         <span class="rank">{{ i + 1 }}</span>
         <span class="name">{{ entry.nickname }}</span>
-        <span class="score">{{ entry.best_score.toLocaleString() }}</span>
+        <span class="score">{{ record(entry.best_score) }}</span>
       </li>
     </ol>
   </div>

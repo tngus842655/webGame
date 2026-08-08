@@ -4,6 +4,7 @@ import type { CoreDict } from '../i18n'
 const dict: CoreDict = {
   'home.best': 'Melhor {n}',
   'home.myRank': '{score} pts (nº {rank})',
+  'home.myRankStage': 'Fase {score} (#{rank})',
   'home.ranking': 'Ranking',
   'common.back': 'Início',
   'common.tapClose': 'Toque para fechar',
@@ -37,6 +38,7 @@ const dict: CoreDict = {
   'ranking.error': 'Não foi possível carregar o ranking. Tente mais tarde.',
   'ranking.empty': 'Ainda não há recordes. Seja o primeiro!',
   'ranking.unknown': 'Jogo desconhecido',
+  'rank.stage': 'Fase {n}',
   'settings.title': 'Configurações',
   'settings.nickname': 'Apelido',
   'settings.nicknameHint': 'Nome exibido no ranking.',
@@ -134,6 +136,7 @@ const dict: CoreDict = {
   'guide.goal': 'Objetivo',
   'guide.how': 'Controles',
   'guide.score': 'Pontuação',
+  'guide.record': 'Recorde',
   'guide.close': 'Entendi',
   'hud.score': 'Pontos',
   'brick.wave': 'Onda {n}',
@@ -305,6 +308,12 @@ const dict: CoreDict = {
   'game.bamboo': 'Sobe no Bambu',
   'bm.height': '{n} nós',
   'bm.ad': '▶ Ver anúncio, encher o tempo e continuar',
+  'game.reflect': 'Gol de Um Traço',
+  'rf.stage': 'Fase {n}',
+  'rf.start': 'Lançar',
+  'rf.abort': '↺ Redesenhar',
+  'rf.clear': 'Gol!',
+  'rf.adHint': '▶ Anúncio: ver a trajetória',
 }
 
 export default dict

@@ -4,6 +4,7 @@ import type { CoreDict } from '../i18n'
 const dict: CoreDict = {
   'home.best': 'Récord {n}',
   'home.myRank': '{score} pts (n.º {rank})',
+  'home.myRankStage': 'Nivel {score} (#{rank})',
   'home.ranking': 'Clasificación',
   'common.back': 'Inicio',
   'common.tapClose': 'Toca para cerrar',
@@ -37,6 +38,7 @@ const dict: CoreDict = {
   'ranking.error': 'No se pudo cargar la clasificación. Inténtalo más tarde.',
   'ranking.empty': 'Aún no hay récords. ¡Sé el primero!',
   'ranking.unknown': 'Juego desconocido',
+  'rank.stage': 'Nivel {n}',
   'settings.title': 'Ajustes',
   'settings.nickname': 'Apodo',
   'settings.nicknameHint': 'Nombre mostrado en la clasificación.',
@@ -134,6 +136,7 @@ const dict: CoreDict = {
   'guide.goal': 'Objetivo',
   'guide.how': 'Controles',
   'guide.score': 'Puntuación',
+  'guide.record': 'Récord',
   'guide.close': 'Entendido',
   'hud.score': 'Puntos',
   'brick.wave': 'Oleada {n}',
@@ -305,6 +308,12 @@ const dict: CoreDict = {
   'game.bamboo': 'Trepa el Bambú',
   'bm.height': '{n} nudos',
   'bm.ad': '▶ Ver anuncio, rellenar tiempo y seguir',
+  'game.reflect': 'Gol de un Trazo',
+  'rf.stage': 'Nivel {n}',
+  'rf.start': 'Lanzar',
+  'rf.abort': '↺ Redibujar',
+  'rf.clear': '¡Gol!',
+  'rf.adHint': '▶ Anuncio: ver la trayectoria',
 }
 
 export default dict

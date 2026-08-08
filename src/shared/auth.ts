@@ -28,15 +28,19 @@ function readProvider(user: User | null | undefined): LinkedAccount | null {
 }
 
 // 계정 전환은 OAuth 리다이렉트를 거치므로 메모리 변수로는 이전 계정을 알 수 없다.
-// 마지막 계정 id를 저장해두고, 달라졌으면 이전 계정의 로컬 최고점을 정리한다
-// (홈 화면이 이전 계정 기록을 새 계정 것처럼 보여주는 문제 방지. 키는 scores.ts와 공유)
+// 마지막 계정 id를 저장해두고, 달라졌으면 이전 계정의 흔적을 정리한다
+// (홈 화면이나 게임이 이전 계정 기록을 새 계정 것처럼 보여주는 문제 방지)
 const LAST_USER_KEY = 'webgame:lastUserId'
 
-function clearLocalBestsIfUserChanged(nextId: string) {
+// 계정에 딸린 것만 지운다 — 최고점(scores.ts)과 게임 진도(단계를 저장하는 게임).
+// 즐겨찾기·최근 플레이(library.ts)는 기기 취향이라 계정을 갈아타도 남긴다.
+const PER_USER_PREFIXES = ['webgame:best:', 'webgame:progress:']
+
+function clearLocalUserDataIfChanged(nextId: string) {
   const last = localStorage.getItem(LAST_USER_KEY)
   if (last && last !== nextId) {
     for (const key of Object.keys(localStorage)) {
-      if (key.startsWith('webgame:best:')) localStorage.removeItem(key)
+      if (PER_USER_PREFIXES.some((prefix) => key.startsWith(prefix))) localStorage.removeItem(key)
     }
   }
   localStorage.setItem(LAST_USER_KEY, nextId)
@@ -47,7 +51,7 @@ whenSupabaseReady((sb) => {
   sb.auth.onAuthStateChange((_event, session) => {
     cachedUserId = session?.user.id ?? null
     // 연동(link)은 id가 그대로라 정리 대상이 아니다 — 다른 계정으로 갈아탄 경우에만 지워진다
-    if (cachedUserId) clearLocalBestsIfUserChanged(cachedUserId)
+    if (cachedUserId) clearLocalUserDataIfChanged(cachedUserId)
     linkedProvider.value = readProvider(session?.user)
   })
 })

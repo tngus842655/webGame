@@ -4,6 +4,7 @@ import type { CoreDict } from '../i18n'
 const dict: CoreDict = {
   'home.best': 'Rekor {n}',
   'home.myRank': '{score} puan (#{rank})',
+  'home.myRankStage': 'Bölüm {score} (#{rank})',
   'home.ranking': 'Sıralama',
   'common.back': 'Ana sayfa',
   'common.tapClose': 'Kapatmak için dokunun',
@@ -37,6 +38,7 @@ const dict: CoreDict = {
   'ranking.error': 'Sıralama yüklenemedi. Daha sonra tekrar deneyin.',
   'ranking.empty': 'Henüz rekor yok. İlk sen ol!',
   'ranking.unknown': 'Bilinmeyen oyun',
+  'rank.stage': 'Bölüm {n}',
   'settings.title': 'Ayarlar',
   'settings.nickname': 'Takma ad',
   'settings.nicknameHint': 'Sıralamada görünen ad.',
@@ -134,6 +136,7 @@ const dict: CoreDict = {
   'guide.goal': 'Hedef',
   'guide.how': 'Kontroller',
   'guide.score': 'Puan',
+  'guide.record': 'Rekor',
   'guide.close': 'Anladım',
   'hud.score': 'Puan',
   'brick.wave': 'Dalga {n}',
@@ -305,6 +308,12 @@ const dict: CoreDict = {
   'game.bamboo': 'Bambuya Tırman',
   'bm.height': '{n} boğum',
   'bm.ad': '▶ Reklam izle, süreyi doldur, devam et',
+  'game.reflect': 'Tek Çizgiyle Gol',
+  'rf.stage': 'Bölüm {n}',
+  'rf.start': 'Fırlat',
+  'rf.abort': '↺ Yeniden çiz',
+  'rf.clear': 'Gol!',
+  'rf.adHint': '▶ Reklam: yörüngeyi gör',
 }
 
 export default dict
