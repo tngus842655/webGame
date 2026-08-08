@@ -183,11 +183,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (!state.daily) {
       c.fillStyle = ground('#00796B', '#7FBDB4')
       c.font = font(24)
-      c.textAlign = 'left'
-      c.fillText(t('common.stage', { n: state.level }), SCORE_PANEL.left, SCORE_PANEL.subY)
+      c.textAlign = 'right'
+      c.fillText(t('common.stage', { n: state.level }), SCORE_PANEL.right, SCORE_PANEL.subY)
     }
     c.textAlign = 'center'
-    const heartX = (i: number) => 462 + i * 42
+    // 하트와 단계 표시를 맞바꿨다 — 오른쪽 위는 멈춤·도움말 아래로 내려온
+    // 좋아요·싫어요 줄(GamePlayPage)이 쓰는 자리라 하트가 그 밑에 깔렸다
+    const heartX = (i: number) => SCORE_PANEL.left + 14 + i * 42
     for (let i = 0; i < 3; i++) {
       drawIcon(c, 'heart', heartX(i), SCORE_PANEL.subY - 8, 14, { dim: i >= state.lives })
     }

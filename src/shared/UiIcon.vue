@@ -22,6 +22,8 @@ defineProps<{
     | 'dice'
     | 'play'
     | 'check'
+    | 'arrow-up'
+    | 'arrow-down'
 }>()
 </script>
 
@@ -137,6 +139,12 @@ defineProps<{
     </g>
 
     <path v-else-if="name === 'play'" fill="currentColor" stroke="none" d="M7.8 5.2 19.2 12 7.8 18.8z" />
+
+    <!-- 좋아요·싫어요 화살표. 한 붓으로 닫아 두었으니 놓이는 자리에서 fill만 켜면
+         속이 찬 화살표가 된다 (별처럼 아이콘을 둘로 두지 않아도 된다). -->
+    <path v-else-if="name === 'arrow-up'" d="M12 4.2 18 11.8h-3.2v8h-5.6v-8H6z" />
+
+    <path v-else-if="name === 'arrow-down'" d="M12 19.8 18 12.2h-3.2v-8h-5.6v8H6z" />
 
     <path
       v-else

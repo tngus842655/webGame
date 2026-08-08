@@ -254,9 +254,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       valueColor: ground('#5D4037', '#E5D8D0'),
     })
 
-    // 체력 하트
+    // 체력 하트 — 왼쪽에 둔다. 오른쪽 끝은 멈춤·도움말 아래로 내려온
+    // 좋아요·싫어요 줄(GamePlayPage)이 쓰는 자리라 하트가 그 밑에 깔렸다.
     for (let i = 0; i < p.maxHp; i++) {
-      drawHeart(c, ARENA.right - 26 - i * 40, 56, 15, i < p.hp)
+      drawHeart(c, ARENA.left + 26 + i * 40, 56, 15, i < p.hp)
     }
 
     // 경험치 바

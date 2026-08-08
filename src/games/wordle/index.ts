@@ -27,7 +27,10 @@ const KEY_Y = 916
 const KEY_H = 76
 const KEY_GAP = 10
 const KEY_W = 90
-const SHARE_BTN = { x: 588, y: 96, w: 120, h: 56 } as const
+// 오른쪽 위(588)에 있었는데 그 자리로 좋아요·싫어요 줄(GamePlayPage)이 내려온다.
+// 세로가 짧은 기기에서는 그 줄이 이 버튼을 덮어 눌리지 않았다 — 뒤로가기 아래로 옮겨
+// 반대쪽 끝에 세운다 (점수판은 x 140부터라 여기는 비어 있다).
+const SHARE_BTN = { x: 12, y: 96, w: 120, h: 56 } as const
 
 const STATUS_COLORS: Record<CellStatus, string> = { g: '#6AAA64', y: '#C9B458', x: '#787C7E' }
 // 한 칸이 뒤집히는 시간과 칸 사이 시차
