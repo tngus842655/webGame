@@ -58,7 +58,7 @@ src/
 │  ├─ ads.ts                # 리워드 광고 추상화 (H5 Games Ads / AdMob / 개발용 스텁)
 │  ├─ adViews.ts            # 광고 호출 기록·집계 (어느 게임 어느 자리에서, 어떻게 끝났나)
 │  ├─ native.ts             # 안드로이드 앱(Capacitor) 전용 — 딥링크 로그인, 뒤로가기, 스플래시
-│  ├─ appUpdate.ts          # Play 인앱 업데이트 안내 (안드로이드 앱에서만)
+│  ├─ appUpdate.ts          # 새 버전 안내 → 플레이 스토어 열기 (안드로이드 앱에서만)
 │  ├─ music.ts             # BGM 재생 (public/bgm/*.mp3, 파일 없으면 무음)
 │  ├─ theme.ts              # 라이트·다크·시스템. <html data-theme> + isDarkTheme()
 │  ├─ library.ts            # 즐겨찾기·최근 플레이 (localStorage 전용)

@@ -55,6 +55,11 @@ const en = {
   'common.back': 'Home',
   'common.tapClose': 'Tap anywhere to close',
   'common.stage': 'Level {n}',
+  // 새 버전 안내 팝업 (안드로이드 앱에서만). 누르면 플레이 스토어가 열린다
+  'update.title': 'A new version is out',
+  'update.body': 'Tap Update to open the Play Store.',
+  'update.now': 'Update',
+  'update.later': 'Later',
   // 탭에 세 개가 나란히 서므로 짧게 — 한국어는 글자가 좁아 한 낱말 더 들어간다
   'home.sectionNew': 'New',
   'home.sectionFavorites': 'Favorites',

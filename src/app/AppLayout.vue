@@ -5,6 +5,7 @@
 // DB가 'Guest-xxxx'로 채운다. 둘 다 설정 화면에서 언제든 바꿀 수 있다.
 import { onMounted } from 'vue'
 import { flushPendingScores } from '@/shared/scores'
+import UpdatePrompt from '@/shared/UpdatePrompt.vue'
 
 // 보내지 못하고 남아 있던 점수를 올린다 (오프라인·전송 실패분). 남은 게 없으면 그냥 지나간다.
 onMounted(() => void flushPendingScores().catch(() => {}))
@@ -13,5 +14,7 @@ onMounted(() => void flushPendingScores().catch(() => {}))
 <template>
   <div class="app-shell">
     <RouterView />
+    <!-- 새 버전이 있을 때만 스스로 뜬다 (안드로이드 앱에서만) -->
+    <UpdatePrompt />
   </div>
 </template>
