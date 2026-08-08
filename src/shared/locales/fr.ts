@@ -311,6 +311,10 @@ const dict: CoreDict = {
   'rf.abort': '↺ Retracer',
   'rf.clear': 'But !',
   'rf.adHint': '▶ Pub : voir la trajectoire',
+  'rf.resetAsk': 'Recommencer ce niveau ?',
+  'rf.resetBody': 'Tous les traits tracés seront effacés.',
+  'rf.resetYes': 'Recommencer',
+  'rf.resetNo': 'Annuler',
 }
 
 export default dict

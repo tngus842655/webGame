@@ -311,6 +311,10 @@ const dict: CoreDict = {
   'rf.abort': '↺ Redesenhar',
   'rf.clear': 'Gol!',
   'rf.adHint': '▶ Anúncio: ver a trajetória',
+  'rf.resetAsk': 'Recomeçar esta fase?',
+  'rf.resetBody': 'Todas as linhas que você desenhou serão apagadas.',
+  'rf.resetYes': 'Recomeçar',
+  'rf.resetNo': 'Cancelar',
 }
 
 export default dict

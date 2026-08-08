@@ -311,6 +311,10 @@ const dict: CoreDict = {
   'rf.abort': '↺ 引き直す',
   'rf.clear': 'ゴール！',
   'rf.adHint': '▶ 広告を見て軌道プレビュー',
+  'rf.resetAsk': 'このステージを最初からやり直しますか？',
+  'rf.resetBody': '引いた線はすべて消えます。',
+  'rf.resetYes': '最初から',
+  'rf.resetNo': 'キャンセル',
 }
 
 export default dict

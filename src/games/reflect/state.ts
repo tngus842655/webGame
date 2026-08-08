@@ -428,6 +428,20 @@ export function abortRun(state: ReflectState): boolean {
   return true
 }
 
+// 그은 선만 한 번에 걷어낸다 — 실패 기록과 직전 궤적은 남는다 (왜 빗나갔는지 보면서 다시 놓으라고)
+export function clearLines(state: ReflectState): boolean {
+  if (state.phase !== 'placing' || state.lines.length === 0) return false
+  state.lines = []
+  return true
+}
+
+// 이 단계를 받았을 때로 되돌린다 — 씨앗이 같아 배치는 그대로이고 그은 선·실패 기록·궤적이 지워진다
+export function resetStage(state: ReflectState): boolean {
+  if (state.phase !== 'placing') return false
+  loadLevel(state)
+  return true
+}
+
 // 화살표로 단계 이동 — 발사 중에는 막는다
 export function selectStage(state: ReflectState, level: number): boolean {
   if (state.phase !== 'placing' || level < 1 || level === state.level) return false

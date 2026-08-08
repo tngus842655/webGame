@@ -311,6 +311,10 @@ const dict: CoreDict = {
   'rf.abort': '↺ Vẽ lại',
   'rf.clear': 'Vào đích!',
   'rf.adHint': '▶ Quảng cáo: xem đường đi',
+  'rf.resetAsk': 'Chơi lại màn này từ đầu?',
+  'rf.resetBody': 'Mọi đường bạn đã vẽ sẽ bị xoá.',
+  'rf.resetYes': 'Chơi lại',
+  'rf.resetNo': 'Huỷ',
 }
 
 export default dict

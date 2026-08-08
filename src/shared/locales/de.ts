@@ -311,6 +311,10 @@ const dict: CoreDict = {
   'rf.abort': '↺ Neu zeichnen',
   'rf.clear': 'Tor!',
   'rf.adHint': '▶ Werbung: Flugbahn zeigen',
+  'rf.resetAsk': 'Dieses Level neu starten?',
+  'rf.resetBody': 'Alle gezeichneten Striche werden gelöscht.',
+  'rf.resetYes': 'Neu starten',
+  'rf.resetNo': 'Abbrechen',
 }
 
 export default dict
