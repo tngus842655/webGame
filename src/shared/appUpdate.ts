@@ -32,8 +32,9 @@ function askedRecently(): boolean {
 }
 
 export async function checkAppUpdate(): Promise<void> {
-  if (!isNative || askedRecently()) return
+  if (!isNative) return
   try {
+    if (askedRecently()) return
     // 웹 번들에 안드로이드 전용 코드가 실려 갈 이유가 없다 (native.ts와 같은 규칙)
     const { AppUpdate, AppUpdateAvailability } = await import('@capawesome/capacitor-app-update')
     const info = await AppUpdate.getAppUpdateInfo()
@@ -51,9 +52,11 @@ export async function checkAppUpdate(): Promise<void> {
 // 팝업의 '업데이트'. market:// 인텐트라 플레이 스토어 앱이 이 앱 페이지에서 열린다
 // (스토어 앱이 없으면 플러그인이 웹 주소로 떨어뜨린다).
 export async function startAppUpdate(): Promise<void> {
-  updateAvailable.value = false
   const { AppUpdate } = await import('@capawesome/capacitor-app-update')
+  // 스토어가 열린 뒤에 닫는다. 먼저 닫아 버리면 인텐트가 실패했을 때 누른 사람 눈에는
+  // 아무 일도 안 일어난 것으로 보인다 — 지금 고치고 있는 바로 그 모양이다.
   await AppUpdate.openAppStore()
+  updateAvailable.value = false
 }
 
 export function dismissAppUpdate(): void {

@@ -51,9 +51,18 @@ import { t } from './i18n'
 }
 
 .update-card p {
-  margin: 10px 0 20px;
+  margin-top: 10px;
   font-size: 15px;
   line-height: 1.5;
   color: var(--ink-muted);
+}
+
+/* 일시정지 시트와 같은 간격 (GamePlayPage.vue) */
+.update-card .btn {
+  margin-top: 18px;
+}
+
+.update-card .btn--ghost {
+  margin-top: 6px;
 }
 </style>

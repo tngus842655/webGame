@@ -3,7 +3,7 @@ import AppLayout from './app/AppLayout.vue'
 import { router } from './app/router'
 import { loadLocale, locale } from './shared/i18n'
 import { handleBack } from './shared/backButton'
-import { checkAppUpdate } from './shared/appUpdate'
+import { checkAppUpdate, dismissAppUpdate, updateAvailable } from './shared/appUpdate'
 import { exitApp, startNativeShell } from './shared/native'
 import { claimTossPromotion } from './shared/tossPromotion'
 // 첫 적용은 index.html이 하고, 이 import는 그 뒤를 잇는다 — 설정 화면을 한 번도
@@ -29,6 +29,13 @@ document.addEventListener('contextmenu', (event) => {
 // router.back()은 웹에서 브라우저 뒤로가기를 눌렀을 때와 같은 popstate를 내므로
 // 광고 오버레이처럼 그걸 듣고 있는 것들이 따로 손대지 않아도 같이 닫힌다.
 function goBack() {
+  // 업데이트 팝업이 떠 있으면 그것부터 닫는다. Play가 띄우던 다이얼로그는 시스템 창이라
+  // 뒤로가기를 알아서 받아냈는데, 우리가 그리는 팝업은 여기서 받지 않으면 홈에서
+  // 뒤로가기 한 번에 팝업을 띄운 채로 앱이 꺼진다.
+  if (updateAvailable.value) {
+    dismissAppUpdate()
+    return
+  }
   // 게임 화면처럼 직접 받는 곳이 있으면 거기서 끝난다 (한 번은 일시정지가 받아낸다)
   if (handleBack()) return
   if (router.currentRoute.value.path === '/') void exitApp()
