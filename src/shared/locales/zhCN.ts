@@ -16,6 +16,7 @@ const dict: CoreDict = {
   'home.sectionRecent': '最近玩过',
   'home.heroTitle': '今日推荐',
   'home.heroPlay': '立即开始',
+  'home.heroPlayers': '本周 {n} 人在玩',
   'home.reasonNew': '刚刚上线的新游戏',
   'home.reasonTop': '当前玩的人最多',
   'home.reasonTry': '你还没玩过这一款',

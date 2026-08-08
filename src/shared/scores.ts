@@ -121,6 +121,19 @@ function cachedPopularity(): Map<string, number> {
   }
 }
 
+const PLAYERS_KEY = 'webgame:gamePlayers'
+
+// 최근 7일 동안 그 게임을 한 사람 수 (get_game_popularity가 점수와 같이 돌려준다).
+// 정렬 캐시에 얹지 않고 따로 담는 이유는, 그쪽 모양을 바꾸면 예전 캐시를 든 기기에서
+// 첫 화면 순서가 무너지기 때문이다. 기록이 없는 게임은 지도에 아예 없다.
+export function gamePlayers(): Map<string, number> {
+  try {
+    return new Map(JSON.parse(localStorage.getItem(PLAYERS_KEY) ?? '[]'))
+  } catch {
+    return new Map()
+  }
+}
+
 // 동률(기록이 아직 없는 신규 게임 포함)은 레지스트리 순서 유지 — sort는 안정 정렬
 const FLAGS_KEY = 'webgame:gameFlags'
 
@@ -205,10 +218,14 @@ export async function refreshPopularity(): Promise<void> {
     const sb = await getSupabase()
     const { data, error } = await sb.rpc('get_game_popularity')
     if (error) return
-    const rows = (data ?? []) as Array<{ game_slug: string; score: number }>
+    const rows = (data ?? []) as Array<{ game_slug: string; score: number; players: number }>
     localStorage.setItem(
       POPULARITY_KEY,
       JSON.stringify(rows.map((row) => [row.game_slug, Number(row.score)])),
+    )
+    localStorage.setItem(
+      PLAYERS_KEY,
+      JSON.stringify(rows.map((row) => [row.game_slug, Number(row.players)])),
     )
   } catch {
     // 캐시가 그대로 남아 다음 진입에도 마지막 순서를 유지한다

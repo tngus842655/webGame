@@ -63,6 +63,8 @@ const en = {
   'home.sectionRecent': 'Recently played',
   'home.heroTitle': 'Today\'s pick',
   'home.heroPlay': 'Play now',
+  // 최근 7일 동안 그 게임을 한 사람 수 (get_game_popularity의 players)
+  'home.heroPlayers': '{n} players this week',
   // 추천 이유 — 홈이 데이터로 근거를 댈 수 있는 것만 (신규·1위·안 해봄·인기)
   'home.reasonNew': 'Just added',
   'home.reasonTop': 'Most played right now',

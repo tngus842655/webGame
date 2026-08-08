@@ -16,6 +16,7 @@ const dict: CoreDict = {
   'home.sectionRecent': 'Zuletzt gespielt',
   'home.heroTitle': 'Spiel des Tages',
   'home.heroPlay': 'Jetzt spielen',
+  'home.heroPlayers': '{n} Spieler diese Woche',
   'home.reasonNew': 'Ganz neu dabei',
   'home.reasonTop': 'Gerade am meisten gespielt',
   'home.reasonTry': 'Das hast du noch nicht gespielt',
