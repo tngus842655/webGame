@@ -305,6 +305,12 @@ const dict: CoreDict = {
   'game.bamboo': '竹のぼり',
   'bm.height': '{n}節',
   'bm.ad': '▶ 広告を見て時間を満たして続ける',
+  'game.reflect': '一筆ゴール',
+  'rf.level': '{n}面',
+  'rf.start': '発射',
+  'rf.abort': '↺ 引き直す',
+  'rf.clear': 'ゴール！ +{n}',
+  'rf.ad': '▶ 広告を見て挑戦+3回',
 }
 
 export default dict

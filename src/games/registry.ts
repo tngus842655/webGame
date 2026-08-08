@@ -158,4 +158,9 @@ export const GAMES: GameMeta[] = [
     titleKey: 'game.bamboo',
     loader: () => import('./bamboo'),
   },
+  {
+    slug: 'reflect',
+    titleKey: 'game.reflect',
+    loader: () => import('./reflect'),
+  },
 ]

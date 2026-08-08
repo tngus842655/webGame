@@ -305,6 +305,12 @@ const dict: CoreDict = {
   'game.bamboo': 'Grimpe au Bambou',
   'bm.height': '{n} nœuds',
   'bm.ad': '▶ Pub pour refaire le plein de temps',
+  'game.reflect': "But d'un Trait",
+  'rf.level': 'Niveau {n}',
+  'rf.start': 'Lancer',
+  'rf.abort': '↺ Retracer',
+  'rf.clear': 'But ! +{n}',
+  'rf.ad': '▶ Pub pour 3 essais de plus',
 }
 
 export default dict

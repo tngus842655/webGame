@@ -381,6 +381,12 @@ const dict: FullDict = {
   'game.bamboo': '대나무 타기',
   'bm.height': '{n}마디',
   'bm.ad': '▶ 광고 보고 시간 채워 이어하기',
+  'game.reflect': '한 줄로 골인',
+  'rf.level': '{n}판',
+  'rf.start': '발사',
+  'rf.abort': '↺ 다시 놓기',
+  'rf.clear': '골인! +{n}',
+  'rf.ad': '▶ 광고 보고 시도 3회 더',
 }
 
 export default dict

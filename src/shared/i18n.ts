@@ -433,6 +433,12 @@ const en = {
   'game.bamboo': 'Bamboo Climb',
   'bm.height': '{n} joints up',
   'bm.ad': '▶ Watch ad to refill time and continue',
+  'game.reflect': 'One-Line Goal',
+  'rf.level': 'Stage {n}',
+  'rf.start': 'Launch',
+  'rf.abort': '↺ Redo lines',
+  'rf.clear': 'Goal! +{n}',
+  'rf.ad': '▶ Watch ad for 3 more tries',
 }
 
 export type TranslationKey = keyof typeof en

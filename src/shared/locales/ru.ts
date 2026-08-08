@@ -305,6 +305,12 @@ const dict: CoreDict = {
   'game.bamboo': 'Вверх по бамбуку',
   'bm.height': 'Колен: {n}',
   'bm.ad': '▶ Реклама: пополнить время и продолжить',
+  'game.reflect': 'Гол одной линией',
+  'rf.level': 'Уровень {n}',
+  'rf.start': 'Пуск',
+  'rf.abort': '↺ Перерисовать',
+  'rf.clear': 'Гол! +{n}',
+  'rf.ad': '▶ Реклама: ещё 3 попытки',
 }
 
 export default dict

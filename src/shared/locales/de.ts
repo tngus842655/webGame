@@ -305,6 +305,12 @@ const dict: CoreDict = {
   'game.bamboo': 'Bambus-Klettern',
   'bm.height': '{n} Knoten',
   'bm.ad': '▶ Werbung ansehen: Zeit auffüllen',
+  'game.reflect': 'Ein-Strich-Tor',
+  'rf.level': 'Level {n}',
+  'rf.start': 'Start',
+  'rf.abort': '↺ Neu zeichnen',
+  'rf.clear': 'Tor! +{n}',
+  'rf.ad': '▶ Werbung ansehen: 3 Versuche extra',
 }
 
 export default dict

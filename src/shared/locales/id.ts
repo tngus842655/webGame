@@ -305,6 +305,12 @@ const dict: CoreDict = {
   'game.bamboo': 'Panjat Bambu',
   'bm.height': '{n} ruas',
   'bm.ad': '▶ Tonton iklan, isi waktu, lanjut',
+  'game.reflect': 'Gol Satu Garis',
+  'rf.level': 'Level {n}',
+  'rf.start': 'Luncurkan',
+  'rf.abort': '↺ Gambar ulang',
+  'rf.clear': 'Gol! +{n}',
+  'rf.ad': '▶ Tonton iklan: +3 percobaan',
 }
 
 export default dict

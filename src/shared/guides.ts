@@ -166,6 +166,11 @@ const ko: Record<string, Guide> = {
     how: '화면 좌우 절반 중 가지가 없는 쪽을 탭하면 한 마디 오릅니다.',
     score: '한 마디에 10점. 오를 때마다 시간이 조금 채워지므로 쉬면 그만큼 줄어듭니다.',
   },
+  reflect: {
+    goal: '공은 발사하면 스스로 굴러갑니다. 선을 그어 공을 튕겨서 초록 고리에 넣으세요.',
+    how: '빈 곳을 끌면 선이 그어지고, 그은 선은 탭해서 지웁니다. 발사를 누르면 공이 출발하고, 시도 3번을 다 쓰면 끝입니다.',
+    score: '판을 깰 때마다 점수를 받고, 아껴 둔 시도만큼 보너스가 붙습니다.',
+  },
 }
 
 const en: Record<string, Guide> = {
@@ -323,6 +328,11 @@ const en: Record<string, Guide> = {
     goal: 'Climb the bamboo while dodging branches. Hit one, or let the time bar empty, and the run ends.',
     how: 'Tap the left or right half — whichever side has no branch — to climb one joint.',
     score: '10 per joint. Each climb tops the time bar up a little, so pausing drains it.',
+  },
+  reflect: {
+    goal: 'The ball rolls on its own once launched. Draw lines to bounce it into the green ring.',
+    how: 'Drag on empty space to draw a line, tap a line to erase it. Press Launch to send the ball — the run ends after 3 failed tries.',
+    score: 'Every stage cleared pays points, plus a bonus for tries you saved.',
   },
 }
 
@@ -482,6 +492,11 @@ const ja: Record<string, Guide> = {
     how: '画面の左右半分のうち枝がない側をタップすると1節のぼります。',
     score: '1節10点。のぼるたびに時間が少し足されるので、休むと減っていきます。',
   },
+  reflect: {
+    goal: '発射したボールはひとりでに転がります。線を引いて跳ね返し、緑のリングに入れましょう。',
+    how: '何もない所をドラッグすると線が引け、引いた線はタップで消せます。発射を押すとボールが出発し、挑戦を3回使い切ると終了です。',
+    score: '面をクリアするたびに得点。残した挑戦の分だけボーナスが付きます。',
+  },
 }
 
 const zhCN: Record<string, Guide> = {
@@ -639,6 +654,11 @@ const zhCN: Record<string, Guide> = {
     goal: '避开竹枝往上爬。撞到枝条或时间条耗尽就结束。',
     how: '点击屏幕左右半边中没有竹枝的一侧，就往上爬一节。',
     score: '每节10分。每爬一节会补一点时间，所以停下来就会减少。',
+  },
+  reflect: {
+    goal: '发射后小球会自己滚动。画线让它反弹，滚进绿色圆环。',
+    how: '在空白处拖动画线，点击已画的线可以删除。按下发射让小球出发，3次机会用完就结束。',
+    score: '每过一关都得分，省下的机会越多奖励越高。',
   },
 }
 
@@ -798,6 +818,11 @@ const es: Record<string, Guide> = {
     how: 'Toca la mitad izquierda o derecha, la que no tenga rama, para subir un nudo.',
     score: '10 por nudo. Cada subida rellena un poco el tiempo, así que pararse lo consume.',
   },
+  reflect: {
+    goal: 'La bola rueda sola al lanzarla. Dibuja líneas para hacerla rebotar hasta el aro verde.',
+    how: 'Arrastra en un espacio vacío para dibujar una línea; tócala para borrarla. Pulsa Lanzar para soltar la bola: con 3 intentos fallidos se acaba.',
+    score: 'Cada nivel superado da puntos, más un bono por los intentos que ahorres.',
+  },
 }
 
 const ptBR: Record<string, Guide> = {
@@ -955,6 +980,11 @@ const ptBR: Record<string, Guide> = {
     goal: 'Suba o bambu desviando dos galhos. Se bater num galho ou a barra de tempo zerar, a partida acaba.',
     how: 'Toque na metade esquerda ou direita — a que não tem galho — para subir um nó.',
     score: '10 por nó. Cada subida repõe um pouco de tempo, então parar consome.',
+  },
+  reflect: {
+    goal: 'A bola rola sozinha ao ser lançada. Desenhe linhas para rebatê-la até o anel verde.',
+    how: 'Arraste num espaço vazio para desenhar uma linha; toque nela para apagar. Aperte Lançar para soltar a bola — 3 tentativas falhas encerram a partida.',
+    score: 'Cada fase vencida dá pontos, com bônus pelas tentativas que sobrarem.',
   },
 }
 
@@ -1114,6 +1144,11 @@ const fr: Record<string, Guide> = {
     how: 'Touche la moitié gauche ou droite — celle sans branche — pour monter d\'un nœud.',
     score: '10 par nœud. Chaque montée remplit un peu la jauge, donc s\'arrêter la vide.',
   },
+  reflect: {
+    goal: 'La balle roule toute seule une fois lancée. Trace des traits pour la faire rebondir jusqu\'à l\'anneau vert.',
+    how: 'Glisse sur une zone vide pour tracer un trait, touche-le pour l\'effacer. Appuie sur Lancer — après 3 essais ratés, c\'est fini.',
+    score: 'Chaque niveau réussi rapporte des points, avec un bonus pour les essais économisés.',
+  },
 }
 
 const de: Record<string, Guide> = {
@@ -1271,6 +1306,11 @@ const de: Record<string, Guide> = {
     goal: 'Klettere den Bambus hoch und weiche Ästen aus. Ein Treffer oder eine leere Zeitleiste beendet die Runde.',
     how: 'Tippe die linke oder rechte Hälfte an – die ohne Ast – um einen Knoten höher zu steigen.',
     score: '10 pro Knoten. Jeder Aufstieg füllt die Zeitleiste ein wenig, Pausen leeren sie.',
+  },
+  reflect: {
+    goal: 'Die Kugel rollt nach dem Start von selbst. Zeichne Striche, damit sie in den grünen Ring prallt.',
+    how: 'Ziehe auf freier Fläche, um einen Strich zu zeichnen; tippe ihn an, um ihn zu löschen. Drücke Start — nach 3 Fehlversuchen ist Schluss.',
+    score: 'Jedes geschaffte Level bringt Punkte, plus Bonus für gesparte Versuche.',
   },
 }
 
@@ -1430,6 +1470,11 @@ const ru: Record<string, Guide> = {
     how: 'Нажимайте на ту половину экрана, где нет ветки, — так подниметесь на одно колено.',
     score: '10 за колено. Каждый подъём немного пополняет время, поэтому пауза его тратит.',
   },
+  reflect: {
+    goal: 'После запуска шар катится сам. Рисуйте линии, чтобы отбить его в зелёное кольцо.',
+    how: 'Проведите по пустому месту, чтобы нарисовать линию; нажмите на неё, чтобы стереть. Нажмите «Пуск» — после 3 неудачных попыток игра заканчивается.',
+    score: 'Каждый пройденный уровень даёт очки, плюс бонус за сбережённые попытки.',
+  },
 }
 
 const id: Record<string, Guide> = {
@@ -1587,6 +1632,11 @@ const id: Record<string, Guide> = {
     goal: 'Panjat bambu sambil menghindari dahan. Kena dahan atau bar waktu habis berarti tamat.',
     how: 'Ketuk separuh kiri atau kanan — yang tidak ada dahannya — untuk naik satu ruas.',
     score: '10 per ruas. Setiap panjatan mengisi sedikit waktu, jadi berhenti berarti menyusut.',
+  },
+  reflect: {
+    goal: 'Setelah diluncurkan, bola menggelinding sendiri. Gambar garis untuk memantulkannya ke cincin hijau.',
+    how: 'Seret di tempat kosong untuk menggambar garis; ketuk garis untuk menghapusnya. Tekan Luncurkan — 3 percobaan gagal berarti tamat.',
+    score: 'Setiap level yang lolos memberi poin, plus bonus untuk percobaan yang tersisa.',
   },
 }
 
@@ -1746,6 +1796,11 @@ const vi: Record<string, Guide> = {
     how: 'Chạm nửa trái hoặc nửa phải màn hình — bên không có cành — để leo lên một đốt.',
     score: '10 điểm mỗi đốt. Mỗi lần leo được hồi chút thời gian, nên dừng lại là bị trừ.',
   },
+  reflect: {
+    goal: 'Bóng tự lăn sau khi phóng. Hãy vẽ những đường chắn để bóng bật vào vòng tròn xanh.',
+    how: 'Kéo trên chỗ trống để vẽ đường, chạm vào đường đã vẽ để xoá. Nhấn Phóng để thả bóng — hỏng 3 lượt là kết thúc.',
+    score: 'Mỗi màn vượt qua được cộng điểm, kèm thưởng cho số lượt còn giữ lại.',
+  },
 }
 
 const th: Record<string, Guide> = {
@@ -1904,6 +1959,11 @@ const th: Record<string, Guide> = {
     how: 'แตะครึ่งซ้ายหรือขวาที่ไม่มีกิ่งเพื่อปีนขึ้นหนึ่งปล้อง',
     score: 'ปล้องละ 10 คะแนน ทุกครั้งที่ปีนจะเติมเวลาเล็กน้อย ดังนั้นหยุดพักคือเวลาลด',
   },
+  reflect: {
+    goal: 'ลูกบอลจะกลิ้งเองเมื่อปล่อย ลากเส้นให้ลูกบอลสะท้อนเข้าวงแหวนสีเขียว',
+    how: 'ลากบนพื้นที่ว่างเพื่อวาดเส้น แตะเส้นที่วาดเพื่อลบ กดปล่อยลูกเพื่อเริ่ม ใช้โอกาสครบ 3 ครั้งก็จบเกม',
+    score: 'ผ่านแต่ละด่านได้คะแนน และได้โบนัสตามโอกาสที่เหลืออยู่',
+  },
 }
 
 const tr: Record<string, Guide> = {
@@ -2061,6 +2121,11 @@ const tr: Record<string, Guide> = {
     goal: 'Dallardan kaçarak bambuya tırman. Bir dala çarparsan ya da süre biterse oyun sona erer.',
     how: 'Bir boğum yükselmek için ekranın dalsız olan yarısına dokun.',
     score: 'Boğum başına 10 puan. Her tırmanış süreyi biraz doldurur, durmak ise tüketir.',
+  },
+  reflect: {
+    goal: 'Top fırlatıldıktan sonra kendi kendine yuvarlanır. Çizgiler çizerek onu yeşil halkaya sektir.',
+    how: 'Boş alanda sürükleyerek çizgi çiz; silmek için çizgiye dokun. Fırlat\'a bas — 3 başarısız deneme oyunu bitirir.',
+    score: 'Geçilen her bölüm puan kazandırır, artı sakladığın denemeler için bonus.',
   },
 }
 const TABLES: Record<Locale, Record<string, Guide>> = {

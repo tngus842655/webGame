@@ -305,6 +305,12 @@ const dict: CoreDict = {
   'game.bamboo': 'Bambuya Tırman',
   'bm.height': '{n} boğum',
   'bm.ad': '▶ Reklam izle, süreyi doldur, devam et',
+  'game.reflect': 'Tek Çizgiyle Gol',
+  'rf.level': 'Bölüm {n}',
+  'rf.start': 'Fırlat',
+  'rf.abort': '↺ Yeniden çiz',
+  'rf.clear': 'Gol! +{n}',
+  'rf.ad': '▶ Reklam izle: +3 deneme',
 }
 
 export default dict

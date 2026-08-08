@@ -305,6 +305,12 @@ const dict: CoreDict = {
   'game.bamboo': 'ปีนไผ่',
   'bm.height': '{n} ปล้อง',
   'bm.ad': '▶ ดูโฆษณาเพื่อเติมเวลาและไปต่อ',
+  'game.reflect': 'ลากเส้นเข้าเป้า',
+  'rf.level': 'ด่าน {n}',
+  'rf.start': 'ปล่อยลูก',
+  'rf.abort': '↺ วางเส้นใหม่',
+  'rf.clear': 'เข้าเป้า! +{n}',
+  'rf.ad': '▶ ดูโฆษณารับโอกาสอีก 3 ครั้ง',
 }
 
 export default dict

@@ -305,6 +305,12 @@ const dict: CoreDict = {
   'game.bamboo': 'Leo Tre',
   'bm.height': '{n} đốt',
   'bm.ad': '▶ Xem quảng cáo để đầy thời gian và tiếp tục',
+  'game.reflect': 'Một Nét Ghi Bàn',
+  'rf.level': 'Màn {n}',
+  'rf.start': 'Phóng',
+  'rf.abort': '↺ Vẽ lại',
+  'rf.clear': 'Vào đích! +{n}',
+  'rf.ad': '▶ Xem quảng cáo để có thêm 3 lượt',
 }
 
 export default dict
