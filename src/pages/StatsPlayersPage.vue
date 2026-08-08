@@ -2,6 +2,7 @@
 // 운영자 전용 — 통계 요약의 '이용자 수'를 사람 단위로 펼쳐 본다.
 // 여기서 답하려는 질문은 하나다: 누가 어떤 게임을 얼마나 했나.
 import { onMounted, ref, watch } from 'vue'
+import { statsRange } from '@/shared/adminPeriod'
 import { GAMES } from '@/games/registry'
 import GameIcon from '@/shared/GameIcon.vue'
 import { locale, t } from '@/shared/i18n'
@@ -10,10 +11,9 @@ import {
   fetchTotalPlayers,
   formatDuration,
   PLAYER_LIMIT,
-  STATS_PERIODS,
-  statsDays,
   type PlayerStat,
 } from '@/shared/playSessions'
+import StatsPeriodTabs from '@/shared/StatsPeriodTabs.vue'
 import UiIcon from '@/shared/UiIcon.vue'
 
 const players = ref<PlayerStat[]>([])
@@ -31,8 +31,8 @@ async function load() {
   try {
     // 잘렸는지 알려면 이 기간의 전체 인원이 필요하다 — 통계 요약이 쓰는 값과 같다
     const [rows, count] = await Promise.all([
-      fetchPlayerStats(statsDays.value),
-      fetchTotalPlayers(statsDays.value),
+      fetchPlayerStats(statsRange.value),
+      fetchTotalPlayers(statsRange.value),
     ])
     players.value = rows
     total.value = count
@@ -45,7 +45,7 @@ async function load() {
 }
 
 onMounted(load)
-watch(statsDays, load)
+watch(statsRange, load)
 
 const TITLES = new Map(GAMES.map((game) => [game.slug, game.titleKey]))
 
@@ -73,17 +73,7 @@ function when(iso: string): string {
       <h1>{{ t('stats.playersTitle') }}</h1>
     </header>
 
-    <div class="tabs">
-      <button
-        v-for="p in STATS_PERIODS"
-        :key="p"
-        type="button"
-        :class="{ active: statsDays === p }"
-        @click="statsDays = p"
-      >
-        {{ t('stats.days', { n: p }) }}
-      </button>
-    </div>
+    <StatsPeriodTabs />
 
     <p class="hint">{{ t('stats.playersHint') }}</p>
 
@@ -155,28 +145,6 @@ function when(iso: string): string {
 
 .page-header h1 {
   font-size: 20px;
-}
-
-.tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-.tabs button {
-  flex: 1;
-  padding: 10px 0;
-  border: none;
-  border-radius: 12px;
-  background: var(--surface);
-  color: var(--ink-faint);
-  cursor: pointer;
-}
-
-.tabs button.active {
-  background: var(--ink-muted);
-  color: var(--surface);
-  font-weight: bold;
 }
 
 .hint {

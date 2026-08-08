@@ -1,5 +1,6 @@
 import type { AdMedium, AdOutcome } from './ads'
 import { ensureUserId } from './auth'
+import type { StatsRange } from './playSessions'
 import { getSupabase } from './supabase'
 
 // 리워드 광고 호출 기록 — 어느 매체의 어느 게임 어느 자리에서 광고를 부르고, 그게
@@ -44,9 +45,9 @@ interface AdStatRow {
 }
 
 // 관리자만 통과한다 (get_ad_stats()의 첫 줄이 막는다)
-export async function fetchAdStats(days: number): Promise<AdStat[]> {
+export async function fetchAdStats({ from, to }: StatsRange): Promise<AdStat[]> {
   const sb = await getSupabase()
-  const { data, error } = await sb.rpc('get_ad_stats', { p_days: days })
+  const { data, error } = await sb.rpc('get_ad_stats', { p_from: from, p_to: to })
   if (error) throw error
   return ((data ?? []) as AdStatRow[]).map((row) => {
     const viewed = Number(row.viewed)
