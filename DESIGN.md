@@ -13,7 +13,7 @@
 | 라우팅 | vue-router | 게임 = `/play/:slug` 라우트 하나 |
 | 백엔드 | Supabase (Auth + Postgres + RLS) | 점수·랭킹·프로필·플레이 시간 |
 | i18n | 자체 경량 구현 (`shared/i18n.ts`) | 13개 언어. 게임 내부 HUD·가이드까지 완역, 관리자·통계·개발노트만 en 폴백 |
-| 사운드 | WebAudio 신스 (`shared/sound.ts`) | 오디오 에셋 0개 |
+| 사운드 | WebAudio 신스 (`shared/sound.ts`) | 신스 폴백 + `public/sfx` wav 21개 (`tools/gen-sfx.py`로 합성) |
 | 운영 배포 | Vercel (`main`) | main 반영은 사용자가 직접 수행 |
 | 앱 패키징 | Capacitor (안드로이드) / 앱인토스 | 둘 다 웹 빌드를 앱 안에 넣는다 (`ANDROID_RELEASE.md`) |
 | 타입 검증 | `npm run typecheck` (vue-tsc) | 커밋 전 통과 필수 |
@@ -40,13 +40,15 @@ src/
 ├─ app/                     # router, AppLayout
 ├─ pages/                   # Home / Games / GamePlay / RankingHub / Ranking
 │                           #   / Stats / StatsPlayers / StatsAds / Settings
-│                           #   / Admin / AdminTrash / AdminFeedback / Feedback
+│                           #   / Admin / AdminTrash / AdminFeedback / AdminFeatured
+│                           #   / AdminVotes / Feedback / Event(미니앱 전용)
 │                           #   / DevNotes / Terms / Privacy / AccountDeletion / Trash
 ├─ games/
 │  ├─ types.ts              # GameMeta / GameModule / GameContext
 │  ├─ registry.ts           # 게임 목록 (여기 한 줄 추가로 게임 등록)
 │  ├─ shell.ts              # 공통 골격: rAF 루프, 백그라운드 일시정지, 정리
 │  ├─ stage.ts / overlay.ts / clearBonus.ts / pointer.ts   # 스테이지·게임오버·클리어 보너스·입력
+│  ├─ daily.ts / resumeGate.ts   # 데일리 시드·스트릭 / 광고 뒤 '준비되면 탭' 대기
 │  ├─ scene.ts              # ground(라이트, 다크) — 게임 판 바탕만 테마를 탄다
 │  └─ <slug>/               # 게임 모듈 (index.ts 진입점, state/renderer/config…)
 ├─ shared/
@@ -64,6 +66,9 @@ src/
 │  ├─ theme.ts              # 라이트·다크·시스템. <html data-theme> + isDarkTheme()
 │  ├─ library.ts            # 즐겨찾기·최근 플레이 (localStorage 전용)
 │  ├─ gameVotes.ts          # 게임별 좋아요·싫어요 (하루 한 표) + GameVote.vue
+│  ├─ gameContext.ts        # 게임에 넘기는 GameContext 조립 (점수 제출·광고·루프 정지)
+│  ├─ guides.ts             # 게임별 목표·조작·점수 세 줄 (13개 언어)
+│  ├─ scoreGuard.ts / admin.ts / feedback.ts / toss.ts / tossPromotion.ts
 │  └─ i18n.ts / sound.ts / GameIcon.vue / GameCard.vue / FavoriteButton.vue / releaseNotes
 └─ styles/
 ```
@@ -72,17 +77,19 @@ src/
 
 원본은 `src/games/types.ts`. 요약:
 
-- `GameMeta` — `slug`(라우트·DB `game_slug`와 동일), `titleKey`(i18n), `loader`(동적 import)
-- `GameModule` — `mount(host, ctx)` / `unmount()`. 리소스 정리는 게임 책임이며,
-  `createGameShell()`(shell.ts)을 쓰면 rAF 루프·백그라운드 일시정지·정리가 해결된다.
+- `GameMeta` — `slug`(라우트·DB `game_slug`와 동일), `titleKey`(i18n), `loader`(동적 import),
+  `recordUnit?: 'stage'`(점수가 아니라 단계로 겨루는 게임)
+- `GameModule` — `mount(host, ctx)` / `unmount()` / `currentScore()`. 리소스 정리는 게임
+  책임이며, `createGameShell()`(shell.ts)을 쓰면 rAF 루프·백그라운드 일시정지·정리가
+  해결된다. 관리자용 `canAdminSkip`/`adminSkip`/`canAdminReset`/`adminReset`은 선택이다.
 - `GameContext` — `submitScore`, `getBestScore`, `isRewardAdReady`, `showRewardAd`
 
 ### 새 게임 추가 체크리스트
 
 1. `src/games/<slug>/` 폴더에 `GameModule` 구현 (`shell.ts`·`stage.ts` 활용).
-   상태는 `state.ts`로 뺀다 — 31개 전부 그렇게 돼 있다. 그리기·밸런스 상수까지
+   상태는 `state.ts`로 뺀다 — 모든 게임이 그렇게 돼 있다. 그리기·밸런스 상수까지
    `renderer.ts`·`config.ts`로 더 쪼갠 것은 초기 넷(`suika`·`brick`·`blockblast`·`fruit2048`,
-   `config.ts`는 `match3`까지 다섯)뿐이고, 2026-07 추가분 열 개는 `index.ts` + `state.ts` 두 장이다.
+   `config.ts`는 `match3`까지 다섯)뿐이고, 나머지는 `index.ts` + `state.ts` 두 장이다.
 2. `registry.ts`에 항목 추가
 3. `game.<slug>` 제목 키를 13개 언어로 — 영어는 `i18n.ts`의 `en` 블록, 나머지 12개는
    `locales/<locale>.ts`. **누락을 `vue-tsc`가 잡아 주는 것은 `FullDict`로 선언한 `ko.ts`
@@ -94,7 +101,8 @@ src/
 
 ## 5. 데이터·인증
 
-스키마 원본: `supabase/migrations/` (신규 환경은 순서대로 실행)
+스키마 원본: `supabase/migrations/` (신규 환경은 순서대로 실행).
+아래 표는 훑어보기용이고, **RLS와 운영 DB 적용 여부의 정본은 [SUPABASE.md](./SUPABASE.md)다.**
 
 | 테이블 | 내용 |
 |---|---|
@@ -133,7 +141,7 @@ src/
   같은 이름의 mp3를 넣으면 그쪽이 이긴다. 소리 크기는 `sound.ts`의 `gain`으로 맞춘다.
 - 같은 소리가 20ms 안에 겹치면 건너뛴다 (한 프레임에 여러 번 울리면 뭉쳐서 커진다).
   연쇄는 파일을 늘리지 않고 음을 올려 표현한다.
-- `music.ts` — BGM. `public/bgm/`에 `action.mp3` / `puzzle.mp3` / `sim.mp3` 세 개를 넣으면
+- `music.ts` — BGM. `public/bgm/`에 `action.mp3` / `puzzle.mp3` / `sim.mp3` 세 개가 들어 있고
   `bgmFor(slug)`가 게임별로 골라 반복 재생한다. 파일이 없으면 조용히 넘어가므로
   음원 없이도 앱은 그대로 돈다. 효과음과 별도 토글(설정 화면)을 둔다.
 - 음원 라이선스는 상업적 이용 가능 + 광고 게재 가능한 것만 쓴다(NC 조건 금지).
@@ -141,9 +149,10 @@ src/
 
 ### 리워드 광고
 
-- `ads.ts`가 매체를 감싼다. 웹·앱인토스는 `VITE_ADSENSE_CLIENT`가 있으면 H5 Games
-  Ads(AdSense Ad Placement API), 안드로이드 앱은 `VITE_ADMOB_REWARD_ID`가 있으면 AdMob.
-- **둘 다 없으면 5초 카운트다운 가짜 광고(스텁)를 쓴다.** 실제 매체를 붙이기 전에도
+- `ads.ts`가 매체를 감싼다. 셋으로 갈린다 — 웹은 `VITE_ADSENSE_CLIENT`가 있으면 H5 Games
+  Ads(AdSense Ad Placement API), 앱인토스는 `VITE_TOSS_AD_GROUP_ID`가 있으면 토스 인앱광고,
+  안드로이드 앱은 `VITE_ADMOB_REWARD_ID`가 있으면 AdMob.
+- **셋 다 없으면 5초 카운트다운 가짜 광고(스텁)를 쓴다.** 실제 매체를 붙이기 전에도
   배포본에서 버튼 노출·보상 지급·`/stats/ads` 집계까지 흐름 전체를 그대로 확인하기
   위해서다 — 스텁을 끝까지 보면 `viewed`, 건너뛰면 `dismissed`로 쌓인다.
 - 앱에서 매체가 갈리는 이유는 구글 정책이다 — `ANDROID_RELEASE.md`의 '광고 — AdMob' 참고.
@@ -232,11 +241,11 @@ src/
 
 | 자리 | 담는 것 |
 |---|---|
-| 오늘의 추천 | 하루 한 게임 + 바로 플레이 CTA + 랜덤. 금빛 바탕은 이 칸에만 쓴다 |
+| 오늘의 추천 | 하루 한 게임 + 바로 플레이 CTA. 금빛 바탕은 이 칸에만 쓴다 |
 | 인기 | 신규·추천을 뺀 나머지 중 인기 상위 3개 카드 |
 | 최근 플레이 | 최근 연 게임 최대 8개, 가로 한 줄. 없으면 '새로운 게임을 발견해보세요' 한 줄 |
-| 탐색 메뉴 | 신규 게임·즐겨찾기(눌러 여닫는 목록) + 게임 전체보기(`/games`) 링크 |
-| 게임 둘러보기 | 추천·인기에 선 게임을 뺀 다음 순서 6개 + 게임 전체보기 링크 |
+| 탐색 메뉴 | 신규 게임·즐겨찾기(눌러 여닫는 목록) |
+| 게임 둘러보기 | 추천·인기에 선 게임을 뺀 다음 순서 6개 + 랜덤 + 게임 전체보기 링크 |
 
 **오늘의 추천이 화면의 주인공이되, 화면을 다 쓰지는 않는다.** 아이콘 옆에 이름·추천
 이유를 눕혀 높이를 낮추고, 강조는 금빛 판과 바로 플레이 버튼에 몰아준다. 인기 칸은
@@ -256,8 +265,7 @@ src/
 신규 게임·즐겨찾기 목록은 기본으로 닫혀 있다 — 홈은 선별된 것만 보여주고, 찾는
 사람에게만 편다. 열어둔 목록은 컴포넌트 밖(모듈 스코프)에 남겨 게임을 다녀와도
 그대로고, 앱을 껐다 켜면 닫힌 채로 돌아온다. 게임 전체보기(`/games`)는 등록된 게임
-전부를 홈과 같은 인기순 그리드로 세우는 화면이고, 입구는 탐색 메뉴와 둘러보기 아래
-두 곳이다.
+전부를 홈과 같은 인기순 그리드로 세우는 화면이고, 입구는 둘러보기 아래 한 곳이다.
 
 **순위 숫자는 카드에 붙이지 않는다.** 스물몇 장에 번호가 흩어지면 정작 상위 셋이
 눈에 안 들어온다. 1~3위는 카드 자체가 금·은·동 테를 띠고, 1위만 테를 굵혀 한 칸
@@ -284,8 +292,8 @@ RLS가 필요하다.
 ### 테마
 
 라이트·다크·시스템 셋 중에 고른다(`shared/theme.ts`, 설정 화면). 색은 `styles/main.css`에
-사용자 지정 속성 17개로 모여 있고 `[data-theme='dark']`에서 다시 정의한다. 허브 화면
-열일곱 곳이 하드코딩된 색 대신 이 토큰을 본다.
+사용자 지정 속성 17개로 모여 있고 `[data-theme='dark']`에서 다시 정의한다. 허브 화면은
+전부 하드코딩된 색 대신 이 토큰을 본다.
 
 첫 적용은 `index.html`의 인라인 스크립트가 한다 — 번들은 defer라 그때까지 못 오고,
 다크로 들어갈 때 밝은 화면이 한 번 스치면 그게 제일 먼저 보이는 인상이 된다.
@@ -294,7 +302,7 @@ RLS가 필요하다.
 **캔버스는 CSS 변수를 못 읽는다.** 게임은 `isDarkTheme()`를 매 프레임 보고 판 색을
 고른다(`games/scene.ts`의 `ground(라이트, 다크)`). 바꾸는 것은 판 바탕·여백·그릇·
 캔버스 위 글자뿐이고, **말(과일·블록·보석)은 두 테마 공통**이다 — 어둡게 바꾸면
-다른 게임이 된다. 원래부터 어두운 판을 쓰는 게임 열다섯 개는 부르지 않는다.
+다른 게임이 된다. 원래부터 어두운 판을 쓰는 게임들은 아예 부르지 않는다.
 
 퍼즐 격자(네모로직·파이프·스도쿠·워들)는 흰 판 그대로 뒀다. 숫자·메모·강조색이
 흰 판을 전제로 짜여 있어 판만 뒤집으면 읽히지 않는다.

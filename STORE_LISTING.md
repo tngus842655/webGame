@@ -13,23 +13,23 @@ Play Console → 스토어 등록정보 설정에 그대로 붙여넣을 수 있
 ## 간단한 설명 (80자 제한)
 
 ```
-Thirty small games in one app. Pick one, play a round, put it down.
+Thirty-plus small games in one app. Pick one, play a round, put it down.
 ```
 
-67자. 대안:
+77자. 대안:
 
 ```
-Thirty quick games in one app. Puzzles, arcade runs, and board classics.
+Thirty-plus quick games in one app. Puzzles, arcade runs, and board classics.
 ```
 
-72자.
+77자.
 
 ---
 
 ## 자세한 설명 (4000자 제한)
 
 ```
-Thirty games. One app. Nothing to install between them.
+Thirty-plus games. One app. Nothing to install between them.
 
 MiniGame30 is a collection of small games you can finish in a couple of
 minutes — puzzles, arcade runs, board classics, and a few odd ones. Open
@@ -41,12 +41,13 @@ WHAT'S INSIDE
 
 Puzzle
 • Nonogram — fill the grid from the number clues
-• Sudoku Daily — one puzzle a day for everyone, with notes and a streak
+• Sudoku Daily — one puzzle a day for everyone, with pencil marks
 • Pipe Connect — rotate the pipes until it all lines up
 • Jewel Match — match three, chain the cascades
 • TriPeaks Solitaire — clear the peaks one card at a time
 • Hangul Wordle — guess the word, letter by letter
 • Spot the Match — find the pair before the timer runs out
+• One-Line Goal — draw one line and bounce the ball into the goal
 
 Arcade
 • Endless Runner — jump, slide, keep going
