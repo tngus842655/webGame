@@ -1,4 +1,3 @@
-import { ref } from 'vue'
 import { ensureUserId } from './auth'
 import { t } from './i18n'
 import { getSupabase } from './supabase'
@@ -95,10 +94,6 @@ export function startPlayTracking(slug: string): () => void {
   }
 }
 
-// 통계 화면과 이용자별 상세가 같은 기간을 본다 — 상세로 들어갔다 나와도 고른 탭이 그대로다
-export const STATS_PERIODS = [1, 7, 30] as const
-export const statsDays = ref<number>(7)
-
 // 초 → "1시간 23분" / "12분 30초" / "45초"
 export function formatDuration(sec: number): string {
   if (sec <= 0) return '—'
@@ -119,17 +114,24 @@ export interface GameStat {
   best_score: number
 }
 
+// 기간은 절대 시각 구간이다 — from은 포함, to는 포함하지 않는다.
+// 둘 다 null이면 전체 누적 (adminPeriod.ts의 statsRange가 만든다).
+export interface StatsRange {
+  from: string | null
+  to: string | null
+}
+
 // 구간 전체의 이용자 수 — 게임별 인원은 서로 겹쳐서 더하거나 최댓값을 쓸 수 없다
-export async function fetchTotalPlayers(days: number): Promise<number> {
+export async function fetchTotalPlayers({ from, to }: StatsRange): Promise<number> {
   const sb = await getSupabase()
-  const { data, error } = await sb.rpc('get_total_players', { p_days: days })
+  const { data, error } = await sb.rpc('get_total_players', { p_from: from, p_to: to })
   if (error) throw error
   return Number(data ?? 0)
 }
 
-export async function fetchGameStats(days: number): Promise<GameStat[]> {
+export async function fetchGameStats({ from, to }: StatsRange): Promise<GameStat[]> {
   const sb = await getSupabase()
-  const { data, error } = await sb.rpc('get_game_stats', { p_days: days })
+  const { data, error } = await sb.rpc('get_game_stats', { p_from: from, p_to: to })
   if (error) throw error
   return (data ?? []).map((row: GameStat) => ({
     ...row,
@@ -168,9 +170,9 @@ interface PlayerStatRow {
 }
 
 // 관리자만 통과한다 (get_player_stats()의 첫 줄이 막는다)
-export async function fetchPlayerStats(days: number): Promise<PlayerStat[]> {
+export async function fetchPlayerStats({ from, to }: StatsRange): Promise<PlayerStat[]> {
   const sb = await getSupabase()
-  const { data, error } = await sb.rpc('get_player_stats', { p_days: days })
+  const { data, error } = await sb.rpc('get_player_stats', { p_from: from, p_to: to })
   if (error) throw error
   // (이용자, 게임) 한 쌍이 한 줄로 온다 — 사람 단위로 묶는다.
   // 순서는 서버가 정한 대로 두고 여기서 다시 정렬하지 않는다.

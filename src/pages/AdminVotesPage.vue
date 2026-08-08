@@ -1,32 +1,26 @@
 <script setup lang="ts">
 // 운영자 전용 — 게임 화면에서 받은 좋아요·싫어요를 기간별로 본다.
-// 기간의 축은 vote_day(누른 기기의 시간대 기준 날짜)다. '오늘'과 '이번주'는
-// 화면을 보는 이 기기의 달력으로 자르므로, 표를 묶는 축과 같은 축을 쓴다.
+// 기간의 축은 vote_day(누른 기기의 시간대 기준 날짜)다. 달력을 자르는 규칙은
+// 통계 화면과 함께 쓴다(adminPeriod.ts) — 같은 날 두 화면의 '이번주'가 어긋나면
+// 숫자를 견줄 수가 없다.
 import { computed, onMounted, ref, watch } from 'vue'
+import {
+  formatPeriodCaption,
+  HALVES,
+  type Half,
+  type Period,
+  PERIODS,
+  periodRange,
+} from '@/shared/adminPeriod'
 import { GAMES } from '@/games/registry'
 import GameIcon from '@/shared/GameIcon.vue'
 import { fetchVoteStats, type VoteStat } from '@/shared/gameVotes'
-import { t, type TranslationKey } from '@/shared/i18n'
+import { t } from '@/shared/i18n'
 import UiIcon from '@/shared/UiIcon.vue'
 
-type Period = 'daily' | 'weekly' | 'monthly' | 'all'
-
-const PERIODS: Array<{ key: Period; labelKey: TranslationKey }> = [
-  { key: 'daily', labelKey: 'admin.votesDaily' },
-  { key: 'weekly', labelKey: 'admin.votesWeekly' },
-  { key: 'monthly', labelKey: 'admin.votesMonthly' },
-  { key: 'all', labelKey: 'admin.votesAll' },
-]
-
-// 기간마다 지난 것/진행 중인 것 한 쌍 — 누적만 쪼갤 것이 없다
-const HALVES: Record<Exclude<Period, 'all'>, [TranslationKey, TranslationKey]> = {
-  daily: ['admin.votesYesterday', 'admin.votesToday'],
-  weekly: ['admin.votesLastWeek', 'admin.votesThisWeek'],
-  monthly: ['admin.votesLastMonth', 'admin.votesThisMonth'],
-}
-
+// 통계 화면과 달리 이 화면만의 선택이다 — 셋이 묶여 다니는 통계와 달리 혼자 서 있다
 const period = ref<Period>('daily')
-const half = ref<'prev' | 'curr'>('curr')
+const half = ref<Half>('curr')
 
 // 기간을 옮기면 진행 중인 쪽부터 보여준다 (오늘·이번주·이번달)
 watch(period, () => {
@@ -37,46 +31,14 @@ function fmt(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-function addDays(d: Date, n: number): Date {
-  const next = new Date(d)
-  next.setDate(next.getDate() + n)
-  return next
-}
-
 // vote_day 기준 양끝 포함 구간. 누적은 양끝을 비운다
 const range = computed<{ start: string | null; end: string | null }>(() => {
-  if (period.value === 'all') return { start: null, end: null }
-  const now = new Date()
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-  if (period.value === 'daily') {
-    const day = half.value === 'curr' ? today : addDays(today, -1)
-    return { start: fmt(day), end: fmt(day) }
-  }
-  if (period.value === 'weekly') {
-    // 월요일 시작 (getDay는 일요일이 0)
-    const monday = addDays(today, -((today.getDay() + 6) % 7))
-    return half.value === 'curr'
-      ? { start: fmt(monday), end: fmt(today) }
-      : { start: fmt(addDays(monday, -7)), end: fmt(addDays(monday, -1)) }
-  }
-  return half.value === 'curr'
-    ? { start: fmt(new Date(today.getFullYear(), today.getMonth(), 1)), end: fmt(today) }
-    : {
-        start: fmt(new Date(today.getFullYear(), today.getMonth() - 1, 1)),
-        end: fmt(new Date(today.getFullYear(), today.getMonth(), 0)),
-      }
+  const days = periodRange(period.value, half.value)
+  if (!days) return { start: null, end: null }
+  return { start: fmt(days.first), end: fmt(days.last) }
 })
 
-// 탭 이름만으로는 구간이 정확히 어디서 끊기는지 안 보인다 — 날짜로 적어 준다
-const caption = computed(() => {
-  const { start, end } = range.value
-  if (!start || !end) return ''
-  const md = (s: string) => {
-    const [, m, d] = s.split('-')
-    return `${Number(m)}/${Number(d)}`
-  }
-  return start === end ? md(start) : `${md(start)} ~ ${md(end)}`
-})
+const caption = computed(() => formatPeriodCaption(periodRange(period.value, half.value)))
 
 const stats = ref<VoteStat[]>([])
 const loading = ref(true)
