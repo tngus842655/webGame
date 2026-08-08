@@ -31,9 +31,10 @@ import {
 const START_BTN = { x: 160, y: 1096, w: 400, h: 96 } as const
 const CLEAR_BTN = { x: 580, y: 1096, w: 96, h: 96 } as const
 const AD_BTN = { x: 140, y: 1006, w: 440, h: 74 } as const
-// 단계 스테퍼는 점수판 안에 든다 — 큰 숫자가 곧 지금 단계다
-const PREV_BTN = { x: 156, y: 62, w: 76, h: 72 } as const
-const NEXT_BTN = { x: 488, y: 62, w: 76, h: 72 } as const
+// 단계 스테퍼는 점수판(x 140~580) 안에 든다 — 큰 글자가 곧 지금 단계다.
+// 화살표를 판 가장자리로 붙여 가운데 280px을 글자에 내준다 ('Stage 100'까지 들어간다)
+const PREV_BTN = { x: 148, y: 62, w: 72, h: 72 } as const
+const NEXT_BTN = { x: 500, y: 62, w: 72, h: 72 } as const
 // 스스로 깬 최고 단계 = 이 게임의 기록. 계정 없이도 이어가도록 localStorage에 둔다.
 // 'webgame:progress:' 접두사를 쓰는 이유는 계정을 갈아탈 때 auth.ts가 이 값을 지우기 때문이다 —
 // 진도가 곧 랭킹 값이라 남의 계정에서 깬 단계를 물려받으면 안 된다
@@ -103,6 +104,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   let cleared = loadCleared()
   const state = createState(cleared + 1)
   preloadSfx('clear', 'fail', 'impact', 'pop', 'select', 'shoot', 'tap', 'unlock', 'whoosh')
+  // 화살표로 단계를 옮긴 적이 있으면, 뒤늦게 도착한 기록으로 판을 갈아치우지 않는다
+  let navigated = false
 
   const sparks: Spark[] = []
   let goalRing: { x: number; y: number; age: number } | null = null
@@ -119,6 +122,33 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     preview = null
     adHintUsed = false
   }
+
+  // 기기에 남은 진도와 서버에서 내려온 기록 중 큰 쪽을 따른다.
+  // 계정을 갈아타면 진도가 지워지는데(auth.ts), 원래 계정으로 돌아오면 그 계정의
+  // 기록이 다시 내려오므로 그걸로 이어 준다. 다른 기기에서 놀던 진도도 이 길로 따라온다.
+  const adoptRecord = (best: number | null) => {
+    if (shell.isDestroyed() || best === null || best <= cleared) return
+    cleared = best
+    localStorage.setItem(STAGE_KEY, String(cleared))
+    // 아직 아무것도 안 한 첫 화면에서만 옮긴다 — 놀고 있는데 판이 갈리면 안 된다
+    if (navigated || state.phase !== 'placing' || state.lines.length > 0 || state.fails > 0) return
+    state.level = cleared + 1
+    loadLevel(state)
+    dropPreview()
+  }
+
+  // 기록은 플레이 화면이 서버에서 받아 채우므로(fetchMyStats → syncLocalBests) 게임보다
+  // 늦게 도착할 수 있다. 처음 3초만 지켜보다 그만둔다
+  void ctx.getBestScore().then(adoptRecord)
+  let syncLeft = 6
+  const syncId = window.setInterval(() => {
+    if (syncLeft-- <= 0) {
+      clearInterval(syncId)
+      return
+    }
+    void ctx.getBestScore().then(adoptRecord)
+  }, 500)
+  shell.addCleanup(() => clearInterval(syncId))
 
   // 조준선을 켜 둔 동안에는 선을 고칠 때마다 다시 굴린다 (1200걸음, 선을 놓을 때만 도는 계산이다)
   const refreshPreview = () => {
@@ -203,6 +233,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   const goStage = (delta: number) => {
     if (!selectStage(state, state.level + delta)) return
+    navigated = true
     dropPreview()
     playSfx('tap')
   }
@@ -556,9 +587,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   }
 
   const drawHud = (c: CanvasRenderingContext2D) => {
-    // 이 게임의 기록은 점수가 아니라 단계다 — 큰 숫자가 지금 단계이고,
-    // 머리줄의 '최고 N'이 지금까지 깬 단계다 (신기록 불빛도 그대로 붙는다)
-    drawScorePanel(c, { label: t('rf.stage'), value: String(state.level) })
+    // 이 게임의 기록은 점수가 아니라 단계다 — 큰 글자가 지금 단계이고,
+    // 머리줄의 '최고 N'이 지금까지 깬 단계다 (신기록 불빛도 그대로 붙는다).
+    // 큰 글자에 단위가 붙으므로 머리줄에는 라벨을 두지 않는다 — 같은 말이 두 번 선다
+    drawScorePanel(c, { value: t('rf.stage', { n: state.level }) })
     drawChevron(c, PREV_BTN, -1, canPrev())
     drawChevron(c, NEXT_BTN, 1, canNext())
 
@@ -719,6 +751,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     // 관리자 전용 '진도 초기화' — 테스트로 올려둔 단계를 1단계로 되돌린다.
     // 이 기기의 최고 기록도 함께 지운다 (점수 시절에 쌓인 값이 단계 옆에 남아 있으면 헷갈린다)
     adminReset() {
+      // 지켜보던 동기화가 방금 지운 기록을 도로 끌어오지 않도록 먼저 멈춘다
+      clearInterval(syncId)
       cleared = 0
       localStorage.removeItem(STAGE_KEY)
       clearLocalBest('reflect')

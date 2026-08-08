@@ -309,7 +309,7 @@ const dict: CoreDict = {
   'bm.height': '{n} nœuds',
   'bm.ad': '▶ Pub pour refaire le plein de temps',
   'game.reflect': "But d'un Trait",
-  'rf.stage': 'Niveau',
+  'rf.stage': 'Niv. {n}',
   'rf.start': 'Lancer',
   'rf.abort': '↺ Retracer',
   'rf.clear': 'But !',

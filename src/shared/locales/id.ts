@@ -309,7 +309,7 @@ const dict: CoreDict = {
   'bm.height': '{n} ruas',
   'bm.ad': '▶ Tonton iklan, isi waktu, lanjut',
   'game.reflect': 'Gol Satu Garis',
-  'rf.stage': 'Level',
+  'rf.stage': 'Level {n}',
   'rf.start': 'Luncurkan',
   'rf.abort': '↺ Gambar ulang',
   'rf.clear': 'Gol!',

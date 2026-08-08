@@ -309,7 +309,7 @@ const dict: CoreDict = {
   'bm.height': '{n} boğum',
   'bm.ad': '▶ Reklam izle, süreyi doldur, devam et',
   'game.reflect': 'Tek Çizgiyle Gol',
-  'rf.stage': 'Bölüm',
+  'rf.stage': 'Bölüm {n}',
   'rf.start': 'Fırlat',
   'rf.abort': '↺ Yeniden çiz',
   'rf.clear': 'Gol!',

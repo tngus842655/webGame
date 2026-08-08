@@ -439,7 +439,7 @@ const en = {
   'bm.height': '{n} joints up',
   'bm.ad': '▶ Watch ad to refill time and continue',
   'game.reflect': 'One-Line Goal',
-  'rf.stage': 'Stage',
+  'rf.stage': 'Stage {n}',
   'rf.start': 'Launch',
   'rf.abort': '↺ Redo lines',
   'rf.clear': 'Goal!',

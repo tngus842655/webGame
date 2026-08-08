@@ -309,7 +309,7 @@ const dict: CoreDict = {
   'bm.height': '{n} Knoten',
   'bm.ad': '▶ Werbung ansehen: Zeit auffüllen',
   'game.reflect': 'Ein-Strich-Tor',
-  'rf.stage': 'Level',
+  'rf.stage': 'Level {n}',
   'rf.start': 'Start',
   'rf.abort': '↺ Neu zeichnen',
   'rf.clear': 'Tor!',

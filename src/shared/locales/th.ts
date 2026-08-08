@@ -309,7 +309,7 @@ const dict: CoreDict = {
   'bm.height': '{n} ปล้อง',
   'bm.ad': '▶ ดูโฆษณาเพื่อเติมเวลาและไปต่อ',
   'game.reflect': 'ลากเส้นเข้าเป้า',
-  'rf.stage': 'ด่าน',
+  'rf.stage': 'ด่าน {n}',
   'rf.start': 'ปล่อยลูก',
   'rf.abort': '↺ วางเส้นใหม่',
   'rf.clear': 'เข้าเป้า!',

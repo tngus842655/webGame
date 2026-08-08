@@ -309,7 +309,7 @@ const dict: CoreDict = {
   'bm.height': 'Колен: {n}',
   'bm.ad': '▶ Реклама: пополнить время и продолжить',
   'game.reflect': 'Гол одной линией',
-  'rf.stage': 'Уровень',
+  'rf.stage': 'Ур. {n}',
   'rf.start': 'Пуск',
   'rf.abort': '↺ Перерисовать',
   'rf.clear': 'Гол!',

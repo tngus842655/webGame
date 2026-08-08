@@ -309,7 +309,7 @@ const dict: CoreDict = {
   'bm.height': '第{n}节',
   'bm.ad': '▶ 看广告补满时间继续',
   'game.reflect': '一笔进球',
-  'rf.stage': '关卡',
+  'rf.stage': '第{n}关',
   'rf.start': '发射',
   'rf.abort': '↺ 重新画线',
   'rf.clear': '进球！',

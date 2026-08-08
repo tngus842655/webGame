@@ -309,7 +309,7 @@ const dict: CoreDict = {
   'bm.height': '{n}節',
   'bm.ad': '▶ 広告を見て時間を満たして続ける',
   'game.reflect': '一筆ゴール',
-  'rf.stage': 'ステージ',
+  'rf.stage': '{n}面',
   'rf.start': '発射',
   'rf.abort': '↺ 引き直す',
   'rf.clear': 'ゴール！',

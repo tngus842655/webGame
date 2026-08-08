@@ -309,7 +309,7 @@ const dict: CoreDict = {
   'bm.height': '{n} đốt',
   'bm.ad': '▶ Xem quảng cáo để đầy thời gian và tiếp tục',
   'game.reflect': 'Một Nét Ghi Bàn',
-  'rf.stage': 'Màn',
+  'rf.stage': 'Màn {n}',
   'rf.start': 'Phóng',
   'rf.abort': '↺ Vẽ lại',
   'rf.clear': 'Vào đích!',

@@ -387,7 +387,7 @@ const dict: FullDict = {
   'bm.height': '{n}마디',
   'bm.ad': '▶ 광고 보고 시간 채워 이어하기',
   'game.reflect': '한 줄로 골인',
-  'rf.stage': '단계',
+  'rf.stage': '{n}단계',
   'rf.start': '발사',
   'rf.abort': '↺ 다시 놓기',
   'rf.clear': '골인!',
