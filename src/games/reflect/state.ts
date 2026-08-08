@@ -12,7 +12,7 @@ export const BOARD = { x: 24, y: 230, w: 672, h: 760 } as const
 // 밸런스 상수 — 조절은 전부 여기서
 export const BALL_R = 14
 export const BALL_SPEED = 520
-export const AD_AFTER_FAILS = 2 // 이만큼 실패하면 '선 하나 더' 광고 버튼을 띄운다
+export const AD_AFTER_FAILS = 2 // 이만큼 실패하면 '경로 미리보기' 광고 버튼을 띄운다
 export const RUN_LIMIT = 10 // 시도당 제한 시간(초) — 골에 못 가고 계속 돌면 실패
 export const MIN_LINE_LEN = 44
 export const MAX_LINE_LEN = 250
@@ -436,9 +436,26 @@ export function selectStage(state: ReflectState, level: number): boolean {
   return true
 }
 
-// 광고 보상: 이 단계에서만 선을 하나 더 그을 수 있다 (단계를 옮기면 loadLevel이 원래대로 돌린다)
-export function addLine(state: ReflectState) {
-  state.maxLines += 1
+// 광고 보상: 지금 배치대로 쏘면 공이 어디로 가는지 미리 굴려 본다.
+// 화면과 무관하게 같은 규칙(advance)으로 계산하므로 실제 발사와 한 치도 어긋나지 않는다.
+export function previewPath(state: ReflectState): { points: Array<{ x: number; y: number }>; hits: boolean } {
+  const segs = [...BORDERS, ...state.walls, ...state.lines]
+  const ball: Ball = {
+    x: state.spawn.x,
+    y: state.spawn.y,
+    vx: state.spawn.dx * BALL_SPEED,
+    vy: state.spawn.dy * BALL_SPEED,
+  }
+  const dt = 1 / 120
+  const points = [{ x: ball.x, y: ball.y }]
+  const steps = Math.floor(RUN_LIMIT / dt)
+  for (let i = 0; i < steps; i++) {
+    const ev = advance(ball, segs, dt, state.goal)
+    // 네 걸음에 한 점이면 곡선 없는 직선 경로를 그리기에 충분하다
+    if (ev.goalHit || i % 4 === 3) points.push({ x: ball.x, y: ball.y })
+    if (ev.goalHit) return { points, hits: true }
+  }
+  return { points, hits: false }
 }
 
 // 끝점 사이 길이를 상한까지만 허용 — 미리보기와 확정이 같은 규칙을 쓴다

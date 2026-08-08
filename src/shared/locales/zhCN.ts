@@ -310,7 +310,7 @@ const dict: CoreDict = {
   'rf.start': '发射',
   'rf.abort': '↺ 重新画线',
   'rf.clear': '进球！',
-  'rf.adLine': '▶ 看广告多画一条线',
+  'rf.adHint': '▶ 看广告预览路线',
 }
 
 export default dict

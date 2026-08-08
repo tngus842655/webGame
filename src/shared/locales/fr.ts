@@ -310,7 +310,7 @@ const dict: CoreDict = {
   'rf.start': 'Lancer',
   'rf.abort': '↺ Retracer',
   'rf.clear': 'But !',
-  'rf.adLine': '▶ Pub pour un trait de plus',
+  'rf.adHint': '▶ Pub : voir la trajectoire',
 }
 
 export default dict

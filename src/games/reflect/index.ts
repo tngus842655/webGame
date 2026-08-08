@@ -12,12 +12,12 @@ import {
   MIN_LINE_LEN,
   RUN_LIMIT,
   abortRun,
-  addLine,
   capLine,
   commitLine,
   createState,
   loadLevel,
   launch,
+  previewPath,
   removeLineAt,
   segDist,
   selectStage,
@@ -75,7 +75,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       clearGlow = 1
       burst(prevGoal.x, prevGoal.y, 26, 320, INK.goal)
       goalRing = { x: prevGoal.x, y: prevGoal.y, age: 0 }
-      adLineUsed = false
+      dropPreview()
       // update()가 이미 다음 단계로 넘겼으므로, 방금 깬 단계는 level - 1이다
       if (state.level - 1 > cleared) {
         cleared = state.level - 1
@@ -104,22 +104,35 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   let clearGlow = 0
   let blockedFlash = 0 // 공 자리를 덮는 선을 거절했다는 표시
   let drag: { x1: number; y1: number; x2: number; y2: number; moved: boolean } | null = null
-  let adLineUsed = false // 한 단계에 한 번만 — 광고를 반복해서 선을 늘리지는 못한다
+  // 광고로 받은 조준선. 선을 고칠 때마다 다시 계산하고, 한 번 쏘면 걷힌다 —
+  // 발사할 때까지 살아 있어야 '이 각도가 맞나'를 손으로 맞춰 볼 수 있다
+  let preview: { points: Array<{ x: number; y: number }>; hits: boolean } | null = null
+  let adHintUsed = false // 한 단계에 한 번만
 
-  // 이 단계에서 광고 버튼이 보이는 조건. 몇 번 헤맨 뒤에만 나온다 —
+  const dropPreview = () => {
+    preview = null
+    adHintUsed = false
+  }
+
+  // 조준선을 켜 둔 동안에는 선을 고칠 때마다 다시 굴린다 (1200걸음, 선을 놓을 때만 도는 계산이다)
+  const refreshPreview = () => {
+    if (preview) preview = previewPath(state)
+  }
+
+  // 광고 버튼이 보이는 조건. 몇 번 헤맨 뒤에만 나온다 —
   // 처음부터 띄우면 스스로 풀어 볼 기회를 앞질러 뺏는다
   const adReady = () =>
     state.phase === 'placing' &&
-    !adLineUsed &&
+    !adHintUsed &&
     state.fails >= AD_AFTER_FAILS &&
     ctx.isRewardAdReady()
 
-  async function watchForLine() {
+  async function watchForHint() {
     if (!adReady()) return
-    const rewarded = await ctx.showRewardAd('reflect-line')
-    if (shell.isDestroyed() || !rewarded || adLineUsed) return
-    adLineUsed = true
-    addLine(state)
+    const rewarded = await ctx.showRewardAd('reflect-hint')
+    if (shell.isDestroyed() || !rewarded || adHintUsed || state.phase !== 'placing') return
+    adHintUsed = true
+    preview = previewPath(state)
     playSfx('unlock')
   }
 
@@ -173,13 +186,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   const goStage = (delta: number) => {
     if (!selectStage(state, state.level + delta)) return
-    adLineUsed = false
+    dropPreview()
     playSfx('tap')
   }
 
   const tapStart = () => {
     if (state.phase === 'placing') {
       if (launch(state)) {
+        // 쏘고 나면 조준선은 걷는다 — 실제 공이 그 자리를 지나간다
+        preview = null
         playSfx('shoot')
         vibrate(10)
       }
@@ -196,7 +211,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         return
       }
       if (adReady() && hitBtn(AD_BTN, p.x, p.y)) {
-        void watchForLine()
+        void watchForHint()
         return
       }
       // 단계 이동 화살표 — 깬 단계와 그다음 한 칸(지금 푸는 단계)까지만 오간다
@@ -226,12 +241,16 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       const len = Math.hypot(drag.x2 - drag.x1, drag.y2 - drag.y1)
       if (!drag.moved || len < MIN_LINE_LEN) {
         // 탭 = 그어 둔 선 지우기
-        if (state.phase === 'placing' && removeLineAt(state, drag.x1, drag.y1)) playSfx('pop')
+        if (state.phase === 'placing' && removeLineAt(state, drag.x1, drag.y1)) {
+          playSfx('pop')
+          refreshPreview()
+        }
       } else if (state.phase === 'placing') {
         const result = commitLine(state, capLine(drag.x1, drag.y1, drag.x2, drag.y2))
         if (result === 'ok') {
           playSfx('select')
           vibrate(8)
+          refreshPreview()
         } else if (result === 'blocked') {
           vibrate(30)
           blockedFlash = 1
@@ -356,7 +375,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.restore()
   }
 
-  const drawPreview = (c: CanvasRenderingContext2D) => {
+  const drawDragLine = (c: CanvasRenderingContext2D) => {
     if (!drag || !drag.moved) return
     const seg = capLine(drag.x1, drag.y1, drag.x2, drag.y2)
     const len = Math.hypot(seg.x2 - seg.x1, seg.y2 - seg.y1)
@@ -375,6 +394,33 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       return
     }
     strokeLine(c, seg, 0.65)
+  }
+
+  // 광고로 산 조준선 — 지금 배치대로 쏘면 지나갈 길. 골에 닿는 배치면 초록으로 바뀌어
+  // '이대로 쏘면 들어간다'를 색 하나로 알려 준다 (글자를 더 얹지 않는다)
+  const drawAimPath = (c: CanvasRenderingContext2D) => {
+    if (!preview || preview.points.length < 2 || state.phase !== 'placing') return
+    const tint = preview.hits ? INK.goal : '#4DD0E1'
+    c.save()
+    c.strokeStyle = tint
+    c.globalAlpha = 0.6
+    c.lineWidth = 3
+    c.lineJoin = 'round'
+    c.setLineDash([12, 10])
+    // 흐르는 점선 — 어느 쪽으로 가는 길인지 방향이 보인다
+    c.lineDashOffset = -state.playTime * 60
+    c.beginPath()
+    c.moveTo(preview.points[0].x, preview.points[0].y)
+    for (const p of preview.points) c.lineTo(p.x, p.y)
+    c.stroke()
+    c.setLineDash([])
+    const last = preview.points[preview.points.length - 1]
+    c.globalAlpha = 0.9
+    c.fillStyle = tint
+    c.beginPath()
+    c.arc(last.x, last.y, 6, 0, Math.PI * 2)
+    c.fill()
+    c.restore()
   }
 
   const drawTrail = (c: CanvasRenderingContext2D) => {
@@ -519,7 +565,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.font = font(25, true)
     c.textAlign = 'center'
     c.textBaseline = 'middle'
-    c.fillText(t('rf.adLine'), AD_BTN.x + AD_BTN.w / 2, AD_BTN.y + AD_BTN.h / 2 + 1)
+    c.fillText(t('rf.adHint'), AD_BTN.x + AD_BTN.w / 2, AD_BTN.y + AD_BTN.h / 2 + 1)
     c.textBaseline = 'alphabetic'
   }
 
@@ -542,7 +588,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   }
 
   // 글자 없는 조작 안내 — 첫 단계에서 아직 선을 안 그었으면 손끝이 선을 긋는 시늉을 한다
-  const drawHint = (c: CanvasRenderingContext2D) => {
+  const drawTutorial = (c: CanvasRenderingContext2D) => {
     if (state.level !== 1 || state.lines.length > 0 || state.phase !== 'placing' || drag) return
     const k = (state.playTime % 1.8) / 1.8
     const run = Math.min(1, k / 0.66)
@@ -572,8 +618,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     drawGhostPath(c)
     drawWalls(c)
     drawGoal(c)
+    drawAimPath(c)
     for (const s of state.lines) strokeLine(c, s, 1)
-    drawPreview(c)
+    drawDragLine(c)
     drawTrail(c)
     drawBall(c)
     drawSparks(c)
@@ -587,7 +634,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     drawHud(c)
     drawAdButton(c)
     drawStartButton(c)
-    drawHint(c)
+    drawTutorial(c)
 
     if (state.clearFlash > 0) {
       c.save()
@@ -612,7 +659,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     adminSkip() {
       state.level += 1
       loadLevel(state)
-      adLineUsed = false
+      dropPreview()
     },
   }
 }

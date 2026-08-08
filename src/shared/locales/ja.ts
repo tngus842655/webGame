@@ -310,7 +310,7 @@ const dict: CoreDict = {
   'rf.start': '発射',
   'rf.abort': '↺ 引き直す',
   'rf.clear': 'ゴール！',
-  'rf.adLine': '▶ 広告を見て線をもう1本',
+  'rf.adHint': '▶ 広告を見て軌道プレビュー',
 }
 
 export default dict

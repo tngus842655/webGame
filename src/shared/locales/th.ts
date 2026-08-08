@@ -310,7 +310,7 @@ const dict: CoreDict = {
   'rf.start': 'ปล่อยลูก',
   'rf.abort': '↺ วางเส้นใหม่',
   'rf.clear': 'เข้าเป้า!',
-  'rf.adLine': '▶ ดูโฆษณาเพื่อเพิ่มอีกหนึ่งเส้น',
+  'rf.adHint': '▶ ดูโฆษณาเพื่อดูเส้นทาง',
 }
 
 export default dict

@@ -438,7 +438,7 @@ const en = {
   'rf.start': 'Launch',
   'rf.abort': '↺ Redo lines',
   'rf.clear': 'Goal!',
-  'rf.adLine': '▶ Watch ad for one more line',
+  'rf.adHint': '▶ Watch ad to see the path',
 }
 
 export type TranslationKey = keyof typeof en

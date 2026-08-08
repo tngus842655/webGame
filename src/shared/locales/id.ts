@@ -310,7 +310,7 @@ const dict: CoreDict = {
   'rf.start': 'Luncurkan',
   'rf.abort': '↺ Gambar ulang',
   'rf.clear': 'Gol!',
-  'rf.adLine': '▶ Tonton iklan: satu garis lagi',
+  'rf.adHint': '▶ Iklan: lihat jalur bola',
 }
 
 export default dict

@@ -386,7 +386,7 @@ const dict: FullDict = {
   'rf.start': '발사',
   'rf.abort': '↺ 다시 놓기',
   'rf.clear': '골인!',
-  'rf.adLine': '▶ 광고 보고 선 하나 더',
+  'rf.adHint': '▶ 광고 보고 경로 미리보기',
 }
 
 export default dict
