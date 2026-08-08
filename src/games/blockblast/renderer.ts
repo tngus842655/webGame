@@ -342,7 +342,7 @@ export class BBRenderer {
     if (state.streak >= 2) {
       const pop = Math.min(1, state.streakAge / 0.25)
       c.save()
-      c.translate(560, 88)
+      c.translate(LAYOUT.streakBadge.x, LAYOUT.streakBadge.y)
       c.scale(1.25 - pop * 0.25, 1.25 - pop * 0.25)
       c.fillStyle = '#FF7043'
       c.beginPath()
