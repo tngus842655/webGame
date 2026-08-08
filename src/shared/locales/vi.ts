@@ -306,11 +306,11 @@ const dict: CoreDict = {
   'bm.height': '{n} đốt',
   'bm.ad': '▶ Xem quảng cáo để đầy thời gian và tiếp tục',
   'game.reflect': 'Một Nét Ghi Bàn',
-  'rf.level': 'Màn {n}',
+  'rf.stage': 'Màn',
   'rf.start': 'Phóng',
   'rf.abort': '↺ Vẽ lại',
-  'rf.clear': 'Vào đích! +{n}',
-  'rf.again': 'Vào đích!',
+  'rf.clear': 'Vào đích!',
+  'rf.adLine': '▶ Xem quảng cáo để thêm một đường',
 }
 
 export default dict

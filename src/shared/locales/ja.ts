@@ -306,11 +306,11 @@ const dict: CoreDict = {
   'bm.height': '{n}節',
   'bm.ad': '▶ 広告を見て時間を満たして続ける',
   'game.reflect': '一筆ゴール',
-  'rf.level': '{n}面',
+  'rf.stage': 'ステージ',
   'rf.start': '発射',
   'rf.abort': '↺ 引き直す',
-  'rf.clear': 'ゴール！ +{n}',
-  'rf.again': 'ゴール！',
+  'rf.clear': 'ゴール！',
+  'rf.adLine': '▶ 広告を見て線をもう1本',
 }
 
 export default dict

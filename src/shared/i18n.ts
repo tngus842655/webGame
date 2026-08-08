@@ -434,11 +434,11 @@ const en = {
   'bm.height': '{n} joints up',
   'bm.ad': '▶ Watch ad to refill time and continue',
   'game.reflect': 'One-Line Goal',
-  'rf.level': 'Stage {n}',
+  'rf.stage': 'Stage',
   'rf.start': 'Launch',
   'rf.abort': '↺ Redo lines',
-  'rf.clear': 'Goal! +{n}',
-  'rf.again': 'Goal!',
+  'rf.clear': 'Goal!',
+  'rf.adLine': '▶ Watch ad for one more line',
 }
 
 export type TranslationKey = keyof typeof en

@@ -306,11 +306,11 @@ const dict: CoreDict = {
   'bm.height': '{n} ปล้อง',
   'bm.ad': '▶ ดูโฆษณาเพื่อเติมเวลาและไปต่อ',
   'game.reflect': 'ลากเส้นเข้าเป้า',
-  'rf.level': 'ด่าน {n}',
+  'rf.stage': 'ด่าน',
   'rf.start': 'ปล่อยลูก',
   'rf.abort': '↺ วางเส้นใหม่',
-  'rf.clear': 'เข้าเป้า! +{n}',
-  'rf.again': 'เข้าเป้า!',
+  'rf.clear': 'เข้าเป้า!',
+  'rf.adLine': '▶ ดูโฆษณาเพื่อเพิ่มอีกหนึ่งเส้น',
 }
 
 export default dict

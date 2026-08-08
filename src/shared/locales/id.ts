@@ -306,11 +306,11 @@ const dict: CoreDict = {
   'bm.height': '{n} ruas',
   'bm.ad': '▶ Tonton iklan, isi waktu, lanjut',
   'game.reflect': 'Gol Satu Garis',
-  'rf.level': 'Level {n}',
+  'rf.stage': 'Level',
   'rf.start': 'Luncurkan',
   'rf.abort': '↺ Gambar ulang',
-  'rf.clear': 'Gol! +{n}',
-  'rf.again': 'Gol!',
+  'rf.clear': 'Gol!',
+  'rf.adLine': '▶ Tonton iklan: satu garis lagi',
 }
 
 export default dict

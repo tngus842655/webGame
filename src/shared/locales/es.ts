@@ -306,11 +306,11 @@ const dict: CoreDict = {
   'bm.height': '{n} nudos',
   'bm.ad': '▶ Ver anuncio, rellenar tiempo y seguir',
   'game.reflect': 'Gol de un Trazo',
-  'rf.level': 'Nivel {n}',
+  'rf.stage': 'Nivel',
   'rf.start': 'Lanzar',
   'rf.abort': '↺ Redibujar',
-  'rf.clear': '¡Gol! +{n}',
-  'rf.again': '¡Gol!',
+  'rf.clear': '¡Gol!',
+  'rf.adLine': '▶ Ver anuncio: una línea más',
 }
 
 export default dict

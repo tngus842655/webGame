@@ -168,8 +168,8 @@ const ko: Record<string, Guide> = {
   },
   reflect: {
     goal: '공은 발사하면 스스로 굴러갑니다. 선을 그어 공을 튕겨서 초록 고리에 넣으세요.',
-    how: '빈 곳을 끌면 선이 그어지고, 그은 선은 탭해서 지웁니다. 실패해도 몇 번이든 다시 쏠 수 있고, 판 번호 양옆 화살표로 지나온 판을 오갑니다.',
-    score: '판을 깰 때마다 점수를 받고, 실패 없이 깰수록 보너스가 큽니다.',
+    how: '빈 곳을 끌면 선이 그어지고, 그은 선은 탭해서 지웁니다. 실패해도 몇 번이든 다시 쏠 수 있고, 단계 양옆 화살표로 지나온 단계를 오갑니다.',
+    score: '기록은 깬 단계입니다. 멀리 갈수록 순위가 올라갑니다.',
   },
 }
 
@@ -332,7 +332,7 @@ const en: Record<string, Guide> = {
   reflect: {
     goal: 'The ball rolls on its own once launched. Draw lines to bounce it into the green ring.',
     how: 'Drag on empty space to draw a line, tap a line to erase it. Retry as many times as you like, and use the arrows beside the stage number to revisit earlier stages.',
-    score: 'Every stage cleared pays points — the fewer failed launches, the bigger the bonus.',
+    score: 'Your record is the stage you reached. Get further to climb the rankings.',
   },
 }
 
@@ -494,8 +494,8 @@ const ja: Record<string, Guide> = {
   },
   reflect: {
     goal: '発射したボールはひとりでに転がります。線を引いて跳ね返し、緑のリングに入れましょう。',
-    how: '何もない所をドラッグすると線が引け、引いた線はタップで消せます。何度でも撃ち直せて、面番号の横の矢印で通った面を行き来できます。',
-    score: '面をクリアするたびに得点。失敗が少ないほどボーナスが大きくなります。',
+    how: '何もない所をドラッグすると線が引け、引いた線はタップで消せます。何度でも撃ち直せて、ステージ番号の横の矢印で通ったステージを行き来できます。',
+    score: '記録は到達ステージです。先へ進むほど順位が上がります。',
   },
 }
 
@@ -658,7 +658,7 @@ const zhCN: Record<string, Guide> = {
   reflect: {
     goal: '发射后小球会自己滚动。画线让它反弹，滚进绿色圆环。',
     how: '在空白处拖动画线，点击已画的线可以删除。失败了可以无限重试，用关卡号两侧的箭头能回到走过的关卡。',
-    score: '每过一关都得分，失败次数越少奖励越高。',
+    score: '记录就是通关的关卡数，走得越远排名越高。',
   },
 }
 
@@ -821,7 +821,7 @@ const es: Record<string, Guide> = {
   reflect: {
     goal: 'La bola rueda sola al lanzarla. Dibuja líneas para hacerla rebotar hasta el aro verde.',
     how: 'Arrastra en un espacio vacío para dibujar una línea; tócala para borrarla. Reintenta cuantas veces quieras y usa las flechas junto al número de nivel para volver a niveles anteriores.',
-    score: 'Cada nivel superado da puntos: cuantos menos lanzamientos fallidos, mayor el bono.',
+    score: 'Tu récord es el nivel al que llegaste. Cuanto más avances, mejor puesto.',
   },
 }
 
@@ -984,7 +984,7 @@ const ptBR: Record<string, Guide> = {
   reflect: {
     goal: 'A bola rola sozinha ao ser lançada. Desenhe linhas para rebatê-la até o anel verde.',
     how: 'Arraste num espaço vazio para desenhar uma linha; toque nela para apagar. Tente de novo quantas vezes quiser e use as setas ao lado do número da fase para voltar a fases anteriores.',
-    score: 'Cada fase vencida dá pontos — quanto menos lançamentos falhos, maior o bônus.',
+    score: 'Seu recorde é a fase que você alcançou. Quanto mais longe, melhor a posição.',
   },
 }
 
@@ -1147,7 +1147,7 @@ const fr: Record<string, Guide> = {
   reflect: {
     goal: 'La balle roule toute seule une fois lancée. Trace des traits pour la faire rebondir jusqu\'à l\'anneau vert.',
     how: 'Glisse sur une zone vide pour tracer un trait, touche-le pour l\'effacer. Réessaie autant que tu veux, et les flèches près du numéro de niveau ramènent aux niveaux passés.',
-    score: 'Chaque niveau réussi rapporte des points — moins d\'essais ratés, plus gros bonus.',
+    score: 'Ton record, c\'est le niveau atteint. Va plus loin pour monter au classement.',
   },
 }
 
@@ -1310,7 +1310,7 @@ const de: Record<string, Guide> = {
   reflect: {
     goal: 'Die Kugel rollt nach dem Start von selbst. Zeichne Striche, damit sie in den grünen Ring prallt.',
     how: 'Ziehe auf freier Fläche, um einen Strich zu zeichnen; tippe ihn an, um ihn zu löschen. Versuche es beliebig oft und wechsle mit den Pfeilen neben der Levelnummer zu früheren Leveln.',
-    score: 'Jedes geschaffte Level bringt Punkte — je weniger Fehlversuche, desto größer der Bonus.',
+    score: 'Dein Rekord ist das erreichte Level. Je weiter du kommst, desto besser die Platzierung.',
   },
 }
 
@@ -1473,7 +1473,7 @@ const ru: Record<string, Guide> = {
   reflect: {
     goal: 'После запуска шар катится сам. Рисуйте линии, чтобы отбить его в зелёное кольцо.',
     how: 'Проведите по пустому месту, чтобы нарисовать линию; нажмите на неё, чтобы стереть. Пробуйте сколько угодно раз, а стрелки рядом с номером уровня возвращают к пройденным уровням.',
-    score: 'Каждый пройденный уровень даёт очки — чем меньше неудачных запусков, тем больше бонус.',
+    score: 'Ваш результат — достигнутый уровень. Чем дальше пройдёте, тем выше место.',
   },
 }
 
@@ -1636,7 +1636,7 @@ const id: Record<string, Guide> = {
   reflect: {
     goal: 'Setelah diluncurkan, bola menggelinding sendiri. Gambar garis untuk memantulkannya ke cincin hijau.',
     how: 'Seret di tempat kosong untuk menggambar garis; ketuk garis untuk menghapusnya. Coba lagi sesukanya, dan panah di samping nomor level membawa kembali ke level yang sudah dilewati.',
-    score: 'Setiap level yang lolos memberi poin — makin sedikit peluncuran gagal, makin besar bonusnya.',
+    score: 'Rekormu adalah level yang kamu capai. Makin jauh, makin tinggi peringkatnya.',
   },
 }
 
@@ -1799,7 +1799,7 @@ const vi: Record<string, Guide> = {
   reflect: {
     goal: 'Bóng tự lăn sau khi phóng. Hãy vẽ những đường chắn để bóng bật vào vòng tròn xanh.',
     how: 'Kéo trên chỗ trống để vẽ đường, chạm vào đường đã vẽ để xoá. Thử lại bao nhiêu lần tùy thích, và dùng mũi tên cạnh số màn để quay lại các màn đã qua.',
-    score: 'Mỗi màn vượt qua được cộng điểm — càng ít lượt phóng hỏng, thưởng càng lớn.',
+    score: 'Thành tích của bạn là màn đã đạt tới. Đi càng xa, thứ hạng càng cao.',
   },
 }
 
@@ -1962,7 +1962,7 @@ const th: Record<string, Guide> = {
   reflect: {
     goal: 'ลูกบอลจะกลิ้งเองเมื่อปล่อย ลากเส้นให้ลูกบอลสะท้อนเข้าวงแหวนสีเขียว',
     how: 'ลากบนพื้นที่ว่างเพื่อวาดเส้น แตะเส้นที่วาดเพื่อลบ ลองใหม่ได้ไม่จำกัด และใช้ลูกศรข้างหมายเลขด่านเพื่อย้อนไปด่านที่ผ่านแล้ว',
-    score: 'ผ่านแต่ละด่านได้คะแนน ยิ่งพลาดน้อยยิ่งได้โบนัสมาก',
+    score: 'สถิติของคุณคือด่านที่ไปถึง ยิ่งไปไกลอันดับยิ่งสูง',
   },
 }
 
@@ -2125,7 +2125,7 @@ const tr: Record<string, Guide> = {
   reflect: {
     goal: 'Top fırlatıldıktan sonra kendi kendine yuvarlanır. Çizgiler çizerek onu yeşil halkaya sektir.',
     how: 'Boş alanda sürükleyerek çizgi çiz; silmek için çizgiye dokun. İstediğin kadar yeniden dene, bölüm numarasının yanındaki oklarla geçtiğin bölümlere dönebilirsin.',
-    score: 'Geçilen her bölüm puan kazandırır — başarısız atış ne kadar azsa bonus o kadar büyük.',
+    score: 'Rekorun ulaştığın bölümdür. Ne kadar ilerlersen sıralaman o kadar yükselir.',
   },
 }
 const TABLES: Record<Locale, Record<string, Guide>> = {

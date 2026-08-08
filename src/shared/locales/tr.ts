@@ -306,11 +306,11 @@ const dict: CoreDict = {
   'bm.height': '{n} boğum',
   'bm.ad': '▶ Reklam izle, süreyi doldur, devam et',
   'game.reflect': 'Tek Çizgiyle Gol',
-  'rf.level': 'Bölüm {n}',
+  'rf.stage': 'Bölüm',
   'rf.start': 'Fırlat',
   'rf.abort': '↺ Yeniden çiz',
-  'rf.clear': 'Gol! +{n}',
-  'rf.again': 'Gol!',
+  'rf.clear': 'Gol!',
+  'rf.adLine': '▶ Reklam izle: bir çizgi daha',
 }
 
 export default dict

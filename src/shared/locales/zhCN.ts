@@ -306,11 +306,11 @@ const dict: CoreDict = {
   'bm.height': '第{n}节',
   'bm.ad': '▶ 看广告补满时间继续',
   'game.reflect': '一笔进球',
-  'rf.level': '第{n}关',
+  'rf.stage': '关卡',
   'rf.start': '发射',
   'rf.abort': '↺ 重新画线',
-  'rf.clear': '进球！+{n}',
-  'rf.again': '进球！',
+  'rf.clear': '进球！',
+  'rf.adLine': '▶ 看广告多画一条线',
 }
 
 export default dict

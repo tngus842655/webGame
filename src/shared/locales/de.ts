@@ -306,11 +306,11 @@ const dict: CoreDict = {
   'bm.height': '{n} Knoten',
   'bm.ad': '▶ Werbung ansehen: Zeit auffüllen',
   'game.reflect': 'Ein-Strich-Tor',
-  'rf.level': 'Level {n}',
+  'rf.stage': 'Level',
   'rf.start': 'Start',
   'rf.abort': '↺ Neu zeichnen',
-  'rf.clear': 'Tor! +{n}',
-  'rf.again': 'Tor!',
+  'rf.clear': 'Tor!',
+  'rf.adLine': '▶ Werbung ansehen: ein Strich mehr',
 }
 
 export default dict

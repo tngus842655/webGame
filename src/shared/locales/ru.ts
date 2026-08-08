@@ -306,11 +306,11 @@ const dict: CoreDict = {
   'bm.height': 'Колен: {n}',
   'bm.ad': '▶ Реклама: пополнить время и продолжить',
   'game.reflect': 'Гол одной линией',
-  'rf.level': 'Уровень {n}',
+  'rf.stage': 'Уровень',
   'rf.start': 'Пуск',
   'rf.abort': '↺ Перерисовать',
-  'rf.clear': 'Гол! +{n}',
-  'rf.again': 'Гол!',
+  'rf.clear': 'Гол!',
+  'rf.adLine': '▶ Реклама: ещё одна линия',
 }
 
 export default dict

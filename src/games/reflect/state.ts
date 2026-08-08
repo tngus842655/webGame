@@ -1,23 +1,23 @@
 // 한 줄로 골인 — 공은 스스로 굴러가고, 플레이어는 선을 그어 튕겨서 목표 고리에 넣는다.
 // 배치 후 실행: 선을 놓고 발사 → 지켜보고 → 실패하면 선을 고쳐 다시 쏜다.
 //
-// 판은 역산으로 만든다: 가상의 플레이어 선을 놓고 공을 굴려 본 뒤, 가상 선에
+// 단계는 역산으로 만든다: 가상의 플레이어 선을 놓고 공을 굴려 본 뒤, 가상 선에
 // 튕긴 다음 지나는 경로 위의 한 점을 목표로 삼고 가상 선을 지운다. 그 배치를
-// 그대로 그으면 반드시 풀리므로 풀 수 없는 판이 나오지 않는다. 선을 안 그어도
-// 들어가는 판은 자연 경로를 따로 굴려서 버린다.
+// 그대로 그으면 반드시 풀리므로 풀 수 없는 단계가 나오지 않는다. 선을 안 그어도
+// 들어가는 단계는 자연 경로를 따로 굴려서 버린다.
 
-export const BOARD = { x: 24, y: 230, w: 672, h: 820 } as const
+// 판 아래로 광고 버튼(y 1006)과 발사 버튼(y 1096)이 차례로 선다 — 판 높이는 그 자리를 비워 둔 값이다
+export const BOARD = { x: 24, y: 230, w: 672, h: 760 } as const
 
 // 밸런스 상수 — 조절은 전부 여기서
 export const BALL_R = 14
 export const BALL_SPEED = 520
-export const BONUS_TRIES = 3 // 시도는 무제한이지만, 이 횟수 안에 깨면 남은 만큼 보너스
+export const AD_AFTER_FAILS = 2 // 이만큼 실패하면 '선 하나 더' 광고 버튼을 띄운다
 export const RUN_LIMIT = 10 // 시도당 제한 시간(초) — 골에 못 가고 계속 돌면 실패
 export const MIN_LINE_LEN = 44
 export const MAX_LINE_LEN = 250
 const EPS = 0.4 // 반사 직후 같은 선에 다시 붙지 않게 밀어내는 여유
 const SUBSTEP = BALL_R / 2 // 이동 분할 폭 — 이보다 잘게 옮겨 선을 뚫고 지나가지 않는다
-const SCORE_CAP = 1_000_000
 
 export interface Seg {
   x1: number
@@ -117,7 +117,7 @@ export function advance(ball: Ball, segs: Seg[], dt: number, goal: Goal | null):
   return events
 }
 
-// ─── 판 생성 ───
+// ─── 단계 생성 ───
 
 export interface LevelDef {
   walls: Seg[]
@@ -127,8 +127,8 @@ export interface LevelDef {
   solution: Seg[] // 역산에 쓴 가상 선 — 이 배치가 곧 정답이라는 증거 (시뮬레이션 검증에도 쓴다)
 }
 
-// 판은 레벨 번호를 씨앗으로 만든다 — 12판은 언제 들어와도, 누구에게도 같은 12판이다.
-// 무작위로 두면 되돌아간 판이 다른 배치로 나와 '판 선택'이 말이 안 되고,
+// 단계는 그 번호를 씨앗으로 만든다 — 12단계는 언제 들어와도, 누구에게도 같은 12단계다.
+// 무작위로 두면 되돌아간 단계가 다른 배치로 나와 '단계 선택'이 말이 안 되고,
 // 순위도 저마다 다른 문제를 푼 결과가 된다.
 function seeded(seed: number): () => number {
   let a = seed * 0x9e3779b1 + 0x6d2b79f5
@@ -224,7 +224,7 @@ export function buildLevel(level: number): LevelDef {
   const rand = (a: number, b: number) => a + next() * (b - a)
   for (let attempt = 0; attempt < 80; attempt++) {
     // 1) 고정 벽 — 겹치거나 뭉치면 그 벽만 다시 뽑고, 자리가 안 나면 건너뛴다.
-    //    (벽 수가 많은 레벨에서 한 벽 때문에 판 전체를 버리면 폴백이 급증한다)
+    //    (벽 수가 많은 레벨에서 한 벽 때문에 단계 전체를 버리면 폴백이 급증한다)
     const walls: Seg[] = []
     for (let i = 0; i < p.wallCount; i++) {
       for (let retry = 0; retry < 12; retry++) {
@@ -258,7 +258,7 @@ export function buildLevel(level: number): LevelDef {
     }
     if (walls.some((w) => segDist(w, spawn.x, spawn.y) < BALL_R + 40)) continue
 
-    // 3) 가상 플레이어 선 = 이 판의 정답 배치
+    // 3) 가상 플레이어 선 = 이 단계의 정답 배치
     const virtual: Seg[] = []
     for (let i = 0; i < p.maxLines; i++) {
       virtual.push(
@@ -292,7 +292,7 @@ export function buildLevel(level: number): LevelDef {
       candidates[Math.min(candidates.length - 1, Math.floor(rand(candidates.length * 0.4, candidates.length)))]
     const goal: Goal = { x: pick.x, y: pick.y, r: p.goalR }
 
-    // 5) 선을 안 그어도 들어가는 판이면 버린다
+    // 5) 선을 안 그어도 들어가는 단계면 버린다
     if (naturalHitsGoal(spawn, walls, goal)) continue
 
     return { walls, spawn, goal, maxLines: p.maxLines, solution: virtual }
@@ -317,11 +317,7 @@ export type Phase = 'placing' | 'running'
 export interface ReflectState {
   phase: Phase
   level: number
-  score: number
-  // 점수를 준 가장 깊은 판. 지나온 판을 다시 깨는 것은 연습이지 점수가 아니다 —
-  // 그러지 않으면 1판을 반복해서 도는 것이 가장 빠른 점수 벌이가 되어 순위가 인내심 대결이 된다
-  deepest: number
-  fails: number // 이 판에서 실패한 발사 수 — 적게 깰수록 보너스가 커진다
+  fails: number // 이 단계에서 실패한 발사 수 — 광고 버튼을 언제 띄울지의 기준
   walls: Seg[]
   lines: Seg[]
   maxLines: number
@@ -332,7 +328,6 @@ export interface ReflectState {
   runPath: Array<{ x: number; y: number }> // 이번 시도의 궤적
   lastPath: Array<{ x: number; y: number }> // 직전 실패 궤적 — 희미하게 남겨 원인 분석을 돕는다
   clearFlash: number
-  clearGain: number
   playTime: number
 }
 
@@ -352,12 +347,9 @@ export function loadLevel(state: ReflectState) {
 }
 
 export function createState(startLevel: number): ReflectState {
-  const level = Math.max(1, Math.floor(startLevel))
   const state: ReflectState = {
     phase: 'placing',
-    level,
-    score: 0,
-    deepest: level - 1,
+    level: Math.max(1, Math.floor(startLevel)),
     fails: 0,
     walls: [],
     lines: [],
@@ -369,7 +361,6 @@ export function createState(startLevel: number): ReflectState {
     runPath: [],
     lastPath: [],
     clearFlash: 0,
-    clearGain: 0,
     playTime: 0,
   }
   loadLevel(state)
@@ -395,12 +386,6 @@ export function update(state: ReflectState, dt: number): TickEvents {
   if (state.runPath.length > 700) state.runPath.shift()
 
   if (ev.goalHit) {
-    const fresh = state.level > state.deepest
-    state.clearGain = fresh
-      ? 100 + state.level * 20 + Math.max(0, BONUS_TRIES - state.fails) * 50
-      : 0
-    state.score = Math.min(SCORE_CAP, state.score + state.clearGain)
-    state.deepest = Math.max(state.deepest, state.level)
     state.clearFlash = 1.3
     state.level += 1
     loadLevel(state)
@@ -443,7 +428,7 @@ export function abortRun(state: ReflectState): boolean {
   return true
 }
 
-// 화살표로 판 이동 — 발사 중에는 막는다. 판은 매번 새로 생성되므로 되돌아가도 새 배치다
+// 화살표로 단계 이동 — 발사 중에는 막는다
 export function selectStage(state: ReflectState, level: number): boolean {
   if (state.phase !== 'placing' || level < 1 || level === state.level) return false
   state.level = level
@@ -451,11 +436,9 @@ export function selectStage(state: ReflectState, level: number): boolean {
   return true
 }
 
-// 클리어 보너스(광고 2배) — 방금 얻은 만큼 한 번 더 받고 같은 연출을 다시 띄운다
-export function addBonus(state: ReflectState, points: number) {
-  state.score = Math.min(SCORE_CAP, state.score + points)
-  state.clearGain = points
-  state.clearFlash = 1.3
+// 광고 보상: 이 단계에서만 선을 하나 더 그을 수 있다 (단계를 옮기면 loadLevel이 원래대로 돌린다)
+export function addLine(state: ReflectState) {
+  state.maxLines += 1
 }
 
 // 끝점 사이 길이를 상한까지만 허용 — 미리보기와 확정이 같은 규칙을 쓴다

@@ -1,19 +1,18 @@
 import { t } from '@/shared/i18n'
 import { playSfx, preloadSfx, vibrate } from '@/shared/sound'
 import type { GameContext } from '../types'
-import { createClearBonus } from '../clearBonus'
 import { attachInput } from '../pointer'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
 import { drawScorePanel, font } from '../ui'
 import {
+  AD_AFTER_FAILS,
   BALL_R,
   BOARD,
-  BONUS_TRIES,
   MIN_LINE_LEN,
   RUN_LIMIT,
   abortRun,
-  addBonus,
+  addLine,
   capLine,
   commitLine,
   createState,
@@ -27,14 +26,16 @@ import {
 } from './state'
 
 const START_BTN = { x: 160, y: 1096, w: 400, h: 96 } as const
-const PREV_BTN = { x: 196, y: 170, w: 76, h: 56 } as const
-const NEXT_BTN = { x: 448, y: 170, w: 76, h: 56 } as const
-// 도달한 최고 판 — 계정 없이도 이어가도록 즐겨찾기와 같은 localStorage에 둔다
+const AD_BTN = { x: 140, y: 1006, w: 440, h: 74 } as const
+// 단계 스테퍼는 점수판 안에 든다 — 큰 숫자가 곧 지금 단계다
+const PREV_BTN = { x: 156, y: 62, w: 76, h: 72 } as const
+const NEXT_BTN = { x: 488, y: 62, w: 76, h: 72 } as const
+// 스스로 깬 최고 단계 = 이 게임의 기록. 계정 없이도 이어가도록 즐겨찾기와 같은 localStorage에 둔다
 const STAGE_KEY = 'webgame:reflectStage'
 
-function loadMaxStage(): number {
+function loadCleared(): number {
   const n = Number(localStorage.getItem(STAGE_KEY))
-  return Number.isFinite(n) && n >= 1 ? Math.floor(n) : 1
+  return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 0
 }
 
 // 제도판 위에 선을 긋는 분위기 — 어두운 판이라 두 테마에서 같은 얼굴이다
@@ -74,16 +75,11 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       clearGlow = 1
       burst(prevGoal.x, prevGoal.y, 26, 320, INK.goal)
       goalRing = { x: prevGoal.x, y: prevGoal.y, age: 0 }
-      // update()가 이미 다음 판으로 넘겼으므로 지금 level이 곧 새 도달점이다
-      if (state.level > maxStage) {
-        maxStage = state.level
-        localStorage.setItem(STAGE_KEY, String(maxStage))
-      }
-      // 점수를 준 클리어만 센다 — 지나온 판을 다시 깨는 것으로 광고 차례를 당기지 않는다.
-      // 3판에 한 번만 묻는 것은 네모로직과 같은 기준이고, 시트가 뜨는 동안 셸이 멈춘다
-      if (state.clearGain > 0) {
-        clears += 1
-        if (clears % 3 === 0) void offerDouble(state.clearGain)
+      adLineUsed = false
+      // update()가 이미 다음 단계로 넘겼으므로, 방금 깬 단계는 level - 1이다
+      if (state.level - 1 > cleared) {
+        cleared = state.level - 1
+        localStorage.setItem(STAGE_KEY, String(cleared))
       }
     }
     if (events.failed) {
@@ -92,17 +88,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       const end = state.lastPath[state.lastPath.length - 1]
       if (end) burst(end.x, end.y, 14, 210, '#EF5350')
     }
-    // 클리어 연출이 새 판 좌표를 쓰지 않도록 매 프레임 현재 목표를 기억해 둔다
+    // 클리어 연출이 새 단계 좌표를 쓰지 않도록 매 프레임 현재 목표를 기억해 둔다
     prevGoal = { x: state.goal.x, y: state.goal.y }
     stepEffects(dt)
     draw()
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
-  let maxStage = loadMaxStage()
-  const state = createState(maxStage)
-  preloadSfx('clear', 'fail', 'impact', 'pop', 'select', 'shoot', 'tap', 'whoosh')
-  const bonus = createClearBonus(shell, ctx, 'reflect-clear')
-  let clears = 0
+  let cleared = loadCleared()
+  const state = createState(cleared + 1)
+  preloadSfx('clear', 'fail', 'impact', 'pop', 'select', 'shoot', 'tap', 'unlock', 'whoosh')
 
   const sparks: Spark[] = []
   let goalRing: { x: number; y: number; age: number } | null = null
@@ -110,11 +104,23 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   let clearGlow = 0
   let blockedFlash = 0 // 공 자리를 덮는 선을 거절했다는 표시
   let drag: { x1: number; y1: number; x2: number; y2: number; moved: boolean } | null = null
+  let adLineUsed = false // 한 단계에 한 번만 — 광고를 반복해서 선을 늘리지는 못한다
 
-  async function offerDouble(points: number) {
-    if (!(await bonus.offer(points))) return
-    if (shell.isDestroyed()) return
-    addBonus(state, points)
+  // 이 단계에서 광고 버튼이 보이는 조건. 몇 번 헤맨 뒤에만 나온다 —
+  // 처음부터 띄우면 스스로 풀어 볼 기회를 앞질러 뺏는다
+  const adReady = () =>
+    state.phase === 'placing' &&
+    !adLineUsed &&
+    state.fails >= AD_AFTER_FAILS &&
+    ctx.isRewardAdReady()
+
+  async function watchForLine() {
+    if (!adReady()) return
+    const rewarded = await ctx.showRewardAd('reflect-line')
+    if (shell.isDestroyed() || !rewarded || adLineUsed) return
+    adLineUsed = true
+    addLine(state)
+    playSfx('unlock')
   }
 
   const burst = (x: number, y: number, count: number, speed: number, color: string) => {
@@ -162,6 +168,15 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   const hitBtn = (r: { x: number; y: number; w: number; h: number }, x: number, y: number) =>
     x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h
 
+  const canPrev = () => state.phase === 'placing' && state.level > 1
+  const canNext = () => state.phase === 'placing' && state.level <= cleared
+
+  const goStage = (delta: number) => {
+    if (!selectStage(state, state.level + delta)) return
+    adLineUsed = false
+    playSfx('tap')
+  }
+
   const tapStart = () => {
     if (state.phase === 'placing') {
       if (launch(state)) {
@@ -180,13 +195,17 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         tapStart()
         return
       }
-      // 판 이동 화살표 — 깨서 열어 둔 판(maxStage) 안에서만 오간다
+      if (adReady() && hitBtn(AD_BTN, p.x, p.y)) {
+        void watchForLine()
+        return
+      }
+      // 단계 이동 화살표 — 깬 단계와 그다음 한 칸(지금 푸는 단계)까지만 오간다
       if (state.phase === 'placing' && hitBtn(PREV_BTN, p.x, p.y)) {
-        if (state.level > 1 && selectStage(state, state.level - 1)) playSfx('tap')
+        if (canPrev()) goStage(-1)
         return
       }
       if (state.phase === 'placing' && hitBtn(NEXT_BTN, p.x, p.y)) {
-        if (state.level < maxStage && selectStage(state, state.level + 1)) playSfx('tap')
+        if (canNext()) goStage(1)
         return
       }
       if (state.phase !== 'placing' || !inBoard(p.x, p.y)) return
@@ -470,40 +489,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   }
 
   const drawHud = (c: CanvasRenderingContext2D) => {
-    drawScorePanel(c, { value: state.score.toLocaleString() })
+    // 이 게임의 기록은 점수가 아니라 단계다 — 큰 숫자가 지금 단계이고,
+    // 머리줄의 '최고 N'이 지금까지 깬 단계다 (신기록 불빛도 그대로 붙는다)
+    drawScorePanel(c, { label: t('rf.stage'), value: String(state.level) })
+    drawChevron(c, PREV_BTN, -1, canPrev())
+    drawChevron(c, NEXT_BTN, 1, canNext())
 
-    // 판 스테퍼 ‹ {n}판 › — 깨서 열어 둔 판 안에서 자유롭게 오간다
-    const placing = state.phase === 'placing'
-    c.fillStyle = '#FFFFFF'
-    c.font = font(30, true)
-    c.textAlign = 'center'
-    c.textBaseline = 'middle'
-    c.fillText(t('rf.level', { n: state.level }), 360, 199)
-    c.textBaseline = 'alphabetic'
-    drawChevron(c, PREV_BTN, -1, placing && state.level > 1)
-    drawChevron(c, NEXT_BTN, 1, placing && state.level < maxStage)
-
-    // 왼쪽: 남은 보너스 몫 — 실패할 때마다 다이아가 하나씩 꺼진다
-    for (let i = 0; i < BONUS_TRIES; i++) {
-      const x = 48 + i * 40
-      const y = 198
-      c.save()
-      c.translate(x, y)
-      c.rotate(Math.PI / 4)
-      if (i < BONUS_TRIES - state.fails) {
-        const g = c.createLinearGradient(-9, -9, 9, 9)
-        g.addColorStop(0, '#FFE082')
-        g.addColorStop(1, '#FFA000')
-        c.fillStyle = g
-        c.fillRect(-9, -9, 18, 18)
-      } else {
-        c.strokeStyle = 'rgb(255 255 255 / 0.22)'
-        c.lineWidth = 2.5
-        c.strokeRect(-8, -8, 16, 16)
-      }
-      c.restore()
-    }
-    // 오른쪽: 그을 수 있는 선 자리 — 밝은 빗금이 남은 몫이다
+    // 그을 수 있는 선 자리 — 밝은 빗금이 남은 몫이다
     for (let i = 0; i < state.maxLines; i++) {
       const x = 676 - i * 42
       const remaining = i < state.maxLines - state.lines.length
@@ -515,6 +507,20 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.lineTo(x + 12, 188)
       c.stroke()
     }
+  }
+
+  const drawAdButton = (c: CanvasRenderingContext2D) => {
+    if (!adReady()) return
+    c.fillStyle = '#43A047'
+    c.beginPath()
+    c.roundRect(AD_BTN.x, AD_BTN.y, AD_BTN.w, AD_BTN.h, 22)
+    c.fill()
+    c.fillStyle = '#FFFFFF'
+    c.font = font(25, true)
+    c.textAlign = 'center'
+    c.textBaseline = 'middle'
+    c.fillText(t('rf.adLine'), AD_BTN.x + AD_BTN.w / 2, AD_BTN.y + AD_BTN.h / 2 + 1)
+    c.textBaseline = 'alphabetic'
   }
 
   const drawStartButton = (c: CanvasRenderingContext2D) => {
@@ -535,7 +541,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.textBaseline = 'alphabetic'
   }
 
-  // 글자 없는 조작 안내 — 첫 판에서 아직 선을 안 그었으면 손끝이 선을 긋는 시늉을 한다
+  // 글자 없는 조작 안내 — 첫 단계에서 아직 선을 안 그었으면 손끝이 선을 긋는 시늉을 한다
   const drawHint = (c: CanvasRenderingContext2D) => {
     if (state.level !== 1 || state.lines.length > 0 || state.phase !== 'placing' || drag) return
     const k = (state.playTime % 1.8) / 1.8
@@ -579,6 +585,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     }
 
     drawHud(c)
+    drawAdButton(c)
     drawStartButton(c)
     drawHint(c)
 
@@ -590,12 +597,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fillStyle = '#69F0AE'
       c.font = font(40, true)
       c.textAlign = 'center'
-      // 지나온 판을 다시 깬 것은 점수가 없다 — 없는 +0을 적지 않는다
-      c.fillText(
-        state.clearGain > 0 ? t('rf.clear', { n: state.clearGain }) : t('rf.again'),
-        360,
-        676,
-      )
+      c.fillText(t('rf.clear'), 360, 676)
       c.restore()
     }
   }
@@ -604,15 +606,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
   shell.addCleanup(() => stage.destroy())
   return {
     destroy: () => shell.destroy(),
-    getScore: () => state.score,
-    // 관리자 전용 '다음 단계' — 클리어 점수 없이 판만 넘기고, 넘긴 데까지 열어 준다
+    // 랭킹에 오르는 값 = 스스로 깬 최고 단계
+    getScore: () => cleared,
+    // 관리자 전용 '다음 단계' — 넘긴 단계는 깬 것으로 세지 않는다 (기록은 그대로)
     adminSkip() {
       state.level += 1
       loadLevel(state)
-      if (state.level > maxStage) {
-        maxStage = state.level
-        localStorage.setItem(STAGE_KEY, String(maxStage))
-      }
+      adLineUsed = false
     },
   }
 }
