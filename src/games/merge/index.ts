@@ -94,7 +94,14 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const prevBest = await ctx.getBestScore()
     void ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
-    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adReviveUsed && !state.cleared, 'over.byTime')
+    // 10단계까지 통과한 판은 시간에 쫓겨 끝난 판과 결말이 다르다 — 사유를 갈라야
+    // 팝업이 '게임 오버'가 아니라 '클리어!'로 뜬다
+    overlay.show(
+      state.score,
+      prevBest,
+      ctx.isRewardAdReady() && !adReviveUsed && !state.cleared,
+      state.cleared ? 'over.byClear' : 'over.byTime',
+    )
   }
 
   const genButton = LAYOUT.genButton

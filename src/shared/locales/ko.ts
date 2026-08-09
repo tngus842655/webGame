@@ -212,6 +212,7 @@ const dict: FullDict = {
   'guide.record': '기록',
   'guide.close': '확인',
   'over.title': '게임 오버',
+  'over.clearTitle': '클리어!',
   'over.bestScore': '최고 기록 {n}',
   'over.newRecord': '신기록!',
   'over.retry': '다시하기',

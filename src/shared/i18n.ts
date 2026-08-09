@@ -265,6 +265,7 @@ const en = {
   'guide.record': 'Record',
   'guide.close': 'Got it',
   'over.title': 'Game Over',
+  'over.clearTitle': 'Cleared!',
   'over.bestScore': 'Best {n}',
   'over.newRecord': 'New record!',
   'over.retry': 'Retry',
