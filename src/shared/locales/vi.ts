@@ -118,6 +118,7 @@ const dict: CoreDict = {
   'account.toss': 'Toss',
   'account.tossLogin': 'Đăng nhập bằng Toss',
   'over.title': 'Kết thúc',
+  'over.clearTitle': 'Hoàn thành!',
   'over.bestScore': 'Kỷ lục {n}',
   'over.newRecord': 'Kỷ lục mới!',
   'over.retry': 'Chơi lại',

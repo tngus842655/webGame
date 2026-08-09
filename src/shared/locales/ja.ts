@@ -118,6 +118,7 @@ const dict: CoreDict = {
   'account.toss': 'Toss',
   'account.tossLogin': 'Tossでログイン',
   'over.title': 'ゲームオーバー',
+  'over.clearTitle': 'クリア！',
   'over.bestScore': 'ベスト記録 {n}',
   'over.newRecord': '新記録！',
   'over.retry': 'もう一度',

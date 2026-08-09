@@ -118,6 +118,7 @@ const dict: CoreDict = {
   'account.toss': 'Toss',
   'account.tossLogin': 'Entrar com Toss',
   'over.title': 'Fim de jogo',
+  'over.clearTitle': 'Concluído!',
   'over.bestScore': 'Melhor marca {n}',
   'over.newRecord': 'Novo recorde!',
   'over.retry': 'Tentar de novo',

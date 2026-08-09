@@ -4,16 +4,23 @@
 export const COLS = 5
 export const ROWS = 7
 
-// 아이템 단계 수 (그림은 plantArt.ts) — 12단계 황금 화분이 목표
-export const MAX_LEVEL = 12
+// 아이템 단계 수 (그림은 plantArt.ts) — 8단계 황금 화분이 목표.
+// 12단계였을 때는 화분 하나에 2048(=2^11)어치가 필요해 탭 80회 + 드래그 80회가 들었다.
+// 조합은 늘 '같은 단계 둘'뿐이라 보드는 사실상 누적 생성량의 이진수이고, 위치 전략도 없다
+// (dropItem에 인접 제한이 없다). 그래서 길이가 곧 노가다였다 — 128어치로 줄인다
+export const MAX_LEVEL = 8
 
-// 생성 확률(%) — 낮은 단계일수록 흔하고, 가끔 상위 식물이 터진다.
-// 최종 단계(황금 화분)는 버튼으로 나오지 않는다: 합쳐서만 만들 수 있다
-const SPAWN_PERCENT = [38, 22, 12, 8, 6, 4.5, 3.5, 2.5, 1.8, 1.2, 0.5] as const
+// 생성 확률(%) — 1~7단계. 최종 단계(황금 화분)는 버튼으로 나오지 않는다: 합쳐서만 만들 수 있다.
+// 무게중심을 3~5단계로 옮겼다. 예전 표는 진행량의 44%가 1.7%짜리 희귀 스폰에서 나와
+// 잘해서 이기는 게 아니라 잭팟을 기다리는 판이었다. 지금은 상위 둘(7%)이 39%를 맡는다.
+// 합이 100이라 예전처럼 남은 1%가 1단계로 새지도 않는다
+const SPAWN_PERCENT = [20, 23, 23, 17, 10, 5, 2] as const
 
-// 점수는 다른 게임과 자릿수를 맞춘다: 화분 하나 = 100점, 남은 시간 1초 = 5점
-const HARVEST_POINTS = 470
-export const TIME_BONUS = 23
+// 점수는 다른 게임과 자릿수를 맞춘다: 화분 하나 = 100점, 남은 시간 1초 = 5점.
+// 가이드 13개 언어(guides.ts merge.score)가 원래 이 숫자로 적혀 있었다 — 코드가 어긋나 있던 쪽이다.
+// 전판을 깨면 약 9,100점으로, 화분이 사실상 못 나오던 시절에 맞춰 부풀린 470/23을 되돌린다
+const HARVEST_POINTS = 100
+export const TIME_BONUS = 5
 
 export const MAX_STAGE = 10
 
@@ -23,9 +30,12 @@ export function stageGoal(stage: number): number {
 }
 
 // 제한 시간: 목표가 늘수록 시간도 늘지만 화분 1개당 여유는 계속 줄어든다.
-// 1단계도 손을 놀리면 못 깨는 수준이고, 위로 갈수록 빠듯해진다
+// 중급 손 속도(탭 0.25초·드래그 0.65초)로 화분 하나가 약 15초다. 1단계는 그중 27%만 쓰고
+// 10단계에서 59%까지 올라간다 — 손이 느린 사람은 9~10단계에서 시간에 걸린다.
+// 시간을 먼저 줄이면 노가다가 사라지는 게 아니라 급해지기만 한다. 분량(MAX_LEVEL)을
+// 줄인 다음에 조이는 순서라야 한다
 export function stageSeconds(stage: number): number {
-  return 210 + (stage - 1) * 85
+  return 55 + (stage - 1) * 22
 }
 
 export const LAYOUT = {
@@ -214,8 +224,9 @@ export function update(state: MergeState, dt: number): TickEvents {
     state.timeLeft -= dt
     if (state.timeLeft <= 0) {
       state.timeLeft = 0
-      // 못 채운 스테이지에서도 키워낸 만큼은 점수로 인정한다 (단계가 높을수록 크게)
-      state.lastBonus = 2 ** Math.max(0, maxBoardLevel(state) - 4)
+      // 못 채운 스테이지에서도 키워낸 만큼은 점수로 인정한다 (단계가 높을수록 크게).
+      // 뺄 값은 체인 길이를 따라간다 — 8단계 체인에서는 보드 최고가 7단계라 최대 32점(화분 1/3)
+      state.lastBonus = 2 ** Math.max(0, maxBoardLevel(state) - 2)
       state.score = Math.min(1_000_000, state.score + state.lastBonus)
       state.phase = 'over'
       events.timeUp = true

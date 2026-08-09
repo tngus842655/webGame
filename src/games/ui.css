@@ -67,6 +67,45 @@
   color: #7a6053;
 }
 
+/* 끝까지 해낸 판 — 실패한 판과 같은 얼굴이면 다 깨고도 진 기분이 든다.
+   판을 금빛으로 갈고 제목을 키운다. 여기서 눈에 먼저 들어와야 하는 건 점수가 아니라
+   '해냈다'라서, 이 줄만 큰 숫자 앞으로 나선다. */
+.gui-sheet.is-clear {
+  background: linear-gradient(#fffdf4, #ffeec6);
+  box-shadow:
+    0 26px 60px rgb(22 11 4 / 0.42),
+    inset 0 2px 0 #fff,
+    inset 0 0 0 2px rgb(238 166 42 / 0.38);
+}
+
+.gui-sheet.is-clear .gui-title {
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  color: #d9820a;
+  text-shadow: 0 2px 0 rgb(255 255 255 / 0.85);
+}
+
+.gui-sheet.is-clear .gui-reason {
+  color: #ba7f38;
+}
+
+[data-theme='dark'] .gui-sheet.is-clear {
+  background: linear-gradient(#3a2e1f, #2e2418);
+  box-shadow:
+    0 26px 60px rgb(0 0 0 / 0.62),
+    inset 0 2px 0 rgb(255 255 255 / 0.06),
+    inset 0 0 0 2px rgb(238 166 42 / 0.32);
+}
+
+[data-theme='dark'] .gui-sheet.is-clear .gui-title {
+  color: #ffc65c;
+  text-shadow: 0 2px 0 rgb(0 0 0 / 0.35);
+}
+
+[data-theme='dark'] .gui-sheet.is-clear .gui-reason {
+  color: #d3ab72;
+}
+
 /* 왜 끝났는지 — 제목 바로 아래 한 줄. 점수보다 앞서 읽히면 안 되니 작고 옅게. */
 .gui-reason {
   margin-top: 6px;

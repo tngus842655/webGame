@@ -2,6 +2,13 @@
 
 type Draw = (c: CanvasRenderingContext2D, r: number) => void
 
+// 게임 단계(1~MAX_LEVEL) → 아래 12종 중 몇 번을 그릴지. 체인이 8단계로 짧아지면서
+// 12종을 다 쓸 수 없게 됐는데, 앞의 여덟만 잘라 쓰면 목표가 '화분 나무'가 되어 버린다.
+// 그래서 생김새가 확실히 갈리는 여덟을 건너뛰며 골랐다 — 씨앗·새싹·어린잎으로 시작해
+// 튤립·해바라기를 거쳐 열매 나무·무지개 꽃, 그리고 황금 화분.
+// **마지막은 반드시 12(황금 화분)여야 한다.** 이 게임의 목표물 그 자체다
+const ART = [1, 2, 3, 5, 7, 9, 11, 12] as const
+
 const POT = '#B5734A'
 const POT_DARK = '#8A5433'
 const LEAF = '#4CAF50'
@@ -23,7 +30,7 @@ export function drawPlant(
   c.ellipse(0, r * 0.86, r * 0.62, r * 0.16, 0, 0, Math.PI * 2)
   c.fill()
 
-  const draw = LEVELS[Math.min(LEVELS.length, Math.max(1, level)) - 1]
+  const draw = LEVELS[ART[Math.min(ART.length, Math.max(1, level)) - 1] - 1]
   draw(c, r)
   c.restore()
 }

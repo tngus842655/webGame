@@ -94,7 +94,14 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const prevBest = await ctx.getBestScore()
     void ctx.submitScore(state.score)
     if (shell.isDestroyed() || state.phase !== 'over') return
-    overlay.show(state.score, prevBest, ctx.isRewardAdReady() && !adReviveUsed && !state.cleared, 'over.byTime')
+    // 10단계까지 통과한 판은 시간에 쫓겨 끝난 판과 결말이 다르다 — 사유를 갈라야
+    // 팝업이 '게임 오버'가 아니라 '클리어!'로 뜬다
+    overlay.show(
+      state.score,
+      prevBest,
+      ctx.isRewardAdReady() && !adReviveUsed && !state.cleared,
+      state.cleared ? 'over.byClear' : 'over.byTime',
+    )
   }
 
   const genButton = LAYOUT.genButton
@@ -174,7 +181,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.restore()
     }
 
-    // HUD: 스테이지 · 점수 · 황금 화분 진행
+    // HUD 윗줄: 스테이지 · 점수 (오른쪽 위는 DOM 버튼 자리라 비운다)
     c.textAlign = 'center'
     card(30, 24, 150, 80)
     c.fillStyle = ground('#A1887F', '#8F7D74')
@@ -192,18 +199,22 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       valueColor: ground('#5D4037', '#E5D8D0'),
     })
 
+    // 황금 화분 진행 — 오른쪽 위는 멈춤·도움말과 그 아래 좋아요·싫어요 줄이 쓰는 자리라
+    // (DESIGN.md '좋아요·싫어요') 카드를 세우면 세로가 짧은 기기부터 목표가 통째로 가렸다.
+    // 시간 바 왼쪽은 어느 화면 비율에서도 그 줄이 닿지 않는 유일한 자리다.
     const goal = stageGoal(state.stage)
-    card(456, 24, 234, 80)
-    drawPlant(c, 496, 66, 26, MAX_LEVEL)
+    drawPlant(c, 64, 168, 21, MAX_LEVEL)
+    c.textAlign = 'left'
     c.fillStyle = ground('#5D4037', '#E5D8D0')
-    c.font = font(34, true)
-    c.fillText(`${state.goldMade} / ${goal}`, 600, 78)
+    c.font = font(32, true)
+    c.fillText(`${state.goldMade} / ${goal}`, 96, 182)
+    c.textAlign = 'center'
 
-    // 남은 시간 바
+    // 남은 시간 바 — 왼쪽 끝은 점수판, 오른쪽 끝은 보드와 선을 맞춘다
     const total = stageSeconds(state.stage)
     const ratio = Math.max(0, Math.min(1, state.timeLeft / total))
-    const barX = 45
-    const barW = 630
+    const barX = 230
+    const barW = 445
     const barY = 156
     const barH = 30
     c.save()
@@ -288,13 +299,14 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       })
     }
 
-    // 자리가 없으면 무엇을 해야 하는지 알린다
+    // 자리가 없으면 무엇을 해야 하는지 알린다 — 눌러도 안 나오는 생성 버튼 바로 아래다.
+    // (예전 자리는 남은 시간 바 한가운데라 시간 위에 글씨가 겹쳐 앉았다)
     const roomLeft = hasEmptyCell(state)
     if (!roomLeft && state.phase === 'playing') {
       c.textAlign = 'center'
       c.fillStyle = ground('#8D6E63', '#B9A69C')
       c.font = font(26, true)
-      c.fillText(t('merge.full'), 360, 176)
+      c.fillText(t('merge.full'), 360, 1262)
     }
 
     // 생성 버튼 (쿨다운 없음 — 자리가 없을 때만 비활성)
