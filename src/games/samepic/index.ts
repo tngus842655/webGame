@@ -5,7 +5,16 @@ import { attachInput } from '../pointer'
 import { createResumeGate } from '../resumeGate'
 import { createGameShell, defineGame } from '../shell'
 import { CanvasStage } from '../stage'
-import { DISCS, DISC_R, GAUGE_MAX, createState, reviveWithTime, tapAt, update } from './state'
+import {
+  DISCS,
+  DISC_R,
+  GAUGE_MAX,
+  createState,
+  newRound,
+  reviveWithTime,
+  tapAt,
+  update,
+} from './state'
 import { SYMBOLS } from './symbols'
 import { drawScorePanel, font } from '../ui'
 
@@ -210,7 +219,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fillStyle = '#FFD54F'
       c.font = font(28, true)
       c.textAlign = 'center'
-      c.fillText(`x${state.combo}`, 646, 112)
+      // 판 밖(646)에 있었는데 그 자리를 좋아요·싫어요 줄(GamePlayPage)이 지난다.
+      // 판 안쪽 오른편으로 들여 점수와 같은 줄에 세운다 — 큰 숫자는 가운데라
+      // 일곱 자리가 되어도 여기까지 닿지 않는다.
+      c.fillText(`x${state.combo}`, 496, 112)
     }
 
     const gw = 600
@@ -239,7 +251,16 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   shell.addCleanup(detachInput)
   shell.addCleanup(() => stage.destroy())
-  return { destroy: () => shell.destroy(), getScore: () => state.score }
+  return {
+    destroy: () => shell.destroy(),
+    getScore: () => state.score,
+    // 관리자 전용 '다음 단계' — newRound는 그림만 새로 깔고 score를 건드리지 않는다.
+    adminSkip() {
+      if (state.phase !== 'playing') return
+      state.round += 1
+      newRound(state)
+    },
+  }
 }
 
 export default defineGame(createSession)

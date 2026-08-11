@@ -30,8 +30,8 @@ Capacitor는 `dist/`를 앱 안에 통째로 넣고 앱 자신의 웹뷰로 띄�
 `android/app/build.gradle`에서 두 값을 올린다. `versionCode`는 반드시 이전보다 커야 한다.
 
 ```gradle
-versionCode 8
-versionName "8"
+versionCode <직전 값 + 1>
+versionName "<versionCode와 같은 값>"
 ```
 
 ```powershell
@@ -40,26 +40,33 @@ cd android
 .\gradlew.bat bundleRelease
 ```
 
+빌드가 꼬여 보이면 `.\gradlew.bat clean`을 한 번 돌리고 다시 한다. 평소에는 필요 없다.
+
 `android\app\build\outputs\bundle\release\app-release.aab`를 Play Console에 올린다.
 
 폰에 바로 설치해 확인하는 것은 `ANDROID_DEBUG.md`의 '설치까지 한 번에'를 따른다.
 
-> `npm run build:android`은 `vite build` + `cap sync android`다.
+> `npm run build:android`은 `vue-tsc --noEmit` + `vite build` + `cap sync android`다.
 > 이걸 건너뛰고 gradle만 돌리면 **앱 안에 예전 웹 빌드가 그대로 들어간다.**
+> 타입 오류가 하나라도 있으면 빌드가 여기서 멈춘다 — 게임과 무관해 보이는 오류가 떠도
+> 먼저 `npm run typecheck`로 확인할 것.
 
 ---
 
 ## 업데이트 안내 팝업
 
-새 버전을 올리면 사용자가 앱을 열 때 Play가 '나중에 / 업데이트' 다이얼로그를 띄운다.
-`@capawesome/capacitor-app-update` + `src/shared/appUpdate.ts`.
+새 버전을 올리면 사용자가 앱을 열 때 '나중에 / 업데이트' 팝업이 뜬다.
+버전 확인은 `@capawesome/capacitor-app-update`가, 팝업은 `src/shared/UpdatePrompt.vue`가 한다.
 
 **따로 관리할 값이 없다.** 최신 버전이 무엇인지는 Play가 알고 있으므로, 릴리스할 때
 `versionCode`만 올리면 된다. 앱이나 DB에 최신 버전을 적어두는 방식이 아니다.
 
-권유 방식(flexible)이다. 받겠다고 하면 게임을 하는 동안 뒤에서 내려받고, **다 받은
-것은 다음에 앱을 열 때 설치한다.** 게임 도중에 앱이 다시 시작되면 그 판이 날아가기
-때문이다. '나중에'를 누르면 24시간 동안 다시 묻지 않는다.
+**'업데이트'를 누르면 플레이 스토어의 이 앱 페이지가 열린다.** 받는 것도 설치도 거기서
+눈에 보이는 채로 끝난다. '나중에'를 누르면 24시간 동안 다시 묻지 않는다.
+
+Play가 대신 띄워주는 다이얼로그(flexible)를 쓰다가 바꿨다. 그쪽은 '업데이트'를 눌러도
+화면에 아무 일도 일어나지 않고 — 내려받기는 뒤에서 조용히 돌고, 설치는 다음에 앱을 열
+때다 — 버튼이 먹지 않은 것처럼 보였다.
 
 알아둘 것:
 
@@ -147,7 +154,7 @@ TWA는 그 자체가 크롬이라 이 문제가 없었다. 앱에서 로그인�
 
 앱에서는 AdSense(H5 Games Ads)를 쓸 수 없다. AdSense는 웹사이트용 상품이라
 앱 웹뷰에서 게재하면 프로그램 정책 위반이고 게시자 계정이 제재 대상이 된다.
-웹과 앱인토스는 지금까지대로 AdSense, 안드로이드 앱만 AdMob으로 간다.
+웹은 AdSense(H5 Games Ads), 앱인토스는 토스 인앱광고, 안드로이드 앱만 AdMob으로 간다.
 
 **지금은 실제 광고가 꺼져 있다.** `VITE_ADMOB_REWARD_ID`가 비어 있으면 5초 카운트다운
 스텁이, 테스트 단위를 넣으면 구글 테스트 광고가 뜬다. 매니페스트의 AdMob 앱 ID는
@@ -212,16 +219,3 @@ TWA는 주소창을 없애려고 이 파일이 필요했다. Capacitor는 웹사
 | 업로드 시 "이미 사용된 버전 코드" | `versionCode`를 더 큰 값으로 올리고 재빌드. Console에서는 못 고친다 |
 | 업로드 시 서명 키 불일치 | `keystore.properties`가 TWA 때 쓰던 키를 가리키는지 확인 |
 | 앱 이름·아이콘이 안 바뀜 | 매니페스트가 아니라 `android/app/src/main/res`를 본다. 아이콘은 `node tools/android-assets.mjs`로 다시 만든다 |
-
-
-## 안드로이드 빌드시 (.aab 파일 생성)
-bash 에서 확인 (프로젝트 경로)
-npm run build
-npx cap sync android
-
-cmd에서
-프로젝트 경로로 들어가서 (cd C:\Workspace\webGame\android)
-gradlew.bat clean
-
-아래 실행하기전에 버전올리기 (C:\Workspace\webGame\android\app - build.gradle)
-gradlew.bat bundleRelease

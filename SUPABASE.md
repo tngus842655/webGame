@@ -28,7 +28,7 @@
 | `20260804100000_toss_login.sql` | `toss_accounts` 테이블 — 앱인토스 토스 로그인 | ✅ 2026-08-04 |
 | `20260806000000_toss_anon_keys.sql` | `toss_anon_keys` — 토스 식별키, 프로모션 중복 지급 기준 | ✅ |
 | `20260806100000_promotion_grants.sql` | `promotion_grants` — 프로모션 지급 이력 (식별키 단위) | ✅ |
-| `20260806200000_promotion_status.sql` | `get_promotion_status()` — 안내 화면이 읽는 진행 상황 | ✅ |
+| `20260806200000_promotion_status.sql` | `my_promotion_status()` — 안내 화면이 읽는 진행 상황 | ✅ |
 | `20260806300000_promotion_plays_since.sql` | 판 수를 접속 보상 이후로만 세도록 수정 | ✅ |
 | `20260806400000_promotion_failures.sql` | `promotion_failures` — 지급 거절 사유 기록 | ✅ |
 | `20260806500000_promotion_failures_dedup.sql` | 실패 기록을 (식별키, 단계, 코드) 한 줄로 묶고 횟수를 센다 | ✅ |
@@ -36,6 +36,9 @@
 | `20260806700000_promotion_end_manual.sql` | 프로모션 종료 스위치를 클라이언트 손에서 뺀다 | ✅ |
 | `20260807000000_ad_views_medium.sql` | `ad_views.medium` 컬럼 — 매체 구분, `get_ad_stats()` 재정의 | ✅ 2026-08-07 |
 | `20260807100000_ad_views_purge_untagged.sql` | 매체 없는 기존 광고 기록 삭제 (위 파일 다음에) | ✅ 2026-08-07 |
+| `20260808000000_game_votes.sql` | `game_votes` 테이블 — 게임별 좋아요·싫어요, 하루 한 표 | ✅ 2026-08-08 |
+| `20260808100000_game_vote_stats.sql` | `get_game_vote_stats()` — 인기도 화면 집계 | ✅ 2026-08-08 |
+| `20260808200000_stats_calendar_periods.sql` | 통계 4개 함수의 기간을 달력 구간(`p_from`·`p_to`)으로 — 롤링(`p_days`) 폐기 | |
 
 ## 테이블
 
@@ -49,8 +52,9 @@
 | `feedback` | 사용자 의견 (버그·문의·제안) | insert는 본인만 / **조회·삭제는 관리자만** / update 정책 없음(금지) |
 | `ad_views` | 리워드 광고 호출 기록 (매체·게임·자리·결과). 테스트 광고는 담지 않는다 | insert는 본인만 / **조회는 관리자만** / update·delete 정책 없음(금지) |
 | `toss_accounts` | 토스 `userKey` ↔ `auth.users`. 앱인토스 전용 | **정책 없음** — service_role(서버 함수)만 다룬다 |
+| `game_votes` | 게임별 좋아요·싫어요. 기본키 `(user_id, game_slug, vote_day)`가 '하루 한 표'를 지킨다 | 쓰기는 본인만 / **조회는 관리자만**(`get_game_vote_stats()`) |
 
-삭제 연쇄: `auth.users` → `profiles` → `scores`·`play_sessions`·`feedback`·`ad_views` 순으로
+삭제 연쇄: `auth.users` → `profiles` → `scores`·`play_sessions`·`feedback`·`ad_views`·`game_votes` 순으로
 `on delete cascade`가 걸려 있다. 최상위 한 줄만 지우면 전부 따라 지워진다.
 (탈퇴하면 그 사람이 보낸 의견도 함께 사라진다 — 개인정보처리방침대로다.)
 
@@ -61,12 +65,16 @@
 | `get_leaderboard(p_game_slug, p_since, p_limit)` | 랭킹 화면 | 공개 |
 | `get_my_stats()` | 홈 화면, 게임 진입 시 최고점 동기화 | 로그인 사용자 |
 | `get_game_popularity()` | 홈 정렬 | 공개 |
-| `get_game_stats(p_days)` | 관리자 통계 | `is_admin()` 아니면 `forbidden` |
-| `get_total_players(p_days)` | 관리자 통계 | `is_admin()` 아니면 `forbidden` |
-| `get_player_stats(p_days)` | 관리자 통계 → 이용자별 상세 | `is_admin()` 아니면 `forbidden` |
-| `get_ad_stats(p_days)` | 관리자 통계 → 광고 현황 | `is_admin()` 아니면 `forbidden` |
+| `get_game_stats(p_from, p_to)` | 관리자 통계 | `is_admin()` 아니면 `forbidden` |
+| `get_total_players(p_from, p_to)` | 관리자 통계 | `is_admin()` 아니면 `forbidden` |
+| `get_player_stats(p_from, p_to)` | 관리자 통계 → 이용자별 상세 | `is_admin()` 아니면 `forbidden` |
+| `get_ad_stats(p_from, p_to)` | 관리자 통계 → 광고 현황 | `is_admin()` 아니면 `forbidden` |
+| `get_game_vote_stats(p_start, p_end)` | 관리자 인기도 (`/admin/votes`) | `is_admin()` 아니면 `forbidden` |
 | `is_admin()` | 라우트 가드, 다른 함수의 권한 검사 | 공개 (결과만 boolean) |
 | `delete_my_account()` | 계정 삭제 화면 | `authenticated`만. `auth.uid()` 본인 것만 지운다 |
+
+통계 네 함수의 기간은 화면이 보는 사람의 시간대로 계산한 절대 시각 구간이다.
+`p_from`은 구간에 들고 `p_to`는 들지 않으며, 둘 다 null이면 전체 누적이다.
 
 트리거로만 도는 함수는 클라이언트가 직접 부르지 않는다 — `handle_new_user()`(가입 시 프로필 생성),
 `check_score_rate_limit()`·`check_session_rate_limit()`·`check_feedback_rate_limit()`·`check_ad_view_rate_limit()`(분당 제출 상한).

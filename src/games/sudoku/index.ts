@@ -95,9 +95,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   const onPuzzleClear = async () => {
     let points = clearPoints(state)
-    // 스트릭은 출석 표시일 뿐 점수에는 넣지 않는다 —
-    // 지난 날들의 기록이 오늘 점수에 얹히면 순위표가 실력을 재지 못한다
-    if (state.daily) state.streak = recordDailyClear().streak
+    // 오늘 데일리를 풀었다는 기록만 남긴다 (연속 일수는 화면에 쓰지 않는다).
+    // 점수에는 넣지 않는다 — 지난 날들의 기록이 오늘 점수에 얹히면
+    // 순위표가 실력을 재지 못한다
+    if (state.daily) recordDailyClear()
     playSfx('clear')
     vibrate(30)
     state.phase = 'clearing'
@@ -177,19 +178,19 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       labelColor: ground('#80CBC4', '#6E9E98'),
       valueColor: ground('#004D40', '#CFEAE5'),
     })
-    c.fillStyle = ground('#00796B', '#7FBDB4')
-    c.font = font(24)
-    c.textAlign = 'left'
-    const now = new Date()
-    c.fillText(
-      state.daily
-        ? t('sd.daily', { date: `${now.getMonth() + 1}/${now.getDate()}` })
-        : t('sd.practice', { n: state.level }),
-      SCORE_PANEL.left,
-      SCORE_PANEL.subY,
-    )
+    // 몇 단계째인지만 남긴다. 데일리는 단계가 없는 하루치 한 판이고, 날짜를 적어 봐야
+    // 플레이어가 이미 아는 것이라 비운다.
+    if (!state.daily) {
+      c.fillStyle = ground('#00796B', '#7FBDB4')
+      c.font = font(24)
+      // 판 오른쪽 끝도 좋아요·싫어요 줄이 스치는 자리라 가운데로 (아이스슬라이드와 같은 자리)
+      c.textAlign = 'center'
+      c.fillText(t('common.stage', { n: state.level }), SCORE_PANEL.cx, SCORE_PANEL.subY)
+    }
     c.textAlign = 'center'
-    const heartX = (i: number) => 462 + i * 42
+    // 하트와 단계 표시를 맞바꿨다 — 오른쪽 위는 멈춤·도움말 아래로 내려온
+    // 좋아요·싫어요 줄(GamePlayPage)이 쓰는 자리라 하트가 그 밑에 깔렸다
+    const heartX = (i: number) => SCORE_PANEL.left + 14 + i * 42
     for (let i = 0; i < 3; i++) {
       drawIcon(c, 'heart', heartX(i), SCORE_PANEL.subY - 8, 14, { dim: i >= state.lives })
     }
@@ -200,11 +201,9 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       })
     }
 
-    // 스트릭·경과 시간
+    // 경과 시간 (점수가 이것으로 갈린다)
     c.fillStyle = '#FFFFFF'
     c.font = font(26, true)
-    c.textAlign = 'left'
-    c.fillText(t('sd.streak', { n: state.streak }), GRID_X + 4, 216)
     const mm = Math.floor(state.elapsed / 60)
     const ss = String(Math.floor(state.elapsed % 60)).padStart(2, '0')
     c.textAlign = 'right'
@@ -347,11 +346,21 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.fillStyle = state.memo ? '#FFFFFF' : '#00695C'
     c.font = font(30, true)
     c.fillText(t('sd.memo'), MEMO.x + 148, MEMO.y + 52)
+
   }
 
   shell.addCleanup(detachInput)
   shell.addCleanup(() => stage.destroy())
-  return { destroy: () => shell.destroy(), getScore: () => state.score }
+  return {
+    destroy: () => shell.destroy(),
+    getScore: () => state.score,
+    // 관리자 전용 '다음 단계' — 연습 퍼즐 번호만 올린다. loadPractice는 격자·생명만
+    // 바꾸고 score를 건드리지 않는다. 데일리를 풀던 중이면 연습 1판으로 넘어간다.
+    adminSkip() {
+      if (state.phase !== 'playing') return
+      loadPractice(state, state.level + 1)
+    },
+  }
 }
 
 export default defineGame(createSession)

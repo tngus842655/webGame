@@ -58,7 +58,7 @@ function placeAll(syms: number[]): Placed[] {
   return out
 }
 
-function newRound(state: SameState) {
+export function newRound(state: SameState) {
   const count = symbolCount(state.round)
   const pool = SYMBOLS.map((_, i) => i)
   for (let i = pool.length - 1; i > 0; i--) {

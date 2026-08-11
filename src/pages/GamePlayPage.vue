@@ -2,9 +2,11 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { GAMES } from '@/games/registry'
+import { ensureAdminChecked, isAdmin } from '@/shared/admin'
 import { pauseRunningGame, resumeRunningGame } from '@/games/shell'
 import type { GameModule } from '@/games/types'
 import GameGuide from '@/shared/GameGuide.vue'
+import GameVote from '@/shared/GameVote.vue'
 import { setBackHandler } from '@/shared/backButton'
 import { createGameContext } from '@/shared/gameContext'
 import { t, type TranslationKey } from '@/shared/i18n'
@@ -22,6 +24,30 @@ const host = ref<HTMLDivElement | null>(null)
 const slug = String(route.params.slug)
 const titleKey = ref<TranslationKey | null>(null)
 const guideOpen = ref(false)
+// 이 게임이 '다음 단계'를 지원하는지 (버튼은 관리자에게만 보인다)
+const canAdminSkip = ref(false)
+// 진도를 기기에 저장하는 게임만 '진도 초기화'를 지원한다
+const canAdminReset = ref(false)
+// 되돌릴 수 없는 일이라 두 번 눌러야 실행된다 (첫 탭은 칩 문구만 바꾼다)
+const resetArmed = ref(false)
+let resetArmId = 0
+
+function skipLevel() {
+  game?.adminSkip()
+}
+
+function resetProgress() {
+  if (!resetArmed.value) {
+    resetArmed.value = true
+    resetArmId = window.setTimeout(() => {
+      resetArmed.value = false
+    }, 3000)
+    return
+  }
+  clearTimeout(resetArmId)
+  resetArmed.value = false
+  game?.adminReset()
+}
 
 // 일시정지 — 실시간 게임은 전화 한 통에 판이 날아간다.
 // 화면을 벗어나면 자동으로 멈추고, 돌아올 때는 곧바로 재개하지 않고 셋을 센다.
@@ -112,6 +138,11 @@ onMounted(async () => {
   if (disposed) return
   game = mod.default
   game.mount(host.value, createGameContext(slug))
+  // 관리자 전용 '다음 단계'. 판이 나뉘는 게임에서만 뜨고, 홈을 거치지 않고 바로
+  // 들어온 경우를 위해 여기서 한 번 확인한다 (결과는 캐시된다).
+  canAdminSkip.value = game.canAdminSkip()
+  canAdminReset.value = game.canAdminReset()
+  void ensureAdminChecked()
   stopTracking = startPlayTracking(slug)
   stopScoreGuard = startScoreGuard(slug, () => game?.currentScore() ?? null)
   startBgm(bgmFor(slug))
@@ -130,6 +161,7 @@ onBeforeUnmount(() => {
   disposed = true
   setBackHandler(null)
   clearInterval(pollId)
+  clearTimeout(resetArmId)
   // 다음 게임이 이전 게임의 기록을 달고 뜨지 않도록 (첫 갱신까지 250ms가 뜬다)
   setHudBest(null, 0)
   stopCountdown()
@@ -149,9 +181,27 @@ onBeforeUnmount(() => {
   <div class="play-page">
     <div ref="host" class="game-host"></div>
     <div class="top-bar">
-      <button class="chip back-button" type="button" @click="router.push('/')">
-        <UiIcon name="back" />{{ t('common.back') }}
-      </button>
+      <div class="top-left">
+        <button class="chip back-button" type="button" @click="router.push('/')">
+          <UiIcon name="back" />{{ t('common.back') }}
+        </button>
+        <button
+          v-if="isAdmin && canAdminSkip"
+          class="chip skip-button"
+          type="button"
+          @click="skipLevel"
+        >
+          {{ t('admin.skipLevel') }}
+        </button>
+        <button
+          v-if="isAdmin && canAdminReset"
+          class="chip skip-button"
+          type="button"
+          @click="resetProgress"
+        >
+          {{ resetArmed ? t('admin.resetConfirm') : t('admin.resetProgress') }}
+        </button>
+      </div>
       <button
         class="chip icon-button"
         type="button"
@@ -169,6 +219,8 @@ onBeforeUnmount(() => {
         ?
       </button>
     </div>
+
+    <GameVote class="vote-row" :slug="slug" />
 
     <!-- 멈춤 화면 -->
     <div v-if="paused" class="pause-scrim">
@@ -223,6 +275,14 @@ onBeforeUnmount(() => {
   pointer-events: none;
 }
 
+/* 좋아요·싫어요는 멈춤·도움말 바로 아래에 붙는다 (줄 높이 38 + 사이 8).
+   .top-bar 안에 넣으면 그 줄이 두 줄이 되면서 왼쪽 뒤로가기까지 같이 내려앉는다. */
+.vote-row {
+  position: absolute;
+  top: 56px;
+  right: 10px;
+}
+
 .chip {
   display: flex;
   align-items: center;
@@ -243,9 +303,28 @@ onBeforeUnmount(() => {
     background-color 0.1s ease;
 }
 
-.back-button {
-  /* 뒤로는 왼쪽 끝, 멈춤·도움말은 오른쪽 끝으로 (버튼 길이가 언어마다 달라도) */
+/* 왼쪽 묶음은 왼쪽 끝, 멈춤·도움말은 오른쪽 끝으로 (버튼 길이가 언어마다 달라도) */
+.top-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-right: auto;
+}
+
+/* 관리자 전용이라 평소에는 없는 버튼이다. 게임 조작이 아니라는 게 보이도록
+   같은 칩 모양을 쓰되 글씨를 옅게 둔다. */
+.skip-button {
+  pointer-events: auto;
+  color: var(--ink-muted);
+  font-weight: 600;
+}
+
+.skip-button:active {
+  background: rgb(255 255 255 / 0.98);
+  transform: scale(0.95);
+}
+
+.back-button {
   gap: 4px;
   padding-left: 10px;
   cursor: pointer;

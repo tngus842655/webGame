@@ -373,9 +373,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.font = font(30, true)
     c.fillStyle = '#FFFFFF'
     c.textAlign = 'left'
-    c.fillText(t('df.wave', { n: state.wave }), 36, 190)
+    const wave = t('df.wave', { n: state.wave })
+    c.fillText(wave, 36, 190)
     c.fillStyle = leakFlash > 0 ? '#FF5252' : '#FFFFFF'
-    drawIconValue(c, 'heart', String(state.lives), 684, 180, 16, 'right')
+    // 생명은 오른쪽 끝에 있었지만 그 자리로 좋아요·싫어요 줄(GamePlayPage)이
+    // 내려온다. 웨이브 뒤에 붙여 한 줄로 읽히게 둔다.
+    const heartX = 36 + c.measureText(wave).width + 28
+    drawIconValue(c, 'heart', String(state.lives), heartX, 180, 16, 'left')
     c.textAlign = 'center'
 
     // 하단 바: 소환 버튼 + 골드

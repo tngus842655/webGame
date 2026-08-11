@@ -410,6 +410,19 @@ defineProps<{ slug: string }>()
       <circle cx="14" cy="33.4" r="1.4" fill="#2E2E2E" />
     </g>
 
+    <!-- 한 줄로 골인 -->
+    <g v-else-if="slug === 'reflect'">
+      <rect x="4" y="4" width="40" height="40" rx="8" fill="#0D1B2A" />
+      <path d="M8 32 L28 32 L28 17" stroke="#FFFFFF" stroke-width="2" fill="none" opacity="0.4" stroke-dasharray="3 3.5" />
+      <path d="M21 40 L36 25" stroke="#FFB300" stroke-width="4" stroke-linecap="round" />
+      <circle cx="21" cy="40" r="2" fill="#FFD54F" />
+      <circle cx="36" cy="25" r="2" fill="#FFD54F" />
+      <circle cx="28" cy="12" r="5.5" fill="none" stroke="#3EE6A8" stroke-width="2.5" />
+      <circle cx="28" cy="12" r="1.8" fill="#3EE6A8" />
+      <circle cx="12" cy="32" r="4.6" fill="#FFB74D" />
+      <circle cx="10.5" cy="30.5" r="1.6" fill="#FFF3E0" />
+    </g>
+
     <!-- 등록되지 않은 게임 -->
     <g v-else>
       <rect x="6" y="6" width="36" height="36" rx="9" fill="#D7CCC8" />

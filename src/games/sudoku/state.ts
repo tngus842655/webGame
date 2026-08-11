@@ -9,7 +9,6 @@ export interface SudokuState {
   level: number // 연습 퍼즐 번호 (데일리 다음부터 1, 2, …)
   score: number
   lives: number
-  streak: number // 데일리 연속 클리어 일수 (표시용)
   givens: boolean[] // 81
   cells: number[] // 81, 0 = 빈칸
   notes: number[] // 81, 메모한 숫자의 비트마스크 (1 << d)
@@ -267,7 +266,6 @@ export function createState(): SudokuState {
     level: 0,
     score: 0,
     lives: 3,
-    streak: currentStreak(),
     givens: [],
     cells: [],
     notes: [],

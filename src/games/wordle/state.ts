@@ -163,7 +163,6 @@ export interface WordleState {
   current: string[] // 입력 중인 자모
   maxRows: number // 광고 보상 시 7로 늘어난다
   score: number
-  streak: number
   practiceCount: number
   keyStatus: Record<string, CellStatus> // 키보드 색칠 (g > y > x)
   dailyShare: string | null // 데일리 결과 이모지 그리드
@@ -192,7 +191,6 @@ export function createState(): WordleState {
     current: [],
     maxRows: BASE_ROWS,
     score: 0,
-    streak: currentStreak(),
     practiceCount: 0,
     keyStatus: {},
     dailyShare: null,
@@ -232,8 +230,9 @@ export function submitGuess(state: WordleState): SubmitResult {
   if (result.every((s) => s === 'g')) {
     const points = (state.maxRows + 1 - state.rows.length) * 220
     if (state.daily) {
-      // 스트릭은 출석 표시일 뿐 점수에는 넣지 않는다 (순위표는 이번 판 실력만 반영)
-      state.streak = recordDailyClear().streak
+      // 오늘 데일리를 풀었다는 기록만 남긴다 (연속 일수는 화면에 쓰지 않는다).
+      // 점수에는 넣지 않는다 — 순위표는 이번 판 실력만 반영한다
+      recordDailyClear()
       state.dailyShare = state.results.map((row) => row.map((s) => EMOJI[s]).join('')).join('\n')
     }
     state.score = Math.min(1_000_000, state.score + points)

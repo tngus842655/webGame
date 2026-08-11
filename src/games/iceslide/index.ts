@@ -14,6 +14,7 @@ import {
   addMoves,
   canUndo,
   createState,
+  loadLevel,
   restart,
   slide,
   undo,
@@ -722,7 +723,16 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   shell.addCleanup(detachInput)
   shell.addCleanup(() => stage.destroy())
-  return { destroy: () => shell.destroy(), getScore: () => state.score }
+  return {
+    destroy: () => shell.destroy(),
+    getScore: () => state.score,
+    // 관리자 전용 '다음 단계' — 정상 진행은 클리어 점수를 얹고 넘어가지만 여기서는 그 부분을 뺀다.
+    adminSkip() {
+      if (state.phase !== 'playing') return
+      state.level += 1
+      loadLevel(state)
+    },
+  }
 }
 
 export default defineGame(createSession)

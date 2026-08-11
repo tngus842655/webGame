@@ -60,6 +60,14 @@ const JAR_RADIUS = 62
 const DANGER_BAND = 120 // 위험 경고 그라데이션 높이
 const CHART_Y = 1200 // 하단 진화 도표 중심 y
 
+// 다음 과일 카드. 원래는 오른쪽 위(566, 34)였는데 그 자리를 멈춤·도움말과 그 아래
+// 좋아요·싫어요 줄(GamePlayPage)이 쓴다 — 세로가 짧은 기기일수록 그 줄이 캔버스
+// 안쪽으로 깊이 내려와 카드가 통째로 그 밑에 깔렸다. 더 내리는 길은 막혀 있다:
+// 바로 아래가 떨어뜨릴 과일이 지나는 길(dropY 235, 사과 반지름 62면 y 173부터)이라
+// 이번엔 조준 중인 과일을 카드가 덮는다. 위아래가 다 막혀서 반대쪽으로 옮겼다 —
+// 뒤로가기 칩 아래, 점수판(x 230부터) 왼쪽의 빈 자리다.
+const NEXT_CARD = { x: 30, y: 64, size: 124 } as const
+
 // 논리 좌표 720×1280 스테이지 위에 게임을 그린다 (DESIGN.md 7.1, 7.6)
 export class SuikaRenderer {
   private readonly stage: CanvasStage
@@ -345,11 +353,12 @@ export class SuikaRenderer {
     })
 
     // 다음 과일 (라벨 대신 작은 점 3개로 표현)
+    const { x, y, size } = NEXT_CARD
     c.save()
     c.fillStyle = scene().nextPanel
     c.globalAlpha = 0.75
     c.beginPath()
-    c.roundRect(566, 34, 124, 124, 26)
+    c.roundRect(x, y, size, size, 26)
     c.fill()
     c.restore()
     c.save()
@@ -357,11 +366,11 @@ export class SuikaRenderer {
     c.fillStyle = scene().label
     for (let i = 0; i < 3; i++) {
       c.beginPath()
-      c.arc(612 + i * 16, 56, 3.5, 0, Math.PI * 2)
+      c.arc(x + 46 + i * 16, y + 24, 3.5, 0, Math.PI * 2)
       c.fill()
     }
     c.restore()
-    drawFruit(c, 628, 108, 0, state.nextTier, Math.min(TIERS[state.nextTier].radius, 34))
+    drawFruit(c, x + 62, y + 76, 0, state.nextTier, Math.min(TIERS[state.nextTier].radius, 34))
   }
 
   // 하단 진화 순서 — 달성한 티어는 컬러, 미달성은 흐리게

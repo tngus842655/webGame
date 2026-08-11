@@ -2,9 +2,6 @@ import { COLORS, GRID, LAYOUT, SCORING, SHAPES, type PieceShape } from './config
 
 export type Phase = 'playing' | 'over'
 
-// 데일리 모드는 시드 고정 난수를 꽂아 딜 순서를 모두에게 같게 만든다
-export type Rng = () => number
-
 export interface Piece {
   shape: PieceShape
   color: number // COLORS 인덱스
@@ -32,7 +29,6 @@ export interface BBState {
   score: number
   grid: number[] // GRID×GRID, 0=빈칸, n>0 = COLORS[n-1]
   tray: (Piece | null)[]
-  rng: Rng
   streak: number
   streakAge: number // 콤보 배지 팝 연출용
   streakGrace: number // 남은 콤보 유예 — 줄을 못 지운 배치를 한 번은 버틴다
@@ -42,9 +38,9 @@ export interface BBState {
   hintTime: number // 힌트·강조 애니메이션 시간
 }
 
-function randomFrom(shapes: PieceShape[], rng: Rng): Piece {
+function randomFrom(shapes: PieceShape[]): Piece {
   const total = shapes.reduce((sum, s) => sum + s.weight, 0)
-  let r = rng() * total
+  let r = Math.random() * total
   let picked = shapes[0]
   for (const s of shapes) {
     r -= s.weight
@@ -53,16 +49,15 @@ function randomFrom(shapes: PieceShape[], rng: Rng): Piece {
       break
     }
   }
-  return { shape: picked, color: Math.floor(rng() * COLORS.length) }
+  return { shape: picked, color: Math.floor(Math.random() * COLORS.length) }
 }
 
-export function createState(rng: Rng = Math.random): BBState {
+export function createState(): BBState {
   return {
     phase: 'playing',
     score: 0,
     grid: new Array<number>(GRID * GRID).fill(0),
-    tray: [randomFrom(SHAPES, rng), randomFrom(SHAPES, rng), randomFrom(SHAPES, rng)],
-    rng,
+    tray: [randomFrom(SHAPES), randomFrom(SHAPES), randomFrom(SHAPES)],
     streak: 0,
     streakAge: 0,
     streakGrace: 0,
@@ -77,11 +72,7 @@ export function createState(rng: Rng = Math.random): BBState {
 // (꽉 찬 줄은 즉시 지워진다) 1×1은 항상 놓을 수 있다
 export function replaceTrayWithSmall(state: BBState) {
   const smalls = SHAPES.filter((s) => s.cells.length <= 3)
-  state.tray = [
-    randomFrom([SHAPES[0]], state.rng),
-    randomFrom(smalls, state.rng),
-    randomFrom(smalls, state.rng),
-  ]
+  state.tray = [randomFrom([SHAPES[0]]), randomFrom(smalls), randomFrom(smalls)]
 }
 
 export function pieceSize(piece: Piece): { w: number; h: number } {
@@ -217,11 +208,7 @@ export function placePiece(
   state.score += gained
 
   if (state.tray.every((p) => p === null)) {
-    state.tray = [
-      randomFrom(SHAPES, state.rng),
-      randomFrom(SHAPES, state.rng),
-      randomFrom(SHAPES, state.rng),
-    ]
+    state.tray = [randomFrom(SHAPES), randomFrom(SHAPES), randomFrom(SHAPES)]
   }
   const remaining = state.tray.filter((p): p is Piece => p !== null)
   const gameOver = !remaining.some((p) => anyFit(state.grid, p))

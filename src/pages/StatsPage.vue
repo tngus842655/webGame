@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { fetchAdStats } from '@/shared/adViews'
+import { statsRange } from '@/shared/adminPeriod'
 import { GAMES } from '@/games/registry'
 import GameIcon from '@/shared/GameIcon.vue'
 import { t } from '@/shared/i18n'
@@ -8,10 +9,9 @@ import {
   fetchGameStats,
   fetchTotalPlayers,
   formatDuration,
-  STATS_PERIODS,
-  statsDays,
   type GameStat,
 } from '@/shared/playSessions'
+import StatsPeriodTabs from '@/shared/StatsPeriodTabs.vue'
 import UiIcon from '@/shared/UiIcon.vue'
 
 const stats = ref<GameStat[]>([])
@@ -42,9 +42,9 @@ async function load() {
   failed.value = false
   try {
     const [rows, total, ads] = await Promise.all([
-      fetchGameStats(statsDays.value),
-      fetchTotalPlayers(statsDays.value),
-      fetchAdStats(statsDays.value),
+      fetchGameStats(statsRange.value),
+      fetchTotalPlayers(statsRange.value),
+      fetchAdStats(statsRange.value),
     ])
     stats.value = rows
     players.value = total
@@ -57,7 +57,7 @@ async function load() {
 }
 
 onMounted(load)
-watch(statsDays, load)
+watch(statsRange, load)
 </script>
 
 <template>
@@ -67,17 +67,7 @@ watch(statsDays, load)
       <h1>{{ t('stats.title') }}</h1>
     </header>
 
-    <div class="tabs">
-      <button
-        v-for="p in STATS_PERIODS"
-        :key="p"
-        type="button"
-        :class="{ active: statsDays === p }"
-        @click="statsDays = p"
-      >
-        {{ t('stats.days', { n: p }) }}
-      </button>
-    </div>
+    <StatsPeriodTabs />
 
     <p class="hint">{{ t('stats.hint') }}</p>
 
@@ -146,28 +136,6 @@ watch(statsDays, load)
 
 .stats-header h1 {
   font-size: 20px;
-}
-
-.tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-.tabs button {
-  flex: 1;
-  padding: 10px 0;
-  border: none;
-  border-radius: 12px;
-  background: var(--surface);
-  color: var(--ink-faint);
-  cursor: pointer;
-}
-
-.tabs button.active {
-  background: var(--ink-muted);
-  color: var(--surface);
-  font-weight: bold;
 }
 
 .hint {

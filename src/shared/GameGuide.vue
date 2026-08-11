@@ -2,6 +2,7 @@
 // 게임 설명 팝업 — 플레이 화면의 ? 버튼으로 연다.
 // 게임 화면 위에 뜨므로 바깥을 눌러도 닫히지 않는다 (오터치로 사라지면 성가시다)
 import { computed } from 'vue'
+import { GAMES } from '@/games/registry'
 import { guideFor } from './guides'
 import { t } from './i18n'
 import UiIcon from './UiIcon.vue'
@@ -12,6 +13,13 @@ defineEmits<{ close: [] }>()
 // guideFor는 locale을 읽으므로 computed로 감싼다 — 한 번만 읽어두면 언어를 바꿔도
 // 팝업 본문만 이전 언어로 남는다 (주변 라벨은 t()라 바로 바뀐다)
 const guide = computed(() => guideFor(props.slug))
+
+// 점수가 없는 게임(단계로 겨루는 게임)은 셋째 줄 제목을 '기록'으로 바꾼다
+const recordLabel = computed(() =>
+  GAMES.find((g) => g.slug === props.slug)?.recordUnit === 'stage'
+    ? t('guide.record')
+    : t('guide.score'),
+)
 </script>
 
 <template>
@@ -29,7 +37,7 @@ const guide = computed(() => guideFor(props.slug))
           <dd>{{ guide.how }}</dd>
         </div>
         <div class="row">
-          <dt><UiIcon name="star" /> {{ t('guide.score') }}</dt>
+          <dt><UiIcon name="star" /> {{ recordLabel }}</dt>
           <dd>{{ guide.score }}</dd>
         </div>
       </dl>

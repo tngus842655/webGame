@@ -1,4 +1,3 @@
-import { t } from '@/shared/i18n'
 import { CanvasStage } from '../stage'
 import { drawBlock, drawEmptyCell } from './blockArt'
 import { GRID, LAYOUT } from './config'
@@ -19,14 +18,6 @@ export interface DragState {
   trayIndex: number
   x: number
   y: number
-}
-
-// 세션이 들고 있는 HUD 부가 정보 (모드·스트릭·목표)
-export interface HudInfo {
-  daily: boolean
-  streak: number
-  done: boolean // 오늘 목표를 이미 달성했다
-  goal: number
 }
 
 const BOARD_PAD = 14
@@ -90,9 +81,9 @@ export class BBRenderer {
     return this.stage.toBoard(clientX, clientY)
   }
 
-  draw(state: BBState, drag: DragState | null, hud: HudInfo) {
+  draw(state: BBState, drag: DragState | null) {
     this.drawBackground()
-    this.drawHud(state, hud)
+    this.drawHud(state)
     this.drawBoard(state)
 
     const dragPiece = drag ? state.tray[drag.trayIndex] : null
@@ -293,7 +284,7 @@ export class BBRenderer {
     c.globalAlpha = 1
   }
 
-  private drawHud(state: BBState, hud: HudInfo) {
+  private drawHud(state: BBState) {
     const { c } = this
     const s = scene()
     c.textAlign = 'center'
@@ -306,43 +297,11 @@ export class BBRenderer {
       valueColor: s.value,
     })
 
-    // 데일리↔자유 전환 칩 (점수판 왼쪽)
-    const chip = LAYOUT.modeChip
-    c.save()
-    c.fillStyle = hud.daily ? '#FF7043' : s.panel
-    c.beginPath()
-    c.roundRect(chip.x, chip.y, chip.w, chip.h, 36)
-    c.fill()
-    if (!hud.daily) {
-      c.strokeStyle = s.trayEdge
-      c.lineWidth = 2
-      c.stroke()
-    }
-    c.fillStyle = hud.daily ? '#FFFFFF' : s.hint
-    c.font = font(22, true)
-    c.fillText(
-      t(hud.daily ? 'daily.label' : 'daily.free'),
-      chip.x + chip.w / 2,
-      chip.y + chip.h / 2 + 8,
-    )
-    c.restore()
-
-    // 스트릭·목표 안내줄 (최고 기록은 점수판이 머리줄에 그린다 — 여기 두면 같은 값이 두 번 나온다)
-    if (hud.daily) {
-      const parts = [
-        t('daily.streak', { n: hud.streak }),
-        hud.done ? t('daily.goalDone') : t('daily.goal', { n: hud.goal.toLocaleString() }),
-      ]
-      c.fillStyle = s.hint
-      c.font = font(26)
-      c.fillText(parts.join('  ·  '), LAYOUT.width / 2, LAYOUT.infoY)
-    }
-
     // 연속 클리어 배지 (숫자만 — 언어 무관)
     if (state.streak >= 2) {
       const pop = Math.min(1, state.streakAge / 0.25)
       c.save()
-      c.translate(560, 88)
+      c.translate(LAYOUT.streakBadge.x, LAYOUT.streakBadge.y)
       c.scale(1.25 - pop * 0.25, 1.25 - pop * 0.25)
       c.fillStyle = '#FF7043'
       c.beginPath()

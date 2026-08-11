@@ -4,6 +4,9 @@ export interface GameMeta {
   slug: string
   titleKey: TranslationKey // 표시할 때 t()로 변환
   loader: () => Promise<{ default: GameModule }>
+  // 기록을 점수가 아닌 단위로 세는 게임(한 줄로 골인 = 깬 단계). DB에는 같은 칼럼에
+  // 그 숫자가 그대로 들어가고, 랭킹·홈이 '점' 대신 이 단위로 읽어 준다
+  recordUnit?: 'stage'
 }
 
 export interface GameModule {
@@ -12,6 +15,15 @@ export interface GameModule {
   unmount(): void
   // 진행 중 점수 — 게임오버 전에 나가도 기록이 남도록 허브가 주기적으로 읽는다 (0 = 아직 없음)
   currentScore(): number
+  // 관리자 전용 '다음 단계'를 지원하는 게임인지 (mount 뒤에 물어야 한다)
+  canAdminSkip(): boolean
+  // 점수는 그대로 두고 판만 넘긴다. 지원하지 않는 게임에서는 아무 일도 하지 않는다
+  adminSkip(): void
+  // 관리자 전용 '진도 초기화'를 지원하는 게임인지 (mount 뒤에 물어야 한다).
+  // 기기에 진도를 저장해 두는 게임에서만 참이다 — 테스트로 올려둔 단계를 되돌릴 길이 필요하다
+  canAdminReset(): boolean
+  // 저장해 둔 진도와 이 기기의 최고 기록을 지우고 처음부터. 지원하지 않으면 아무 일도 하지 않는다
+  adminReset(): void
 }
 
 export interface GameContext {

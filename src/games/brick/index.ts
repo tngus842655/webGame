@@ -232,7 +232,18 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
   shell.addCleanup(detachInput)
   shell.addCleanup(() => renderer.destroy())
-  return { destroy: () => shell.destroy(), getScore: () => state.score }
+  return {
+    destroy: () => shell.destroy(),
+    getScore: () => state.score,
+    // 관리자 전용 '다음 단계' — advanceWave는 줄을 한 칸 내리고 새 줄을 깐다.
+    // 바닥에 닿으면 phase를 'over'로 바꾸고 참을 돌려주는데, 턴 종료와 똑같이
+    // gameOver()까지 불러야 끝이 난다. 반환값을 버리면 게임오버 화면이 뜨지 않은
+    // 채로 조준·발사·이 버튼이 모두 phase 검사에 막혀 화면이 먹통이 된다.
+    adminSkip() {
+      if (state.phase !== 'aiming') return
+      if (advanceWave(state)) void gameOver()
+    },
+  }
 }
 
 export default defineGame(createSession)

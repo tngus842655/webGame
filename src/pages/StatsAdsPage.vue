@@ -4,10 +4,11 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import type { AdMedium } from '@/shared/ads'
 import { fetchAdStats, type AdStat } from '@/shared/adViews'
+import { statsRange } from '@/shared/adminPeriod'
 import { GAMES } from '@/games/registry'
 import GameIcon from '@/shared/GameIcon.vue'
 import { t, type TranslationKey } from '@/shared/i18n'
-import { STATS_PERIODS, statsDays } from '@/shared/playSessions'
+import StatsPeriodTabs from '@/shared/StatsPeriodTabs.vue'
 import UiIcon from '@/shared/UiIcon.vue'
 
 const stats = ref<AdStat[]>([])
@@ -19,7 +20,7 @@ async function load() {
   loading.value = true
   failed.value = false
   try {
-    stats.value = await fetchAdStats(statsDays.value)
+    stats.value = await fetchAdStats(statsRange.value)
   } catch {
     failed.value = true
   } finally {
@@ -28,7 +29,7 @@ async function load() {
 }
 
 onMounted(load)
-watch(statsDays, load)
+watch(statsRange, load)
 
 const MEDIUM_LABELS: Record<AdMedium, TranslationKey> = {
   adsense: 'stats.adWeb',
@@ -134,20 +135,10 @@ function pct(n: number, total: number): string {
       <h1>{{ t('stats.adsTitle') }}</h1>
     </header>
 
-    <div class="tabs">
-      <button
-        v-for="p in STATS_PERIODS"
-        :key="p"
-        type="button"
-        :class="{ active: statsDays === p }"
-        @click="statsDays = p"
-      >
-        {{ t('stats.days', { n: p }) }}
-      </button>
-    </div>
+    <StatsPeriodTabs />
 
     <!-- 매체가 하나뿐이면 전체와 같은 값이라 갈라 볼 것이 없다 -->
-    <div v-if="mediums.length > 1" class="tabs mediums">
+    <div v-if="mediums.length > 1" class="tabs">
       <button type="button" :class="{ active: medium === 'all' }" @click="medium = 'all'">
         {{ t('stats.adAll') }}
       </button>
@@ -246,6 +237,7 @@ function pct(n: number, total: number): string {
   margin-bottom: 14px;
 }
 
+/* 바로 위 기간 탭(StatsPeriodTabs)과 같은 크기여야 두 줄이 한 벌로 읽힌다 */
 .tabs button {
   flex: 1;
   padding: 10px 0;
@@ -253,6 +245,8 @@ function pct(n: number, total: number): string {
   border-radius: 12px;
   background: var(--surface);
   color: var(--ink-faint);
+  font: inherit;
+  font-size: 13.5px;
   cursor: pointer;
 }
 
@@ -260,11 +254,6 @@ function pct(n: number, total: number): string {
   background: var(--ink-muted);
   color: var(--surface);
   font-weight: bold;
-}
-
-/* 기간 탭과 한 묶음으로 읽히도록 붙여 둔다 */
-.mediums {
-  margin-top: -6px;
 }
 
 .hint {

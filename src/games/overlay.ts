@@ -4,6 +4,11 @@ import { countUp, createSheet } from './ui'
 
 // 게임 공통 게임오버 오버레이 (점수·최고 기록·광고 이어하기·다시하기)
 // 문구는 show() 시점에 t()로 채워 언어 변경이 즉시 반영된다.
+
+// 끝까지 해내고 끝난 판. 이 사유가 오면 팝업이 실패한 얼굴('게임 오버')이 아니라
+// 완주한 얼굴('클리어!')로 바뀐다 — 다 깨고도 진 것과 똑같은 화면을 보면 허탈하다.
+// 사유 키가 곧 판의 결말이므로 게임마다 따로 깃발을 넘기게 하지 않는다.
+const CLEAR_REASON: TranslationKey = 'over.byClear'
 export interface GameOverOverlayOptions {
   // 광고 보상 지점이 없는 게임은 생략한다
   adLabelKey?: TranslationKey
@@ -64,13 +69,15 @@ export function createGameOverOverlay(
       // 판이 끝났으니 곡도 접는다 (다시하기·이어하기로 팝업을 닫으면 돌아온다)
       duckBgm()
       const isRecord = prevBest === null || score > prevBest
+      const isClear = reasonKey === CLEAR_REASON
+      sheet.find('.gui-sheet')?.classList.toggle('is-clear', isClear)
 
       const badge = sheet.find('[data-badge]')
       if (badge) {
         badge.textContent = t('over.newRecord')
         badge.style.display = isRecord ? '' : 'none'
       }
-      set('[data-title]', t('over.title'))
+      set('[data-title]', t(isClear ? 'over.clearTitle' : 'over.title'))
       const reason = sheet.find('[data-reason]')
       if (reason) {
         reason.textContent = reasonKey ? t(reasonKey) : ''
