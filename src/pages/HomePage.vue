@@ -15,6 +15,7 @@ import GameCard from '@/shared/GameCard.vue'
 import GameIcon from '@/shared/GameIcon.vue'
 import { APP_NAME, t, type TranslationKey } from '@/shared/i18n'
 import { favorites, recents } from '@/shared/library'
+import { thisMonthRange } from '@/shared/rankPeriod'
 import { isInToss } from '@/shared/toss'
 import { promotionStatus } from '@/shared/tossPromotion'
 import UiIcon from '@/shared/UiIcon.vue'
@@ -62,9 +63,10 @@ const promoNote = computed(() =>
 function scoreLabel(card: { slug: string; best: number | null; stat: MyGameStat | null }): string {
   // 점수가 아니라 단계로 겨루는 게임은 '점'을 붙이지 않는다 (registry의 recordUnit)
   const stage = GAMES.find((g) => g.slug === card.slug)?.recordUnit === 'stage'
-  if (card.stat) {
+  // 순위는 이번 달(KST) 기준 — 이번 달 기록이 없으면 전체 최고 기록으로 떨어진다
+  if (card.stat && card.stat.rank !== null && card.stat.period_best !== null) {
     return t(stage ? 'home.myRankStage' : 'home.myRank', {
-      score: card.stat.best_score.toLocaleString(),
+      score: card.stat.period_best.toLocaleString(),
       rank: card.stat.rank,
     })
   }
@@ -140,7 +142,7 @@ const heroReason = computed(() => {
   if (rank === 1) return t('home.reasonTop')
   if (game.best === null && !game.stat) return t('home.reasonTry')
   if (rank !== undefined && rank <= HERO_RISING) return t('home.reasonRising', { n: rank })
-  if (game.stat) return t('home.reasonRank', { n: game.stat.rank })
+  if (game.stat?.rank != null) return t('home.reasonRank', { n: game.stat.rank })
   // 최근 플레이한 게임은 후보에서 빠지므로, 기록이 남아 있다면 한동안 손을 뗀 게임이다
   return t('home.reasonBack')
 })
@@ -215,7 +217,8 @@ onMounted(async () => {
   const [, , myStats] = await Promise.all([
     flags,
     refreshPopularity(),
-    fetchMyStats().catch(() => [] as MyGameStat[]),
+    // 카드의 '내 순위'는 이번 달(KST) 판에서 매긴다 — 랭킹 화면의 '이번 달'과 같은 구간
+    fetchMyStats(thisMonthRange()).catch(() => [] as MyGameStat[]),
   ])
   // 서버 기록을 로컬에 되먹인다 — 안 하면 플레이 화면의 최고 기록이 이 기기 값에 머문다
   syncLocalBests(myStats)

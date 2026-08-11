@@ -24,6 +24,7 @@ defineProps<{
     | 'check'
     | 'arrow-up'
     | 'arrow-down'
+    | 'crown'
 }>()
 </script>
 
@@ -145,6 +146,12 @@ defineProps<{
     <path v-else-if="name === 'arrow-up'" d="M12 4.2 18 11.8h-3.2v8h-5.6v-8H6z" />
 
     <path v-else-if="name === 'arrow-down'" d="M12 19.8 18 12.2h-3.2v-8h-5.6v8H6z" />
+
+    <!-- 명예의 전당 왕관 — 시상대 위 1위 머리에 얹는다. 작게 놓이므로 면으로 채운다. -->
+    <g v-else-if="name === 'crown'" fill="currentColor" stroke="none">
+      <path d="M3 7.8 7.7 11 12 5.2 16.3 11 21 7.8 19.2 17H4.8z" />
+      <rect x="4.6" y="18.4" width="14.8" height="2.2" rx="1.1" />
+    </g>
 
     <path
       v-else

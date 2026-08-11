@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { GAMES } from '@/games/registry'
 import { getCurrentUserId } from '@/shared/auth'
 import { t } from '@/shared/i18n'
+import { formatRankRange, thisMonthRange, thisWeekRange } from '@/shared/rankPeriod'
 import { fetchLeaderboard, type LeaderboardEntry } from '@/shared/scores'
 import UiIcon from '@/shared/UiIcon.vue'
 
@@ -20,7 +21,13 @@ function record(value: number): string {
 // 여기까지가 상위권. 1~3위는 금·은·동을 두르고, 10위까지는 번호와 글자를 한 톤 올린다.
 const TOP_TIER = 10
 
-const period = ref<'week' | 'all'>('week')
+const period = ref<'week' | 'month'>('week')
+
+// 탭 이름만으로는 구간이 정확히 어디서 끊기는지 안 보인다 — 날짜로 적어 준다
+const caption = computed(() =>
+  formatRankRange(period.value === 'week' ? thisWeekRange() : thisMonthRange()),
+)
+
 const entries = ref<LeaderboardEntry[]>([])
 const loading = ref(true)
 const failed = ref(false)
@@ -56,10 +63,11 @@ watch(period, load)
       <button type="button" :class="{ active: period === 'week' }" @click="period = 'week'">
         {{ t('ranking.week') }}
       </button>
-      <button type="button" :class="{ active: period === 'all' }" @click="period = 'all'">
-        {{ t('ranking.all') }}
+      <button type="button" :class="{ active: period === 'month' }" @click="period = 'month'">
+        {{ t('ranking.month') }}
       </button>
     </div>
+    <p class="caption">{{ caption }}</p>
 
     <p v-if="loading" class="notice">{{ t('ranking.loading') }}</p>
     <p v-else-if="failed" class="notice">{{ t('ranking.error') }}</p>
@@ -97,7 +105,13 @@ watch(period, load)
 .tabs {
   display: flex;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 6px;
+}
+
+.caption {
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--ink-faint);
 }
 
 .tabs button {

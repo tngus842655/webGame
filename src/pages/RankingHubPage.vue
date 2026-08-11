@@ -3,8 +3,11 @@ import { onMounted } from 'vue'
 import { GAMES } from '@/games/registry'
 import GameIcon from '@/shared/GameIcon.vue'
 import { t } from '@/shared/i18n'
+import { prevMonthLabel } from '@/shared/rankPeriod'
 import { rankedGames, refreshPopularity } from '@/shared/scores'
 import UiIcon from '@/shared/UiIcon.vue'
+
+const hallMonth = prevMonthLabel()
 
 // 홈과 달리 신규를 앞에 세우지 않는다 — 번호를 밝히는 화면이라 1번 자리에는 인기 1위가 서야 한다.
 // 캐시로 첫 렌더부터 확정하고, 새 값은 다음 진입에 반영한다.
@@ -26,6 +29,16 @@ onMounted(() => {
       <RouterLink class="back" to="/"><UiIcon name="back" /></RouterLink>
       <h1>{{ t('home.ranking') }}</h1>
     </header>
+
+    <!-- 지난달 시상식 입구 — 목록 위 한 줄. 여기만 금빛을 써서 문이라는 것을 알린다 -->
+    <RouterLink class="hall-entry" to="/ranking/hall">
+      <span class="hall-crown"><UiIcon name="crown" /></span>
+      <span class="hall-text">
+        <strong>{{ t('hall.entry') }}</strong>
+        <small>{{ t('hall.period', { y: hallMonth.y, m: hallMonth.m }) }}</small>
+      </span>
+      <UiIcon name="chevron" />
+    </RouterLink>
 
     <ul class="game-list">
       <li v-for="game in games" :key="game.slug">
@@ -55,6 +68,82 @@ onMounted(() => {
 
 .hub-header h1 {
   font-size: 20px;
+}
+
+/* 명예의 전당 입구 — 홈 추천 칸과 같은 금빛 계열로, 아래 목록과 결이 갈린다 */
+.hall-entry {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 14px;
+  padding: 12px 12px 12px 14px;
+  border: 1.5px solid #f2ba62;
+  border-radius: 14px;
+  background: linear-gradient(158deg, #fff6e2, #ffe8bf);
+  transition: transform 0.1s ease;
+}
+
+.hall-entry:active {
+  transform: scale(0.985);
+}
+
+.hall-crown {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.75);
+  color: #e8a812;
+}
+
+.hall-crown svg {
+  width: 20px;
+  height: 20px;
+}
+
+.hall-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.hall-text strong {
+  font-size: 14.5px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.hall-text small {
+  font-size: 12px;
+  font-weight: 700;
+  color: #b06c1f;
+}
+
+/* UiIcon은 놓이는 자리가 크기를 정한다 — 안 주면 줄을 통째로 채운다 */
+.hall-entry > svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: #c69245;
+}
+
+/* 홈 추천 칸과 같은 규칙 — 결은 두고 명도만 내린다 */
+[data-theme='dark'] .hall-entry {
+  border-color: #7a5a22;
+  background: linear-gradient(158deg, #3a2c17, #2c2114);
+}
+
+[data-theme='dark'] .hall-crown {
+  background: rgb(255 213 130 / 0.14);
+}
+
+[data-theme='dark'] .hall-text small {
+  color: #e6a94f;
 }
 
 .game-list {
