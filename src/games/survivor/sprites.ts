@@ -1,4 +1,114 @@
-// 서바이버 캐릭터·적·투사체 벡터 아트
+// 서바이버 캐릭터·적·투사체·아이템 벡터 아트
+
+import type { ItemKind } from './state'
+
+// 체력 하트. HUD 하트 줄과 강화 아이콘, 회복 아이템이 같은 그림을 쓴다
+export function drawHeart(
+  c: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  r: number,
+  filled: boolean,
+) {
+  c.save()
+  c.translate(x, y)
+  c.beginPath()
+  c.moveTo(0, r * 0.75)
+  c.bezierCurveTo(-r * 1.4, -r * 0.3, -r * 0.5, -r * 1.2, 0, -r * 0.4)
+  c.bezierCurveTo(r * 0.5, -r * 1.2, r * 1.4, -r * 0.3, 0, r * 0.75)
+  c.closePath()
+  if (filled) {
+    c.fillStyle = '#E53935'
+    c.fill()
+    c.strokeStyle = '#9B1B18'
+  } else {
+    c.fillStyle = 'rgb(141 110 99 / 0.18)'
+    c.fill()
+    c.strokeStyle = 'rgb(141 110 99 / 0.35)'
+  }
+  c.lineWidth = 2
+  c.stroke()
+  c.restore()
+}
+
+// 바닥에 떨어진 아이템. 셋이 같은 받침을 쓰고 속 그림으로만 갈린다 —
+// 멀리서도 "주울 것"이라는 것부터 읽혀야 한다
+export function drawItem(
+  c: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  kind: ItemKind,
+  life: number,
+  phase: number,
+) {
+  // 사라지기 전 3초는 깜빡인다
+  if (life < 3 && Math.floor(life * 6) % 2 === 0) return
+  const bob = Math.sin(phase) * 3
+
+  c.save()
+  c.translate(x, y)
+
+  // 여기 있다고 알리는 물결
+  const ripple = (phase / 6) % 1
+  c.globalAlpha = 0.3 * (1 - ripple)
+  c.strokeStyle = '#FFB300'
+  c.lineWidth = 3
+  c.beginPath()
+  c.arc(0, 0, 22 + ripple * 20, 0, Math.PI * 2)
+  c.stroke()
+  c.globalAlpha = 1
+
+  c.fillStyle = 'rgb(93 64 55 / 0.18)'
+  c.beginPath()
+  c.ellipse(0, 25, 15, 5, 0, 0, Math.PI * 2)
+  c.fill()
+
+  c.translate(0, bob)
+  c.fillStyle = '#FFF3E0'
+  c.strokeStyle = '#6D4C41'
+  c.lineWidth = 3
+  c.beginPath()
+  c.arc(0, 0, 21, 0, Math.PI * 2)
+  c.fill()
+  c.stroke()
+
+  if (kind === 'heal') {
+    drawHeart(c, 0, 1, 12, true)
+  } else if (kind === 'rapid') {
+    c.fillStyle = '#F9A825'
+    c.beginPath()
+    c.moveTo(3, -14)
+    c.lineTo(-9, 2)
+    c.lineTo(-1, 2)
+    c.lineTo(-3, 14)
+    c.lineTo(9, -2)
+    c.lineTo(1, -2)
+    c.closePath()
+    c.fill()
+  } else {
+    // 폭탄 — 심지에 불이 붙어 있다
+    c.strokeStyle = '#8D6E63'
+    c.lineWidth = 3
+    c.beginPath()
+    c.moveTo(4, -8)
+    c.quadraticCurveTo(11, -13, 9, -18)
+    c.stroke()
+    c.fillStyle = '#FF7043'
+    c.beginPath()
+    c.arc(9, -19, 3.2, 0, Math.PI * 2)
+    c.fill()
+    c.fillStyle = '#37474F'
+    c.beginPath()
+    c.arc(-1, 3, 11, 0, Math.PI * 2)
+    c.fill()
+    c.fillStyle = 'rgb(255 255 255 / 0.35)'
+    c.beginPath()
+    c.arc(-5, -1, 3.2, 0, Math.PI * 2)
+    c.fill()
+  }
+
+  c.restore()
+}
 
 export function drawHero(c: CanvasRenderingContext2D, x: number, y: number, r: number, faceDir: number) {
   c.save()

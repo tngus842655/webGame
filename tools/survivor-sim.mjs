@@ -60,10 +60,10 @@ async function loadState(overrides) {
 // 사람의 성장 단계를 흉내 낸 결정적 정책들 (GAME_BALANCE.md 1.1).
 // react = 다음 손가락 위치를 정하기까지 걸리는 시간, ahead = 적 위치를 몇 초 앞서 보는가.
 const POLICIES = {
-  초보: { dirs: 8, react: 0.32, ahead: 0, wall: 0, orb: 0, jitter: 0.35, pick: 'random' },
-  입문: { dirs: 12, react: 0.2, ahead: 0.15, wall: 0.9, orb: 0.2, jitter: 0.12, pick: 'naive' },
-  중급: { dirs: 16, react: 0.11, ahead: 0.3, wall: 1.8, orb: 0.7, jitter: 0.04, pick: 'greedy' },
-  상급: { dirs: 32, react: 0.05, ahead: 0.3, wall: 2.0, orb: 0.9, jitter: 0, pick: 'optimal' },
+  초보: { dirs: 8, react: 0.32, ahead: 0, wall: 0, orb: 0, item: 0, jitter: 0.35, pick: 'random' },
+  입문: { dirs: 12, react: 0.2, ahead: 0.15, wall: 0.9, orb: 0.2, item: 0.6, jitter: 0.12, pick: 'naive' },
+  중급: { dirs: 16, react: 0.11, ahead: 0.3, wall: 1.8, orb: 0.7, item: 2.5, jitter: 0.04, pick: 'greedy' },
+  상급: { dirs: 32, react: 0.05, ahead: 0.3, wall: 2.0, orb: 0.9, item: 3.5, jitter: 0, pick: 'optimal' },
 }
 
 // 입문 — 눈에 띄는 숫자를 고른다. '공격력 +1'이 제일 세 보인다
@@ -156,7 +156,16 @@ function cost(x, y, state, policy, ahead, arena) {
     }
   }
 
-  return danger + policy.wall * wall - policy.orb * orb
+  // 아이템은 판 건너편에 떨어지므로 오브보다 멀리까지 끌어당겨야 주우러 간다
+  let item = 0
+  if (policy.item > 0) {
+    for (const it of state.items) {
+      const d2 = (x - it.x) ** 2 + (y - it.y) ** 2
+      item += 1 / (1 + d2 / 160000)
+    }
+  }
+
+  return danger + policy.wall * wall - policy.orb * orb - policy.item * item
 }
 
 function decide(mod, state, policy) {

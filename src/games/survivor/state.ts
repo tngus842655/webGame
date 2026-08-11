@@ -41,6 +41,26 @@ export function xpForLevel(level: number): number {
   return 4 + level * level
 }
 
+// ── 아이템 ─────────────────────────────────────────────────
+// 판 건너편에 떨어진다. 자동 공격만 도는 게임에 "지금 저기까지 갈까"라는
+// 판단을 하나 넣는 장치라, 가만히 있어도 주워지는 자리에는 두지 않는다.
+export type ItemKind = 'heal' | 'bomb' | 'rapid'
+
+export interface Item {
+  x: number
+  y: number
+  kind: ItemKind
+  life: number
+}
+
+const ITEM_INTERVAL = 26
+const ITEM_LIFE = 13 // 마지막 3초는 깜빡인다 (index.ts)
+const ITEM_MIN_DIST = 240
+export const ITEM_R = 22
+export const BOMB_R = 300
+export const RAPID_TIME = 8
+const RAPID_MULT = 0.45
+
 export type Phase = 'playing' | 'levelup' | 'over'
 
 export interface Enemy {
@@ -103,7 +123,11 @@ export interface SurvivorState {
   enemies: Enemy[]
   bullets: Bullet[]
   orbs: Orb[]
+  items: Item[]
   spawnTimer: number
+  itemTimer: number
+  // 연사 부스트 남은 시간
+  rapid: number
   taken: Record<UpgradeOption['key'], number> // 지금까지 고른 업그레이드 횟수
   choices: UpgradeOption[]
   // 눌러 둔 자리. 도착하면 지워진다
@@ -137,7 +161,10 @@ export function createState(): SurvivorState {
     enemies: [],
     bullets: [],
     orbs: [],
+    items: [],
     spawnTimer: 1,
+    itemTimer: 18,
+    rapid: 0,
     taken: { damage: 0, shots: 0, firerate: 0, speed: 0, maxhp: 0 },
     choices: [],
     move: null,
@@ -199,28 +226,75 @@ function edgePoint(): { x: number; y: number } {
   return { x: ARENA.right + 30, y: ARENA.top + Math.random() * (ARENA.bottom - ARENA.top) }
 }
 
-function spawnEnemy(state: SurvivorState) {
-  if (state.enemies.length >= ENEMY_CAP) return
-  const p = state.player
-  // 가장자리를 몇 번 찍어 보고 플레이어에게서 가장 먼 자리를 쓴다.
-  // 구석에 몰려 있으면 안전거리를 만족하는 자리가 없을 수 있어 최선으로 물러선다
-  let best = edgePoint()
-  let bestDist = Math.hypot(best.x - p.x, best.y - p.y)
-  for (let i = 0; i < 5 && bestDist < SPAWN_SAFE_DIST; i++) {
-    const next = edgePoint()
-    const dist = Math.hypot(next.x - p.x, next.y - p.y)
+function arenaPoint(): { x: number; y: number } {
+  return {
+    x: ARENA.left + 44 + Math.random() * (ARENA.right - ARENA.left - 88),
+    y: ARENA.top + 44 + Math.random() * (ARENA.bottom - ARENA.top - 88),
+  }
+}
+
+// 플레이어에게서 minDist 밖의 자리를 고른다. 몇 번 찍어 보고 가장 먼 곳을 쓴다 —
+// 구석에 몰려 있으면 조건을 만족하는 자리가 아예 없을 수 있어 최선으로 물러선다
+function pickAwayFrom(
+  from: { x: number; y: number },
+  minDist: number,
+  gen: () => { x: number; y: number },
+): { x: number; y: number } {
+  let best = gen()
+  let bestDist = Math.hypot(best.x - from.x, best.y - from.y)
+  for (let i = 0; i < 5 && bestDist < minDist; i++) {
+    const next = gen()
+    const dist = Math.hypot(next.x - from.x, next.y - from.y)
     if (dist > bestDist) {
       best = next
       bestDist = dist
     }
   }
+  return best
+}
+
+function spawnEnemy(state: SurvivorState) {
+  if (state.enemies.length >= ENEMY_CAP) return
+  const spot = pickAwayFrom(state.player, SPAWN_SAFE_DIST, edgePoint)
   state.enemies.push({
-    x: best.x,
-    y: best.y,
+    x: spot.x,
+    y: spot.y,
     r: 24,
     hp: enemyHp(state.time),
     speed: enemySpeed(state.time),
   })
+}
+
+function spawnItem(state: SurvivorState) {
+  const p = state.player
+  // 체력이 가득이면 회복은 주워도 헛걸음이다 — 아예 내지 않는다
+  const kinds: ItemKind[] = p.hp < p.maxHp ? ['bomb', 'rapid', 'heal'] : ['bomb', 'rapid']
+  const spot = pickAwayFrom(p, ITEM_MIN_DIST, arenaPoint)
+  state.items.push({
+    x: spot.x,
+    y: spot.y,
+    kind: kinds[Math.floor(Math.random() * kinds.length)],
+    life: ITEM_LIFE,
+  })
+}
+
+function takeItem(state: SurvivorState, item: Item, result: UpdateResult) {
+  const p = state.player
+  result.picked = item.kind
+  if (item.kind === 'heal') {
+    p.hp = Math.min(p.maxHp, p.hp + 1)
+  } else if (item.kind === 'rapid') {
+    state.rapid = RAPID_TIME
+  } else {
+    // 폭탄 — 줍는 순간 둘레를 쓸어낸다. 언제 주우러 갈지가 이 아이템의 전부다
+    state.enemies = state.enemies.filter((enemy) => {
+      if (Math.hypot(enemy.x - p.x, enemy.y - p.y) > BOMB_R) return true
+      state.orbs.push({ x: enemy.x, y: enemy.y })
+      state.kills += 1
+      result.killed += 1
+      return false
+    })
+  }
 }
 
 // 가까운 적부터 한 갈래씩 맡긴다. 갈래가 적보다 많으면 남는 갈래를 좌우로 벌려 쏜다
@@ -249,13 +323,15 @@ export interface UpdateResult {
   leveledUp: boolean
   killed: number
   hurt: boolean
+  picked: ItemKind | null
 }
 
 export function update(state: SurvivorState, dt: number): UpdateResult {
-  const result: UpdateResult = { died: false, leveledUp: false, killed: 0, hurt: false }
+  const result: UpdateResult = { died: false, leveledUp: false, killed: 0, hurt: false, picked: null }
   const p = state.player
   state.time += dt
   p.invuln = Math.max(0, p.invuln - dt)
+  state.rapid = Math.max(0, state.rapid - dt)
 
   // 이동 — 눌러 둔 자리로 걸어간다. 손을 떼도 그 자리까지는 간다
   if (state.move) {
@@ -277,6 +353,20 @@ export function update(state: SurvivorState, dt: number): UpdateResult {
     state.spawnTimer = spawnInterval(state.time)
     spawnEnemy(state)
   }
+
+  // 아이템 — 떨어뜨리고, 수명이 다하면 거둔다
+  state.itemTimer -= dt
+  if (state.itemTimer <= 0) {
+    state.itemTimer = ITEM_INTERVAL
+    spawnItem(state)
+  }
+  state.items = state.items.filter((item) => {
+    item.life -= dt
+    if (item.life <= 0) return false
+    if (Math.hypot(p.x - item.x, p.y - item.y) > PLAYER_R + ITEM_R) return true
+    takeItem(state, item, result)
+    return false
+  })
 
   // 적 추적 + 접촉 데미지
   for (const enemy of state.enemies) {
@@ -300,7 +390,7 @@ export function update(state: SurvivorState, dt: number): UpdateResult {
   // 자동 발사
   p.fireTimer -= dt
   if (p.fireTimer <= 0 && state.enemies.length > 0) {
-    p.fireTimer = p.fireInterval
+    p.fireTimer = state.rapid > 0 ? p.fireInterval * RAPID_MULT : p.fireInterval
     fire(state)
   }
 
@@ -334,8 +424,12 @@ export function update(state: SurvivorState, dt: number): UpdateResult {
     return true
   })
 
-  // 경험치 오브 흡수
+  // 경험치 오브 흡수.
+  // 레벨이 오르면 그 프레임의 나머지 오브는 손대지 않고 남긴다 — 한 프레임에 두 번
+  // 오르면 나중 것이 choices를 덮어써 레벨 둘에 강화 하나만 받게 된다.
+  // 폭탄이 한 번에 서른 마리를 눕히면서 오브가 뭉쳐 들어오므로 실제로 일어난다.
   state.orbs = state.orbs.filter((orb) => {
+    if (state.phase !== 'playing') return true
     const dx = p.x - orb.x
     const dy = p.y - orb.y
     const dist = Math.hypot(dx, dy)

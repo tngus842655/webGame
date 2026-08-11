@@ -5,11 +5,13 @@ import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
 import { createResumeGate } from '../resumeGate'
 import { createGameShell, defineGame } from '../shell'
-import { drawBullet, drawEnemy, drawHero, drawOrb } from './sprites'
+import { drawBullet, drawEnemy, drawHeart, drawHero, drawItem, drawOrb } from './sprites'
 import { CanvasStage } from '../stage'
 import {
   ARENA,
+  BOMB_R,
   PLAYER_R,
+  RAPID_TIME,
   UPGRADE_POOL,
   createState,
   applyUpgrade,
@@ -19,28 +21,6 @@ import {
 } from './state'
 import { drawScorePanel, font } from '../ui'
 import { ground } from '../scene'
-
-function drawHeart(c: CanvasRenderingContext2D, x: number, y: number, r: number, filled: boolean) {
-  c.save()
-  c.translate(x, y)
-  c.beginPath()
-  c.moveTo(0, r * 0.75)
-  c.bezierCurveTo(-r * 1.4, -r * 0.3, -r * 0.5, -r * 1.2, 0, -r * 0.4)
-  c.bezierCurveTo(r * 0.5, -r * 1.2, r * 1.4, -r * 0.3, 0, r * 0.75)
-  c.closePath()
-  if (filled) {
-    c.fillStyle = '#E53935'
-    c.fill()
-    c.strokeStyle = '#9B1B18'
-  } else {
-    c.fillStyle = 'rgb(141 110 99 / 0.18)'
-    c.fill()
-    c.strokeStyle = 'rgb(141 110 99 / 0.35)'
-  }
-  c.lineWidth = 2
-  c.stroke()
-  c.restore()
-}
 
 // 강화 카드 아이콘 (이모지 대신 벡터)
 function drawUpgradeIcon(
@@ -130,14 +110,27 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         vibrate(40)
       }
       if (result.leveledUp) vibrate(20)
+      if (result.picked === 'bomb') {
+        // 터진 자리를 기억해 뒀다가 파문을 그린다 (플레이어는 계속 움직이므로)
+        bombAt = { x: state.player.x, y: state.player.y }
+        bombFlash = 1
+        playSfx('explode')
+        vibrate(60)
+      } else if (result.picked) {
+        playSfx('coin')
+        vibrate(20)
+      }
       if (result.died) void gameOver()
     }
+    bombFlash = Math.max(0, bombFlash - dt * 2.4)
     draw()
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  preloadSfx('gameover', 'hurt', 'pop', 'unlock')
+  preloadSfx('gameover', 'hurt', 'pop', 'unlock', 'coin', 'explode')
   let adReviveUsed = false
+  let bombFlash = 0 // 폭탄이 터진 자리에 퍼지는 파문 (1 → 0)
+  let bombAt = { x: 360, y: 700 }
 
   const overlay = createGameOverOverlay(shell.wrapper, {
     adLabelKey: 'sv.ad',
@@ -274,8 +267,21 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     }
 
     for (const orb of state.orbs) drawOrb(c, orb.x, orb.y, state.time * 4)
+    for (const item of state.items) drawItem(c, item.x, item.y, item.kind, item.life, state.time * 3)
     for (const bullet of state.bullets) drawBullet(c, bullet.x, bullet.y)
     for (const enemy of state.enemies) drawEnemy(c, enemy.x, enemy.y, enemy.r, enemy.hp)
+
+    // 폭탄이 쓸어낸 자리
+    if (bombFlash > 0) {
+      c.save()
+      c.globalAlpha = bombFlash * 0.55
+      c.strokeStyle = '#FF7043'
+      c.lineWidth = 10
+      c.beginPath()
+      c.arc(bombAt.x, bombAt.y, BOMB_R * (1 - bombFlash), 0, Math.PI * 2)
+      c.stroke()
+      c.restore()
+    }
 
     const blink = p.invuln > 0 && Math.floor(p.invuln * 10) % 2 === 0
     const facing = state.move ? Math.max(-1, Math.min(1, (state.move.x - p.x) / 80)) : 0
@@ -283,6 +289,24 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (blink) c.globalAlpha = 0.35
     drawHero(c, p.x, p.y, PLAYER_R, facing)
     c.restore()
+
+    // 연사 부스트 — 남은 시간이 줄어드는 고리로 보여 준다
+    if (state.rapid > 0) {
+      c.save()
+      c.strokeStyle = '#F9A825'
+      c.lineWidth = 4
+      c.lineCap = 'round'
+      c.beginPath()
+      c.arc(
+        p.x,
+        p.y,
+        PLAYER_R + 10,
+        -Math.PI / 2,
+        -Math.PI / 2 + Math.PI * 2 * (state.rapid / RAPID_TIME),
+      )
+      c.stroke()
+      c.restore()
+    }
 
     // HUD — 판(ARENA.top=150) 위에 얹혀야 해서 좁고 짧은 판을 쓴다.
     // 이 게임의 성적은 버틴 시간이라 큰 숫자 자리에 시간이 온다.
