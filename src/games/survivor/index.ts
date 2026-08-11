@@ -31,6 +31,12 @@ import {
 import { drawScorePanel, font } from '../ui'
 import { ground } from '../scene'
 
+// 한 판이 10분까지 가므로 '540초'보다 분:초가 읽힌다
+function clock(seconds: number): string {
+  const total = Math.floor(seconds)
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`
+}
+
 // 강화 카드 아이콘 (이모지 대신 벡터)
 function drawUpgradeIcon(
   c: CanvasRenderingContext2D,
@@ -337,10 +343,12 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     }
 
     // HUD — 판(ARENA.top=150) 위에 얹혀야 해서 좁고 짧은 판을 쓴다.
-    // 이 게임의 성적은 버틴 시간이라 큰 숫자 자리에 시간이 온다.
+    // 큰 숫자는 점수다. 예전에는 버틴 시간을 큰 자리에 뒀는데, 머리줄의 최고 기록은
+    // 점수라서 '195초' 옆에 '최고 18,929'가 나란히 서는 꼴이었다 — 단위가 서로 달랐다.
+    // 처치 수는 따로 세지 않는다. 점수가 처치×10 + 초라 사실상 같은 숫자다.
     drawScorePanel(c, {
-      label: t('sv.kills', { k: state.kills, lv: state.level }),
-      value: t('sv.time', { n: Math.floor(state.time) }),
+      label: t('sv.hud', { lv: state.level, t: clock(state.time) }),
+      value: scoreOf(state).toLocaleString(),
       compact: true,
       panelColor: ground('rgb(255 255 255 / 0.72)', 'rgb(255 255 255 / 0.08)'),
       labelColor: ground('#BCAAA4', '#8F7D74'),
