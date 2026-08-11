@@ -627,39 +627,3 @@ order by g.granted_at desc limit 20;
 
 ### 남은 것
 
-
-
-### 프로모션 확인 쿼리 (복사후 삭제예정)
--- 프로모션 점검 (콘솔 '실제 소진 금액' 확인 직후 실행)
-with 사람별 as (
-  select anon_key, sum(amount) as 합계, min(granted_at) as 첫지급
-  from promotion_grants group by anon_key
-)
-select 1 as n, '지급 총액' as 항목,
-       (select sum(amount) from promotion_grants) || '원' as 값,
-       '콘솔 소진액 − 이 값 = 유실분. 8/11 기준 60원' as 확인법
-union all
-select 2, '참여자',
-       (select count(*) from 사람별) || '명',
-       '완주 ' || (select count(*) from 사람별 where 합계 = 100) || '명 ('
-         || (select round(100.0 * count(*) filter (where 합계 = 100) / count(*)) from 사람별) || '%)'
-union all
-select 3, '지급 거절',
-       (select count(*) from promotion_failures) || '건',
-       coalesce((select string_agg(code || ' ' || attempts || '회', ', ') from promotion_failures),
-                '없음 = 막힌 사용자 없음')
-union all
-select 4, '합계 이상치',
-       coalesce((select string_agg(distinct 합계::text, ', ') from 사람별
-                 where 합계 not in (20, 50, 100)), '없음'),
-       '20 / 50 / 100 외의 값이 보이면 단계 판정 이상'
-union all
-select 5, '최근 3일 유입',
-       (select count(*) from 사람별 where 첫지급 >= now() - interval '3 days') || '명',
-       '8/6~8/10 하루 28~32명'
-union all
-select 6, '최근 3일 완주율',
-       coalesce((select round(100.0 * count(*) filter (where 합계 = 100) / nullif(count(*), 0))
-                 from 사람별 where 첫지급 >= now() - interval '3 days'), 0) || '%',
-       '첫날 82% → 8/10 17%. 핵심 지표 반영 후 반등하는지'
-order by n;
