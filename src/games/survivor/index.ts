@@ -5,7 +5,15 @@ import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
 import { createResumeGate } from '../resumeGate'
 import { createGameShell, defineGame } from '../shell'
-import { drawBullet, drawEnemy, drawHeart, drawHero, drawItem, drawOrb } from './sprites'
+import {
+  drawBullet,
+  drawEnemy,
+  drawHeart,
+  drawHero,
+  drawItem,
+  drawItemGlyph,
+  drawOrb,
+} from './sprites'
 import { CanvasStage } from '../stage'
 import {
   ARENA,
@@ -18,6 +26,7 @@ import {
   scoreOf,
   setMoveTarget,
   update,
+  useSlot,
 } from './state'
 import { drawScorePanel, font } from '../ui'
 import { ground } from '../scene'
@@ -100,6 +109,13 @@ const CARD_RECTS = [
   { x: 60, y: 740, w: 600, h: 130 },
 ]
 
+// 아이템 칸 — 판(ARENA.bottom=1148) 아래에 둔다. 96은 대부분의 폰에서 52~58px이라
+// 엄지로 눌러도 빗나가지 않는다. 가운데에 모아 두어 어느 손으로 쥐든 닿는다.
+const SLOT_RECTS = [
+  { x: 254, y: 1168, w: 96, h: 96 },
+  { x: 370, y: 1168, w: 96, h: 96 },
+]
+
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
     if (state.phase === 'playing') {
@@ -110,13 +126,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         vibrate(40)
       }
       if (result.leveledUp) vibrate(20)
-      if (result.picked === 'bomb') {
-        // 터진 자리를 기억해 뒀다가 파문을 그린다 (플레이어는 계속 움직이므로)
-        bombAt = { x: state.player.x, y: state.player.y }
-        bombFlash = 1
-        playSfx('explode')
-        vibrate(60)
-      } else if (result.picked) {
+      // 줍는 것은 칸에 담는 것까지다 — 쓰는 것은 사용자가 칸을 눌렀을 때(onDown)
+      if (result.picked) {
         playSfx('coin')
         vibrate(20)
       }
@@ -201,6 +212,23 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         return
       }
       if (state.phase !== 'playing') return
+      // 칸을 먼저 본다. 판 밖이라 이동 목표가 될 자리가 아니므로 빈 칸이어도 여기서 멈춘다
+      for (let i = 0; i < SLOT_RECTS.length; i++) {
+        const r = SLOT_RECTS[i]
+        if (p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h) {
+          const used = useSlot(state, i)
+          if (used === 'bomb') {
+            bombAt = { x: state.player.x, y: state.player.y }
+            bombFlash = 1
+            playSfx('explode')
+            vibrate(60)
+          } else if (used) {
+            playSfx('unlock')
+            vibrate(20)
+          }
+          return
+        }
+      }
       dragging = true
       everTouched = true
       setMoveTarget(state, p.x, p.y)
@@ -341,6 +369,37 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fill()
     }
     c.restore()
+
+    // 아이템 칸 — 판 아래. 빈 칸은 점선으로 자리만 알려 주고, 든 칸은 눌러 달라고
+    // 테두리가 숨을 쉰다 (아껴 두는 게 요령인 게임이라 '지금 쓸 수 있음'이 보여야 한다)
+    for (let i = 0; i < SLOT_RECTS.length; i++) {
+      const r = SLOT_RECTS[i]
+      const kind = state.slots[i]
+      c.save()
+      if (kind) {
+        c.fillStyle = ground('#FFF3E0', 'rgb(255 243 224 / 0.14)')
+        c.beginPath()
+        c.roundRect(r.x, r.y, r.w, r.h, 18)
+        c.fill()
+        c.strokeStyle = '#F9A825'
+        c.lineWidth = 3 + Math.sin(state.time * 5) * 1.2
+      } else {
+        c.strokeStyle = ground('rgb(141 110 99 / 0.32)', 'rgb(255 255 255 / 0.16)')
+        c.lineWidth = 3
+        c.setLineDash([10, 8])
+      }
+      c.beginPath()
+      c.roundRect(r.x, r.y, r.w, r.h, 18)
+      c.stroke()
+      c.restore()
+      if (kind) {
+        c.save()
+        c.translate(r.x + r.w / 2, r.y + r.h / 2)
+        c.scale(1.35, 1.35)
+        drawItemGlyph(c, kind)
+        c.restore()
+      }
+    }
 
     // 레벨업 카드
     if (state.phase === 'levelup') {

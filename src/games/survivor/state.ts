@@ -1,6 +1,8 @@
 // 뱀서라이크 라이트 — 터치한 자리로 이동, 자동 공격, 3택 레벨업, 생존
 
-export const ARENA = { left: 30, right: 690, top: 150, bottom: 1250 } as const
+// 아래를 1148에서 끊는다 — 그 밑은 아이템 칸 자리다. 판 안에 칸을 얹으면
+// 이동하려고 누른 손가락이 아껴 둔 폭탄을 터뜨린다
+export const ARENA = { left: 30, right: 690, top: 150, bottom: 1148 } as const
 export const PLAYER_R = 26
 export const ENEMY_CAP = 60
 export const BULLET_SPEED = 750
@@ -44,7 +46,13 @@ export function xpForLevel(level: number): number {
 // ── 아이템 ─────────────────────────────────────────────────
 // 판 건너편에 떨어진다. 자동 공격만 도는 게임에 "지금 저기까지 갈까"라는
 // 판단을 하나 넣는 장치라, 가만히 있어도 주워지는 자리에는 두지 않는다.
+//
+// 주우면 칸에 담기고 쓰는 것은 사용자가 정한다. 밟자마자 터지면 폭탄을 아껴 둘
+// 수가 없어서, 정작 둘러싸였을 때 쓸 것이 남아 있지 않았다.
 export type ItemKind = 'heal' | 'bomb' | 'rapid'
+
+// 칸 수. 늘리면 아껴 두기가 쉬워져 위기 자체가 사라진다
+export const SLOT_COUNT = 2
 
 export interface Item {
   x: number
@@ -124,6 +132,8 @@ export interface SurvivorState {
   bullets: Bullet[]
   orbs: Orb[]
   items: Item[]
+  // 주워 둔 아이템. 빈 칸은 null이라 자리가 고정된다 (앞으로 당기면 누르려던 칸이 바뀐다)
+  slots: (ItemKind | null)[]
   spawnTimer: number
   itemTimer: number
   // 연사 부스트 남은 시간
@@ -162,6 +172,7 @@ export function createState(): SurvivorState {
     bullets: [],
     orbs: [],
     items: [],
+    slots: Array(SLOT_COUNT).fill(null),
     spawnTimer: 1,
     itemTimer: 18,
     rapid: 0,
@@ -265,36 +276,40 @@ function spawnEnemy(state: SurvivorState) {
   })
 }
 
+// 체력이 가득이어도 회복은 나온다 — 칸에 넣어 뒀다 나중에 쓰면 되기 때문이다
+const ITEM_KINDS: ItemKind[] = ['heal', 'bomb', 'rapid']
+
 function spawnItem(state: SurvivorState) {
-  const p = state.player
-  // 체력이 가득이면 회복은 주워도 헛걸음이다 — 아예 내지 않는다
-  const kinds: ItemKind[] = p.hp < p.maxHp ? ['bomb', 'rapid', 'heal'] : ['bomb', 'rapid']
-  const spot = pickAwayFrom(p, ITEM_MIN_DIST, arenaPoint)
+  const spot = pickAwayFrom(state.player, ITEM_MIN_DIST, arenaPoint)
   state.items.push({
     x: spot.x,
     y: spot.y,
-    kind: kinds[Math.floor(Math.random() * kinds.length)],
+    kind: ITEM_KINDS[Math.floor(Math.random() * ITEM_KINDS.length)],
     life: ITEM_LIFE,
   })
 }
 
-function takeItem(state: SurvivorState, item: Item, result: UpdateResult) {
+// 칸에 든 아이템을 쓴다. 쓴 종류를 돌려준다 (빈 칸이면 null)
+export function useSlot(state: SurvivorState, index: number): ItemKind | null {
+  if (state.phase !== 'playing') return null
+  const kind = state.slots[index]
+  if (kind === null || kind === undefined) return null
+  state.slots[index] = null
   const p = state.player
-  result.picked = item.kind
-  if (item.kind === 'heal') {
+  if (kind === 'heal') {
     p.hp = Math.min(p.maxHp, p.hp + 1)
-  } else if (item.kind === 'rapid') {
+  } else if (kind === 'rapid') {
     state.rapid = RAPID_TIME
   } else {
-    // 폭탄 — 줍는 순간 둘레를 쓸어낸다. 언제 주우러 갈지가 이 아이템의 전부다
+    // 폭탄 — 선 자리를 기준으로 둘레를 쓸어낸다. 언제 터뜨릴지가 이 아이템의 전부다
     state.enemies = state.enemies.filter((enemy) => {
       if (Math.hypot(enemy.x - p.x, enemy.y - p.y) > BOMB_R) return true
       state.orbs.push({ x: enemy.x, y: enemy.y })
       state.kills += 1
-      result.killed += 1
       return false
     })
   }
+  return kind
 }
 
 // 가까운 적부터 한 갈래씩 맡긴다. 갈래가 적보다 많으면 남는 갈래를 좌우로 벌려 쏜다
@@ -364,7 +379,11 @@ export function update(state: SurvivorState, dt: number): UpdateResult {
     item.life -= dt
     if (item.life <= 0) return false
     if (Math.hypot(p.x - item.x, p.y - item.y) > PLAYER_R + ITEM_R) return true
-    takeItem(state, item, result)
+    // 칸이 다 찼으면 줍지 않는다 — 밟고 지나가도 그 자리에 남는다
+    const free = state.slots.indexOf(null)
+    if (free < 0) return true
+    state.slots[free] = item.kind
+    result.picked = item.kind
     return false
   })
 
@@ -402,7 +421,17 @@ export function update(state: SurvivorState, dt: number): UpdateResult {
   // 눕히고 남은 위력은 뒤로 뚫고 나간다. 넘치는 데미지를 버리면 공격력 강화가
   // 적 체력을 넘어서는 순간부터 아무 일도 하지 않아, 고르면 손해인 선택지가 된다
   state.bullets = state.bullets.filter((bullet) => {
-    if (bullet.x < 0 || bullet.x > 720 || bullet.y < 100 || bullet.y > 1280) return false
+    // 판 밖 40px까지만 쫓아간다 (적이 서는 가장자리는 30px 밖이다).
+    // 아래만 20px인 것은 그 밑이 아이템 칸 자리라서다 — 가장자리에 막 선 적은
+    // 반지름이 24라 이 안에서 맞는다
+    if (
+      bullet.x < ARENA.left - 40 ||
+      bullet.x > ARENA.right + 40 ||
+      bullet.y < ARENA.top - 40 ||
+      bullet.y > ARENA.bottom + 20
+    ) {
+      return false
+    }
     for (let i = 0; i < state.enemies.length; i++) {
       const enemy = state.enemies[i]
       const dx = bullet.x - enemy.x

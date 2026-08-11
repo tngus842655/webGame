@@ -66,6 +66,37 @@ const POLICIES = {
   상급: { dirs: 32, react: 0.05, ahead: 0.3, wall: 2.0, orb: 0.9, item: 3.5, jitter: 0, pick: 'optimal' },
 }
 
+// 칸에 든 아이템을 언제 쓰는가. 아이템이 손에 들어온 뒤의 판단이라 실력이 가장 크게 갈린다.
+//   bomb  — 반경 안에 이만큼 모였을 때 터뜨린다 (아낄수록 값이 크다)
+//   heal  — 체력이 이만큼 깎였을 때 쓴다 (0이면 가득 찼는데도 써 버린다)
+//   rapid — 화면에 적이 이만큼 있을 때 쓴다
+const USE = {
+  초보: { bomb: 1, heal: 0, rapid: 1 },
+  입문: { bomb: 3, heal: 1, rapid: 4 },
+  중급: { bomb: 7, heal: 2, rapid: 12 },
+  상급: { bomb: 11, heal: 2, rapid: 16 },
+}
+
+function useSlots(mod, state, policyName) {
+  const rule = USE[policyName]
+  const p = state.player
+  for (let i = 0; i < state.slots.length; i++) {
+    const kind = state.slots[i]
+    if (!kind) continue
+    let go = false
+    if (kind === 'heal') go = p.maxHp - p.hp >= rule.heal
+    else if (kind === 'rapid') go = state.rapid <= 0 && state.enemies.length >= rule.rapid
+    else {
+      let near = 0
+      for (const e of state.enemies) {
+        if (Math.hypot(e.x - p.x, e.y - p.y) <= mod.BOMB_R) near++
+      }
+      go = near >= rule.bomb
+    }
+    if (go) mod.useSlot(state, i)
+  }
+}
+
 // 입문 — 눈에 띄는 숫자를 고른다. '공격력 +1'이 제일 세 보인다
 const NAIVE_ORDER = ['damage', 'maxhp', 'firerate', 'shots', 'speed']
 // 중급 — 초당 몇 발을 뿌리는지가 중요하다는 것까지는 안다
@@ -201,7 +232,7 @@ function decide(mod, state, policy) {
   else mod.setMoveTarget(state, p.x + (dx / len) * 300, p.y + (dy / len) * 300)
 }
 
-function run(mod, policy, runSeed) {
+function run(mod, policy, runSeed, policyName) {
   reseed(runSeed)
   const state = mod.createState()
   let think = 0
@@ -215,6 +246,7 @@ function run(mod, policy, runSeed) {
     if (think <= 0) {
       think = policy.react
       decide(mod, state, policy)
+      useSlots(mod, state, policyName)
     }
     mod.update(state, DT)
   }
@@ -276,8 +308,8 @@ async function main() {
       const cells = []
       for (const period of periods) {
         const mod = await loadState({ spawnRamp: ramp, hpPeriod: period })
-        const mid = summarize(Array.from({ length: runs }, (_, i) => run(mod, POLICIES.중급, i + 1)))
-        const top = summarize(Array.from({ length: runs }, (_, i) => run(mod, POLICIES.상급, i + 1)))
+        const mid = summarize(Array.from({ length: runs }, (_, i) => run(mod, POLICIES.중급, i + 1, '중급')))
+        const top = summarize(Array.from({ length: runs }, (_, i) => run(mod, POLICIES.상급, i + 1, '상급')))
         cells.push(`${mmss(mid.medianTime)} / ${mmss(top.medianTime)}`.padStart(14))
       }
       console.log(`${String(ramp).padEnd(8)} ${cells.join('')}`)
@@ -290,7 +322,7 @@ async function main() {
   console.log('정책     중앙 생존   하위10%   상위10%    레벨    처치   중앙점수   흔들림')
   const groups = []
   for (const [name, policy] of Object.entries(POLICIES)) {
-    const rows = Array.from({ length: runs }, (_, i) => run(mod, policy, i + 1))
+    const rows = Array.from({ length: runs }, (_, i) => run(mod, policy, i + 1, name))
     const s = summarize(rows)
     groups.push(s.scores)
     console.log(

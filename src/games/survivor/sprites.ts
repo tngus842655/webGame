@@ -31,6 +31,45 @@ export function drawHeart(
   c.restore()
 }
 
+// 아이템 속 그림 (원점 기준, 반지름 14쯤). 바닥에 떨어진 것과 아래 칸에 담긴 것이
+// 같은 그림이어야 주운 게 무엇인지 바로 이어진다
+export function drawItemGlyph(c: CanvasRenderingContext2D, kind: ItemKind) {
+  if (kind === 'heal') {
+    drawHeart(c, 0, 1, 12, true)
+  } else if (kind === 'rapid') {
+    c.fillStyle = '#F9A825'
+    c.beginPath()
+    c.moveTo(3, -14)
+    c.lineTo(-9, 2)
+    c.lineTo(-1, 2)
+    c.lineTo(-3, 14)
+    c.lineTo(9, -2)
+    c.lineTo(1, -2)
+    c.closePath()
+    c.fill()
+  } else {
+    // 폭탄 — 심지에 불이 붙어 있다
+    c.strokeStyle = '#8D6E63'
+    c.lineWidth = 3
+    c.beginPath()
+    c.moveTo(4, -8)
+    c.quadraticCurveTo(11, -13, 9, -18)
+    c.stroke()
+    c.fillStyle = '#FF7043'
+    c.beginPath()
+    c.arc(9, -19, 3.2, 0, Math.PI * 2)
+    c.fill()
+    c.fillStyle = '#37474F'
+    c.beginPath()
+    c.arc(-1, 3, 11, 0, Math.PI * 2)
+    c.fill()
+    c.fillStyle = 'rgb(255 255 255 / 0.35)'
+    c.beginPath()
+    c.arc(-5, -1, 3.2, 0, Math.PI * 2)
+    c.fill()
+  }
+}
+
 // 바닥에 떨어진 아이템. 셋이 같은 받침을 쓰고 속 그림으로만 갈린다 —
 // 멀리서도 "주울 것"이라는 것부터 읽혀야 한다
 export function drawItem(
@@ -72,41 +111,7 @@ export function drawItem(
   c.fill()
   c.stroke()
 
-  if (kind === 'heal') {
-    drawHeart(c, 0, 1, 12, true)
-  } else if (kind === 'rapid') {
-    c.fillStyle = '#F9A825'
-    c.beginPath()
-    c.moveTo(3, -14)
-    c.lineTo(-9, 2)
-    c.lineTo(-1, 2)
-    c.lineTo(-3, 14)
-    c.lineTo(9, -2)
-    c.lineTo(1, -2)
-    c.closePath()
-    c.fill()
-  } else {
-    // 폭탄 — 심지에 불이 붙어 있다
-    c.strokeStyle = '#8D6E63'
-    c.lineWidth = 3
-    c.beginPath()
-    c.moveTo(4, -8)
-    c.quadraticCurveTo(11, -13, 9, -18)
-    c.stroke()
-    c.fillStyle = '#FF7043'
-    c.beginPath()
-    c.arc(9, -19, 3.2, 0, Math.PI * 2)
-    c.fill()
-    c.fillStyle = '#37474F'
-    c.beginPath()
-    c.arc(-1, 3, 11, 0, Math.PI * 2)
-    c.fill()
-    c.fillStyle = 'rgb(255 255 255 / 0.35)'
-    c.beginPath()
-    c.arc(-5, -1, 3.2, 0, Math.PI * 2)
-    c.fill()
-  }
-
+  drawItemGlyph(c, kind)
   c.restore()
 }
 

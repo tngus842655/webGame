@@ -43,7 +43,7 @@ const ko: Record<string, Guide> = {
   },
   survivor: {
     goal: '몰려드는 적 사이에서 살아남으세요. 체력이 다하면 끝입니다.',
-    how: '판을 톡 치면 그 자리로 갑니다. 누른 채 끌면 따라와요. 공격은 자동이고, 레벨업 때 강화를 하나 고르세요. 바닥에 떨어진 아이템은 밟는 순간 효과가 나요.',
+    how: '판을 톡 치면 그 자리로 갑니다. 누른 채 끌면 따라와요. 공격은 자동이고, 레벨업 때 강화를 하나 고르세요. 떨어진 아이템은 지나가면 아래 칸에 담기고, 칸을 눌러야 씁니다 — 폭탄은 몰렸을 때 터뜨리세요.',
     score: '처치 수와 생존 시간을 더해 계산합니다.',
   },
   merge: {
@@ -206,7 +206,7 @@ const en: Record<string, Guide> = {
   },
   survivor: {
     goal: 'Stay alive in the swarm. When your health runs out, the run ends.',
-    how: 'Tap anywhere and you walk there. Hold and drag to lead the way. Attacks are automatic — pick an upgrade on level up. Items on the floor go off the moment you step on them.',
+    how: 'Tap anywhere and you walk there. Hold and drag to lead the way. Attacks are automatic — pick an upgrade on level up. Items you walk over go into the two slots below; tap a slot to use one — save the bomb for when you are swarmed.',
     score: 'Kills plus time survived.',
   },
   merge: {
@@ -369,7 +369,7 @@ const ja: Record<string, Guide> = {
   },
   survivor: {
     goal: '群がる敵の中で生き延びます。体力が尽きると終了です。',
-    how: '画面をタップするとその場所へ移動します。押したまま動かすとついてきます。攻撃は自動、レベルアップ時に強化を1つ選びます。床に落ちたアイテムは踏んだ瞬間に発動します。',
+    how: '画面をタップするとその場所へ移動します。押したまま動かすとついてきます。攻撃は自動、レベルアップ時に強化を1つ選びます。落ちたアイテムは通ると下の枠に入り、枠を押すと使えます。爆弾は囲まれた時まで取っておきましょう。',
     score: '撃破数と生存時間の合計。',
   },
   merge: {
@@ -532,7 +532,7 @@ const zhCN: Record<string, Guide> = {
   },
   survivor: {
     goal: '在敌群中活下来。生命耗尽就结束。',
-    how: '点一下就会走到那里，按住拖动则会跟着走。攻击是自动的，升级时选择一项强化。掉在地上的道具，踩到就立刻生效。',
+    how: '点一下就会走到那里，按住拖动则会跟着走。攻击是自动的，升级时选择一项强化。踩过的道具会存进下方两个格子，点格子才会使用。炸弹留到被围住时再用。',
     score: '击杀数加生存时间。',
   },
   merge: {
@@ -695,7 +695,7 @@ const es: Record<string, Guide> = {
   },
   survivor: {
     goal: 'Sobrevive entre la horda. Si te quedas sin vida, se acaba.',
-    how: 'Toca un punto y caminarás hasta allí. Mantén y arrastra para guiarlo. El ataque es automático: elige una mejora al subir de nivel. Los objetos del suelo se activan en cuanto los pisas.',
+    how: 'Toca un punto y caminarás hasta allí. Mantén y arrastra para guiarlo. El ataque es automático: elige una mejora al subir de nivel. Los objetos que pisas van a las dos casillas de abajo; toca una para usarla. Guarda la bomba para cuando te rodeen.',
     score: 'Bajas más tiempo sobrevivido.',
   },
   merge: {
@@ -858,7 +858,7 @@ const ptBR: Record<string, Guide> = {
   },
   survivor: {
     goal: 'Sobreviva no meio da horda. Se a vida acabar, acaba.',
-    how: 'Toque em um ponto e ele anda até lá. Segure e arraste para guiar. O ataque é automático — escolha uma melhoria ao subir de nível. Os itens no chão agem no instante em que você pisa neles.',
+    how: 'Toque em um ponto e ele anda até lá. Segure e arraste para guiar. O ataque é automático — escolha uma melhoria ao subir de nível. Os itens que você pisa vão para os dois espaços abaixo; toque em um para usar. Guarde a bomba para quando te cercarem.',
     score: 'Abates mais tempo sobrevivido.',
   },
   merge: {
@@ -1021,7 +1021,7 @@ const fr: Record<string, Guide> = {
   },
   survivor: {
     goal: 'Reste en vie dans la horde. Quand ta santé tombe à zéro, c\'est fini.',
-    how: 'Touche un point et tu t\'y rends. Maintiens et glisse pour le guider. Les tirs sont automatiques : choisis une amélioration à chaque niveau. Les objets au sol s\'activent dès que tu marches dessus.',
+    how: 'Touche un point et tu t\'y rends. Maintiens et glisse pour le guider. Les tirs sont automatiques : choisis une amélioration à chaque niveau. Les objets ramassés vont dans les deux cases du bas ; touche une case pour l\'utiliser. Garde la bombe pour quand tu es encerclé.',
     score: 'Éliminations plus temps de survie.',
   },
   merge: {
@@ -1184,7 +1184,7 @@ const de: Record<string, Guide> = {
   },
   survivor: {
     goal: 'Bleib im Schwarm am Leben. Geht die Gesundheit aus, ist Schluss.',
-    how: 'Tippe irgendwohin und du läufst dorthin. Halten und ziehen, um zu führen. Angegriffen wird automatisch — bei jedem Stufenaufstieg eine Verbesserung wählen. Gegenstände am Boden wirken, sobald du darauftrittst.',
+    how: 'Tippe irgendwohin und du läufst dorthin. Halten und ziehen, um zu führen. Angegriffen wird automatisch — bei jedem Stufenaufstieg eine Verbesserung wählen. Aufgesammelte Gegenstände landen in den zwei Feldern unten; tippe ein Feld an, um sie zu nutzen. Heb die Bombe auf, bis du umzingelt bist.',
     score: 'Abschüsse plus überlebte Zeit.',
   },
   merge: {
@@ -1347,7 +1347,7 @@ const ru: Record<string, Guide> = {
   },
   survivor: {
     goal: 'Выживайте в толпе врагов. Когда здоровье кончится, игра заканчивается.',
-    how: 'Коснитесь точки — герой пойдёт туда. Удерживайте и ведите пальцем, чтобы он следовал. Атака автоматическая: при повышении уровня выберите улучшение. Предметы на полу срабатывают, как только вы на них наступите.',
+    how: 'Коснитесь точки — герой пойдёт туда. Удерживайте и ведите пальцем, чтобы он следовал. Атака автоматическая: при повышении уровня выберите улучшение. Подобранные предметы попадают в две ячейки внизу — нажмите на ячейку, чтобы применить. Бомбу приберегите на момент окружения.',
     score: 'Убийства плюс время выживания.',
   },
   merge: {
@@ -1510,7 +1510,7 @@ const id: Record<string, Guide> = {
   },
   survivor: {
     goal: 'Tetap hidup di tengah kerumunan. Kalau nyawa habis, permainan berakhir.',
-    how: 'Ketuk satu titik dan kamu berjalan ke sana. Tahan lalu seret untuk menuntun. Serangan otomatis — pilih satu peningkatan saat naik level. Item yang jatuh di lantai langsung bekerja begitu kamu menginjaknya.',
+    how: 'Ketuk satu titik dan kamu berjalan ke sana. Tahan lalu seret untuk menuntun. Serangan otomatis — pilih satu peningkatan saat naik level. Item yang kamu lewati masuk ke dua kotak di bawah; ketuk kotaknya untuk memakainya. Simpan bom sampai kamu terkepung.',
     score: 'Jumlah bunuh ditambah lama bertahan.',
   },
   merge: {
@@ -1673,7 +1673,7 @@ const vi: Record<string, Guide> = {
   },
   survivor: {
     goal: 'Sống sót giữa bầy địch. Hết máu là kết thúc.',
-    how: 'Chạm vào một điểm là bạn đi tới đó. Giữ và kéo để dẫn đường. Bắn tự động — lên cấp thì chọn một nâng cấp. Vật phẩm rơi dưới sàn phát tác ngay khi bạn giẫm lên.',
+    how: 'Chạm vào một điểm là bạn đi tới đó. Giữ và kéo để dẫn đường. Bắn tự động — lên cấp thì chọn một nâng cấp. Vật phẩm bạn đi qua sẽ vào hai ô bên dưới; chạm vào ô để dùng. Hãy để dành bom cho lúc bị vây.',
     score: 'Số địch hạ được cộng thời gian sống sót.',
   },
   merge: {
@@ -1836,7 +1836,7 @@ const th: Record<string, Guide> = {
   },
   survivor: {
     goal: 'เอาชีวิตรอดท่ามกลางฝูงศัตรู ถ้าพลังชีวิตหมดก็จบ',
-    how: 'แตะตรงไหนก็เดินไปตรงนั้น กดค้างแล้วลากเพื่อให้เดินตาม การโจมตีเป็นอัตโนมัติ เลือกอัปเกรดเมื่อเลเวลอัพ ไอเทมที่ตกอยู่บนพื้นจะทำงานทันทีที่เหยียบ',
+    how: 'แตะตรงไหนก็เดินไปตรงนั้น กดค้างแล้วลากเพื่อให้เดินตาม การโจมตีเป็นอัตโนมัติ เลือกอัปเกรดเมื่อเลเวลอัพ ไอเทมที่เดินผ่านจะเก็บเข้าช่องสองช่องด้านล่าง แตะช่องเพื่อใช้ เก็บระเบิดไว้ตอนโดนรุมล้อม',
     score: 'จำนวนที่สังหารบวกเวลาที่รอด',
   },
   merge: {
@@ -1999,7 +1999,7 @@ const tr: Record<string, Guide> = {
   },
   survivor: {
     goal: 'Sürünün ortasında hayatta kal. Canın biterse oyun biter.',
-    how: 'Bir noktaya dokun, oraya yürürsün. Basılı tutup sürükleyerek yönlendir. Saldırı otomatik — seviye atlayınca bir geliştirme seç. Yerdeki eşyalar üzerine bastığın anda etkisini gösterir.',
+    how: 'Bir noktaya dokun, oraya yürürsün. Basılı tutup sürükleyerek yönlendir. Saldırı otomatik — seviye atlayınca bir geliştirme seç. Üzerinden geçtiğin eşyalar alttaki iki bölmeye girer; kullanmak için bölmeye dokun. Bombayı kuşatıldığın ana sakla.',
     score: 'Öldürme sayısı artı hayatta kalma süresi.',
   },
   merge: {
