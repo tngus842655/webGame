@@ -187,24 +187,41 @@ export function trashedGames<T extends { slug: string }>(games: readonly T[]): T
   })
 }
 
+// 주 목록에 세우는 게임 — 휴지통·숨김 처리된 것을 뺀다
+function visibleGames<T extends { slug: string }>(games: readonly T[]): T[] {
+  const flags = cachedFlags()
+  return games.filter((game) => {
+    const flag = flags.get(game.slug)
+    return !flag?.trashed && !flag?.hidden
+  })
+}
+
 // 정렬: 관리자가 고정한 게임이 맨 앞(그 안에서는 sortOrder), 나머지는 인기순.
 // 휴지통·숨김 처리된 게임은 주 목록에서 뺀다.
 export function sortByPopularity<T extends { slug: string }>(games: readonly T[]): T[] {
   const popularity = cachedPopularity()
   const flags = cachedFlags()
-  return games
-    .filter((game) => {
-      const flag = flags.get(game.slug)
-      return !flag?.trashed && !flag?.hidden
-    })
-    .slice()
-    .sort((a, b) => {
-      const fa = flags.get(a.slug)
-      const fb = flags.get(b.slug)
-      if (!!fa?.featured !== !!fb?.featured) return fa?.featured ? -1 : 1
-      if (fa?.featured && fb?.featured) return (fa.sortOrder ?? 0) - (fb.sortOrder ?? 0)
-      return (popularity.get(b.slug) ?? 0) - (popularity.get(a.slug) ?? 0)
-    })
+  return visibleGames(games).sort((a, b) => {
+    const fa = flags.get(a.slug)
+    const fb = flags.get(b.slug)
+    if (!!fa?.featured !== !!fb?.featured) return fa?.featured ? -1 : 1
+    if (fa?.featured && fb?.featured) return (fa.sortOrder ?? 0) - (fb.sortOrder ?? 0)
+    return (popularity.get(b.slug) ?? 0) - (popularity.get(a.slug) ?? 0)
+  })
+}
+
+// 랭킹 화면 전용 — 순위를 함께 실어 순수 인기순으로 세운다.
+// 홈은 관리자가 올린 신규를 맨 앞에 고정하지만, 순위를 숫자로 밝히는 화면에서
+// 그랬다가는 1번 자리에 인기 1위가 아닌 게임이 선다.
+// 아직 기록이 없어 순위가 없는 게임(popularityRanks에 안 들어간다)은 맨 뒤에 붙는다.
+export function rankedGames<T extends { slug: string }>(
+  games: readonly T[],
+): Array<T & { rank: number | null }> {
+  const shown = visibleGames(games)
+  const ranks = popularityRanks(shown)
+  return shown
+    .map((game) => ({ ...game, rank: ranks.get(game.slug) ?? null }))
+    .sort((a, b) => (a.rank ?? Infinity) - (b.rank ?? Infinity))
 }
 
 export async function refreshPopularity(): Promise<void> {

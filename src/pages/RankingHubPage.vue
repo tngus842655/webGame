@@ -3,11 +3,12 @@ import { onMounted } from 'vue'
 import { GAMES } from '@/games/registry'
 import GameIcon from '@/shared/GameIcon.vue'
 import { t } from '@/shared/i18n'
-import { refreshPopularity, sortByPopularity } from '@/shared/scores'
+import { rankedGames, refreshPopularity } from '@/shared/scores'
 import UiIcon from '@/shared/UiIcon.vue'
 
-// 홈과 동일한 인기순 정렬 — 캐시로 첫 렌더부터 확정하고, 새 값은 다음 진입에 반영한다
-const games = sortByPopularity(GAMES)
+// 홈과 달리 신규를 앞에 세우지 않는다 — 번호를 밝히는 화면이라 1번 자리에는 인기 1위가 서야 한다.
+// 캐시로 첫 렌더부터 확정하고, 새 값은 다음 진입에 반영한다.
+const games = rankedGames(GAMES)
 
 onMounted(() => {
   void refreshPopularity()
@@ -24,6 +25,8 @@ onMounted(() => {
     <ul class="game-list">
       <li v-for="game in games" :key="game.slug">
         <RouterLink class="row" :to="`/ranking/${game.slug}`">
+          <!-- 최근 7일 기록이 없는 게임은 매길 순위가 없다 — 자리만 지킨다 -->
+          <span class="rank">{{ game.rank ?? '–' }}</span>
           <span class="thumb"><GameIcon :slug="game.slug" /></span>
           <span class="title">{{ t(game.titleKey) }}</span>
           <span class="arrow"><UiIcon name="chevron" /></span>
@@ -60,7 +63,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 11px 12px 11px 14px;
+  padding: 11px 12px;
   background: var(--surface);
   border-radius: 14px;
   box-shadow: var(--shadow-card);
@@ -70,6 +73,18 @@ onMounted(() => {
 .row:active {
   transform: scale(0.985);
   background: var(--surface-press);
+}
+
+/* 인기 순위. 두 자리로 넘어가도 아래 줄과 어긋나지 않게 자릿수 폭을 고정한다 */
+.rank {
+  flex-shrink: 0;
+  width: 22px;
+  font-size: 15px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  text-align: center;
+  color: var(--ink-muted);
 }
 
 .thumb {
