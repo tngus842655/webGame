@@ -207,6 +207,7 @@ const dict: FullDict = {
   'pause.title': '잠시 멈춤',
   'pause.resume': '계속하기',
   'pause.quit': '그만두기',
+  'vote.ask': '이 게임 어땠나요?',
   'vote.up': '이 게임 좋아요',
   'vote.down': '이 게임 싫어요',
   'vote.thanksUp': '좋아요를 남겼어요',

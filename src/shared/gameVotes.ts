@@ -55,6 +55,19 @@ export async function saveVote(slug: string, vote: VoteValue | null): Promise<vo
   localStorage.setItem(storeKey(slug), JSON.stringify({ day, vote }))
 }
 
+const askKey = (slug: string) => `webgame:vote-ask-${slug}`
+
+// 게임오버 팝업에서 오늘 이 게임의 표를 이미 물어봤는가 (overlay.ts).
+// 한 번 묻고 지나갔으면 오늘은 다시 묻지 않는다 — 다시하기 루프 한복판이라
+// 판마다 또 물으면 잔소리가 된다. 표는 어차피 하루 한 장이다.
+export function askedVoteToday(slug: string): boolean {
+  return localStorage.getItem(askKey(slug)) === todayKey()
+}
+
+export function markVoteAsked(slug: string): void {
+  localStorage.setItem(askKey(slug), todayKey())
+}
+
 export interface VoteStat {
   slug: string
   up: number

@@ -16,6 +16,7 @@ import { bgmFor, duckBgm, resumeBgm, startBgm, stopBgm } from '@/shared/music'
 import { startPlayTracking } from '@/shared/playSessions'
 import { fetchMyStats, getLocalBest, syncLocalBests } from '@/shared/scores'
 import { startScoreGuard } from '@/shared/scoreGuard'
+import { setOverlayGame } from '@/games/overlay'
 import { setHudBest } from '@/games/ui'
 
 const route = useRoute()
@@ -137,6 +138,9 @@ onMounted(async () => {
   // 로드 완료 전에 페이지를 떠났으면 mount하지 않는다
   if (disposed) return
   game = mod.default
+  // 게임오버 팝업이 좋아요·싫어요를 물을 때 쓴다 — 게임 30여 개가 함께 쓰는 팝업이라
+  // 어느 게임인지는 여기서 한 번 알려준다 (overlay.ts)
+  setOverlayGame(slug)
   game.mount(host.value, createGameContext(slug))
   // 관리자 전용 '다음 단계'. 판이 나뉘는 게임에서만 뜨고, 홈을 거치지 않고 바로
   // 들어온 경우를 위해 여기서 한 번 확인한다 (결과는 캐시된다).
@@ -164,6 +168,7 @@ onBeforeUnmount(() => {
   clearTimeout(resetArmId)
   // 다음 게임이 이전 게임의 기록을 달고 뜨지 않도록 (첫 갱신까지 250ms가 뜬다)
   setHudBest(null, 0)
+  setOverlayGame(null)
   stopCountdown()
   document.removeEventListener('visibilitychange', onVisibility)
   stopBgm()

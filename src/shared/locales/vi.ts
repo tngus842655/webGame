@@ -141,6 +141,7 @@ const dict: CoreDict = {
   'pause.title': 'Tạm dừng',
   'pause.resume': 'Tiếp tục',
   'pause.quit': 'Thoát',
+  'vote.ask': 'Bạn thấy trò này thế nào?',
   'vote.up': 'Thích trò này',
   'vote.down': 'Không thích trò này',
   'vote.thanksUp': 'Đã ghi nhận, cảm ơn!',

@@ -141,6 +141,7 @@ const dict: CoreDict = {
   'pause.title': 'Duraklatıldı',
   'pause.resume': 'Devam et',
   'pause.quit': 'Çık',
+  'vote.ask': 'Bu oyunu nasıl buldun?',
   'vote.up': 'Bu oyunu beğendim',
   'vote.down': 'Bu oyunu beğenmedim',
   'vote.thanksUp': 'Not aldık, teşekkürler!',

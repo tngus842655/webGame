@@ -141,6 +141,7 @@ const dict: CoreDict = {
   'pause.title': 'Пауза',
   'pause.resume': 'Продолжить',
   'pause.quit': 'Выйти',
+  'vote.ask': 'Как вам эта игра?',
   'vote.up': 'Нравится эта игра',
   'vote.down': 'Не нравится эта игра',
   'vote.thanksUp': 'Записали, спасибо!',
