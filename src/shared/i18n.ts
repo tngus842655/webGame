@@ -175,6 +175,10 @@ const en = {
   'ranking.empty': 'No records yet. Be the first!',
   'ranking.unknown': 'Unknown game',
   'rank.stage': 'Stage {n}',
+  // 랭킹 화면 아래 고정된 내 줄 — 아직 이름을 정하지 않은 사람에게만 유도가 붙는다
+  'rank.setName': 'Set your name',
+  'rank.nameNudge': 'You appear on the leaderboard under this name.',
+  'rank.cancel': 'Cancel',
   'hall.title': 'Hall of Fame',
   'hall.entry': 'Last month\'s Hall of Fame',
   'hall.period': '{m}/{y}',

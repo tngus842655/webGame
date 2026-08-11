@@ -25,6 +25,7 @@ defineProps<{
     | 'arrow-up'
     | 'arrow-down'
     | 'crown'
+    | 'pencil'
 }>()
 </script>
 
@@ -151,6 +152,13 @@ defineProps<{
     <g v-else-if="name === 'crown'" fill="currentColor" stroke="none">
       <path d="M3 7.8 7.7 11 12 5.2 16.3 11 21 7.8 19.2 17H4.8z" />
       <rect x="4.6" y="18.4" width="14.8" height="2.2" rx="1.1" />
+    </g>
+
+    <!-- 이름을 고칠 수 있다는 표시. 랭킹의 내 줄에서 12px 남짓으로 놓이므로
+         몸통은 한 붓으로 닫고, 지우개 쪽 띠 하나만 더해 연필로 읽히게 한다. -->
+    <g v-else-if="name === 'pencil'">
+      <path d="M4 20 4.9 16.4 16.1 5.2a1.9 1.9 0 0 1 2.7 2.7L7.6 19.1z" />
+      <path d="M13.3 8.1 15.9 10.7" />
     </g>
 
     <path
