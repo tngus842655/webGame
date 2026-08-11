@@ -34,10 +34,13 @@ versionCode <직전 값 + 1>
 versionName "<versionCode와 같은 값>"
 ```
 
-```powershell
-npm run build:android
+```CMD
+cd C:\Workspace\webGame
+npx cap sync android
+
 cd android
-.\gradlew.bat bundleRelease
+gradlew.bat clean
+gradlew.bat bundleRelease
 ```
 
 빌드가 꼬여 보이면 `.\gradlew.bat clean`을 한 번 돌리고 다시 한다. 평소에는 필요 없다.
