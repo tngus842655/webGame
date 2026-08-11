@@ -182,6 +182,68 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* 이 게임 어땠는지 묻는 줄 — 두 번째 판에 딱 한 번 뜬다 (overlay.ts).
+   화살표는 게임 화면 구석의 그것(GameVote.vue)과 같은 그림·같은 색이라,
+   여기서 문구와 함께 보고 나면 저기 떠 있던 아이콘이 무엇인지도 알게 된다. */
+.gui-vote {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 13px;
+  border-top: 1px solid rgb(154 124 100 / 0.18);
+}
+
+.gui-vote-ask {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #a98d7d;
+  word-break: keep-all;
+}
+
+.gui-vote-btn {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgb(154 124 100 / 0.12);
+  color: #a98d7d;
+  cursor: pointer;
+  transition:
+    transform 0.1s ease,
+    background-color 0.14s ease,
+    color 0.14s ease;
+}
+
+.gui-vote-btn:active {
+  transform: scale(0.88);
+}
+
+.gui-vote-btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* 표를 남기면 화살표 속이 찬다 — 비어 있는 동안은 아직 고르지 않았다는 뜻이다 */
+.gui-vote-btn.on svg {
+  fill: currentColor;
+}
+
+.gui-vote-btn.on.up {
+  color: #3e9a46;
+  background: rgb(62 154 70 / 0.16);
+}
+
+.gui-vote-btn.on.down {
+  color: #d0453f;
+  background: rgb(208 69 63 / 0.16);
+}
+
 /* 버튼 생김새는 main.css의 .btn을 그대로 쓰고, 시트 안 간격만 여기서 준다.
    광고 버튼처럼 '무엇을 주는지'가 괄호로 붙는 문구는 길어서 두 줄이 되는데,
    그대로 두면 괄호 한가운데가 잘린다. 문구에 넣은 줄바꿈을 살려 괄호 앞에서 끊는다. */
@@ -228,8 +290,29 @@
   text-shadow: 0 2px 0 rgb(0 0 0 / 0.35);
 }
 
-[data-theme='dark'] .gui-stats {
+[data-theme='dark'] .gui-stats,
+[data-theme='dark'] .gui-vote {
   border-top-color: rgb(255 255 255 / 0.1);
+}
+
+[data-theme='dark'] .gui-vote-ask {
+  color: var(--ink-muted);
+}
+
+[data-theme='dark'] .gui-vote-btn {
+  background: rgb(255 255 255 / 0.08);
+  color: var(--ink-faint);
+}
+
+/* 어두운 판 위에서는 같은 초록·빨강이 가라앉는다 — GameVote.vue와 같은 값으로 올려 잡는다 */
+[data-theme='dark'] .gui-vote-btn.on.up {
+  color: #6ec975;
+  background: rgb(110 201 117 / 0.16);
+}
+
+[data-theme='dark'] .gui-vote-btn.on.down {
+  color: #ff7a72;
+  background: rgb(255 122 114 / 0.16);
 }
 
 @keyframes gui-fade {

@@ -175,6 +175,10 @@ const en = {
   'ranking.empty': 'No records yet. Be the first!',
   'ranking.unknown': 'Unknown game',
   'rank.stage': 'Stage {n}',
+  // 랭킹 화면 아래 고정된 내 줄 — 아직 이름을 정하지 않은 사람에게만 유도가 붙는다
+  'rank.setName': 'Set your name',
+  'rank.nameNudge': 'You appear on the leaderboard under this name.',
+  'rank.cancel': 'Cancel',
   'hall.title': 'Hall of Fame',
   'hall.entry': 'Last month\'s Hall of Fame',
   'hall.period': '{m}/{y}',
@@ -257,6 +261,7 @@ const en = {
   'pause.quit': 'Quit',
   // 게임 화면의 좋아요·싫어요. 앞의 둘은 화살표 두 개의 읽어주기 이름이고,
   // 나머지는 누른 뒤 잠깐 떴다 사라지는 한 줄이다
+  'vote.ask': 'How was this game?',
   'vote.up': 'I like this game',
   'vote.down': "I don't like this game",
   'vote.thanksUp': 'Liked — thanks!',
