@@ -39,6 +39,7 @@
 | `20260808000000_game_votes.sql` | `game_votes` 테이블 — 게임별 좋아요·싫어요, 하루 한 표 | ✅ 2026-08-08 |
 | `20260808100000_game_vote_stats.sql` | `get_game_vote_stats()` — 인기도 화면 집계 | ✅ 2026-08-08 |
 | `20260808200000_stats_calendar_periods.sql` | 통계 4개 함수의 기간을 달력 구간(`p_from`·`p_to`)으로 — 롤링(`p_days`) 폐기 | |
+| `20260811000000_calendar_rankings.sql` | 랭킹도 달력 구간으로 — `get_leaderboard()`·`get_my_stats()` 인자 교체, `get_hall_of_fame()` 신설 | ✅ 2026-08-11 |
 
 ## 테이블
 
@@ -62,8 +63,9 @@
 
 | 함수 | 호출하는 곳 | 권한 |
 | --- | --- | --- |
-| `get_leaderboard(p_game_slug, p_since, p_limit)` | 랭킹 화면 | 공개 |
-| `get_my_stats()` | 홈 화면, 게임 진입 시 최고점 동기화 | 로그인 사용자 |
+| `get_leaderboard(p_game_slug, p_from, p_to, p_limit)` | 랭킹 화면 (이번 주·이번 달, KST) | 공개 |
+| `get_my_stats(p_from, p_to)` | 홈 화면(이번 달 순위), 게임 진입 시 최고점 동기화 | 로그인 사용자 |
+| `get_hall_of_fame(p_from, p_to, p_top)` | 명예의 전당 — 지난달 게임별 1~3위 | 공개 |
 | `get_game_popularity()` | 홈 정렬 | 공개 |
 | `get_game_stats(p_from, p_to)` | 관리자 통계 | `is_admin()` 아니면 `forbidden` |
 | `get_total_players(p_from, p_to)` | 관리자 통계 | `is_admin()` 아니면 `forbidden` |

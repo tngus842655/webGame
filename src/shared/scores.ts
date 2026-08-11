@@ -1,4 +1,10 @@
 import { ensureUserId, getCurrentUserId } from './auth'
+import {
+  prevMonthRange,
+  thisMonthRange,
+  thisWeekRange,
+  type RankRange,
+} from './rankPeriod'
 import { getSupabase } from './supabase'
 
 function bestKey(slug: string) {
@@ -86,18 +92,26 @@ export async function saveScore(slug: string, score: number): Promise<void> {
 
 export interface MyGameStat {
   game_slug: string
+  // 전체 누적 최고 — syncLocalBests가 이 값으로 로컬 캐시를 되먹인다
   best_score: number
-  rank: number
+  // 구간 안 최고와 순위. 구간에 기록이 없으면 null (구간을 안 넘기면 전체 기준)
+  period_best: number | null
+  rank: number | null
 }
 
-// 내 게임별 최고점·순위 (세션 없으면 익명 로그인 후 조회)
-export async function fetchMyStats(): Promise<MyGameStat[]> {
+// 내 게임별 최고점·순위 (세션 없으면 익명 로그인 후 조회).
+// 구간을 넘기면 순위는 그 구간의 기록끼리 매긴다 — 홈이 이번 달(KST)을 넘긴다.
+// 최고점은 항상 전체 누적이다. 플레이 화면의 신기록 판정이 이 값을 본다.
+export async function fetchMyStats(range?: RankRange): Promise<MyGameStat[]> {
   // 세션이 없다 = 아직 아무것도 기록하지 않은 방문자. 보여줄 내 기록도 없다.
   // 여기서 계정을 만들지 않는다 — 열어만 보고 나간 사람까지 쌓이지 않도록,
   // 계정은 첫 점수·플레이 기록이 만든다.
   if (!(await getCurrentUserId())) return []
   const sb = await getSupabase()
-  const { data, error } = await sb.rpc('get_my_stats')
+  const { data, error } = await sb.rpc('get_my_stats', {
+    p_from: range?.from.toISOString() ?? null,
+    p_to: range?.to.toISOString() ?? null,
+  })
   if (error) throw error
   return (data ?? []) as MyGameStat[]
 }
@@ -187,24 +201,41 @@ export function trashedGames<T extends { slug: string }>(games: readonly T[]): T
   })
 }
 
+// 주 목록에 세우는 게임 — 휴지통·숨김 처리된 것을 뺀다
+function visibleGames<T extends { slug: string }>(games: readonly T[]): T[] {
+  const flags = cachedFlags()
+  return games.filter((game) => {
+    const flag = flags.get(game.slug)
+    return !flag?.trashed && !flag?.hidden
+  })
+}
+
 // 정렬: 관리자가 고정한 게임이 맨 앞(그 안에서는 sortOrder), 나머지는 인기순.
 // 휴지통·숨김 처리된 게임은 주 목록에서 뺀다.
 export function sortByPopularity<T extends { slug: string }>(games: readonly T[]): T[] {
   const popularity = cachedPopularity()
   const flags = cachedFlags()
-  return games
-    .filter((game) => {
-      const flag = flags.get(game.slug)
-      return !flag?.trashed && !flag?.hidden
-    })
-    .slice()
-    .sort((a, b) => {
-      const fa = flags.get(a.slug)
-      const fb = flags.get(b.slug)
-      if (!!fa?.featured !== !!fb?.featured) return fa?.featured ? -1 : 1
-      if (fa?.featured && fb?.featured) return (fa.sortOrder ?? 0) - (fb.sortOrder ?? 0)
-      return (popularity.get(b.slug) ?? 0) - (popularity.get(a.slug) ?? 0)
-    })
+  return visibleGames(games).sort((a, b) => {
+    const fa = flags.get(a.slug)
+    const fb = flags.get(b.slug)
+    if (!!fa?.featured !== !!fb?.featured) return fa?.featured ? -1 : 1
+    if (fa?.featured && fb?.featured) return (fa.sortOrder ?? 0) - (fb.sortOrder ?? 0)
+    return (popularity.get(b.slug) ?? 0) - (popularity.get(a.slug) ?? 0)
+  })
+}
+
+// 랭킹 화면 전용 — 순위를 함께 실어 순수 인기순으로 세운다.
+// 홈은 관리자가 올린 신규를 맨 앞에 고정하지만, 순위를 숫자로 밝히는 화면에서
+// 그랬다가는 1번 자리에 인기 1위가 아닌 게임이 선다.
+// 아직 기록이 없어 순위가 없는 게임(popularityRanks에 안 들어간다)은 맨 뒤에 붙는다.
+export function rankedGames<T extends { slug: string }>(
+  games: readonly T[],
+): Array<T & { rank: number | null }> {
+  const shown = visibleGames(games)
+  const ranks = popularityRanks(shown)
+  return shown
+    .map((game) => ({ ...game, rank: ranks.get(game.slug) ?? null }))
+    .sort((a, b) => (a.rank ?? Infinity) - (b.rank ?? Infinity))
 }
 
 export async function refreshPopularity(): Promise<void> {
@@ -229,19 +260,42 @@ export interface LeaderboardEntry {
   achieved_at: string
 }
 
+// 구간은 KST 달력으로 딱 끊는다 (rankPeriod.ts). 롤링('최근 7일')이었을 때는
+// 아침에 본 순위와 저녁에 본 순위가 서로 다른 구간을 말했다.
 export async function fetchLeaderboard(
   slug: string,
-  period: 'week' | 'all',
+  period: 'week' | 'month',
   limit = 50,
 ): Promise<LeaderboardEntry[]> {
-  const since =
-    period === 'week' ? new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString() : null
+  const range = period === 'week' ? thisWeekRange() : thisMonthRange()
   const sb = await getSupabase()
   const { data, error } = await sb.rpc('get_leaderboard', {
     p_game_slug: slug,
-    p_since: since,
+    p_from: range.from.toISOString(),
+    p_to: range.to.toISOString(),
     p_limit: limit,
   })
   if (error) throw error
   return (data ?? []) as LeaderboardEntry[]
+}
+
+export interface HallEntry {
+  game_slug: string
+  rank: number
+  user_id: string
+  nickname: string
+  best_score: number
+}
+
+// 지난달(KST) 게임별 1~3위 — 명예의 전당. 서버 한 번에 전 게임을 받는다.
+// scores에는 update/delete 정책이 없어 지난 구간은 다시 계산해도 같은 답이 나온다.
+export async function fetchHallOfFame(): Promise<HallEntry[]> {
+  const range = prevMonthRange()
+  const sb = await getSupabase()
+  const { data, error } = await sb.rpc('get_hall_of_fame', {
+    p_from: range.from.toISOString(),
+    p_to: range.to.toISOString(),
+  })
+  if (error) throw error
+  return (data ?? []) as HallEntry[]
 }

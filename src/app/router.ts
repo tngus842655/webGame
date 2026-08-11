@@ -9,6 +9,7 @@ import AdminVotesPage from '@/pages/AdminVotesPage.vue'
 import TrashPage from '@/pages/TrashPage.vue'
 import GamePlayPage from '@/pages/GamePlayPage.vue'
 import GamesPage from '@/pages/GamesPage.vue'
+import HallOfFamePage from '@/pages/HallOfFamePage.vue'
 import RankingHubPage from '@/pages/RankingHubPage.vue'
 import RankingPage from '@/pages/RankingPage.vue'
 import SettingsPage from '@/pages/SettingsPage.vue'
@@ -30,6 +31,8 @@ export const router = createRouter({
     { path: '/play/:slug', component: GamePlayPage },
     { path: '/games', component: GamesPage },
     { path: '/ranking', component: RankingHubPage },
+    // 정적 경로가 :slug보다 먼저 매칭되지만, 사람이 읽을 때도 앞에 있어야 헷갈리지 않는다
+    { path: '/ranking/hall', component: HallOfFamePage },
     { path: '/ranking/:slug', component: RankingPage },
     { path: '/settings', component: SettingsPage },
     { path: '/stats', component: StatsPage, meta: { admin: true } },
