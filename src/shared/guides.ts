@@ -43,7 +43,7 @@ const ko: Record<string, Guide> = {
   },
   survivor: {
     goal: '몰려드는 적 사이에서 살아남으세요. 체력이 다하면 끝입니다.',
-    how: '끌어서 이동만 하면 공격은 자동입니다. 레벨업 때 강화를 하나 고르세요.',
+    how: '판을 톡 치면 그 자리로 갑니다. 누른 채 끌면 따라와요. 공격은 자동이고, 레벨업 때 강화를 하나 고르세요.',
     score: '처치 수와 생존 시간을 더해 계산합니다.',
   },
   merge: {
@@ -206,7 +206,7 @@ const en: Record<string, Guide> = {
   },
   survivor: {
     goal: 'Stay alive in the swarm. When your health runs out, the run ends.',
-    how: 'Just drag to move — attacks are automatic. Pick an upgrade on level up.',
+    how: 'Tap anywhere and you walk there. Hold and drag to lead the way. Attacks are automatic — pick an upgrade on level up.',
     score: 'Kills plus time survived.',
   },
   merge: {
@@ -369,7 +369,7 @@ const ja: Record<string, Guide> = {
   },
   survivor: {
     goal: '群がる敵の中で生き延びます。体力が尽きると終了です。',
-    how: 'ドラッグで移動するだけ、攻撃は自動です。レベルアップ時に強化を1つ選びます。',
+    how: '画面をタップするとその場所へ移動します。押したまま動かすとついてきます。攻撃は自動、レベルアップ時に強化を1つ選びます。',
     score: '撃破数と生存時間の合計。',
   },
   merge: {
@@ -532,7 +532,7 @@ const zhCN: Record<string, Guide> = {
   },
   survivor: {
     goal: '在敌群中活下来。生命耗尽就结束。',
-    how: '拖动移动即可，攻击是自动的。升级时选择一项强化。',
+    how: '点一下就会走到那里，按住拖动则会跟着走。攻击是自动的，升级时选择一项强化。',
     score: '击杀数加生存时间。',
   },
   merge: {
@@ -695,7 +695,7 @@ const es: Record<string, Guide> = {
   },
   survivor: {
     goal: 'Sobrevive entre la horda. Si te quedas sin vida, se acaba.',
-    how: 'Solo arrastra para moverte: el ataque es automático. Elige una mejora al subir de nivel.',
+    how: 'Toca un punto y caminarás hasta allí. Mantén y arrastra para guiarlo. El ataque es automático: elige una mejora al subir de nivel.',
     score: 'Bajas más tiempo sobrevivido.',
   },
   merge: {
@@ -858,7 +858,7 @@ const ptBR: Record<string, Guide> = {
   },
   survivor: {
     goal: 'Sobreviva no meio da horda. Se a vida acabar, acaba.',
-    how: 'Basta arrastar para andar — o ataque é automático. Escolha uma melhoria ao subir de nível.',
+    how: 'Toque em um ponto e ele anda até lá. Segure e arraste para guiar. O ataque é automático — escolha uma melhoria ao subir de nível.',
     score: 'Abates mais tempo sobrevivido.',
   },
   merge: {
@@ -1021,7 +1021,7 @@ const fr: Record<string, Guide> = {
   },
   survivor: {
     goal: 'Reste en vie dans la horde. Quand ta santé tombe à zéro, c\'est fini.',
-    how: 'Glisse simplement pour bouger, les tirs sont automatiques. Choisis une amélioration à chaque niveau.',
+    how: 'Touche un point et tu t\'y rends. Maintiens et glisse pour le guider. Les tirs sont automatiques : choisis une amélioration à chaque niveau.',
     score: 'Éliminations plus temps de survie.',
   },
   merge: {
@@ -1184,7 +1184,7 @@ const de: Record<string, Guide> = {
   },
   survivor: {
     goal: 'Bleib im Schwarm am Leben. Geht die Gesundheit aus, ist Schluss.',
-    how: 'Einfach ziehen zum Bewegen — angegriffen wird automatisch. Bei jedem Stufenaufstieg eine Verbesserung wählen.',
+    how: 'Tippe irgendwohin und du läufst dorthin. Halten und ziehen, um zu führen. Angegriffen wird automatisch — bei jedem Stufenaufstieg eine Verbesserung wählen.',
     score: 'Abschüsse plus überlebte Zeit.',
   },
   merge: {
@@ -1347,7 +1347,7 @@ const ru: Record<string, Guide> = {
   },
   survivor: {
     goal: 'Выживайте в толпе врагов. Когда здоровье кончится, игра заканчивается.',
-    how: 'Просто тяните, чтобы двигаться, — атака автоматическая. При повышении уровня выберите улучшение.',
+    how: 'Коснитесь точки — герой пойдёт туда. Удерживайте и ведите пальцем, чтобы он следовал. Атака автоматическая: при повышении уровня выберите улучшение.',
     score: 'Убийства плюс время выживания.',
   },
   merge: {
@@ -1510,7 +1510,7 @@ const id: Record<string, Guide> = {
   },
   survivor: {
     goal: 'Tetap hidup di tengah kerumunan. Kalau nyawa habis, permainan berakhir.',
-    how: 'Cukup seret untuk bergerak — serangan otomatis. Pilih satu peningkatan saat naik level.',
+    how: 'Ketuk satu titik dan kamu berjalan ke sana. Tahan lalu seret untuk menuntun. Serangan otomatis — pilih satu peningkatan saat naik level.',
     score: 'Jumlah bunuh ditambah lama bertahan.',
   },
   merge: {
@@ -1673,7 +1673,7 @@ const vi: Record<string, Guide> = {
   },
   survivor: {
     goal: 'Sống sót giữa bầy địch. Hết máu là kết thúc.',
-    how: 'Chỉ cần kéo để di chuyển — bắn tự động. Lên cấp thì chọn một nâng cấp.',
+    how: 'Chạm vào một điểm là bạn đi tới đó. Giữ và kéo để dẫn đường. Bắn tự động — lên cấp thì chọn một nâng cấp.',
     score: 'Số địch hạ được cộng thời gian sống sót.',
   },
   merge: {
@@ -1836,7 +1836,7 @@ const th: Record<string, Guide> = {
   },
   survivor: {
     goal: 'เอาชีวิตรอดท่ามกลางฝูงศัตรู ถ้าพลังชีวิตหมดก็จบ',
-    how: 'แค่ลากเพื่อเคลื่อนที่ การโจมตีเป็นอัตโนมัติ เลือกอัปเกรดเมื่อเลเวลอัพ',
+    how: 'แตะตรงไหนก็เดินไปตรงนั้น กดค้างแล้วลากเพื่อให้เดินตาม การโจมตีเป็นอัตโนมัติ เลือกอัปเกรดเมื่อเลเวลอัพ',
     score: 'จำนวนที่สังหารบวกเวลาที่รอด',
   },
   merge: {
@@ -1999,7 +1999,7 @@ const tr: Record<string, Guide> = {
   },
   survivor: {
     goal: 'Sürünün ortasında hayatta kal. Canın biterse oyun biter.',
-    how: 'Hareket için sadece sürükle — saldırı otomatik. Seviye atlayınca bir geliştirme seç.',
+    how: 'Bir noktaya dokun, oraya yürürsün. Basılı tutup sürükleyerek yönlendir. Saldırı otomatik — seviye atlayınca bir geliştirme seç.',
     score: 'Öldürme sayısı artı hayatta kalma süresi.',
   },
   merge: {

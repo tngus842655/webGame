@@ -14,6 +14,7 @@ import {
   createState,
   applyUpgrade,
   scoreOf,
+  setMoveTarget,
   update,
 } from './state'
 import { drawScorePanel, font } from '../ui'
@@ -44,7 +45,7 @@ function drawHeart(c: CanvasRenderingContext2D, x: number, y: number, r: number,
 // 강화 카드 아이콘 (이모지 대신 벡터)
 function drawUpgradeIcon(
   c: CanvasRenderingContext2D,
-  key: 'damage' | 'firerate' | 'speed' | 'maxhp',
+  key: 'damage' | 'shots' | 'firerate' | 'speed' | 'maxhp',
   x: number,
   y: number,
 ) {
@@ -66,6 +67,23 @@ function drawUpgradeIcon(
       c.moveTo(-22, 12)
       c.lineTo(-10, 24)
       c.stroke()
+      break
+    case 'shots': // 세 갈래로 퍼지는 탄
+      for (const a of [-0.5, 0, 0.5]) {
+        c.save()
+        c.rotate(a)
+        c.strokeStyle = '#FFCC80'
+        c.lineWidth = 5
+        c.beginPath()
+        c.moveTo(-16, 0)
+        c.lineTo(2, 0)
+        c.stroke()
+        c.fillStyle = '#FB8C00'
+        c.beginPath()
+        c.arc(12, 0, 7, 0, Math.PI * 2)
+        c.fill()
+        c.restore()
+      }
       break
     case 'firerate': // 번개
       c.fillStyle = '#FFB300'
@@ -126,6 +144,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     onRetry() {
       if (state.phase !== 'over') return
       adReviveUsed = false
+      // 팝업 버튼은 DOM이라 캔버스가 pointerup 을 못 받는다 — 여기서 손을 놓아 준다
+      dragging = false
       Object.assign(state, createState())
       overlay.hide()
     },
@@ -142,6 +162,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const rewarded = await ctx.showRewardAd('survivor-revive')
     if (shell.isDestroyed() || !rewarded || state.phase !== 'over') return
     adReviveUsed = true
+    dragging = false
+    state.move = null
     state.player.hp = state.player.maxHp
     state.player.invuln = 2
     state.enemies = state.enemies.filter(
@@ -162,6 +184,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     overlay.show(score, prevBest, ctx.isRewardAdReady() && !adReviveUsed)
   }
 
+  // 누른 자리로 걸어간다. 끌면 손가락을 따라오고, 떼도 찍어 둔 자리까지는 간다 —
+  // 화면 위쪽처럼 엄지가 닿기 힘든 곳은 한 번 톡 치고 손을 떼면 된다.
+  // dragging 은 이 손짓이 판에서 시작했는지를 본다 (강화 카드를 누른 손가락이
+  // 그대로 미끄러지면서 캐릭터를 카드 자리로 끌고 가는 것을 막는다)
+  let dragging = false
+  let everTouched = false
+
   const detachInput = attachInput(stage.canvas, {
     onDown(clientX, clientY) {
       const p = stage.toBoard(clientX, clientY)
@@ -179,25 +208,17 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         return
       }
       if (state.phase !== 'playing') return
-      state.joystick = { baseX: p.x, baseY: p.y, dx: 0, dy: 0 }
+      dragging = true
+      everTouched = true
+      setMoveTarget(state, p.x, p.y)
     },
     onMove(clientX, clientY) {
-      if (!state.joystick || state.phase !== 'playing') return
+      if (!dragging || state.phase !== 'playing') return
       const p = stage.toBoard(clientX, clientY)
-      const dx = p.x - state.joystick.baseX
-      const dy = p.y - state.joystick.baseY
-      const len = Math.hypot(dx, dy)
-      if (len < 12) {
-        state.joystick.dx = 0
-        state.joystick.dy = 0
-        return
-      }
-      const k = Math.min(1, len / 70)
-      state.joystick.dx = (dx / len) * k
-      state.joystick.dy = (dy / len) * k
+      setMoveTarget(state, p.x, p.y)
     },
     onUp() {
-      state.joystick = null
+      dragging = false
     },
   })
 
@@ -232,15 +253,35 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.roundRect(ARENA.left, ARENA.top, ARENA.right - ARENA.left, ARENA.bottom - ARENA.top, 22)
     c.stroke()
 
+    const p = state.player
+
+    // 찍어 둔 자리 — 손을 떼도 여기까지 간다는 것을 보여 준다.
+    // 적보다 아래에 깔아 시야를 가리지 않게 한다
+    if (state.move) {
+      c.save()
+      c.strokeStyle = ground('rgb(93 64 55 / 0.45)', 'rgb(255 248 225 / 0.4)')
+      c.lineWidth = 3
+      c.setLineDash([9, 11])
+      c.beginPath()
+      c.moveTo(p.x, p.y)
+      c.lineTo(state.move.x, state.move.y)
+      c.stroke()
+      c.setLineDash([])
+      c.beginPath()
+      c.arc(state.move.x, state.move.y, 17 + Math.sin(state.time * 9) * 2.5, 0, Math.PI * 2)
+      c.stroke()
+      c.restore()
+    }
+
     for (const orb of state.orbs) drawOrb(c, orb.x, orb.y, state.time * 4)
     for (const bullet of state.bullets) drawBullet(c, bullet.x, bullet.y)
     for (const enemy of state.enemies) drawEnemy(c, enemy.x, enemy.y, enemy.r, enemy.hp)
 
-    const p = state.player
     const blink = p.invuln > 0 && Math.floor(p.invuln * 10) % 2 === 0
+    const facing = state.move ? Math.max(-1, Math.min(1, (state.move.x - p.x) / 80)) : 0
     c.save()
     if (blink) c.globalAlpha = 0.35
-    drawHero(c, p.x, p.y, PLAYER_R, state.joystick?.dx ?? 0)
+    drawHero(c, p.x, p.y, PLAYER_R, facing)
     c.restore()
 
     // HUD — 판(ARENA.top=150) 위에 얹혀야 해서 좁고 짧은 판을 쓴다.
@@ -256,8 +297,10 @@ function createSession(host: HTMLElement, ctx: GameContext) {
 
     // 체력 하트 — 왼쪽에 둔다. 오른쪽 끝은 멈춤·도움말 아래로 내려온
     // 좋아요·싫어요 줄(GamePlayPage)이 쓰는 자리라 하트가 그 밑에 깔렸다.
+    // 최대 체력을 계속 고르면 열 몇 개까지 늘어나므로, 그 줄에 닿기 전에 간격을 좁힌다.
+    const heartGap = Math.min(40, 480 / p.maxHp)
     for (let i = 0; i < p.maxHp; i++) {
-      drawHeart(c, ARENA.left + 26 + i * 40, 56, 15, i < p.hp)
+      drawHeart(c, ARENA.left + 26 + i * heartGap, 56, Math.min(15, heartGap * 0.38), i < p.hp)
     }
 
     // 경험치 바
@@ -274,28 +317,6 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       c.fill()
     }
     c.restore()
-
-    // 조이스틱
-    if (state.joystick) {
-      c.save()
-      c.globalAlpha = 0.28
-      c.fillStyle = ground('#5D4037', '#E5D8D0')
-      c.beginPath()
-      c.arc(state.joystick.baseX, state.joystick.baseY, 72, 0, Math.PI * 2)
-      c.fill()
-      c.globalAlpha = 0.55
-      c.fillStyle = '#FFFFFF'
-      c.beginPath()
-      c.arc(
-        state.joystick.baseX + state.joystick.dx * 72,
-        state.joystick.baseY + state.joystick.dy * 72,
-        28,
-        0,
-        Math.PI * 2,
-      )
-      c.fill()
-      c.restore()
-    }
 
     // 레벨업 카드
     if (state.phase === 'levelup') {
@@ -355,21 +376,22 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       }
     }
 
-    // 텍스트 없는 조작 안내: 원을 도는 조이스틱 표식
-    if (state.time < 4 && state.phase === 'playing' && !state.joystick) {
-      const a = state.time * 2
+    // 텍스트 없는 조작 안내: 판을 톡 치는 물결. 한 번이라도 누르면 사라진다
+    if (!everTouched && state.phase === 'playing' && state.time < 8) {
+      const ripple = (state.time % 1.5) / 1.5
       const bx = 360
-      const by = 1130
+      const by = 1040
       c.save()
-      c.globalAlpha = 0.3
+      c.strokeStyle = ground('#5D4037', '#E5D8D0')
+      c.lineWidth = 4
+      c.globalAlpha = 0.45 * (1 - ripple)
+      c.beginPath()
+      c.arc(bx, by, 15 + ripple * 46, 0, Math.PI * 2)
+      c.stroke()
+      c.globalAlpha = 0.4
       c.fillStyle = ground('#5D4037', '#E5D8D0')
       c.beginPath()
-      c.arc(bx, by, 60, 0, Math.PI * 2)
-      c.fill()
-      c.globalAlpha = 0.6
-      c.fillStyle = '#FFFFFF'
-      c.beginPath()
-      c.arc(bx + Math.cos(a) * 42, by + Math.sin(a) * 42, 24, 0, Math.PI * 2)
+      c.arc(bx, by, 15, 0, Math.PI * 2)
       c.fill()
       c.restore()
     }

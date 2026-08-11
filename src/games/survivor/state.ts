@@ -1,10 +1,45 @@
-// 뱀서라이크 라이트 — 조이스틱 이동, 자동 공격, 3택 레벨업, 생존
+// 뱀서라이크 라이트 — 터치한 자리로 이동, 자동 공격, 3택 레벨업, 생존
 
 export const ARENA = { left: 30, right: 690, top: 150, bottom: 1250 } as const
 export const PLAYER_R = 26
 export const ENEMY_CAP = 60
 export const BULLET_SPEED = 750
-export const ORB_ATTRACT_DIST = 130
+export const ORB_ATTRACT_DIST = 170
+
+// 목표점에 이만큼 붙으면 도착으로 보고 멈춘다 (도착점에서 좌우로 떠는 것을 막는다)
+export const ARRIVE_R = 6
+
+// 갈래가 더 늘면 화면이 총알로 덮여 적이 안 보인다
+export const SHOTS_CAP = 6
+export const FIRE_INTERVAL_MIN = 0.16
+
+// 적이 코앞에서 솟으면 피할 방법이 없다 — 이만큼 떨어진 가장자리에만 세운다
+const SPAWN_SAFE_DIST = 300
+
+// 난이도 곡선 — 한 판을 10분으로 잡고 맞춘 값들이다.
+// 셋이 서로 상쇄되므로 하나만 만지지 말고 tools/survivor-sim.mjs 로 함께 확인할 것.
+//
+// 격자 탐색으로 알게 된 것: 생존 시간을 쥐고 있는 것은 체력 곡선이다.
+// 갈래(최대 6)와 연사(최소 0.16초)에 상한이 있어 초당 발사 수는 37.5발에서 멈추는데,
+// 스폰은 10분에도 초당 15마리라 그 아래에 한참 못 미친다. 그래서 스폰을 두 배로 올려도
+// 생존 시간이 1분도 안 움직인다 — 압박은 결국 '한 마리에 몇 발이 드는가'에서 나온다.
+export function spawnInterval(time: number): number {
+  return 1 / (0.7 + time * 0.024) // 처음 초당 0.7마리 → 10분에 15.1마리
+}
+// 처음 2분은 완만하게 두고(강해지는 맛을 보는 구간) 뒤에서 가팔라진다
+export function enemyHp(time: number): number {
+  return 1 + Math.floor((time / 60) ** 1.5) // 2분에 4, 5분에 12, 10분에 32
+}
+export function enemySpeed(time: number): number {
+  return Math.min(235, 80 + time * 0.26) // 플레이어 기본 275보다는 늘 느리다
+}
+
+// 다음 레벨까지 필요한 경험치. 처음 몇 판은 금방 오르고 뒤로 갈수록 뜸해진다 —
+// 처치 수가 시간에 비례해 늘기 때문에, 여기서 조여 주지 않으면 강화가 위협을 앞질러
+// 10분쯤에는 아무것도 위험하지 않게 된다 (실제로 그랬다).
+export function xpForLevel(level: number): number {
+  return 4 + level * level
+}
 
 export type Phase = 'playing' | 'levelup' | 'over'
 
@@ -21,6 +56,8 @@ export interface Bullet {
   y: number
   vx: number
   vy: number
+  // 남은 위력. 적을 눕히고 남으면 그만큼 뒤로 뚫고 나간다
+  power: number
 }
 
 export interface Orb {
@@ -31,13 +68,14 @@ export interface Orb {
 import type { TranslationKey } from '@/shared/i18n'
 
 export interface UpgradeOption {
-  key: 'damage' | 'firerate' | 'speed' | 'maxhp'
+  key: 'damage' | 'shots' | 'firerate' | 'speed' | 'maxhp'
   label: TranslationKey
   desc: TranslationKey
 }
 
 export const UPGRADE_POOL: UpgradeOption[] = [
   { key: 'damage', label: 'sv.dmg', desc: 'sv.dmgDesc' },
+  { key: 'shots', label: 'sv.shots', desc: 'sv.shotsDesc' },
   { key: 'firerate', label: 'sv.rate', desc: 'sv.rateDesc' },
   { key: 'speed', label: 'sv.spd', desc: 'sv.spdDesc' },
   { key: 'maxhp', label: 'sv.hp', desc: 'sv.hpDesc' },
@@ -54,6 +92,7 @@ export interface SurvivorState {
     maxHp: number
     speed: number
     damage: number
+    shots: number
     fireInterval: number
     fireTimer: number
     invuln: number
@@ -67,7 +106,8 @@ export interface SurvivorState {
   spawnTimer: number
   taken: Record<UpgradeOption['key'], number> // 지금까지 고른 업그레이드 횟수
   choices: UpgradeOption[]
-  joystick: { baseX: number; baseY: number; dx: number; dy: number } | null
+  // 눌러 둔 자리. 도착하면 지워진다
+  move: { x: number; y: number } | null
 }
 
 export function scoreOf(state: SurvivorState): number {
@@ -82,10 +122,11 @@ export function createState(): SurvivorState {
     player: {
       x: 360,
       y: 700,
-      hp: 3,
-      maxHp: 3,
-      speed: 260,
+      hp: 5,
+      maxHp: 5,
+      speed: 275,
       damage: 1,
+      shots: 1,
       fireInterval: 0.6,
       fireTimer: 0,
       invuln: 0,
@@ -97,14 +138,29 @@ export function createState(): SurvivorState {
     bullets: [],
     orbs: [],
     spawnTimer: 1,
-    taken: { damage: 0, firerate: 0, speed: 0, maxhp: 0 },
+    taken: { damage: 0, shots: 0, firerate: 0, speed: 0, maxhp: 0 },
     choices: [],
-    joystick: null,
+    move: null,
   }
 }
 
-export function rollChoices(): UpgradeOption[] {
-  const pool = [...UPGRADE_POOL]
+// 판 안으로 접어 넣는다 — 벽 너머를 누르면 벽에 붙은 채 도착을 못 해 계속 밀고 있게 된다
+export function setMoveTarget(state: SurvivorState, x: number, y: number) {
+  state.move = {
+    x: Math.min(ARENA.right - PLAYER_R, Math.max(ARENA.left + PLAYER_R, x)),
+    y: Math.min(ARENA.bottom - PLAYER_R, Math.max(ARENA.top + PLAYER_R, y)),
+  }
+}
+
+// 더 올릴 데가 없는 강화는 선택지에 넣지 않는다 (셋 중 하나가 빈 칸이 되면 안 고른 것만 못하다)
+function isMaxed(state: SurvivorState, key: UpgradeOption['key']): boolean {
+  if (key === 'shots') return state.player.shots >= SHOTS_CAP
+  if (key === 'firerate') return state.player.fireInterval <= FIRE_INTERVAL_MIN + 1e-6
+  return false
+}
+
+export function rollChoices(state: SurvivorState): UpgradeOption[] {
+  const pool = UPGRADE_POOL.filter((option) => !isMaxed(state, option.key))
   for (let i = pool.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
     ;[pool[i], pool[j]] = [pool[j], pool[i]]
@@ -119,11 +175,14 @@ export function applyUpgrade(state: SurvivorState, option: UpgradeOption) {
     case 'damage':
       p.damage += 1
       break
+    case 'shots':
+      p.shots = Math.min(SHOTS_CAP, p.shots + 1)
+      break
     case 'firerate':
-      p.fireInterval = Math.max(0.12, p.fireInterval * 0.8)
+      p.fireInterval = Math.max(FIRE_INTERVAL_MIN, p.fireInterval * 0.82)
       break
     case 'speed':
-      p.speed *= 1.12
+      p.speed *= 1.1
       break
     case 'maxhp':
       p.maxHp += 1
@@ -132,31 +191,57 @@ export function applyUpgrade(state: SurvivorState, option: UpgradeOption) {
   }
 }
 
+function edgePoint(): { x: number; y: number } {
+  const side = Math.floor(Math.random() * 4)
+  if (side === 0) return { x: ARENA.left + Math.random() * (ARENA.right - ARENA.left), y: ARENA.top - 30 }
+  if (side === 1) return { x: ARENA.left + Math.random() * (ARENA.right - ARENA.left), y: ARENA.bottom + 30 }
+  if (side === 2) return { x: ARENA.left - 30, y: ARENA.top + Math.random() * (ARENA.bottom - ARENA.top) }
+  return { x: ARENA.right + 30, y: ARENA.top + Math.random() * (ARENA.bottom - ARENA.top) }
+}
+
 function spawnEnemy(state: SurvivorState) {
   if (state.enemies.length >= ENEMY_CAP) return
-  const side = Math.floor(Math.random() * 4)
-  let x = 360
-  let y = 150
-  if (side === 0) {
-    x = ARENA.left + Math.random() * (ARENA.right - ARENA.left)
-    y = ARENA.top - 30
-  } else if (side === 1) {
-    x = ARENA.left + Math.random() * (ARENA.right - ARENA.left)
-    y = ARENA.bottom + 30
-  } else if (side === 2) {
-    x = ARENA.left - 30
-    y = ARENA.top + Math.random() * (ARENA.bottom - ARENA.top)
-  } else {
-    x = ARENA.right + 30
-    y = ARENA.top + Math.random() * (ARENA.bottom - ARENA.top)
+  const p = state.player
+  // 가장자리를 몇 번 찍어 보고 플레이어에게서 가장 먼 자리를 쓴다.
+  // 구석에 몰려 있으면 안전거리를 만족하는 자리가 없을 수 있어 최선으로 물러선다
+  let best = edgePoint()
+  let bestDist = Math.hypot(best.x - p.x, best.y - p.y)
+  for (let i = 0; i < 5 && bestDist < SPAWN_SAFE_DIST; i++) {
+    const next = edgePoint()
+    const dist = Math.hypot(next.x - p.x, next.y - p.y)
+    if (dist > bestDist) {
+      best = next
+      bestDist = dist
+    }
   }
   state.enemies.push({
-    x,
-    y,
+    x: best.x,
+    y: best.y,
     r: 24,
-    hp: 1 + Math.floor(state.time / 25),
-    speed: Math.min(220, 85 + state.time * 1.6),
+    hp: enemyHp(state.time),
+    speed: enemySpeed(state.time),
   })
+}
+
+// 가까운 적부터 한 갈래씩 맡긴다. 갈래가 적보다 많으면 남는 갈래를 좌우로 벌려 쏜다
+function fire(state: SurvivorState) {
+  const p = state.player
+  const targets = [...state.enemies]
+    .sort((a, b) => (a.x - p.x) ** 2 + (a.y - p.y) ** 2 - ((b.x - p.x) ** 2 + (b.y - p.y) ** 2))
+    .slice(0, p.shots)
+  for (let i = 0; i < p.shots; i++) {
+    const target = targets[i % targets.length]
+    const lap = Math.floor(i / targets.length)
+    const fan = lap === 0 ? 0 : lap * 0.15 * (i % 2 === 0 ? 1 : -1)
+    const angle = Math.atan2(target.y - p.y, target.x - p.x) + fan
+    state.bullets.push({
+      x: p.x,
+      y: p.y,
+      vx: Math.cos(angle) * BULLET_SPEED,
+      vy: Math.sin(angle) * BULLET_SPEED,
+      power: p.damage,
+    })
+  }
 }
 
 export interface UpdateResult {
@@ -172,18 +257,24 @@ export function update(state: SurvivorState, dt: number): UpdateResult {
   state.time += dt
   p.invuln = Math.max(0, p.invuln - dt)
 
-  // 이동
-  if (state.joystick) {
-    p.x += state.joystick.dx * p.speed * dt
-    p.y += state.joystick.dy * p.speed * dt
-    p.x = Math.min(ARENA.right - PLAYER_R, Math.max(ARENA.left + PLAYER_R, p.x))
-    p.y = Math.min(ARENA.bottom - PLAYER_R, Math.max(ARENA.top + PLAYER_R, p.y))
+  // 이동 — 눌러 둔 자리로 걸어간다. 손을 떼도 그 자리까지는 간다
+  if (state.move) {
+    const dx = state.move.x - p.x
+    const dy = state.move.y - p.y
+    const dist = Math.hypot(dx, dy)
+    if (dist <= ARRIVE_R) {
+      state.move = null
+    } else {
+      const step = Math.min(dist, p.speed * dt)
+      p.x += (dx / dist) * step
+      p.y += (dy / dist) * step
+    }
   }
 
   // 적 스폰
   state.spawnTimer -= dt
   if (state.spawnTimer <= 0) {
-    state.spawnTimer = Math.max(0.35, 1.6 - state.time * 0.02)
+    state.spawnTimer = spawnInterval(state.time)
     spawnEnemy(state)
   }
 
@@ -206,23 +297,11 @@ export function update(state: SurvivorState, dt: number): UpdateResult {
     }
   }
 
-  // 자동 발사 (가장 가까운 적)
+  // 자동 발사
   p.fireTimer -= dt
   if (p.fireTimer <= 0 && state.enemies.length > 0) {
     p.fireTimer = p.fireInterval
-    let nearest = state.enemies[0]
-    let best = Infinity
-    for (const enemy of state.enemies) {
-      const d = (enemy.x - p.x) ** 2 + (enemy.y - p.y) ** 2
-      if (d < best) {
-        best = d
-        nearest = enemy
-      }
-    }
-    const dx = nearest.x - p.x
-    const dy = nearest.y - p.y
-    const len = Math.hypot(dx, dy) || 1
-    state.bullets.push({ x: p.x, y: p.y, vx: (dx / len) * BULLET_SPEED, vy: (dy / len) * BULLET_SPEED })
+    fire(state)
   }
 
   // 총알 이동·명중
@@ -230,22 +309,27 @@ export function update(state: SurvivorState, dt: number): UpdateResult {
     bullet.x += bullet.vx * dt
     bullet.y += bullet.vy * dt
   }
+  // 눕히고 남은 위력은 뒤로 뚫고 나간다. 넘치는 데미지를 버리면 공격력 강화가
+  // 적 체력을 넘어서는 순간부터 아무 일도 하지 않아, 고르면 손해인 선택지가 된다
   state.bullets = state.bullets.filter((bullet) => {
     if (bullet.x < 0 || bullet.x > 720 || bullet.y < 100 || bullet.y > 1280) return false
     for (let i = 0; i < state.enemies.length; i++) {
       const enemy = state.enemies[i]
       const dx = bullet.x - enemy.x
       const dy = bullet.y - enemy.y
-      if (dx * dx + dy * dy < enemy.r * enemy.r) {
-        enemy.hp -= p.damage
-        if (enemy.hp <= 0) {
-          state.orbs.push({ x: enemy.x, y: enemy.y })
-          state.enemies.splice(i, 1)
-          state.kills += 1
-          result.killed += 1
-        }
+      if (dx * dx + dy * dy >= enemy.r * enemy.r) continue
+      // 못 뚫으면 여기서 멈춘다 (살아남은 적을 다음 프레임에 또 때리는 일이 없다)
+      if (enemy.hp > bullet.power) {
+        enemy.hp -= bullet.power
         return false
       }
+      bullet.power -= enemy.hp
+      state.orbs.push({ x: enemy.x, y: enemy.y })
+      state.enemies.splice(i, 1)
+      i -= 1
+      state.kills += 1
+      result.killed += 1
+      if (bullet.power <= 0) return false
     }
     return true
   })
@@ -264,8 +348,8 @@ export function update(state: SurvivorState, dt: number): UpdateResult {
       if (state.xp >= state.xpNeed) {
         state.xp = 0
         state.level += 1
-        state.xpNeed = 4 + state.level * 3
-        state.choices = rollChoices()
+        state.xpNeed = xpForLevel(state.level)
+        state.choices = rollChoices(state)
         state.phase = 'levelup'
         result.leveledUp = true
       }
