@@ -40,6 +40,7 @@
 | `20260808100000_game_vote_stats.sql` | `get_game_vote_stats()` — 인기도 화면 집계 | ✅ 2026-08-08 |
 | `20260808200000_stats_calendar_periods.sql` | 통계 4개 함수의 기간을 달력 구간(`p_from`·`p_to`)으로 — 롤링(`p_days`) 폐기 | |
 | `20260811000000_calendar_rankings.sql` | 랭킹도 달력 구간으로 — `get_leaderboard()`·`get_my_stats()` 인자 교체, `get_hall_of_fame()` 신설 | ✅ 2026-08-11 |
+| `20260811100000_game_votes_select_own.sql` | `game_votes` 조회 정책에 '내 표'를 추가 — 관리자가 아니면 투표가 저장되지 않던 문제 | |
 
 ## 테이블
 
@@ -53,7 +54,7 @@
 | `feedback` | 사용자 의견 (버그·문의·제안) | insert는 본인만 / **조회·삭제는 관리자만** / update 정책 없음(금지) |
 | `ad_views` | 리워드 광고 호출 기록 (매체·게임·자리·결과). 테스트 광고는 담지 않는다 | insert는 본인만 / **조회는 관리자만** / update·delete 정책 없음(금지) |
 | `toss_accounts` | 토스 `userKey` ↔ `auth.users`. 앱인토스 전용 | **정책 없음** — service_role(서버 함수)만 다룬다 |
-| `game_votes` | 게임별 좋아요·싫어요. 기본키 `(user_id, game_slug, vote_day)`가 '하루 한 표'를 지킨다 | 쓰기는 본인만 / **조회는 관리자만**(`get_game_vote_stats()`) |
+| `game_votes` | 게임별 좋아요·싫어요. 기본키 `(user_id, game_slug, vote_day)`가 '하루 한 표'를 지킨다 | 쓰기는 본인만 / 조회는 **본인 표**와 관리자만(`get_game_vote_stats()`) |
 
 삭제 연쇄: `auth.users` → `profiles` → `scores`·`play_sessions`·`feedback`·`ad_views`·`game_votes` 순으로
 `on delete cascade`가 걸려 있다. 최상위 한 줄만 지우면 전부 따라 지워진다.
@@ -86,6 +87,12 @@
 화면을 숨기는 것으로는 API 직접 호출을 막지 못한다. 그래서 관리자 전용 데이터는
 **함수 안에서 `is_admin()`을 검사**하고, 나머지는 RLS로 막는다.
 `security definer` 함수는 RLS를 우회하므로 추가할 때마다 권한 검사를 빠뜨리지 말 것.
+
+**조회를 막은 표에 쓰기를 열 때는 select 정책도 같이 본다.** upsert(`INSERT ... ON CONFLICT
+DO UPDATE`)와 `where`가 붙은 update·delete는 select 정책을 함께 타기 때문이다. 조회를
+관리자만으로 잠근 표에 본인 쓰기를 열어 두면, upsert는 오류로 막히고 delete는 오류 없이
+0줄을 지운다 — `game_votes`가 정확히 이 경우였다. 쓰기를 여는 대상에게는 **자기 줄 조회**를
+같이 열어 둘 것.
 
 ## SQL로 처리되지 않는 대시보드 설정
 
