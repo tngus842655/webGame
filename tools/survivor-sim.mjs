@@ -67,14 +67,14 @@ const POLICIES = {
 }
 
 // 칸에 든 아이템을 언제 쓰는가. 아이템이 손에 들어온 뒤의 판단이라 실력이 가장 크게 갈린다.
-//   bomb  — 반경 안에 이만큼 모였을 때 터뜨린다 (아낄수록 값이 크다)
+//   bomb  — 판에 적이 이만큼 찼을 때 터뜨린다 (판 전체를 쓸어내므로 아낄수록 값이 크다)
 //   heal  — 체력이 이만큼 깎였을 때 쓴다 (0이면 가득 찼는데도 써 버린다)
 //   rapid — 화면에 적이 이만큼 있을 때 쓴다
 const USE = {
   초보: { bomb: 1, heal: 0, rapid: 1 },
-  입문: { bomb: 3, heal: 1, rapid: 4 },
-  중급: { bomb: 7, heal: 2, rapid: 12 },
-  상급: { bomb: 11, heal: 2, rapid: 16 },
+  입문: { bomb: 4, heal: 1, rapid: 4 },
+  중급: { bomb: 14, heal: 2, rapid: 12 },
+  상급: { bomb: 24, heal: 2, rapid: 16 },
 }
 
 function useSlots(mod, state, policyName) {
@@ -86,13 +86,7 @@ function useSlots(mod, state, policyName) {
     let go = false
     if (kind === 'heal') go = p.maxHp - p.hp >= rule.heal
     else if (kind === 'rapid') go = state.rapid <= 0 && state.enemies.length >= rule.rapid
-    else {
-      let near = 0
-      for (const e of state.enemies) {
-        if (Math.hypot(e.x - p.x, e.y - p.y) <= mod.BOMB_R) near++
-      }
-      go = near >= rule.bomb
-    }
+    else go = state.enemies.length >= rule.bomb
     if (go) mod.useSlot(state, i)
   }
 }
@@ -132,7 +126,7 @@ function chooseUpgrade(mod, state, policy) {
     const heal = choices.find((c) => c.key === 'maxhp')
     if (heal) return heal
   }
-  const hpSoon = mod.enemyHp(state.time + 45) // 곧 두꺼워질 적을 기준으로 고른다
+  const hpSoon = mod.enemyHp(state.threatTime + 45) // 곧 두꺼워질 적을 기준으로 고른다
   let best = choices[0]
   let bestRate = -1
   for (const choice of choices) {

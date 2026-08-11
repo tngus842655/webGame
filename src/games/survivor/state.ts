@@ -65,7 +65,6 @@ const ITEM_INTERVAL = 26
 const ITEM_LIFE = 13 // 마지막 3초는 깜빡인다 (index.ts)
 const ITEM_MIN_DIST = 240
 export const ITEM_R = 22
-export const BOMB_R = 300
 export const RAPID_TIME = 8
 const RAPID_MULT = 0.45
 
@@ -112,6 +111,11 @@ export const UPGRADE_POOL: UpgradeOption[] = [
 export interface SurvivorState {
   phase: Phase
   time: number
+  // 난이도 시계. 보통 time과 함께 흐르지만 광고 이어하기 때만 뒤로 감는다.
+  // 죽은 지점의 난이도 그대로 되살리면 그 지점은 이미 처치 능력이 필요량의 60%대라
+  // 체력을 채워 주든 둘레를 치워 주든 10초를 못 넘긴다 (실측 중앙값 11초).
+  // 화면의 시계와 점수는 time 그대로라 뒤로 가지 않는다.
+  threatTime: number
   kills: number
   player: {
     x: number
@@ -152,6 +156,7 @@ export function createState(): SurvivorState {
   return {
     phase: 'playing',
     time: 0,
+    threatTime: 0,
     kills: 0,
     player: {
       x: 360,
@@ -271,8 +276,8 @@ function spawnEnemy(state: SurvivorState) {
     x: spot.x,
     y: spot.y,
     r: 24,
-    hp: enemyHp(state.time),
-    speed: enemySpeed(state.time),
+    hp: enemyHp(state.threatTime),
+    speed: enemySpeed(state.threatTime),
   })
 }
 
@@ -289,6 +294,25 @@ function spawnItem(state: SurvivorState) {
   })
 }
 
+// 광고를 보고 이어할 때 되감는 난이도. 죽는 지점(10분 언저리)에서 120초를 빼면
+// 적 체력이 32 → 22로 내려가 처치 능력이 다시 스폰을 앞선다 — 그래야 이어하기가
+// 몇 초가 아니라 몇 분을 벌어 준다.
+const REVIVE_ROLLBACK = 120
+
+// 광고 보상 이어하기. 체력을 채우는 것만으로는 부족해서 위협 자체를 물린다
+export function reviveAfterAd(state: SurvivorState) {
+  state.player.hp = state.player.maxHp
+  state.player.invuln = 3
+  state.threatTime = Math.max(0, state.threatTime - REVIVE_ROLLBACK)
+  // 판을 통째로 비운다. 멀리 있는 것만 남겨 둬도 곧바로 다시 몰려든다
+  state.enemies = []
+  state.bullets = []
+  // 되살아나자마자 코앞에 서지 않도록 한 박자 쉰다
+  state.spawnTimer = 1.5
+  state.move = null
+  state.phase = 'playing'
+}
+
 // 칸에 든 아이템을 쓴다. 쓴 종류를 돌려준다 (빈 칸이면 null)
 export function useSlot(state: SurvivorState, index: number): ItemKind | null {
   if (state.phase !== 'playing') return null
@@ -301,13 +325,12 @@ export function useSlot(state: SurvivorState, index: number): ItemKind | null {
   } else if (kind === 'rapid') {
     state.rapid = RAPID_TIME
   } else {
-    // 폭탄 — 선 자리를 기준으로 둘레를 쓸어낸다. 언제 터뜨릴지가 이 아이템의 전부다
-    state.enemies = state.enemies.filter((enemy) => {
-      if (Math.hypot(enemy.x - p.x, enemy.y - p.y) > BOMB_R) return true
+    // 폭탄 — 판 위의 적을 모두 쓸어낸다. 언제 터뜨릴지가 이 아이템의 전부다
+    for (const enemy of state.enemies) {
       state.orbs.push({ x: enemy.x, y: enemy.y })
       state.kills += 1
-      return false
-    })
+    }
+    state.enemies = []
   }
   return kind
 }
@@ -345,6 +368,7 @@ export function update(state: SurvivorState, dt: number): UpdateResult {
   const result: UpdateResult = { died: false, leveledUp: false, killed: 0, hurt: false, picked: null }
   const p = state.player
   state.time += dt
+  state.threatTime += dt
   p.invuln = Math.max(0, p.invuln - dt)
   state.rapid = Math.max(0, state.rapid - dt)
 
@@ -365,7 +389,7 @@ export function update(state: SurvivorState, dt: number): UpdateResult {
   // 적 스폰
   state.spawnTimer -= dt
   if (state.spawnTimer <= 0) {
-    state.spawnTimer = spawnInterval(state.time)
+    state.spawnTimer = spawnInterval(state.threatTime)
     spawnEnemy(state)
   }
 

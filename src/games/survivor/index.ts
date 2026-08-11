@@ -17,12 +17,12 @@ import {
 import { CanvasStage } from '../stage'
 import {
   ARENA,
-  BOMB_R,
   PLAYER_R,
   RAPID_TIME,
   UPGRADE_POOL,
   createState,
   applyUpgrade,
+  reviveAfterAd,
   scoreOf,
   setMoveTarget,
   update,
@@ -173,13 +173,7 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (shell.isDestroyed() || !rewarded || state.phase !== 'over') return
     adReviveUsed = true
     dragging = false
-    state.move = null
-    state.player.hp = state.player.maxHp
-    state.player.invuln = 2
-    state.enemies = state.enemies.filter(
-      (e) => Math.hypot(e.x - state.player.x, e.y - state.player.y) > 320,
-    )
-    state.phase = 'playing'
+    reviveAfterAd(state)
     overlay.hide()
     await gate.wait()
   }
@@ -305,14 +299,20 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     for (const bullet of state.bullets) drawBullet(c, bullet.x, bullet.y)
     for (const enemy of state.enemies) drawEnemy(c, enemy.x, enemy.y, enemy.r, enemy.hp)
 
-    // 폭탄이 쓸어낸 자리
+    // 폭탄이 판을 쓸어낸 순간 — 판 전체가 번쩍하고, 터진 자리에서 파문이 끝까지 퍼진다
     if (bombFlash > 0) {
       c.save()
+      c.beginPath()
+      c.roundRect(ARENA.left, ARENA.top, ARENA.right - ARENA.left, ARENA.bottom - ARENA.top, 22)
+      c.clip()
+      c.globalAlpha = bombFlash * 0.3
+      c.fillStyle = '#FFF3E0'
+      c.fill()
       c.globalAlpha = bombFlash * 0.55
       c.strokeStyle = '#FF7043'
       c.lineWidth = 10
       c.beginPath()
-      c.arc(bombAt.x, bombAt.y, BOMB_R * (1 - bombFlash), 0, Math.PI * 2)
+      c.arc(bombAt.x, bombAt.y, 1200 * (1 - bombFlash), 0, Math.PI * 2)
       c.stroke()
       c.restore()
     }
@@ -355,12 +355,18 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       valueColor: ground('#5D4037', '#E5D8D0'),
     })
 
-    // 체력 하트 — 왼쪽에 둔다. 오른쪽 끝은 멈춤·도움말 아래로 내려온
-    // 좋아요·싫어요 줄(GamePlayPage)이 쓰는 자리라 하트가 그 밑에 깔렸다.
-    // 최대 체력을 계속 고르면 열 몇 개까지 늘어나므로, 그 줄에 닿기 전에 간격을 좁힌다.
-    const heartGap = Math.min(40, 480 / p.maxHp)
+    // 체력 하트 — 왼쪽 위. 오른쪽으로는 점수판이 x=230부터 서 있어 한 줄에 넷이 한계다
+    // (다섯 번째부터 판 밑으로 들어가 글씨를 가렸다). 그래서 넷씩 끊어 아랫줄로 내린다.
+    // 두 줄 아래는 경험치 바(y=132)라 더 못 내려간다 — 여덟 개를 넘으면 줄을 늘리는
+    // 대신 간격과 크기를 줄여 두 줄 안에 담는다.
+    const heartRows = Math.min(2, Math.ceil(p.maxHp / 4))
+    const heartsPerRow = Math.max(4, Math.ceil(p.maxHp / heartRows))
+    const heartGap = Math.min(40, 158 / Math.max(1, heartsPerRow - 1))
+    const heartR = Math.min(15, heartGap * 0.4)
     for (let i = 0; i < p.maxHp; i++) {
-      drawHeart(c, ARENA.left + 26 + i * heartGap, 56, Math.min(15, heartGap * 0.38), i < p.hp)
+      const col = i % heartsPerRow
+      const row = Math.floor(i / heartsPerRow)
+      drawHeart(c, ARENA.left + 26 + col * heartGap, 56 + row * 36, heartR, i < p.hp)
     }
 
     // 경험치 바
