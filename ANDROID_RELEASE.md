@@ -36,6 +36,7 @@ versionName "<versionCode와 같은 값>"
 
 ```CMD
 cd C:\Workspace\webGame
+npm run build:android   
 npx cap sync android
 
 cd android
