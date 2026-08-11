@@ -39,7 +39,7 @@
 | `20260808000000_game_votes.sql` | `game_votes` 테이블 — 게임별 좋아요·싫어요, 하루 한 표 | ✅ 2026-08-08 |
 | `20260808100000_game_vote_stats.sql` | `get_game_vote_stats()` — 인기도 화면 집계 | ✅ 2026-08-08 |
 | `20260808200000_stats_calendar_periods.sql` | 통계 4개 함수의 기간을 달력 구간(`p_from`·`p_to`)으로 — 롤링(`p_days`) 폐기 | |
-| `20260811000000_calendar_rankings.sql` | 랭킹도 달력 구간으로 — `get_leaderboard()`·`get_my_stats()` 인자 교체, `get_hall_of_fame()` 신설 | |
+| `20260811000000_calendar_rankings.sql` | 랭킹도 달력 구간으로 — `get_leaderboard()`·`get_my_stats()` 인자 교체, `get_hall_of_fame()` 신설 | ✅ 2026-08-11 |
 
 ## 테이블
 
