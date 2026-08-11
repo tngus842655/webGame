@@ -81,9 +81,11 @@ function record(board: Board, value: number): string {
         <!-- 게임 아이콘이 곧 그 게임의 컨셉 그림이다. 크게 블러를 먹여 게임마다
              다른 색 워시를 깔고, 한 장을 더 또렷하게 뒤에 눕혀 모티프를 남긴다 —
              흰 카드 서른 장이 똑같아 보이지 않도록. 에셋 없이 아이콘을 재활용한다. -->
+        <!-- 아이콘 크기는 감싸는 span이 정한다 — svg에 직접 클래스를 얹으면
+             GameIcon 자신의 width/height 100% 규칙과 특정도가 같아 승자가 빌드 순서에 갈린다 -->
         <span class="board-art" aria-hidden="true">
-          <GameIcon class="art-wash" :slug="board.slug" />
-          <GameIcon class="art-mark" :slug="board.slug" />
+          <span class="art-wash"><GameIcon :slug="board.slug" /></span>
+          <span class="art-mark"><GameIcon :slug="board.slug" /></span>
         </span>
         <RouterLink class="game" :to="`/ranking/${board.slug}`">
           <span class="game-thumb"><GameIcon :slug="board.slug" /></span>
@@ -167,6 +169,7 @@ function record(board: Board, value: number): string {
   top: 50%;
   left: 50%;
   width: 125%;
+  aspect-ratio: 1;
   transform: translate(-50%, -52%);
   filter: blur(32px) saturate(1.4);
   opacity: 0.3;
@@ -178,6 +181,7 @@ function record(board: Board, value: number): string {
   right: -20px;
   bottom: -16px;
   width: 130px;
+  height: 130px;
   transform: rotate(-12deg);
   opacity: 0.1;
 }
