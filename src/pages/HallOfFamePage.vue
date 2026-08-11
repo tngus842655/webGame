@@ -78,6 +78,13 @@ function record(board: Board, value: number): string {
 
     <ul v-else class="boards">
       <li v-for="board in boards" :key="board.slug" class="board">
+        <!-- 게임 아이콘이 곧 그 게임의 컨셉 그림이다. 크게 블러를 먹여 게임마다
+             다른 색 워시를 깔고, 한 장을 더 또렷하게 뒤에 눕혀 모티프를 남긴다 —
+             흰 카드 서른 장이 똑같아 보이지 않도록. 에셋 없이 아이콘을 재활용한다. -->
+        <span class="board-art" aria-hidden="true">
+          <GameIcon class="art-wash" :slug="board.slug" />
+          <GameIcon class="art-mark" :slug="board.slug" />
+        </span>
         <RouterLink class="game" :to="`/ranking/${board.slug}`">
           <span class="game-thumb"><GameIcon :slug="board.slug" /></span>
           <span class="game-title">{{ t(board.titleKey) }}</span>
@@ -138,10 +145,47 @@ function record(board: Board, value: number): string {
 }
 
 .board {
+  position: relative;
+  /* 배경 그림이 둥근 모서리 밖으로 튀어나오지 않게 */
+  overflow: hidden;
   padding: 4px 14px 16px;
   background: var(--surface);
   border-radius: 16px;
   box-shadow: var(--shadow-card);
+}
+
+.board-art {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* 색 워시 — 아이콘을 카드보다 크게 늘리고 뭉개서 색만 남긴다.
+   블러 반지름이 아이콘 폭에 비해 커서 형체는 사라지고 게임 고유의 색구름이 된다. */
+.art-wash {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 125%;
+  transform: translate(-50%, -52%);
+  filter: blur(32px) saturate(1.4);
+  opacity: 0.3;
+}
+
+/* 모티프 — 같은 아이콘을 또렷하게 우하단에 눕힌다. 시상대 뒤로 반쯤 걸친다. */
+.art-mark {
+  position: absolute;
+  right: -20px;
+  bottom: -16px;
+  width: 130px;
+  transform: rotate(-12deg);
+  opacity: 0.1;
+}
+
+/* 배경 그림은 position이 걸려 있어 가만히 두면 내용 위에 얹힌다 — 내용을 한 층 올린다 */
+.game,
+.podium {
+  position: relative;
 }
 
 /* 게임 이름 줄 — 누르면 그 게임의 이번 랭킹으로 간다 (지난달을 봤으면 다음은 이번 달이다) */
@@ -295,5 +339,15 @@ function record(board: Board, value: number): string {
 
 [data-theme='dark'] .block::before {
   background: rgb(255 255 255 / 0.32);
+}
+
+/* 어두운 판에서는 색이 형광으로 뜬다 — 워시를 낮추고 채도도 덜 올린다 */
+[data-theme='dark'] .art-wash {
+  filter: blur(32px) saturate(1.15);
+  opacity: 0.2;
+}
+
+[data-theme='dark'] .art-mark {
+  opacity: 0.08;
 }
 </style>
