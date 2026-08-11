@@ -5,7 +5,7 @@ import { onMounted, ref } from 'vue'
 import { GAMES } from '@/games/registry'
 import GameIcon from '@/shared/GameIcon.vue'
 import { t, type TranslationKey } from '@/shared/i18n'
-import { prevMonthLabel } from '@/shared/rankPeriod'
+import { hallMonthReady, prevMonthLabel } from '@/shared/rankPeriod'
 import { fetchHallOfFame, rankedGames, type HallEntry } from '@/shared/scores'
 import UiIcon from '@/shared/UiIcon.vue'
 
@@ -23,6 +23,12 @@ const loading = ref(true)
 const failed = ref(false)
 
 onMounted(async () => {
+  // 기릴 달이 없으면(운영 첫 달) 조회하지 않는다. 입구 배너가 안 서지만
+  // 주소로 바로 들어올 수 있으므로 여기서도 막는다 — 빈 안내가 뜬다.
+  if (!hallMonthReady()) {
+    loading.value = false
+    return
+  }
   try {
     const byGame = new Map<string, HallEntry[]>()
     for (const row of await fetchHallOfFame()) {

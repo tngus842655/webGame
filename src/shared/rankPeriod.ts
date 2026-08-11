@@ -52,6 +52,17 @@ export function prevMonthLabel(now: Date = new Date()): { y: number; m: number }
   return { y: k.getUTCFullYear(), m: k.getUTCMonth() + 1 }
 }
 
+// 명예의 전당이 처음으로 기릴 달 — 실제 운영을 시작한 2026년 8월.
+// 그전(7월)은 비공개 테스트 기록이라 테스트 계정이 1위를 다 쥐고 있다.
+const HALL_FIRST = { y: 2026, m: 8 }
+
+// 기릴 지난달이 생겼는지. 2026년 9월 1일(KST)부터 참이 되고,
+// 그전에는 랭킹보기의 입구 배너도 서지 않는다.
+export function hallMonthReady(now: Date = new Date()): boolean {
+  const { y, m } = prevMonthLabel(now)
+  return y > HALL_FIRST.y || (y === HALL_FIRST.y && m >= HALL_FIRST.m)
+}
+
 // 구간을 KST 달력 날짜로 적는다 — 탭 이름만으로는 어디서 끊기는지 안 보인다.
 // to는 미포함이라 하루 물려 마지막 날을 적는다.
 export function formatRankRange(range: RankRange): string {

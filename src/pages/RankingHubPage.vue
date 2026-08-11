@@ -3,10 +3,12 @@ import { onMounted } from 'vue'
 import { GAMES } from '@/games/registry'
 import GameIcon from '@/shared/GameIcon.vue'
 import { t } from '@/shared/i18n'
-import { prevMonthLabel } from '@/shared/rankPeriod'
+import { hallMonthReady, prevMonthLabel } from '@/shared/rankPeriod'
 import { rankedGames, refreshPopularity } from '@/shared/scores'
 import UiIcon from '@/shared/UiIcon.vue'
 
+// 기릴 달이 없으면(운영 첫 달) 입구도 없다 — 9월 1일부터 자동으로 선다
+const hallReady = hallMonthReady()
 const hallMonth = prevMonthLabel()
 
 // 홈과 달리 신규를 앞에 세우지 않는다 — 번호를 밝히는 화면이라 1번 자리에는 인기 1위가 서야 한다.
@@ -31,7 +33,7 @@ onMounted(() => {
     </header>
 
     <!-- 지난달 시상식 입구 — 목록 위 한 줄. 여기만 금빛을 써서 문이라는 것을 알린다 -->
-    <RouterLink class="hall-entry" to="/ranking/hall">
+    <RouterLink v-if="hallReady" class="hall-entry" to="/ranking/hall">
       <span class="hall-crown"><UiIcon name="crown" /></span>
       <span class="hall-text">
         <strong>{{ t('hall.entry') }}</strong>
