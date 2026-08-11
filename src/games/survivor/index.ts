@@ -5,46 +5,42 @@ import { createGameOverOverlay } from '../overlay'
 import { attachInput } from '../pointer'
 import { createResumeGate } from '../resumeGate'
 import { createGameShell, defineGame } from '../shell'
-import { drawBullet, drawEnemy, drawHero, drawOrb } from './sprites'
+import {
+  drawBullet,
+  drawEnemy,
+  drawHeart,
+  drawHero,
+  drawItem,
+  drawItemGlyph,
+  drawOrb,
+} from './sprites'
 import { CanvasStage } from '../stage'
 import {
   ARENA,
   PLAYER_R,
+  RAPID_TIME,
   UPGRADE_POOL,
   createState,
   applyUpgrade,
+  reviveAfterAd,
   scoreOf,
+  setMoveTarget,
   update,
+  useSlot,
 } from './state'
 import { drawScorePanel, font } from '../ui'
 import { ground } from '../scene'
 
-function drawHeart(c: CanvasRenderingContext2D, x: number, y: number, r: number, filled: boolean) {
-  c.save()
-  c.translate(x, y)
-  c.beginPath()
-  c.moveTo(0, r * 0.75)
-  c.bezierCurveTo(-r * 1.4, -r * 0.3, -r * 0.5, -r * 1.2, 0, -r * 0.4)
-  c.bezierCurveTo(r * 0.5, -r * 1.2, r * 1.4, -r * 0.3, 0, r * 0.75)
-  c.closePath()
-  if (filled) {
-    c.fillStyle = '#E53935'
-    c.fill()
-    c.strokeStyle = '#9B1B18'
-  } else {
-    c.fillStyle = 'rgb(141 110 99 / 0.18)'
-    c.fill()
-    c.strokeStyle = 'rgb(141 110 99 / 0.35)'
-  }
-  c.lineWidth = 2
-  c.stroke()
-  c.restore()
+// 한 판이 10분까지 가므로 '540초'보다 분:초가 읽힌다
+function clock(seconds: number): string {
+  const total = Math.floor(seconds)
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`
 }
 
 // 강화 카드 아이콘 (이모지 대신 벡터)
 function drawUpgradeIcon(
   c: CanvasRenderingContext2D,
-  key: 'damage' | 'firerate' | 'speed' | 'maxhp',
+  key: 'damage' | 'shots' | 'firerate' | 'speed' | 'maxhp',
   x: number,
   y: number,
 ) {
@@ -66,6 +62,23 @@ function drawUpgradeIcon(
       c.moveTo(-22, 12)
       c.lineTo(-10, 24)
       c.stroke()
+      break
+    case 'shots': // 세 갈래로 퍼지는 탄
+      for (const a of [-0.5, 0, 0.5]) {
+        c.save()
+        c.rotate(a)
+        c.strokeStyle = '#FFCC80'
+        c.lineWidth = 5
+        c.beginPath()
+        c.moveTo(-16, 0)
+        c.lineTo(2, 0)
+        c.stroke()
+        c.fillStyle = '#FB8C00'
+        c.beginPath()
+        c.arc(12, 0, 7, 0, Math.PI * 2)
+        c.fill()
+        c.restore()
+      }
       break
     case 'firerate': // 번개
       c.fillStyle = '#FFB300'
@@ -102,6 +115,13 @@ const CARD_RECTS = [
   { x: 60, y: 740, w: 600, h: 130 },
 ]
 
+// 아이템 칸 — 판(ARENA.bottom=1148) 아래에 둔다. 96은 대부분의 폰에서 52~58px이라
+// 엄지로 눌러도 빗나가지 않는다. 가운데에 모아 두어 어느 손으로 쥐든 닿는다.
+const SLOT_RECTS = [
+  { x: 254, y: 1168, w: 96, h: 96 },
+  { x: 370, y: 1168, w: 96, h: 96 },
+]
+
 function createSession(host: HTMLElement, ctx: GameContext) {
   const shell = createGameShell(host, (dt) => {
     if (state.phase === 'playing') {
@@ -112,20 +132,30 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         vibrate(40)
       }
       if (result.leveledUp) vibrate(20)
+      // 줍는 것은 칸에 담는 것까지다 — 쓰는 것은 사용자가 칸을 눌렀을 때(onDown)
+      if (result.picked) {
+        playSfx('coin')
+        vibrate(20)
+      }
       if (result.died) void gameOver()
     }
+    bombFlash = Math.max(0, bombFlash - dt * 2.4)
     draw()
   })
   const stage = new CanvasStage(shell.wrapper, 720, 1280)
   const state = createState()
-  preloadSfx('gameover', 'hurt', 'pop', 'unlock')
+  preloadSfx('gameover', 'hurt', 'pop', 'unlock', 'coin', 'explode')
   let adReviveUsed = false
+  let bombFlash = 0 // 폭탄이 터진 자리에 퍼지는 파문 (1 → 0)
+  let bombAt = { x: 360, y: 700 }
 
   const overlay = createGameOverOverlay(shell.wrapper, {
     adLabelKey: 'sv.ad',
     onRetry() {
       if (state.phase !== 'over') return
       adReviveUsed = false
+      // 팝업 버튼은 DOM이라 캔버스가 pointerup 을 못 받는다 — 여기서 손을 놓아 준다
+      dragging = false
       Object.assign(state, createState())
       overlay.hide()
     },
@@ -142,12 +172,8 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     const rewarded = await ctx.showRewardAd('survivor-revive')
     if (shell.isDestroyed() || !rewarded || state.phase !== 'over') return
     adReviveUsed = true
-    state.player.hp = state.player.maxHp
-    state.player.invuln = 2
-    state.enemies = state.enemies.filter(
-      (e) => Math.hypot(e.x - state.player.x, e.y - state.player.y) > 320,
-    )
-    state.phase = 'playing'
+    dragging = false
+    reviveAfterAd(state)
     overlay.hide()
     await gate.wait()
   }
@@ -161,6 +187,13 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     if (shell.isDestroyed() || state.phase !== 'over') return
     overlay.show(score, prevBest, ctx.isRewardAdReady() && !adReviveUsed)
   }
+
+  // 누른 자리로 걸어간다. 끌면 손가락을 따라오고, 떼도 찍어 둔 자리까지는 간다 —
+  // 화면 위쪽처럼 엄지가 닿기 힘든 곳은 한 번 톡 치고 손을 떼면 된다.
+  // dragging 은 이 손짓이 판에서 시작했는지를 본다 (강화 카드를 누른 손가락이
+  // 그대로 미끄러지면서 캐릭터를 카드 자리로 끌고 가는 것을 막는다)
+  let dragging = false
+  let everTouched = false
 
   const detachInput = attachInput(stage.canvas, {
     onDown(clientX, clientY) {
@@ -179,25 +212,34 @@ function createSession(host: HTMLElement, ctx: GameContext) {
         return
       }
       if (state.phase !== 'playing') return
-      state.joystick = { baseX: p.x, baseY: p.y, dx: 0, dy: 0 }
+      // 칸을 먼저 본다. 판 밖이라 이동 목표가 될 자리가 아니므로 빈 칸이어도 여기서 멈춘다
+      for (let i = 0; i < SLOT_RECTS.length; i++) {
+        const r = SLOT_RECTS[i]
+        if (p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h) {
+          const used = useSlot(state, i)
+          if (used === 'bomb') {
+            bombAt = { x: state.player.x, y: state.player.y }
+            bombFlash = 1
+            playSfx('explode')
+            vibrate(60)
+          } else if (used) {
+            playSfx('unlock')
+            vibrate(20)
+          }
+          return
+        }
+      }
+      dragging = true
+      everTouched = true
+      setMoveTarget(state, p.x, p.y)
     },
     onMove(clientX, clientY) {
-      if (!state.joystick || state.phase !== 'playing') return
+      if (!dragging || state.phase !== 'playing') return
       const p = stage.toBoard(clientX, clientY)
-      const dx = p.x - state.joystick.baseX
-      const dy = p.y - state.joystick.baseY
-      const len = Math.hypot(dx, dy)
-      if (len < 12) {
-        state.joystick.dx = 0
-        state.joystick.dy = 0
-        return
-      }
-      const k = Math.min(1, len / 70)
-      state.joystick.dx = (dx / len) * k
-      state.joystick.dy = (dy / len) * k
+      setMoveTarget(state, p.x, p.y)
     },
     onUp() {
-      state.joystick = null
+      dragging = false
     },
   })
 
@@ -232,32 +274,99 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     c.roundRect(ARENA.left, ARENA.top, ARENA.right - ARENA.left, ARENA.bottom - ARENA.top, 22)
     c.stroke()
 
+    const p = state.player
+
+    // 찍어 둔 자리 — 손을 떼도 여기까지 간다는 것을 보여 준다.
+    // 적보다 아래에 깔아 시야를 가리지 않게 한다
+    if (state.move) {
+      c.save()
+      c.strokeStyle = ground('rgb(93 64 55 / 0.45)', 'rgb(255 248 225 / 0.4)')
+      c.lineWidth = 3
+      c.setLineDash([9, 11])
+      c.beginPath()
+      c.moveTo(p.x, p.y)
+      c.lineTo(state.move.x, state.move.y)
+      c.stroke()
+      c.setLineDash([])
+      c.beginPath()
+      c.arc(state.move.x, state.move.y, 17 + Math.sin(state.time * 9) * 2.5, 0, Math.PI * 2)
+      c.stroke()
+      c.restore()
+    }
+
     for (const orb of state.orbs) drawOrb(c, orb.x, orb.y, state.time * 4)
+    for (const item of state.items) drawItem(c, item.x, item.y, item.kind, item.life, state.time * 3)
     for (const bullet of state.bullets) drawBullet(c, bullet.x, bullet.y)
     for (const enemy of state.enemies) drawEnemy(c, enemy.x, enemy.y, enemy.r, enemy.hp)
 
-    const p = state.player
+    // 폭탄이 판을 쓸어낸 순간 — 판 전체가 번쩍하고, 터진 자리에서 파문이 끝까지 퍼진다
+    if (bombFlash > 0) {
+      c.save()
+      c.beginPath()
+      c.roundRect(ARENA.left, ARENA.top, ARENA.right - ARENA.left, ARENA.bottom - ARENA.top, 22)
+      c.clip()
+      c.globalAlpha = bombFlash * 0.3
+      c.fillStyle = '#FFF3E0'
+      c.fill()
+      c.globalAlpha = bombFlash * 0.55
+      c.strokeStyle = '#FF7043'
+      c.lineWidth = 10
+      c.beginPath()
+      c.arc(bombAt.x, bombAt.y, 1200 * (1 - bombFlash), 0, Math.PI * 2)
+      c.stroke()
+      c.restore()
+    }
+
     const blink = p.invuln > 0 && Math.floor(p.invuln * 10) % 2 === 0
+    const facing = state.move ? Math.max(-1, Math.min(1, (state.move.x - p.x) / 80)) : 0
     c.save()
     if (blink) c.globalAlpha = 0.35
-    drawHero(c, p.x, p.y, PLAYER_R, state.joystick?.dx ?? 0)
+    drawHero(c, p.x, p.y, PLAYER_R, facing)
     c.restore()
 
+    // 연사 부스트 — 남은 시간이 줄어드는 고리로 보여 준다
+    if (state.rapid > 0) {
+      c.save()
+      c.strokeStyle = '#F9A825'
+      c.lineWidth = 4
+      c.lineCap = 'round'
+      c.beginPath()
+      c.arc(
+        p.x,
+        p.y,
+        PLAYER_R + 10,
+        -Math.PI / 2,
+        -Math.PI / 2 + Math.PI * 2 * (state.rapid / RAPID_TIME),
+      )
+      c.stroke()
+      c.restore()
+    }
+
     // HUD — 판(ARENA.top=150) 위에 얹혀야 해서 좁고 짧은 판을 쓴다.
-    // 이 게임의 성적은 버틴 시간이라 큰 숫자 자리에 시간이 온다.
+    // 큰 숫자는 점수다. 예전에는 버틴 시간을 큰 자리에 뒀는데, 머리줄의 최고 기록은
+    // 점수라서 '195초' 옆에 '최고 18,929'가 나란히 서는 꼴이었다 — 단위가 서로 달랐다.
+    // 처치 수는 따로 세지 않는다. 점수가 처치×10 + 초라 사실상 같은 숫자다.
     drawScorePanel(c, {
-      label: t('sv.kills', { k: state.kills, lv: state.level }),
-      value: t('sv.time', { n: Math.floor(state.time) }),
+      label: t('sv.hud', { lv: state.level, t: clock(state.time) }),
+      value: scoreOf(state).toLocaleString(),
       compact: true,
       panelColor: ground('rgb(255 255 255 / 0.72)', 'rgb(255 255 255 / 0.08)'),
       labelColor: ground('#BCAAA4', '#8F7D74'),
       valueColor: ground('#5D4037', '#E5D8D0'),
     })
 
-    // 체력 하트 — 왼쪽에 둔다. 오른쪽 끝은 멈춤·도움말 아래로 내려온
-    // 좋아요·싫어요 줄(GamePlayPage)이 쓰는 자리라 하트가 그 밑에 깔렸다.
+    // 체력 하트 — 왼쪽 위. 오른쪽으로는 점수판이 x=230부터 서 있어 한 줄에 넷이 한계다
+    // (다섯 번째부터 판 밑으로 들어가 글씨를 가렸다). 그래서 넷씩 끊어 아랫줄로 내린다.
+    // 두 줄 아래는 경험치 바(y=132)라 더 못 내려간다 — 여덟 개를 넘으면 줄을 늘리는
+    // 대신 간격과 크기를 줄여 두 줄 안에 담는다.
+    const heartRows = Math.min(2, Math.ceil(p.maxHp / 4))
+    const heartsPerRow = Math.max(4, Math.ceil(p.maxHp / heartRows))
+    const heartGap = Math.min(40, 158 / Math.max(1, heartsPerRow - 1))
+    const heartR = Math.min(15, heartGap * 0.4)
     for (let i = 0; i < p.maxHp; i++) {
-      drawHeart(c, ARENA.left + 26 + i * 40, 56, 15, i < p.hp)
+      const col = i % heartsPerRow
+      const row = Math.floor(i / heartsPerRow)
+      drawHeart(c, ARENA.left + 26 + col * heartGap, 56 + row * 36, heartR, i < p.hp)
     }
 
     // 경험치 바
@@ -275,26 +384,35 @@ function createSession(host: HTMLElement, ctx: GameContext) {
     }
     c.restore()
 
-    // 조이스틱
-    if (state.joystick) {
+    // 아이템 칸 — 판 아래. 빈 칸은 점선으로 자리만 알려 주고, 든 칸은 눌러 달라고
+    // 테두리가 숨을 쉰다 (아껴 두는 게 요령인 게임이라 '지금 쓸 수 있음'이 보여야 한다)
+    for (let i = 0; i < SLOT_RECTS.length; i++) {
+      const r = SLOT_RECTS[i]
+      const kind = state.slots[i]
       c.save()
-      c.globalAlpha = 0.28
-      c.fillStyle = ground('#5D4037', '#E5D8D0')
+      if (kind) {
+        c.fillStyle = ground('#FFF3E0', 'rgb(255 243 224 / 0.14)')
+        c.beginPath()
+        c.roundRect(r.x, r.y, r.w, r.h, 18)
+        c.fill()
+        c.strokeStyle = '#F9A825'
+        c.lineWidth = 3 + Math.sin(state.time * 5) * 1.2
+      } else {
+        c.strokeStyle = ground('rgb(141 110 99 / 0.32)', 'rgb(255 255 255 / 0.16)')
+        c.lineWidth = 3
+        c.setLineDash([10, 8])
+      }
       c.beginPath()
-      c.arc(state.joystick.baseX, state.joystick.baseY, 72, 0, Math.PI * 2)
-      c.fill()
-      c.globalAlpha = 0.55
-      c.fillStyle = '#FFFFFF'
-      c.beginPath()
-      c.arc(
-        state.joystick.baseX + state.joystick.dx * 72,
-        state.joystick.baseY + state.joystick.dy * 72,
-        28,
-        0,
-        Math.PI * 2,
-      )
-      c.fill()
+      c.roundRect(r.x, r.y, r.w, r.h, 18)
+      c.stroke()
       c.restore()
+      if (kind) {
+        c.save()
+        c.translate(r.x + r.w / 2, r.y + r.h / 2)
+        c.scale(1.35, 1.35)
+        drawItemGlyph(c, kind)
+        c.restore()
+      }
     }
 
     // 레벨업 카드
@@ -355,21 +473,22 @@ function createSession(host: HTMLElement, ctx: GameContext) {
       }
     }
 
-    // 텍스트 없는 조작 안내: 원을 도는 조이스틱 표식
-    if (state.time < 4 && state.phase === 'playing' && !state.joystick) {
-      const a = state.time * 2
+    // 텍스트 없는 조작 안내: 판을 톡 치는 물결. 한 번이라도 누르면 사라진다
+    if (!everTouched && state.phase === 'playing' && state.time < 8) {
+      const ripple = (state.time % 1.5) / 1.5
       const bx = 360
-      const by = 1130
+      const by = 1040
       c.save()
-      c.globalAlpha = 0.3
+      c.strokeStyle = ground('#5D4037', '#E5D8D0')
+      c.lineWidth = 4
+      c.globalAlpha = 0.45 * (1 - ripple)
+      c.beginPath()
+      c.arc(bx, by, 15 + ripple * 46, 0, Math.PI * 2)
+      c.stroke()
+      c.globalAlpha = 0.4
       c.fillStyle = ground('#5D4037', '#E5D8D0')
       c.beginPath()
-      c.arc(bx, by, 60, 0, Math.PI * 2)
-      c.fill()
-      c.globalAlpha = 0.6
-      c.fillStyle = '#FFFFFF'
-      c.beginPath()
-      c.arc(bx + Math.cos(a) * 42, by + Math.sin(a) * 42, 24, 0, Math.PI * 2)
+      c.arc(bx, by, 15, 0, Math.PI * 2)
       c.fill()
       c.restore()
     }

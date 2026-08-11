@@ -41,6 +41,7 @@
 | `20260808200000_stats_calendar_periods.sql` | 통계 4개 함수의 기간을 달력 구간(`p_from`·`p_to`)으로 — 롤링(`p_days`) 폐기 | ✅ |
 | `20260811000000_calendar_rankings.sql` | 랭킹도 달력 구간으로 — `get_leaderboard()`·`get_my_stats()` 인자 교체, `get_hall_of_fame()` 신설 | ✅ 2026-08-11 |
 | `20260811100000_game_votes_select_own.sql` | `game_votes` 조회 정책에 '내 표'를 추가 — 관리자가 아니면 투표가 저장되지 않던 문제 | ✅ 2026-08-11 |
+| `20260811200000_rankings_exclude_admin.sql` | 관리자 점수를 랭킹에서 제외 — `admin_user_ids()` 신설, 랭킹 3함수를 security definer로 | ✅ 2026-08-11 |
 
 ## 테이블
 
