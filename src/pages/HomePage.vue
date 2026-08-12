@@ -17,7 +17,7 @@ import { APP_NAME, t, type TranslationKey } from '@/shared/i18n'
 import { favorites, recents } from '@/shared/library'
 import { thisMonthRange } from '@/shared/rankPeriod'
 import { isInToss } from '@/shared/toss'
-import { promotionStatus } from '@/shared/tossPromotion'
+import { promotionStatus, type PromotionStatus } from '@/shared/tossPromotion'
 import UiIcon from '@/shared/UiIcon.vue'
 import {
   featuredSlugs,
@@ -39,7 +39,23 @@ const router = useRouter()
 // 앱인토스 프로모션 배너. 상태를 못 읽었으면(비로그인·조회 실패) 아예 안 그린다.
 // 웹·안드로이드에서는 상태가 채워질 일이 없지만(claimTossPromotion이 즉시 빠져나온다),
 // 배너 문구는 이 컴포넌트에 그대로 있으므로 조건에서 한 번 더 막는다.
-const promo = computed(() => (isInToss ? promotionStatus.value : null))
+// 100원을 다 받은 사람에게는 지급 당일까지만 보인다 — '다 받았어요'는 받은 날의
+// 확인이지 매일 볼 안내가 아니고, 다음 날부터는 홈 첫 줄을 게임에 돌려준다.
+const promo = computed(() => {
+  if (!isInToss) return null
+  const status = promotionStatus.value
+  if (!status) return null
+  if (status.granted >= status.total && !grantedToday(status)) return null
+  return status
+})
+
+// 마지막 지급이 오늘인지 — 기기 시간대 기준(앱인토스 사용자는 한국이라 KST와 같다)
+function grantedToday(status: PromotionStatus): boolean {
+  return (
+    !!status.last_granted_at &&
+    new Date(status.last_granted_at).toDateString() === new Date().toDateString()
+  )
+}
 
 const promoHeadline = computed(() => {
   const status = promo.value
@@ -251,8 +267,9 @@ onMounted(async () => {
     </nav>
 
     <!-- 앱인토스 프로모션. 미니앱 빌드에서만, 그리고 지급 상태를 읽어온 뒤에만 뜬다.
-         고지 화면으로 가는 유일한 입구라 다 받은 뒤에도, 이벤트가 끝난 뒤에도 남긴다 —
-         "왜 안 들어오냐"가 가장 많이 몰리는 때가 끝난 직후다 -->
+         고지 화면으로 가는 유일한 입구라 이벤트가 끝난 뒤에도 남긴다 —
+         "왜 안 들어오냐"가 가장 많이 몰리는 때가 끝난 직후다.
+         단, 100원을 다 받은 사람은 지급 당일까지만 본다 (promo 계산이 거른다) -->
     <RouterLink v-if="promo" class="promo" to="/event">
       <span class="promo-text">
         <strong>{{ promoHeadline }}</strong>
