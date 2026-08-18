@@ -136,6 +136,31 @@ echo sdk.dir=C:/Android/Sdk > android\local.properties
 
 ---
 
+## 다시 clone했을 때
+
+gitignore된 것은 clone에 따라오지 않는다. JDK와 Android SDK는 PC에 남아 있으니 위
+"최초 1회 세팅"을 다시 할 필요는 없고, **아래 넷만 채우면 된다.**
+
+| 무엇 | 복구 |
+| --- | --- |
+| `node_modules/` | `npm ci` |
+| `.env.local` | `.env.example`을 복사해 Supabase 두 값과 `VITE_ADMOB_REWARD_ID`를 채운다 |
+| `android/local.properties` | `echo sdk.dir=C:/Android/Sdk> android\local.properties` |
+| `android/keystore.properties` | `keystore.properties.example`을 복사해 실제 경로·비밀번호를 채운다 |
+
+빠뜨렸을 때 **드러나는 방식이 다르다.** `local.properties`가 없으면 gradle이
+`SDK location not found`로 즉사하지만, `keystore.properties`가 없으면 **빌드가 그냥
+성공하고 서명 없는 AAB가 나온다** — Play에 올릴 때야 알게 된다.
+
+두 파일 모두 `.properties`(자바) 형식이라 **경로 구분자는 `/`** 다. `\`는 이스케이프
+문자로 먹혀 경로가 깨진다. cmd의 `echo ... > 파일`은 `>` 앞의 공백까지 값에 넣으므로
+붙여 쓸 것.
+
+**키스토어 파일 자체는 저장소에 없다.** 프로젝트 폴더 안에 두면 이런 사고 때 같이
+사라진다 — 백업이 실제로 있는지 확인해 둘 것.
+
+---
+
 ## 소셜 로그인 — 앱에서만 다른 부분
 
 구글은 앱 웹뷰 안에서 도는 OAuth를 거부한다(`disallowed_useragent`).
@@ -160,8 +185,9 @@ TWA는 그 자체가 크롬이라 이 문제가 없었다. 앱에서 로그인�
 앱 웹뷰에서 게재하면 프로그램 정책 위반이고 게시자 계정이 제재 대상이 된다.
 웹은 AdSense(H5 Games Ads), 앱인토스는 토스 인앱광고, 안드로이드 앱만 AdMob으로 간다.
 
-**광고 단위 ID를 받았다**(2026-08-18). 남은 것은 `.env.local`에 값을 넣고 빌드하는 것,
-그리고 Play Console 선언을 맞추는 것뿐이다.
+**실제 광고를 켰다**(2026-08-18). 스토어 연결·광고 단위 생성·`AD_ID` 권한 해제·
+Play Console 선언까지 끝내고 versionCode 16을 프로덕션에 제출했다.
+광고가 실제로 뜨기 시작하는 것은 **Play 심사와 AdMob 앱 검토를 둘 다 통과한 뒤**다.
 
 ### 두 ID를 헷갈리지 말 것
 
@@ -170,7 +196,7 @@ TWA는 그 자체가 크롬이라 이 문제가 없었다. 앱에서 로그인�
 | ID | 구분자 | 값 | 들어가는 곳 |
 | --- | --- | --- | --- |
 | 앱 ID | 물결 `~` | `ca-app-pub-9942492825878908~7836378510` | `AndroidManifest.xml`의 `APPLICATION_ID` (반영됨) |
-| 광고 단위 ID | 슬래시 `/` | `ca-app-pub-9942492825878908/6071693099` | `.env.local`의 `VITE_ADMOB_REWARD_ID` (직접 넣을 것) |
+| 광고 단위 ID | 슬래시 `/` | `ca-app-pub-9942492825878908/6071693099` | `.env.local`의 `VITE_ADMOB_REWARD_ID` (PC마다 직접) |
 
 `.env.local`은 gitignore(`*.local`)라 저장소에 없다. clone 직후에는 `.env.example`을
 복사해 만들어야 하고, **Supabase 값이 빠지면 랭킹·로그인이 통째로 죽는다**
@@ -195,12 +221,18 @@ Interstitial)** 은 SDK API가 달라서(`ads.ts`는 `prepareRewardVideoAd`를 �
 | --- | --- | --- |
 | `AndroidManifest.xml` | `AD_ID`의 `tools:node="remove"` 블록 삭제 | 완료 |
 | `PrivacyPage.vue` | 광고 매체를 위탁 목록에 추가, 광고 ID 이용 고지, 맞춤 광고 거부 안내 | 완료 |
-| `.env.local` | `VITE_ADMOB_REWARD_ID` | 직접 넣을 것 |
-| Play Console | '광고 ID 사용' → 예, 데이터 보안에 '기기 또는 기타 ID' 추가 | 남음 (`PLAY_CONSOLE.md`) |
+| `.env.local` | `VITE_ADMOB_REWARD_ID` | 빌드하는 PC마다 직접 |
+| Play Console | '광고 ID 사용' → 예 | 완료 |
+| Play Console | 데이터 보안에 '기기 또는 기타 ID' 추가 | 확인 필요 (`PLAY_CONSOLE.md`) |
 
-**AdMob 앱 검토가 끝난 뒤에 올린다.** 승인 전에는 재고가 안 붙어 광고가 아예 안 뜨는데,
-`ads.ts`는 그것을 매체 사정으로 보고 보상을 그냥 준다 — 광고 없이 보상만 나가고
-`/stats/ads`에는 `못 뜸`만 쌓인다.
+**개인정보처리방침을 먼저 웹에 배포하고 나서 올린다.** 심사자가 Play Console에 적힌
+정책 URL을 실제로 연다. 배포가 안 된 채로 "광고 목적으로 기기 ID 공유"를 선언하면
+문서와 선언이 어긋나 반려된다.
+
+AdMob 앱 검토는 기다리지 않았다 — Play 심사와 병렬로 돌기 때문이다. 승인 전에는 재고가
+안 붙어 광고가 아예 안 뜨는데, `ads.ts`는 그것을 매체 사정으로 보고 보상을 그냥 준다.
+그동안은 광고 없이 보상만 나가고 `/stats/ads`에는 `못 뜸`만 쌓인다 — 정상이다.
+며칠이 지나도 `시청`이 하나도 없으면 그때 광고 단위 ID를 의심한다.
 
 ### 스토어 연결 — 앱 이름으로는 안 찾아진다
 
