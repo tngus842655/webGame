@@ -42,6 +42,8 @@
 | `20260811000000_calendar_rankings.sql` | 랭킹도 달력 구간으로 — `get_leaderboard()`·`get_my_stats()` 인자 교체, `get_hall_of_fame()` 신설 | ✅ 2026-08-11 |
 | `20260811100000_game_votes_select_own.sql` | `game_votes` 조회 정책에 '내 표'를 추가 — 관리자가 아니면 투표가 저장되지 않던 문제 | ✅ 2026-08-11 |
 | `20260811200000_rankings_exclude_admin.sql` | 관리자 점수를 랭킹에서 제외 — `admin_user_ids()` 신설, 랭킹 3함수를 security definer로 | ✅ 2026-08-11 |
+| `20260812000000_promotion_status_last_grant.sql` | `my_promotion_status()`에 `last_granted_at` 추가 — 홈 배너의 '다 받았어요'를 지급 당일에만 남기기 위해 | ✅ |
+| `20260822000000_promotion_end.sql` | 프로모션 종료 — `promotion_state.ended_at` 설정. 콘솔에서 프로모션을 TERMINATED로 내린 것을 기존 번들에도 반영한다 | ✅ 2026-08-22 |
 
 ## 테이블
 

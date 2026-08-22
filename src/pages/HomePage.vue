@@ -17,7 +17,7 @@ import { APP_NAME, t, type TranslationKey } from '@/shared/i18n'
 import { favorites, recents } from '@/shared/library'
 import { thisMonthRange } from '@/shared/rankPeriod'
 import { isInToss } from '@/shared/toss'
-import { promotionStatus, type PromotionStatus } from '@/shared/tossPromotion'
+import { promotionEnded, promotionStatus, type PromotionStatus } from '@/shared/tossPromotion'
 import UiIcon from '@/shared/UiIcon.vue'
 import {
   featuredSlugs,
@@ -62,7 +62,7 @@ const promoHeadline = computed(() => {
   if (!status) return ''
   // 다 받았다는 사실은 이벤트가 끝나도 변하지 않는다 — 종료보다 먼저 본다
   if (status.granted >= status.total) return '토스포인트 100원을 다 받았어요'
-  if (status.ended) return '토스포인트 이벤트가 끝났어요'
+  if (promotionEnded.value) return '토스포인트 이벤트가 끝났어요'
   if (status.granted > 0) return `${status.total - status.granted}원 더 받을 수 있어요`
   return '게임 3판이면 토스포인트 100원'
 })
@@ -70,7 +70,7 @@ const promoHeadline = computed(() => {
 // 끝난 뒤에도 조건표를 띄우면 이제 못 받는 조건을 계속 광고하는 셈이 된다.
 // 그 자리에 받은 포인트가 어디 있는지를 넣는다 — 종료 직후에 가장 많이 묻는 것이다.
 const promoNote = computed(() =>
-  promo.value?.ended
+  promotionEnded.value
     ? '받은 포인트는 토스 혜택 탭에서 볼 수 있어요'
     : '접속 20원 · 1판 30원 · 3판 50원',
 )

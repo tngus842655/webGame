@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { isInToss, recordTossAnonKey } from './toss'
 
 // 앱인토스 프로모션 — 접속 20원, 1판 30원, 누적 3판 50원 (1인 100원).
@@ -43,10 +43,32 @@ export interface PromotionStatus {
 // — 계정은 claimTossPromotion()이 만들고, 그 전에 물으면 세션이 없어 조회가 막힌다.
 export const promotionStatus = ref<PromotionStatus | null>(null)
 
-// 한 번에 한 단계만 준다. 접속할 때와 판이 끝날 때마다 불리므로, 여러 단계가 한꺼번에
-// 충족돼 있어도 몇 판 안에 따라잡는다.
+// 프로모션이 끝났는지. 코드를 비웠다는 것 자체가 종료라 서버 응답을 기다릴 것도 없다 —
+// 참여한 적이 없거나 조회가 막혀 status가 null인 사람에게 진행 중 문구가 뜨면 안 된다.
+export const promotionEnded = computed(
+  () => !PROMOTION_CODE || (promotionStatus.value?.ended ?? false),
+)
+
+// 한 번에 한 단계만 준다. 접속할 때마다 불리므로, 여러 단계가 한꺼번에 충족돼 있어도
+// 몇 번 안에 따라잡는다.
+//
+// 판이 끝날 때도 불렀었다(gameContext.ts). 프로모션이 끝나면서 뺐다 — 지급이 없으니
+// 판마다 상태를 다시 물을 이유가 없다. 다음 프로모션에서 1판·3판 단계를 쓰려면
+// 그 호출을 되살려야 한다. 접속 한 번으로는 2·3단계 조건이 채워진 것을 못 보기 때문이다.
 export async function claimTossPromotion(): Promise<void> {
-  if (!isInToss || !PROMOTION_CODE || running || rejected) return
+  if (!isInToss) return
+  // 코드가 없으면 지급은 건너뛰고 내역만 읽는다. 프로모션은 끝나도 '얼마 받았는지'와
+  // '이제 끝났다'는 남아야 한다 — 끝난 직후가 "왜 안 들어오냐"가 가장 많이 몰리는 때다.
+  //
+  // 여기서 계정을 만들지 않는 것이 중요하다. 접속 보상이 사라졌으니 열어만 보고 나간
+  // 방문자까지 계정을 쌓을 이유가 없어졌다(main.ts의 원칙으로 돌아간다). 쓰던 세션이
+  // 있는 사람 — 받은 적이 있는 사람 — 만 조회가 되고, 나머지는 status가 null로 남아
+  // 배너도 안내도 뜨지 않는다.
+  if (!PROMOTION_CODE) {
+    await refreshPromotionStatus()
+    return
+  }
+  if (running || rejected) return
   running = true
   try {
     // 서버가 auth.uid()로 식별키를 찾으므로 등록이 먼저다 (계정도 여기서 만들어진다)

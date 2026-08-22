@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import UiIcon from '@/shared/UiIcon.vue'
-import { promotionStatus } from '@/shared/tossPromotion'
+import { promotionEnded, promotionStatus } from '@/shared/tossPromotion'
 
 // 앱인토스 프로모션 고지 화면. 미니앱 빌드에서만 라우터에 등록된다(app/router.ts).
 //
@@ -24,7 +24,9 @@ const granted = computed(() => status.value?.granted ?? 0)
 const total = computed(() => status.value?.total ?? 100)
 const percent = computed(() => Math.min(100, Math.round((granted.value / total.value) * 100)))
 const allDone = computed(() => status.value != null && granted.value >= total.value)
-const ended = computed(() => status.value?.ended ?? false)
+// 서버가 종료를 알려주지만, 참여한 적이 없어 status가 비는 사람도 있다 — 그쪽에도
+// 진행 중 문구가 뜨면 안 되므로 코드가 비었는지까지 함께 보는 쪽을 쓴다
+const ended = promotionEnded
 
 function isDone(stage: number) {
   return status.value?.done.includes(stage) ?? false
@@ -38,7 +40,7 @@ const playsLeft = computed(() => Math.max(0, 3 - (status.value?.plays ?? 0)))
   <div class="event">
     <header class="event-header">
       <RouterLink class="back" to="/"><UiIcon name="back" /></RouterLink>
-      <h1>토스포인트 100원 받기</h1>
+      <h1>{{ ended ? '토스포인트 100원 이벤트' : '토스포인트 100원 받기' }}</h1>
     </header>
 
     <section class="progress card">
@@ -73,15 +75,25 @@ const playsLeft = computed(() => Math.max(0, 3 - (status.value?.plays ?? 0)))
       </p>
     </section>
 
+    <!-- 끝난 뒤에도 이 화면은 남는다 — 받은 사람이 내역을 확인하러 오는 곳이다.
+         그래서 사실이 달라진 두 문장만 시제를 가른다 -->
     <section class="card notice">
-      <h2>언제 지급되나요</h2>
-      <p>
+      <h2>{{ ended ? '지급은 어떻게 됐나요' : '언제 지급되나요' }}</h2>
+      <p v-if="ended">
+        이벤트가 끝나 더 이상 지급되지 않습니다. 끝나기 전에 조건을 채워 받은 포인트는
+        그대로 남아 있고, 토스 앱 혜택 탭 → 토스포인트에서 적립 내역을 확인할 수 있습니다.
+      </p>
+      <p v-else>
         조건을 채우면 바로 지급됩니다. 지급되면 토스 앱에서 알림이 오고, 혜택 탭 →
         토스포인트에서 적립 내역을 확인할 수 있습니다.
       </p>
 
-      <h2>무엇을 하면 받나요</h2>
-      <p>
+      <h2>{{ ended ? '어떤 이벤트였나요' : '무엇을 하면 받나요' }}</h2>
+      <p v-if="ended">
+        접속하면 20원, 게임을 1판 마치면 30원, 3판을 마치면 50원을 드렸습니다. 모두 합해
+        한 사람당 100원이었습니다.
+      </p>
+      <p v-else>
         접속하면 20원, 게임을 1판 마치면 30원, 3판을 마치면 50원을 드립니다. 모두 합해
         한 사람당 100원입니다.
       </p>
